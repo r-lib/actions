@@ -1,5 +1,7 @@
 # R `pr-push` Action
 
+[![RStudio community](https://img.shields.io/badge/community-github--actions-blue?style=social&logo=rstudio&logoColor=75AADB)](https://community.rstudio.com/new-topic?category=Package%20development&tags=github-actions)
+
 > Pull request pushing
 
 This GitHub Action pushes changes to the head of the pull request branch. It
