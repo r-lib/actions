@@ -1,9 +1,5 @@
 # setup-r
 
-<p align="left">
-  <a href="https://github.com/jimhester/setup-r"><img alt="GitHub Actions status" src="https://github.com/jimhester/setup-r/workflows/setup-r/badge.svg"></a>
-</p>
-
 This action sets up an R environment for use in actions by:
 
 - downloading and caching a version of R by version and adding to PATH
