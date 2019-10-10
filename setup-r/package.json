@@ -13,7 +13,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/r-lib/actions.git",
-    "directory": "packages/tool-cache"
+    "directory": "setup-r"
   },
   "keywords": [
     "actions",
