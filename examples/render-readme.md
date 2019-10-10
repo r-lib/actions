@@ -1,4 +1,4 @@
-Render a README.Rmd to README.md (UNTESTED)
+Render a README.Rmd to README.md then open a PR with the changes (UNTESTED)
 
 ```yaml
 on:
