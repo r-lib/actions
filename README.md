@@ -5,9 +5,9 @@
 
 This repository stores [GitHub Actions](https://github.com/features/actions), which can be used to do a variety of CI and CD tasks for R projects.
 
-## Recipes
+## Examples
 
-See the [@r-lib/actions/recipes](https://github.com/r-lib/actions/tree/master/recipies) repository
+See the [@r-lib/actions/examples](https://github.com/r-lib/actions/tree/master/examples) directory
 for a variety of example workflows.
 
 ## License
