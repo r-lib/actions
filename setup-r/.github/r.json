@@ -1,0 +1,15 @@
+{
+    "problemMatcher": [
+        {
+            "owner": "r",
+            "pattern": [
+                {
+                    "regexp": "^(Error|Warning)(?: in (.*) )?: (.*)$",
+                    "severity": 1,
+                    "code": 2,
+                    "message": 3
+                }
+            ]
+        }
+    ]
+}

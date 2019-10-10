@@ -7,7 +7,7 @@ This repository stores [GitHub Actions](https://github.com/features/actions), wh
 
 ## Recipes
 
-See the [@r-lib/actions/recipes](https://github.com/r-lib/actions/recipes) repository
+See the [@r-lib/actions/recipes](https://github.com/r-lib/actions/tree/master/recipies) repository
 for a variety of example workflows.
 
 ## License

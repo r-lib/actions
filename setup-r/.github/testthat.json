@@ -1,0 +1,16 @@
+{
+    "problemMatcher": [
+        {
+            "owner": "testthat",
+            "pattern": [
+                {
+                    "regexp": "^(.*):(\\d+): (\\w+): (\\w+)$",
+                    "file": 1,
+                    "line": 2,
+                    "severity": 3,
+                    "message": 4
+                }
+            ]
+        }
+    ]
+}

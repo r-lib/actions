@@ -1,0 +1,17 @@
+{
+    "problemMatcher": [
+        {
+            "owner": "rcmdcheck",
+            "pattern": [
+                {
+                    "regexp": "^(.*) [.][.][.] (ERROR|NOTE|WARNING)$",
+                    "severity": 2,
+                },
+                {
+                    "regexp": "^\\s*(.*)$",
+                    "message": 1
+                }
+            ]
+        }
+    ]
+}
