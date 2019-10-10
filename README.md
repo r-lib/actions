@@ -10,6 +10,21 @@ This repository stores [GitHub Actions](https://github.com/features/actions), wh
 See the [@r-lib/actions/examples](https://github.com/r-lib/actions/tree/master/examples) directory
 for a variety of example workflows.
 
+### [Quickstart](https://github.com/r-lib/actions/blob/master/examples/quickstart.md)
+
+A minimal CI suite for an R project.
+
+### [tidyverse](https://github.com/r-lib/actions/blob/master/examples/tidyverse.md)
+
+A complex CI suite testing on macOS, linux and Windows across 5 minor R
+versions, used by the tidyverse team to ensure their packages work on most
+users' systems.
+
+### [commands](https://github.com/r-lib/actions/blob/master/examples/tidyverse.md)
+
+A workflow which sets up a `/document` and `/style` commands for Pull Request
+comments, to automatically document and style the code and commit the changes.
+
 ## License
 
-All recipes in this repository are published with the [CC0](./LICENSE) license.
+All examples in this repository are published with the [CC0](./LICENSE) license.
