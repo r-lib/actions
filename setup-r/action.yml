@@ -1,0 +1,13 @@
+name: 'Setup R environment'
+description: 'Setup a R environment and add it to the PATH'
+author: 'Jim Hester'
+inputs:
+  r-version:
+    description: 'Version range or exact version of an R version to use.'
+    default: '3.x'
+  rtools-version:
+    description: 'Exact version of Rtools to use.'
+    default: '35'
+runs:
+  using: 'node12'
+  main: 'lib/setup-r.js'
