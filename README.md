@@ -14,13 +14,13 @@ for a variety of example workflows.
 
 A minimal CI suite for an R project.
 
-### [tidyverse](https://github.com/r-lib/actions/blob/master/examples/tidyverse.md)
+### [Tidyverse](https://github.com/r-lib/actions/blob/master/examples/tidyverse.md)
 
 A complex CI suite testing on macOS, linux and Windows across 5 minor R
 versions, used by the tidyverse team to ensure their packages work on most
 users' systems.
 
-### [commands](https://github.com/r-lib/actions/blob/master/examples/tidyverse.md)
+### [Commands](https://github.com/r-lib/actions/blob/master/examples/commands.md)
 
 A workflow which sets up a `/document` and `/style` commands for Pull Request
 comments, to automatically document and style the code and commit the changes.
