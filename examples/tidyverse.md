@@ -9,7 +9,7 @@ on their repositories, but is probably overkill for less widely used packages.
 
 1. You have a complex R package
 2. With OS-specific code
-2. And you want to ensure compatibility with older R versions
+3. And you want to ensure compatibility with older R versions
 
 ```yaml
 on: [push, pull_request]
