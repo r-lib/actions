@@ -1,0 +1,44 @@
+{
+  "name": "setup-pandoc",
+  "version": "0.0.0",
+  "private": true,
+  "description": "pandoc setup action",
+  "main": "lib/setup-pandoc.js",
+  "scripts": {
+    "build": "tsc",
+    "format": "prettier --write **/*.ts",
+    "format-check": "prettier --check **/*.ts",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/r-lib/actions.git",
+    "directory": "setup-pandoc"
+  },
+  "keywords": [
+    "actions",
+    "r",
+    "setup",
+    "pandoc"
+  ],
+  "author": "jimhester",
+  "license": "MIT",
+  "homepage": "https://github.com/r-lib/actions/tree/master/setup-pandoc",
+  "dependencies": {
+    "@actions/core": "^1.0.0",
+    "@actions/exec": "^1.0.0",
+    "@actions/tool-cache": "^1.0.0",
+    "@actions/io": "^1.0.0",
+    "semver": "^6.1.1"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.13",
+    "@types/node": "^12.7.11",
+    "husky": "^3.0.8",
+    "jest": "^24.9.0",
+    "jest-circus": "^24.7.1",
+    "prettier": "^1.18.2",
+    "ts-jest": "^24.0.2",
+    "typescript": "^3.5.1"
+  }
+}

@@ -1,0 +1,10 @@
+name: 'Setup pandoc'
+description: 'Setup pandoc and add it to your PATH'
+author: 'Jim Hester'
+inputs:
+  pandoc-version:
+    description: 'Exact version of pandoc to use'
+    default: '2.7.3'
+runs:
+  using: 'node12'
+  main: 'lib/setup-pandoc.js'
