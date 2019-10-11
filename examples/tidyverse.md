@@ -17,8 +17,7 @@ on: [push, pull_request]
 name: Continuous integration
 
 jobs:
-  macOS-checks:
-    name: macOS Checks
+  macOS:
     runs-on: macOS-latest
     strategy:
       matrix:
@@ -28,43 +27,36 @@ jobs:
       - uses: r-lib/actions/setup-r@master
         with:
           r-version: ${{ matrix.r }}
+      - uses: r-lib/actions/setup-pandoc@master
       - name: Install dependencies
-      - run: Rscript -e 'install.packges("remotes")' -e 'remotes::install_deps(dependencies = TRUE)'
+        run: Rscript -e 'install.packages(c("remotes", "rcmdcheck"))' -e 'remotes::install_deps(dependencies = TRUE)'
       - name: Check
-      - run: Rscript -e "rcmdcheck::rcmdcheck(manual = FALSE, error_on='error')"
-  linux-checks:
-    name: linux Checks
+        run: Rscript -e "rcmdcheck::rcmdcheck(manual = FALSE, error_on='error')"
+
+  linux:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        r: ['3.5', '3.6']
-    container: rstudio/r-base:${{ matrix.r }}-xenial
+    container: rstudio/r-base:3.6-xenial
     env:
       CRAN: 'https://demo.rstudiopm.com/all/__linux__/xenial/latest'
     steps:
       - uses: actions/checkout@v1
       - uses: r-lib/actions/setup-r@master
-        with:
-          r-version: ${{ matrix.r }}
+      - uses: r-lib/actions/setup-pandoc@master
       - name: Install dependencies
-      - run: Rscript -e 'install.packges("remotes")' -e 'remotes::install_deps(dependencies = TRUE)'
+        run: Rscript -e 'install.packages(c("remotes", "rcmdcheck"))' -e 'remotes::install_deps(dependencies = TRUE)'
       - name: Check
-      - run: Rscript -e "rcmdcheck::rcmdcheck(manual = FALSE, error_on='error')"
-  windows-checks:
-    name: Windows Checks
+        run: Rscript -e "rcmdcheck::rcmdcheck(manual = FALSE, error_on='error')"
+
+  windows:
     runs-on: windows-latest
-    strategy:
-      matrix:
-        r: ['3.2', '3.3', '3.4', '3.5', '3.6', 'devel']
     steps:
       - uses: actions/checkout@v1
       - uses: r-lib/actions/setup-r@master
-        with:
-          r-version: ${{ matrix.r }}
+      - uses: r-lib/actions/setup-pandoc@master
       - name: Install dependencies
-      - run: Rscript -e 'install.packges("remotes")' -e 'remotes::install_deps(dependencies = TRUE)'
+        run: Rscript -e 'install.packages(c("remotes", "rcmdcheck"))' -e 'remotes::install_deps(dependencies = TRUE)'
       - name: Check
-      - run: Rscript -e "rcmdcheck::rcmdcheck(manual = FALSE, error_on='error')"
+        run: Rscript -e "rcmdcheck::rcmdcheck(manual = FALSE, error_on='error')"
 ```
 
 ## Can I tune it?
