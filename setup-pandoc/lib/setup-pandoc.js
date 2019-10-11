@@ -23,6 +23,7 @@ const io = __importStar(require("@actions/io"));
 const tc = __importStar(require("@actions/tool-cache"));
 const path = __importStar(require("path"));
 const util = __importStar(require("util"));
+const fs = __importStar(require("fs"));
 const IS_WINDOWS = process.platform === "win32";
 const IS_MAC = process.platform === "darwin";
 if (!tempDirectory) {
@@ -97,6 +98,12 @@ function installPandocWindows(version) {
         }
         extPath = yield tc.extractZip(downloadPath);
         const toolPath = yield tc.cacheDir(extPath, "pandoc", version);
+        fs.readdir(toolPath, function (err, items) {
+            console.log(items);
+            for (var i = 0; i < items.length; i++) {
+                console.log(items[i]);
+            }
+        });
         core.addPath(toolPath);
     });
 }

@@ -6,6 +6,7 @@ import * as io from "@actions/io";
 import * as tc from "@actions/tool-cache";
 import * as path from "path";
 import * as util from "util";
+import * as fs from "fs";
 
 const IS_WINDOWS = process.platform === "win32";
 const IS_MAC = process.platform === "darwin";
@@ -87,6 +88,14 @@ async function installPandocWindows(version: string) {
   extPath = await tc.extractZip(downloadPath);
 
   const toolPath = await tc.cacheDir(extPath, "pandoc", version);
+
+  fs.readdir(toolPath, function(err, items) {
+    console.log(items);
+
+    for (var i = 0; i < items.length; i++) {
+      console.log(items[i]);
+    }
+  });
 
   core.addPath(toolPath);
 }
