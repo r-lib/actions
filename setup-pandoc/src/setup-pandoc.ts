@@ -105,6 +105,7 @@ async function installPandocLinux(version: string) {
   await io.mv(downloadPath, path.join(tempDirectory, fileName));
 
   try {
+    await exec.exec("sudo apt-get", ["install", "-y", "gdebi-core"]);
     await exec.exec("sudo gdebi", [
       "--non-interactive",
       path.join(tempDirectory, fileName)

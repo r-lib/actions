@@ -111,6 +111,7 @@ function installPandocLinux(version) {
         downloadPath = yield tc.downloadTool(downloadUrl);
         yield io.mv(downloadPath, path.join(tempDirectory, fileName));
         try {
+            yield exec.exec("sudo apt-get", ["install", "-y", "gdebi-core"]);
             yield exec.exec("sudo gdebi", [
                 "--non-interactive",
                 path.join(tempDirectory, fileName)
