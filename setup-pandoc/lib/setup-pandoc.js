@@ -96,8 +96,7 @@ function installPandocWindows(version) {
             throw new Error("Temp directory not set");
         }
         extPath = yield tc.extractZip(downloadPath);
-        const toolRoot = path.join(extPath, "pandoc");
-        const toolPath = yield tc.cacheDir(toolRoot, "pandoc", version);
+        const toolPath = yield tc.cacheDir(extPath, "pandoc", version);
         core.addPath(toolPath);
     });
 }

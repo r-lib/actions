@@ -86,9 +86,7 @@ async function installPandocWindows(version: string) {
 
   extPath = await tc.extractZip(downloadPath);
 
-  const toolRoot = path.join(extPath, "pandoc");
-
-  const toolPath = await tc.cacheDir(toolRoot, "pandoc", version);
+  const toolPath = await tc.cacheDir(extPath, "pandoc", version);
 
   core.addPath(toolPath);
 }
