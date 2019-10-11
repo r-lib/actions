@@ -89,15 +89,13 @@ async function installPandocWindows(version: string) {
 
   const toolPath = await tc.cacheDir(extPath, "pandoc", version);
 
-  fs.readdir(toolPath, function(err, items) {
-    console.log(items);
+  // It extracts to this folder
+  const toolRoot = path.join(
+    toolPath,
+    util.format("pandoc-%s-windows-x86_64", version)
+  );
 
-    for (var i = 0; i < items.length; i++) {
-      console.log(items[i]);
-    }
-  });
-
-  core.addPath(toolPath);
+  core.addPath(toolRoot);
 }
 
 async function installPandocLinux(version: string) {
