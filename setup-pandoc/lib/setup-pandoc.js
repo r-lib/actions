@@ -84,21 +84,20 @@ function installPandocMac(version) {
 }
 function installPandocWindows(version) {
     return __awaiter(this, void 0, void 0, function* () {
-        const fileName = util.format("pandoc-%s-windows-x86_64.msi", version);
+        const fileName = util.format("pandoc-%s-windows-x86_64.zip", version);
         const downloadUrl = util.format("https://github.com/jgm/pandoc/releases/download/%s/%s", version, fileName);
         let downloadPath = null;
         downloadPath = yield tc.downloadTool(downloadUrl);
-        yield io.mv(downloadPath, path.join(tempDirectory, fileName));
         //
         // Extract
         //
         let extPath = tempDirectory;
         if (!extPath) {
-            throw new Error('Temp directory not set');
+            throw new Error("Temp directory not set");
         }
         extPath = yield tc.extractZip(downloadPath);
-        const toolRoot = path.join(extPath, 'pandoc');
-        const toolPath = yield tc.cacheDir(toolRoot, 'pandoc', version);
+        const toolRoot = path.join(extPath, "pandoc");
+        const toolPath = yield tc.cacheDir(toolRoot, "pandoc", version);
         core.addPath(toolPath);
     });
 }

@@ -66,7 +66,7 @@ async function installPandocMac(version: string) {
 }
 
 async function installPandocWindows(version: string) {
-  const fileName = util.format("pandoc-%s-windows-x86_64.msi", version);
+  const fileName = util.format("pandoc-%s-windows-x86_64.zip", version);
   const downloadUrl = util.format(
     "https://github.com/jgm/pandoc/releases/download/%s/%s",
     version,
@@ -75,7 +75,6 @@ async function installPandocWindows(version: string) {
   let downloadPath: string | null = null;
 
   downloadPath = await tc.downloadTool(downloadUrl);
-  await io.mv(downloadPath, path.join(tempDirectory, fileName));
 
   //
   // Extract
