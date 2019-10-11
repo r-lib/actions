@@ -77,19 +77,21 @@ async function installPandocWindows(version: string) {
   downloadPath = await tc.downloadTool(downloadUrl);
   await io.mv(downloadPath, path.join(tempDirectory, fileName));
 
-  try {
-    await exec.exec(path.join(tempDirectory, fileName), [
-      "/VERYSILENT",
-      "/SUPPRESSMSGBOXES",
-      "/DIR=C:\\pandoc"
-    ]);
-  } catch (error) {
-    core.debug(error);
-
-    throw `Failed to install pandoc: ${error}`;
+  //
+  // Extract
+  //
+  let extPath: string = tempDirectory;
+  if (!extPath) {
+    throw new Error("Temp directory not set");
   }
 
-  core.addPath(`C:\\pandoc`);
+  extPath = await tc.extractZip(downloadPath);
+
+  const toolRoot = path.join(extPath, "pandoc");
+
+  const toolPath = await tc.cacheDir(toolRoot, "pandoc", version);
+
+  core.addPath(toolPath);
 }
 
 async function installPandocLinux(version: string) {

@@ -89,18 +89,17 @@ function installPandocWindows(version) {
         let downloadPath = null;
         downloadPath = yield tc.downloadTool(downloadUrl);
         yield io.mv(downloadPath, path.join(tempDirectory, fileName));
-        try {
-            yield exec.exec(path.join(tempDirectory, fileName), [
-                "/VERYSILENT",
-                "/SUPPRESSMSGBOXES",
-                "/DIR=C:\\pandoc"
-            ]);
+        //
+        // Extract
+        //
+        let extPath = tempDirectory;
+        if (!extPath) {
+            throw new Error('Temp directory not set');
         }
-        catch (error) {
-            core.debug(error);
-            throw `Failed to install pandoc: ${error}`;
-        }
-        core.addPath(`C:\\pandoc`);
+        extPath = yield tc.extractZip(downloadPath);
+        const toolRoot = path.join(extPath, 'pandoc');
+        const toolPath = yield tc.cacheDir(toolRoot, 'pandoc', version);
+        core.addPath(toolPath);
     });
 }
 function installPandocLinux(version) {
