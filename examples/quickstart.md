@@ -23,9 +23,9 @@ jobs:
       - uses: actions/checkout@v1
       - uses: r-lib/actions/setup-r@master
       - name: Install dependencies
-      - run: Rscript -e 'install.packges("remotes")' -e 'remotes::install_deps(dependencies = TRUE)'
+        run: Rscript -e 'install.packages("remotes")' -e 'remotes::install_deps(dependencies = TRUE)'
       - name: Check
-      - run: Rscript -e "rcmdcheck::rcmdcheck(manual = FALSE, error_on='error')"
+        run: Rscript -e "rcmdcheck::rcmdcheck(manual = FALSE, error_on='error')"
 ```
 
 ## Can I tune it?
