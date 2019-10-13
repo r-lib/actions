@@ -20,12 +20,10 @@ jobs:
     name: Check
     runs-on: macOS-latest
     steps:
-      - uses: actions/checkout@v1
-      - uses: r-lib/actions/setup-r@master
       - name: Install dependencies
         run: Rscript -e 'install.packages("remotes")' -e 'remotes::install_deps(dependencies = TRUE)'
       - name: Check
-        run: Rscript -e "rcmdcheck::rcmdcheck(manual = FALSE, error_on='error')"
+        run: Rscript -e 'install.packages("rcmdcheck")' -e 'rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"))'
 ```
 
 ## Can I tune it?
