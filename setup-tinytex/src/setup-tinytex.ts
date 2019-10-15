@@ -49,7 +49,7 @@ async function installTinyTexPosix() {
   downloadPath = await tc.downloadTool(downloadUrl);
   await io.mv(downloadPath, path.join(tempDirectory, fileName));
 
-  exec.exec("sh", [path.join(tempDirectory, fileName)]);
+  await exec.exec("sh", [path.join(tempDirectory, fileName)]);
 
   let binPath: string;
 

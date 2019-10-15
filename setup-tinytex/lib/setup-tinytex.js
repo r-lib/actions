@@ -69,7 +69,7 @@ function installTinyTexPosix() {
         let downloadPath = null;
         downloadPath = yield tc.downloadTool(downloadUrl);
         yield io.mv(downloadPath, path.join(tempDirectory, fileName));
-        exec.exec("sh", [path.join(tempDirectory, fileName)]);
+        yield exec.exec("sh", [path.join(tempDirectory, fileName)]);
         let binPath;
         // The binaries are in TinyTeX/bin/*/, where the wildcard is the
         // architecture, but we should always take the first one.
