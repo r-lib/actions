@@ -67,3 +67,5 @@ async function installTinyTexWindows() {
     path.join(process.env["APPDATA"] || "C:\\", "TinyTeX", "bin", "win32")
   );
 }
+
+run();
