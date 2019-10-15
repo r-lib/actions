@@ -74,7 +74,7 @@ function installTinyTexPosix() {
 function installTinyTexWindows() {
     return __awaiter(this, void 0, void 0, function* () {
         const fileName = "install-windows.bat";
-        const downloadUrl = "https://yihui.name/gh/tinytex/tools/install-unx.sh";
+        const downloadUrl = "https://yihui.name/gh/tinytex/tools/install-windows.bat";
         let downloadPath = null;
         downloadPath = yield tc.downloadTool(downloadUrl);
         yield io.mv(downloadPath, path.join(tempDirectory, fileName));

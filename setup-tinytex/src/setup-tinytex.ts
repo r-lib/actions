@@ -5,8 +5,6 @@ import * as exec from "@actions/exec";
 import * as io from "@actions/io";
 import * as tc from "@actions/tool-cache";
 import * as path from "path";
-import * as util from "util";
-import * as fs from "fs";
 
 const IS_WINDOWS = process.platform === "win32";
 const IS_MAC = process.platform === "darwin";
@@ -55,7 +53,7 @@ async function installTinyTexPosix() {
 
 async function installTinyTexWindows() {
   const fileName = "install-windows.bat";
-  const downloadUrl = "https://yihui.name/gh/tinytex/tools/install-unx.sh";
+  const downloadUrl = "https://yihui.name/gh/tinytex/tools/install-windows.bat";
   let downloadPath: string | null = null;
 
   downloadPath = await tc.downloadTool(downloadUrl);
