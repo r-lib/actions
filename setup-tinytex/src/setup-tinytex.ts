@@ -5,6 +5,7 @@ import * as exec from "@actions/exec";
 import * as io from "@actions/io";
 import * as tc from "@actions/tool-cache";
 import * as path from "path";
+import * as fs from "fs";
 
 const IS_WINDOWS = process.platform === "win32";
 const IS_MAC = process.platform === "darwin";
@@ -49,6 +50,22 @@ async function installTinyTexPosix() {
   await io.mv(downloadPath, path.join(tempDirectory, fileName));
 
   exec.exec("sh", [path.join(tempDirectory, fileName)]);
+
+  let binPath: string;
+
+  // The binaries are in TinyTeX/bin/*/, where the wildcard is the
+  // architecture, but we should always take the first one.
+  if (IS_MAC) {
+    binPath = fs.readdirSync(
+      path.join(process.env["HOME"] || "/", "Library/TinyTeX/bin")
+    )[1];
+  } else {
+    binPath = fs.readdirSync(
+      path.join(process.env["HOME"] || "/", ".TinyTeX/bin")
+    )[1];
+  }
+
+  core.addPath(binPath);
 }
 
 async function installTinyTexWindows() {

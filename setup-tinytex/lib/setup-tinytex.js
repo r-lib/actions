@@ -22,6 +22,7 @@ const exec = __importStar(require("@actions/exec"));
 const io = __importStar(require("@actions/io"));
 const tc = __importStar(require("@actions/tool-cache"));
 const path = __importStar(require("path"));
+const fs = __importStar(require("fs"));
 const IS_WINDOWS = process.platform === "win32";
 const IS_MAC = process.platform === "darwin";
 if (!tempDirectory) {
@@ -69,6 +70,16 @@ function installTinyTexPosix() {
         downloadPath = yield tc.downloadTool(downloadUrl);
         yield io.mv(downloadPath, path.join(tempDirectory, fileName));
         exec.exec("sh", [path.join(tempDirectory, fileName)]);
+        let binPath;
+        // The binaries are in TinyTeX/bin/*/, where the wildcard is the
+        // architecture, but we should always take the first one.
+        if (IS_MAC) {
+            binPath = fs.readdirSync(path.join(process.env["HOME"] || "/", "Library/TinyTeX/bin"))[1];
+        }
+        else {
+            binPath = fs.readdirSync(path.join(process.env["HOME"] || "/", ".TinyTeX/bin"))[1];
+        }
+        core.addPath(binPath);
     });
 }
 function installTinyTexWindows() {
