@@ -65,7 +65,7 @@ async function installTinyTexPosix() {
     )[1];
   }
 
-  console.log(binPath);
+  console.log("binPath: " + binPath);
 
   core.addPath(binPath);
 }
