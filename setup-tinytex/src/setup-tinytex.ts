@@ -58,11 +58,11 @@ async function installTinyTexPosix() {
   if (IS_MAC) {
     binPath = fs.readdirSync(
       path.join(process.env["HOME"] || "/", "Library/TinyTeX/bin")
-    )[1];
+    )[0];
   } else {
     binPath = fs.readdirSync(
       path.join(process.env["HOME"] || "/", ".TinyTeX/bin")
-    )[1];
+    )[0];
   }
 
   console.log("binPath: " + binPath);

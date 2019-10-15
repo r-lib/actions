@@ -74,10 +74,10 @@ function installTinyTexPosix() {
         // The binaries are in TinyTeX/bin/*/, where the wildcard is the
         // architecture, but we should always take the first one.
         if (IS_MAC) {
-            binPath = fs.readdirSync(path.join(process.env["HOME"] || "/", "Library/TinyTeX/bin"))[1];
+            binPath = fs.readdirSync(path.join(process.env["HOME"] || "/", "Library/TinyTeX/bin"))[0];
         }
         else {
-            binPath = fs.readdirSync(path.join(process.env["HOME"] || "/", ".TinyTeX/bin"))[1];
+            binPath = fs.readdirSync(path.join(process.env["HOME"] || "/", ".TinyTeX/bin"))[0];
         }
         console.log("binPath: " + binPath);
         core.addPath(binPath);
