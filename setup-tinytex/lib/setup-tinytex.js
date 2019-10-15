@@ -79,7 +79,7 @@ function installTinyTexPosix() {
         else {
             binPath = fs.readdirSync(path.join(process.env["HOME"] || "/", ".TinyTeX/bin"))[0];
         }
-        console.log("binPath: " + binPath);
+        core.debug("binPath: " + binPath);
         core.addPath(binPath);
     });
 }
