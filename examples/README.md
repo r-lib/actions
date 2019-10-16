@@ -25,9 +25,9 @@ jobs:
       - uses: actions/checkout@v1
       - uses: r-lib/actions/setup-r@master
       - name: Install dependencies
-      - run: Rscript -e 'install.packges("remotes")' -e 'remotes::install_deps(dependencies = TRUE)'
+        run: Rscript -e "install.packages(c('remotes', 'rcmdcheck'))" -e "remotes::install_deps(dependencies = TRUE)"
       - name: Check
-      - run: Rscript -e "rcmdcheck::rcmdcheck(manual = FALSE, error_on='error')"
+        run: Rscript -e "rcmdcheck::rcmdcheck(args = '--no-manual', error_on = 'error')"
 ```
 
 ## Tidyverse CI workflow
@@ -62,10 +62,13 @@ jobs:
         with:
           r-version: ${{ matrix.r }}
       - uses: r-lib/actions/setup-pandoc@master
+      - uses: r-lib/actions/setup-tinytex@master
       - name: Install dependencies
-        run: Rscript -e 'install.packages(c("remotes", "rcmdcheck"))' -e 'remotes::install_deps(dependencies = TRUE)'
+        env:
+          R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
+        run: Rscript -e "install.packages(c('remotes', 'rcmdcheck'))" -e "remotes::install_deps(dependencies = TRUE)"
       - name: Check
-        run: Rscript -e "rcmdcheck::rcmdcheck(manual = FALSE, error_on='error')"
+        run: Rscript -e "rcmdcheck::rcmdcheck(error_on = 'error')"
 
   linux:
     runs-on: ubuntu-latest
@@ -76,10 +79,11 @@ jobs:
       - uses: actions/checkout@v1
       - uses: r-lib/actions/setup-r@master
       - uses: r-lib/actions/setup-pandoc@master
+      - uses: r-lib/actions/setup-tinytex@master
       - name: Install dependencies
-        run: Rscript -e 'install.packages(c("remotes", "rcmdcheck"))' -e 'remotes::install_deps(dependencies = TRUE)'
+        run: Rscript -e "install.packages(c('remotes', 'rcmdcheck'))" -e "remotes::install_deps(dependencies = TRUE)"
       - name: Check
-        run: Rscript -e "rcmdcheck::rcmdcheck(manual = FALSE, error_on='error')"
+        run: Rscript -e "rcmdcheck::rcmdcheck(error_on = 'error')"
 
   windows:
     runs-on: windows-latest
@@ -87,10 +91,11 @@ jobs:
       - uses: actions/checkout@v1
       - uses: r-lib/actions/setup-r@master
       - uses: r-lib/actions/setup-pandoc@master
+      - uses: r-lib/actions/setup-tinytex@master
       - name: Install dependencies
-        run: Rscript -e 'install.packages(c("remotes", "rcmdcheck"))' -e 'remotes::install_deps(dependencies = TRUE)'
+        run: Rscript -e "install.packages(c('remotes', 'rcmdcheck'))" -e "remotes::install_deps(dependencies = TRUE)"
       - name: Check
-        run: Rscript -e "rcmdcheck::rcmdcheck(manual = FALSE, error_on='error')"
+        run: Rscript -e "rcmdcheck::rcmdcheck(error_on = 'error')"
 ```
 
 ## Commands workflow
