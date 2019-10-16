@@ -1,18 +1,3 @@
-# Commands workflow
-
-This workflow enables the use of 2 R specific commands in pull request issue
-comments. `\document` will use [roxygen2](https://roxygen2.r-lib.org/) to
-rebuild the documentation for the package and commit the result to the pull
-request. `\style` will use [styler](https://styler.r-lib.org/) to restyle your
-package.
-
-## When it can they be used?
-
-1. You get frequent Pull Requests, often with documentation only fixes.
-2. You regularly style your code with styler, and require all additions be
-   styled as well.
-
-```yaml
 on:
   issue_comment:
     types: [created]
@@ -60,18 +45,3 @@ jobs:
       - uses: r-lib/actions/pr-push@master
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-```
-
-## Can I tune it?
-
-Sure!
-
-This workflow is using following Actions to execute the pipeline,
-see their pages for the available options:
-
-1. [`r-lib/actions/setup-r`](https://github.com/r-lib/actions/setup-r)
-2. [`r-lib/actions/pr-fetch`](https://github.com/r-lib/actions/pr-fetch)
-3. [`r-lib/actions/pr-push`](https://github.com/r-lib/actions/pr-push)
-
-You can also use this same formula to do other things in between fetching and
-pushing.

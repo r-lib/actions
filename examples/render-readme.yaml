@@ -1,6 +1,3 @@
-Render a README.Rmd to README.md then open a PR with the changes (UNTESTED)
-
-```yaml
 on:
   schedule:
     # run on Monday day at 11 PM
@@ -24,4 +21,3 @@ jobs:
       uses: peter-evans/create-pull-request@v1.5.1-multi
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-```

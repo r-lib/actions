@@ -1,0 +1,69 @@
+---
+output: github_document
+---
+
+```{r setup, include = FALSE}
+print_yaml <- function(filename) {
+  cat("```yaml", readLines(filename), "```", sep = "\n")
+}
+```
+
+## Quickstart CI workflow
+
+This workflow installs latest stable R version
+and runs R CMD check via the [rcmdcheck](https://github.com/r-lib/rcmdcheck)
+package.
+
+### When can it be used?
+
+1. You have a simple R package
+2. There is no OS-specific code
+3. You want a quick start with R CI
+
+```{r echo = FALSE, results = "asis"}
+print_yaml("quickstart.yaml")
+```
+
+## Tidyverse CI workflow
+
+This workflow installs the last 5 minor R versions
+and runs R CMD check via the [rcmdcheck](https://github.com/r-lib/rcmdcheck)
+package on the three major OSs. This workflow is what the tidyverse teams uses
+on their repositories, but is probably overkill for less widely used packages.
+
+## When it can be used?
+
+1. You have a complex R package
+2. With OS-specific code
+3. And you want to ensure compatibility with older R versions
+
+```{r echo = FALSE, results = "asis"}
+print_yaml("tidyverse.yaml")
+```
+
+## Commands workflow
+
+This workflow enables the use of 2 R specific commands in pull request issue
+comments. `\document` will use [roxygen2](https://roxygen2.r-lib.org/) to
+rebuild the documentation for the package and commit the result to the pull
+request. `\style` will use [styler](https://styler.r-lib.org/) to restyle your
+package.
+
+## When it can they be used?
+
+1. You get frequent Pull Requests, often with documentation only fixes.
+2. You regularly style your code with styler, and require all additions be
+   styled as well.
+
+```{r echo = FALSE, results = "asis"}
+print_yaml("commands.yaml")
+```
+
+## Re-build README.md every day
+
+This example automatically re-builds the README.md from README.Rmd every
+day and opens a PR with the changes (if any).
+
+```{r echo = FALSE, results = "asis"}
+print_yaml("render-readme.yaml")
+```
