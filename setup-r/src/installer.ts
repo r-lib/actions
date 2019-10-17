@@ -323,6 +323,7 @@ function getDownloadUrlWindows(version: string): string {
 
 function setREnvironmentVariables() {
   core.exportVariable("R_LIBS_USER", path.join(tempDirectory, "Library"));
+  core.exportVariable("CI", "true");
 }
 
 async function determineVersion(version: string): Promise<string> {

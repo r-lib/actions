@@ -306,6 +306,7 @@ function getDownloadUrlWindows(version) {
 }
 function setREnvironmentVariables() {
     core.exportVariable("R_LIBS_USER", path.join(tempDirectory, "Library"));
+    core.exportVariable("CI", "true");
 }
 function determineVersion(version) {
     return __awaiter(this, void 0, void 0, function* () {
