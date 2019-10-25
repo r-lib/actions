@@ -17,6 +17,5 @@ jobs:
         run: Rscript -e 'rmarkdown::render("examples/README.Rmd")'
       - name: Commit results
         run: |
-          git checkout -b build-readme
-          git commit README.md -m 'Re-build readme'
+          git commit examples/README.md -m 'Re-build README.Rmd'
           git push
