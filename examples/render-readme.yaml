@@ -11,7 +11,7 @@ jobs:
     - uses: r-lib/actions/setup-r@master
     - uses: r-lib/actions/setup-pandoc@master
     - name: Install dependencies
-      run: Rscript -e 'install.packges(c("remotes"))' -e 'remotes::install_deps(dependencies = TRUE)'
+      run: Rscript -e 'install.packages(c("remotes"))' -e 'remotes::install_deps(dependencies = TRUE)'
     - name: Render README
       run: Rscript -e 'rmarkdown::render("README.Rmd")'
     - name: Commit results
