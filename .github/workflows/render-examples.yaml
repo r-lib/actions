@@ -1,0 +1,20 @@
+on:
+  push:
+    paths:
+      - examples/README.Rmd
+      - examples/*yaml
+
+jobs:
+  render:
+    runs-on: macOS-latest
+    steps:
+      - uses: r-lib/actions/setup-r@v1
+      - name: Install rmarkdown
+        run: Rscript -e 'install.packages("rmarkdown")'
+      - name: Render Readme
+        run: Rscript -e 'rmarkdown::render("README.Rmd")'
+      - name: Commit results
+        run: |
+          git checkout -b build-readme
+          git commit README.md -m 'Re-build readme'
+          git push
