@@ -18,4 +18,4 @@ jobs:
       - name: Commit results
         run: |
           git commit examples/README.md -m 'Re-build README.Rmd'
-          git push origin HEAD:master
+          git push https://${{github.actor}}:${{secrets.GITHUB_TOKEN}}@github.com/${{github.repository}}.git HEAD:master
