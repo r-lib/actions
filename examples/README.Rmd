@@ -10,7 +10,7 @@ print_yaml <- function(filename) {
 
 ## Quickstart CI workflow
 
-This workflow installs latest stable R version
+This workflow installs latest stable R version on macOS
 and runs R CMD check via the [rcmdcheck](https://github.com/r-lib/rcmdcheck)
 package.
 
@@ -28,8 +28,10 @@ print_yaml("quickstart.yaml")
 
 This workflow installs the last 5 minor R versions
 and runs R CMD check via the [rcmdcheck](https://github.com/r-lib/rcmdcheck)
-package on the three major OSs. This workflow is what the tidyverse teams uses
-on their repositories, but is probably overkill for less widely used packages.
+package on the three major OSs (linux, macOS and Windows). This workflow is
+what the tidyverse teams uses on their repositories, but is overkill
+for less widely used packages, which are better off using the simpler
+quickstart CI workflow.
 
 ## When it can be used?
 
@@ -51,7 +53,7 @@ package.
 
 ## When it can they be used?
 
-1. You get frequent Pull Requests, often with documentation only fixes.
+1. You get frequent pull requests, often with documentation only fixes.
 2. You regularly style your code with styler, and require all additions be
    styled as well.
 
