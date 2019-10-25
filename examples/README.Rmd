@@ -61,10 +61,10 @@ package.
 print_yaml("commands.yaml")
 ```
 
-## Re-build README.md every day
+## Re-build README.md when README.Rmd changes
 
-This example automatically re-builds the README.md from README.Rmd every
-day and opens a PR with the changes (if any). It needs further testing.
+This example automatically re-builds this README.md from README.Rmd whenever it
+or its yaml dependencies change and commits the results to the master branch.
 
 ```{r echo = FALSE, results = "asis"}
 print_yaml("render-readme.yaml")

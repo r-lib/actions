@@ -1,24 +1,22 @@
 on:
-  schedule:
-    # run on Monday day at 11 PM
-    - cron: '0 23 * * 1'
+  push:
+    paths:
+      - examples/README.Rmd
+      - examples/*yaml
 
 jobs:
-  name: Render readme
-  runs-on: macOS-latest
-  steps:
-    - uses: actions/checkout@v1
-    - uses: r-lib/actions/setup-r@master
-    - uses: r-lib/actions/setup-pandoc@master
-    - name: Install dependencies
-      run: Rscript -e 'install.packages(c("remotes"))' -e 'remotes::install_deps(dependencies = TRUE)'
-    - name: Render README
-      run: Rscript -e 'rmarkdown::render("README.Rmd")'
-    - name: Commit results
-      run: |
-        git checkout -b build-readme
-        git commit README.md -m 'Re-build README'
-    - name: Create Pull Request
-      uses: peter-evans/create-pull-request@v1.5.1-multi
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  render:
+    name: Render README
+    runs-on: macOS-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: r-lib/actions/setup-r@v1
+      - uses: r-lib/actions/setup-pandoc@v1
+      - name: Install rmarkdown
+        run: Rscript -e 'install.packages("rmarkdown")'
+      - name: Render README
+        run: Rscript -e 'rmarkdown::render("examples/README.Rmd")'
+      - name: Commit results
+        run: |
+          git commit examples/README.md -m 'Re-build README.Rmd'
+          git push https://${{github.actor}}:${{secrets.GITHUB_TOKEN}}@github.com/${{github.repository}}.git HEAD:master
