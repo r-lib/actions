@@ -1,13 +1,13 @@
 on: [push, pull_request]
 
-name: R
+name: R-full
 
 jobs:
   macOS:
     runs-on: macOS-latest
     strategy:
       matrix:
-        r: ['3.2', '3.3', '3.4', '3.5', '3.6', 'devel']
+        r: ['3.6', 'devel']
     steps:
       - uses: actions/checkout@v1
       - uses: r-lib/actions/setup-r@master
@@ -24,7 +24,10 @@ jobs:
 
   linux:
     runs-on: ubuntu-latest
-    container: rstudio/r-base:3.6-xenial
+    strategy:
+      matrix:
+        r: ['3.2', '3.3', '3.4', '3.5', '3.6']
+    container: rstudio/r-base:${{ matrix.r }}-xenial
     env:
       CRAN: 'https://demo.rstudiopm.com/all/__linux__/xenial/latest'
     steps:
