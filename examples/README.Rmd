@@ -64,7 +64,7 @@ print_yaml("commands.yaml")
 ## Re-build README.md every day
 
 This example automatically re-builds the README.md from README.Rmd every
-day and opens a PR with the changes (if any).
+day and opens a PR with the changes (if any). It needs further testing.
 
 ```{r echo = FALSE, results = "asis"}
 print_yaml("render-readme.yaml")
