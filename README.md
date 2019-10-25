@@ -16,8 +16,6 @@ This repository stores [GitHub Actions](https://github.com/features/actions), wh
 See the [@r-lib/actions/examples](https://github.com/r-lib/actions/tree/master/examples) directory
 for a variety of example workflows using these actions.
 
-## License
-
-![CC0 licensed](https://img.shields.io/github/license/r-lib/actions)
+## License ![CC0 licensed](https://img.shields.io/github/license/r-lib/actions)
 
 All examples in this repository are published with the [CC0](./LICENSE) license.
