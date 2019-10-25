@@ -20,7 +20,7 @@ jobs:
       - name: commit
         run: |
           git add man/\* NAMESPACE
-          git commit -m 'Document' --author 'GitHub Actions <actions@github.com>'
+          git commit -m 'Document'
       - uses: r-lib/actions/pr-push@master
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
@@ -41,7 +41,7 @@ jobs:
       - name: commit
         run: |
           git add \*.R
-          git commit -m 'style' --author 'GitHub Actions <actions@github.com>'
+          git commit -m 'style'
       - uses: r-lib/actions/pr-push@master
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
