@@ -9,6 +9,7 @@ jobs:
   steps:
     - uses: actions/checkout@v1
     - uses: r-lib/actions/setup-r@master
+    - uses: r-lib/actions/setup-pandoc@master
     - name: Install dependencies
       run: Rscript -e 'install.packges(c("remotes"))' -e 'remotes::install_deps(dependencies = TRUE)'
     - name: Render README
