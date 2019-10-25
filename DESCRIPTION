@@ -1,0 +1,10 @@
+Package: testpackage
+Title: A Simple Test Description File to Test Packages
+Version: 1.0.0
+Authors@R: 
+    c(person(given = "Jim",
+             family = "Hester",
+             role = c("aut", "cre"),
+             email = "james.hester@rstudio.com"))
+Description: This is a simple package used to test the workflow files.
+License: GPL (>= 2)

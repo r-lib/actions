@@ -1,0 +1,8 @@
+^pr-fetch$
+^pr-push$
+^setup-r$
+^setup-pandoc$
+^setup-tinytex$
+^examples$
+^LICENSE$
+^.github$
