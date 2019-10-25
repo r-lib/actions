@@ -17,7 +17,7 @@ jobs:
     - name: Commit results
       run: |
         git checkout -b build-readme
-        git commit README.md -m 'Re-build readme'
+        git commit README.md -m 'Re-build README'
     - name: Create Pull Request
       uses: peter-evans/create-pull-request@v1.5.1-multi
       env:
