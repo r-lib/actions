@@ -13,7 +13,7 @@ jobs:
       - name: Install rmarkdown
         run: Rscript -e 'install.packages("rmarkdown")'
       - name: Render Readme
-        run: Rscript -e 'rmarkdown::render("README.Rmd")'
+        run: Rscript -e 'rmarkdown::render("examples/README.Rmd")'
       - name: Commit results
         run: |
           git checkout -b build-readme
