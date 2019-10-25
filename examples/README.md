@@ -1,8 +1,8 @@
 
 ## Quickstart CI workflow
 
-This workflow installs latest stable R version and runs R CMD check via
-the [rcmdcheck](https://github.com/r-lib/rcmdcheck) package.
+This workflow installs latest stable R version on macOS and runs R CMD
+check via the [rcmdcheck](https://github.com/r-lib/rcmdcheck) package.
 
 ### When can it be used?
 
@@ -15,7 +15,7 @@ the [rcmdcheck](https://github.com/r-lib/rcmdcheck) package.
 ``` yaml
 on: [push, pull_request]
 
-name: Continuous integration
+name: R
 
 jobs:
   check:
@@ -34,8 +34,10 @@ jobs:
 
 This workflow installs the last 5 minor R versions and runs R CMD check
 via the [rcmdcheck](https://github.com/r-lib/rcmdcheck) package on the
-three major OSs. This workflow is what the tidyverse teams uses on their
-repositories, but is probably overkill for less widely used packages.
+three major OSs (linux, macOS and Windows). This workflow is what the
+tidyverse teams uses on their repositories, but is overkill for less
+widely used packages, which are better off using the simpler quickstart
+CI workflow.
 
 ## When it can be used?
 
@@ -48,14 +50,14 @@ repositories, but is probably overkill for less widely used packages.
 ``` yaml
 on: [push, pull_request]
 
-name: Continuous integration
+name: R-full
 
 jobs:
   macOS:
     runs-on: macOS-latest
     strategy:
       matrix:
-        r: ['3.2', '3.3', '3.4', '3.5', '3.6', 'devel']
+        r: ['3.6', 'devel']
     steps:
       - uses: actions/checkout@v1
       - uses: r-lib/actions/setup-r@master
@@ -72,7 +74,10 @@ jobs:
 
   linux:
     runs-on: ubuntu-latest
-    container: rstudio/r-base:3.6-xenial
+    strategy:
+      matrix:
+        r: ['3.2', '3.3', '3.4', '3.5', '3.6']
+    container: rstudio/r-base:${{ matrix.r }}-xenial
     env:
       CRAN: 'https://demo.rstudiopm.com/all/__linux__/xenial/latest'
     steps:
@@ -108,7 +113,7 @@ the package and commit the result to the pull request. `\style` will use
 
 ## When it can they be used?
 
-1.  You get frequent Pull Requests, often with documentation only fixes.
+1.  You get frequent pull requests, often with documentation only fixes.
 2.  You regularly style your code with styler, and require all additions
     be styled as well.
 
@@ -137,7 +142,7 @@ jobs:
       - name: commit
         run: |
           git add man/\* NAMESPACE
-          git commit -m 'Document' --author 'GitHub Actions <actions@github.com>'
+          git commit -m 'Document'
       - uses: r-lib/actions/pr-push@master
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
@@ -158,7 +163,7 @@ jobs:
       - name: commit
         run: |
           git add \*.R
-          git commit -m 'style' --author 'GitHub Actions <actions@github.com>'
+          git commit -m 'style'
       - uses: r-lib/actions/pr-push@master
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
@@ -167,7 +172,7 @@ jobs:
 ## Re-build README.md every day
 
 This example automatically re-builds the README.md from README.Rmd every
-day and opens a PR with the changes (if any).
+day and opens a PR with the changes (if any). It needs further testing.
 
 ``` yaml
 on:
@@ -181,14 +186,15 @@ jobs:
   steps:
     - uses: actions/checkout@v1
     - uses: r-lib/actions/setup-r@master
+    - uses: r-lib/actions/setup-pandoc@master
     - name: Install dependencies
-      run: Rscript -e 'install.packges(c("remotes"))' -e 'remotes::install_deps(dependencies = TRUE)'
+      run: Rscript -e 'install.packages(c("remotes"))' -e 'remotes::install_deps(dependencies = TRUE)'
     - name: Render README
       run: Rscript -e 'rmarkdown::render("README.Rmd")'
     - name: Commit results
       run: |
         git checkout -b build-readme
-        git commit README.md -m 'Re-build readme' --author 'GitHub Actions <actions@github.com>'
+        git commit README.md -m 'Re-build README'
     - name: Create Pull Request
       uses: peter-evans/create-pull-request@v1.5.1-multi
       env:
