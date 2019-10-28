@@ -22,7 +22,7 @@ jobs:
       - name: Check
         run: Rscript -e "rcmdcheck::rcmdcheck(error_on = 'error')"
       - name: Test coverage
-        if: strategy.matrix == '3.6'
+        if: matrix.r == '3.6'
         run: |
           Rscript -e 'remotes::install_github("r-lib/covr@gh-actions")'
           Rscript -e 'covr::codecov(token = ${{secrets.CODECOV_TOKEN}}'
