@@ -1,4 +1,11 @@
 
+  - [Quickstart CI](#quickstart-ci-workflow) - A simple CI workflow
+  - [Tidyverse CI](#tidyverse-ci-workflow) - A more complex CI workflow
+  - [Pull Request Commands](#commands-workflow) - Adds `/document` and
+    `/style` commands for pull requests.
+  - [Render README](#render-readme) - Render README.Rmd when it changes
+    and commit the result
+
 ## Quickstart CI workflow
 
 This workflow installs latest stable R version on macOS and runs R CMD
@@ -71,6 +78,11 @@ jobs:
         run: Rscript -e "install.packages(c('remotes', 'rcmdcheck'))" -e "remotes::install_deps(dependencies = TRUE)"
       - name: Check
         run: Rscript -e "rcmdcheck::rcmdcheck(error_on = 'error')"
+      - name: Test coverage
+        if: strategy.matrix == '3.6' && secrets.CODECOV_TOKEN != ''
+        run: |
+          Rscript -e 'remotes::install_github("r-lib/covr@gh-actions")'
+          Rscript -e 'covr::codecov(token = ${{secrets.CoDECOV_TOKEN}}'
 
   linux:
     runs-on: ubuntu-latest
@@ -169,7 +181,7 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-## Re-build README.md when README.Rmd changes
+## Render README
 
 This example automatically re-builds this README.md from README.Rmd
 whenever it or its yaml dependencies change and commits the results to
