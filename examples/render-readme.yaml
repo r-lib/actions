@@ -4,6 +4,8 @@ on:
       - examples/README.Rmd
       - examples/*yaml
 
+name: Render README
+
 jobs:
   render:
     name: Render README
