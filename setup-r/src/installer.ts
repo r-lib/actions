@@ -270,7 +270,7 @@ function getFileNameMacOS(version: string): string {
 
 function getDownloadUrlMacOS(version: string): string {
   if (version == "devel") {
-    return "https://mac.r-project.org/el-capitan/R-devel/R-devel-el-capitand.pkg";
+    return "https://mac.r-project.org/el-capitan/R-devel/R-devel-el-capitan.pkg";
   }
   const filename: string = getFileNameMacOS(version);
 
