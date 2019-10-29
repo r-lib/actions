@@ -270,7 +270,7 @@ function getFileNameMacOS(version: string): string {
 
 function getDownloadUrlMacOS(version: string): string {
   if (version == "devel") {
-    return "https://mac.r-project.org/el-capitan/R-devel/R-devel-el-capitan.pkg";
+    return "https://mac.r-project.org/el-capitan/R-devel/R-devel-el-capitand.pkg";
   }
   const filename: string = getFileNameMacOS(version);
 
@@ -324,6 +324,7 @@ function getDownloadUrlWindows(version: string): string {
 function setREnvironmentVariables() {
   core.exportVariable("R_LIBS_USER", path.join(tempDirectory, "Library"));
   core.exportVariable("CI", "true");
+  core.exportVariable("TZ", "UTC");
 }
 
 async function determineVersion(version: string): Promise<string> {

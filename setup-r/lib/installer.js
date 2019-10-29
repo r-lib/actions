@@ -269,7 +269,7 @@ function getFileNameMacOS(version) {
 }
 function getDownloadUrlMacOS(version) {
     if (version == "devel") {
-        return "https://mac.r-project.org/el-capitan/R-devel/R-devel-el-capitan.pkg";
+        return "https://mac.r-project.org/el-capitan/R-devel/R-devel-el-capitand.pkg";
     }
     const filename = getFileNameMacOS(version);
     if (semver.eq(version, "3.2.5")) {
@@ -307,6 +307,7 @@ function getDownloadUrlWindows(version) {
 function setREnvironmentVariables() {
     core.exportVariable("R_LIBS_USER", path.join(tempDirectory, "Library"));
     core.exportVariable("CI", "true");
+    core.exportVariable("TZ", "UTC");
 }
 function determineVersion(version) {
     return __awaiter(this, void 0, void 0, function* () {
