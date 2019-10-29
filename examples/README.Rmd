@@ -26,7 +26,7 @@ package.
 3. You want a quick start with R CI
 
 ```{r echo = FALSE, results = "asis"}
-print_yaml("quickstart.yaml")
+print_yaml("ci-quick.yaml")
 ```
 
 ## Tidyverse CI workflow
@@ -45,7 +45,7 @@ quickstart CI workflow.
 3. And you want to ensure compatibility with older R versions
 
 ```{r echo = FALSE, results = "asis"}
-print_yaml("tidyverse.yaml")
+print_yaml("ci-full.yaml")
 ```
 
 ## Commands workflow
@@ -63,7 +63,7 @@ package.
    styled as well.
 
 ```{r echo = FALSE, results = "asis"}
-print_yaml("commands.yaml")
+print_yaml("pr-commands.yaml")
 ```
 
 ## Render README
