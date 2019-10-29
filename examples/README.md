@@ -82,7 +82,7 @@ jobs:
         if: matrix.r == '3.6'
         run: |
           Rscript -e 'remotes::install_github("r-lib/covr@gh-actions")'
-          Rscript -e 'covr::codecov(token = ${{secrets.CODECOV_TOKEN}}'
+          Rscript -e 'covr::codecov(token = "${{secrets.CODECOV_TOKEN}}")'
 
   linux:
     runs-on: ubuntu-latest
@@ -212,4 +212,37 @@ jobs:
         run: |
           git commit examples/README.md -m 'Re-build README.Rmd'
           git push https://${{github.actor}}:${{secrets.GITHUB_TOKEN}}@github.com/${{github.repository}}.git HEAD:master
+```
+
+## Build pkgdown site
+
+This example build a pkgdown site for a repository and pushes the built
+package to the gh-pages branch.
+
+``` yaml
+on:
+  push:
+    branches: master
+
+name: Pkgdown
+
+jobs:
+  pkgdown:
+    env:
+      CI: true
+    runs-on: macOS-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: r-lib/actions/setup-r@master
+      - uses: r-lib/actions/setup-pandoc@master
+      - name: Install dependencies
+        run: |
+          Rscript -e 'install.packages("remotes")' \
+                  -e 'remotes::install_deps(dependencies = TRUE)' \
+                  -e 'remotes::install_github("jimhester/pkgdown@github-actions-deploy")'
+      - name: Install package
+        run: R CMD INSTALL .
+      - name: Deploy package
+        run: |
+          Rscript -e "pkgdown:::deploy_local(new_process = FALSE, remote_url = 'https://x-access-token:${{secrets.GITHUB_TOKEN}}@github.com/${{github.repository}}.git')"
 ```
