@@ -228,8 +228,6 @@ name: Pkgdown
 
 jobs:
   pkgdown:
-    env:
-      CI: true
     runs-on: macOS-latest
     steps:
       - uses: actions/checkout@master
