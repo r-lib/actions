@@ -7,4 +7,5 @@ Authors@R:
              role = c("aut", "cre"),
              email = "james.hester@rstudio.com"))
 Description: This is a simple package used to test the workflow files.
+Imports: xml2, curl
 License: GPL (>= 2)
