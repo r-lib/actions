@@ -104,6 +104,8 @@ jobs:
           sudo apt-get update
           sudo eval "$sysreqs"
           Rscript -e "remotes::install_deps(dependencies = TRUE)"
+        env:
+          RHUB_PLATFORM: linux-x86_64-ubuntu-gcc
       - name: Check
         run: Rscript -e "rcmdcheck::rcmdcheck(error_on = 'error')"
 
