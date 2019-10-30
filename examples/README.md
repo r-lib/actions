@@ -100,8 +100,7 @@ jobs:
       - name: Install dependencies
         run: |
           Rscript -e "install.packages('remotes')" -e "remotes::install_github('r-hub/sysreqs')"
-          sysreqs=$(Rscript -e "sysreqs::sysreq_commands('DESCRIPTION')")
-          sudo apt-get update
+          sysreqs=$(Rscript -e "cat(sysreqs::sysreq_commands('DESCRIPTION'))")
           eval "$sysreqs"
           Rscript -e "remotes::install_deps(dependencies = TRUE)"
         env:
