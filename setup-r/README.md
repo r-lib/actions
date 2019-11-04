@@ -4,8 +4,13 @@
 
 This action sets up an R environment for use in actions by:
 
-- downloading and caching a version of R by version and adding to PATH
-- registering problem matchers for error output
+- Downloading and caching a version of R by version and adding to PATH
+- Registering [problem matchers](https://github.com/r-lib/actions/tree/master/setup-r/.github) for error output
+- Setting the following environment variables
+  - `NOT_CRAN=true`
+  - `CI=true`
+  - `TZ=UTC`
+  - `R_LIBS_USER=tempdir/Library`
 
 # Usage
 
