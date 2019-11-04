@@ -55,7 +55,13 @@ async function installPandocMac(version: string) {
   );
   let downloadPath: string | null = null;
 
-  downloadPath = await tc.downloadTool(downloadUrl);
+
+  try {
+    downloadPath = await tc.downloadTool(downloadUrl);
+  } catch (error) {
+    throw `Failed to download Pandoc ${version}: ${error}`;
+  }
+
   await io.mv(downloadPath, path.join(tempDirectory, fileName));
 
   exec.exec("sudo installer", [
@@ -75,7 +81,11 @@ async function installPandocWindows(version: string) {
   );
   let downloadPath: string | null = null;
 
-  downloadPath = await tc.downloadTool(downloadUrl);
+  try {
+    downloadPath = await tc.downloadTool(downloadUrl);
+  } catch (error) {
+    throw `Failed to download Pandoc ${version}: ${error}`;
+  }
 
   //
   // Extract
@@ -107,7 +117,12 @@ async function installPandocLinux(version: string) {
   );
   let downloadPath: string | null = null;
 
-  downloadPath = await tc.downloadTool(downloadUrl);
+  try {
+    downloadPath = await tc.downloadTool(downloadUrl);
+  } catch (error) {
+    throw `Failed to download Pandoc ${version}: ${error}`;
+  }
+
   await io.mv(downloadPath, path.join(tempDirectory, fileName));
 
   try {
