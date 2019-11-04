@@ -67,7 +67,12 @@ function installTinyTexPosix() {
         const fileName = "install-unx.sh";
         const downloadUrl = "https://yihui.name/gh/tinytex/tools/install-unx.sh";
         let downloadPath = null;
-        downloadPath = yield tc.downloadTool(downloadUrl);
+        try {
+            downloadPath = yield tc.downloadTool(downloadUrl);
+        }
+        catch (error) {
+            throw `Failed to download TinyTex: ${error}`;
+        }
         yield io.mv(downloadPath, path.join(tempDirectory, fileName));
         yield exec.exec("sh", [path.join(tempDirectory, fileName)]);
         let binPath;
@@ -88,7 +93,12 @@ function installTinyTexWindows() {
         const fileName = "install-windows.bat";
         const downloadUrl = "https://yihui.name/gh/tinytex/tools/install-windows.bat";
         let downloadPath = null;
-        downloadPath = yield tc.downloadTool(downloadUrl);
+        try {
+            downloadPath = yield tc.downloadTool(downloadUrl);
+        }
+        catch (error) {
+            throw `Failed to download TinyTex: ${error}`;
+        }
         yield io.mv(downloadPath, path.join(tempDirectory, fileName));
         exec.exec(path.join(tempDirectory, fileName));
         core.addPath(path.join(process.env["APPDATA"] || "C:\\", "TinyTeX", "bin", "win32"));

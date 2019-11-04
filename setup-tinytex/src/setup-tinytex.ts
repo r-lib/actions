@@ -46,7 +46,12 @@ async function installTinyTexPosix() {
   const downloadUrl = "https://yihui.name/gh/tinytex/tools/install-unx.sh";
   let downloadPath: string | null = null;
 
-  downloadPath = await tc.downloadTool(downloadUrl);
+  try {
+    downloadPath = await tc.downloadTool(downloadUrl);
+  } catch (error) {
+    throw `Failed to download TinyTex: ${error}`;
+  }
+
   await io.mv(downloadPath, path.join(tempDirectory, fileName));
 
   await exec.exec("sh", [path.join(tempDirectory, fileName)]);
@@ -71,7 +76,12 @@ async function installTinyTexWindows() {
   const downloadUrl = "https://yihui.name/gh/tinytex/tools/install-windows.bat";
   let downloadPath: string | null = null;
 
-  downloadPath = await tc.downloadTool(downloadUrl);
+  try {
+    downloadPath = await tc.downloadTool(downloadUrl);
+  } catch (error) {
+    throw `Failed to download TinyTex: ${error}`;
+  }
+
   await io.mv(downloadPath, path.join(tempDirectory, fileName));
 
   exec.exec(path.join(tempDirectory, fileName));
