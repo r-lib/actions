@@ -40,14 +40,15 @@ jobs:
       - uses: r-lib/actions/setup-r@master
       - uses: r-lib/actions/setup-pandoc@master
       - uses: r-lib/actions/setup-tinytex@master
-      - name: Install dependencies
+      - name: Install system dependencies
+        env:
+          RHUB_PLATFORM: linux-x86_64-ubuntu-gcc
         run: |
           Rscript -e "install.packages('remotes')" -e "remotes::install_github('r-hub/sysreqs')"
           sysreqs=$(Rscript -e "cat(sysreqs::sysreq_commands('DESCRIPTION'))")
           eval "$sysreqs"
-          Rscript -e "remotes::install_deps(dependencies = TRUE)"
-        env:
-          RHUB_PLATFORM: linux-x86_64-ubuntu-gcc
+      - name: Install dependencies
+        run: Rscript -e "remotes::install_deps(dependencies = TRUE)"
       - name: Check
         run: Rscript -e "install.packages('rcmdcheck')" -e "rcmdcheck::rcmdcheck(error_on = 'error')"
 
