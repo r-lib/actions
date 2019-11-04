@@ -9,6 +9,7 @@ async function run() {
     core.debug(`got version ${version}`);
     let rtoolsVersion = core.getInput("rtools-version");
     core.debug(`got rtools-version ${rtoolsVersion}`);
+
     await getR(version, rtoolsVersion);
 
     const matchersPath = path.join(__dirname, "..", ".github");

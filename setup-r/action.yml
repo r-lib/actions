@@ -8,6 +8,12 @@ inputs:
   rtools-version:
     description: 'Exact version of Rtools to use.'
     default: '35'
+  Ncpus:
+    description: 'Value to set the R option `Ncpus` to.'
+    default: '2'
+  crayon.enabled:
+    description: 'Value to set the R option `crayon.enabled` to.'
+    default: 'TRUE'
 runs:
   using: 'node12'
   main: 'lib/setup-r.js'

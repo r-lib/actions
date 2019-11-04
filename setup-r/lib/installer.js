@@ -258,7 +258,7 @@ function setupRLibrary() {
         }
         core.debug("R profile is at " + profilePath);
         yield fs_1.promises.writeFile(profilePath, `options(repos = '${process.env["CRAN"] ||
-            "https://cloud.r-project.org"}', crayon.enabled = TRUE, Ncpus = 2)\n`);
+            "https://cloud.r-project.org"}', crayon.enabled = ${core.getInput("crayon.enabled")}, Ncpus = ${core.getInput("Ncpus")})\n`);
         // Make R_LIBS_USER
         io.mkdirP(process.env["R_LIBS_USER"] || path.join(tempDirectory, "Library"));
     });
