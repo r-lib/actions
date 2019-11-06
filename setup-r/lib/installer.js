@@ -69,6 +69,7 @@ function acquireR(version, rtoolsVersion) {
         }
         else if (IS_MAC) {
             acquireRMacOS(version);
+            installFortranMacOS();
         }
         else {
             let returnCode = 1;
@@ -87,6 +88,11 @@ function acquireR(version, rtoolsVersion) {
                 acquireRUbuntu(version);
             }
         }
+    });
+}
+function installFortranMacOS() {
+    return __awaiter(this, void 0, void 0, function* () {
+        exec.exec("sudo brew", ["cask", "install", "gfortran"]);
     });
 }
 function acquireRUbuntu(version) {
