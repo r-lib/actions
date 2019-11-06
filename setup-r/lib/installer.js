@@ -92,7 +92,13 @@ function acquireR(version, rtoolsVersion) {
 }
 function installFortranMacOS() {
     return __awaiter(this, void 0, void 0, function* () {
-        exec.exec("sudo brew", ["cask", "install", "gfortran"]);
+        try {
+            exec.exec("brew", ["cask", "install", "gfortran"]);
+        }
+        catch (error) {
+            core.debug(error);
+            throw `Failed to install gfortan: ${error}`;
+        }
     });
 }
 function acquireRUbuntu(version) {

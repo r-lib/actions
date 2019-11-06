@@ -73,7 +73,13 @@ async function acquireR(version: string, rtoolsVersion: string) {
 }
 
 async function installFortranMacOS() {
-  exec.exec("sudo brew", ["cask", "install", "gfortran"]);
+  try {
+    exec.exec("brew", ["cask", "install", "gfortran"]);
+  } catch (error) {
+    core.debug(error);
+
+    throw `Failed to install gfortan: ${error}`;
+  }
 }
 
 async function acquireRUbuntu(version: string): Promise<string> {
