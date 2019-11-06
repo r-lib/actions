@@ -6,7 +6,7 @@
                 {
                     "regexp": "^(.*) [.][.][.] (ERROR|NOTE|WARNING)$",
                     "code": 1,
-                    "severity": 2,
+                    "severity": 2
                 },
                 {
                     "regexp": "^([^*].+)$",
