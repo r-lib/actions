@@ -5,7 +5,6 @@
             "pattern": [
                 {
                     "regexp": "^(.*) [.][.][.] (ERROR|NOTE|WARNING)$",
-                    "code": 1,
                     "severity": 2
                 },
                 {
