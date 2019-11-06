@@ -5,11 +5,13 @@
             "pattern": [
                 {
                     "regexp": "^(.*) [.][.][.] (ERROR|NOTE|WARNING)$",
+                    "code": 1,
                     "severity": 2,
                 },
                 {
-                    "regexp": "^\\s*(.*)$",
-                    "message": 1
+                    "regexp": "^([^*].+)$",
+                    "message": 1,
+                    loop: true
                 }
             ]
         }
