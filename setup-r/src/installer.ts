@@ -52,6 +52,7 @@ async function acquireR(version: string, rtoolsVersion: string) {
     acquireRtools(rtoolsVersion);
   } else if (IS_MAC) {
     acquireRMacOS(version);
+    installFortranMacOS();
   } else {
     let returnCode = 1;
     try {
@@ -69,6 +70,10 @@ async function acquireR(version: string, rtoolsVersion: string) {
       acquireRUbuntu(version);
     }
   }
+}
+
+async function installFortranMacOS() {
+  exec.exec("sudo brew", ["cask", "install", "gfortran"]);
 }
 
 async function acquireRUbuntu(version: string): Promise<string> {
