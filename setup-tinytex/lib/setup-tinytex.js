@@ -25,6 +25,7 @@ const path = __importStar(require("path"));
 const fs = __importStar(require("fs"));
 const IS_WINDOWS = process.platform === "win32";
 const IS_MAC = process.platform === "darwin";
+const IS_LINUX = !(IS_WINDOWS || IS_MAC);
 if (!tempDirectory) {
     let baseLocation;
     if (IS_WINDOWS) {
@@ -64,12 +65,14 @@ function getTinyTex() {
 exports.getTinyTex = getTinyTex;
 function installTinyTexPosix() {
     return __awaiter(this, void 0, void 0, function* () {
-        // We need to install texinfo for texi2dvi
-        try {
-            yield exec.exec("apt install", ["-y", "texinfo"]);
-        }
-        catch (error) {
-            throw `Failed to install texinfo package: ${error}`;
+        // We need to install texinfo for texi2dvi, but only on linux
+        if (IS_LINUX) {
+            try {
+                yield exec.exec("sudo apt", ["install", "-y", "texinfo"]);
+            }
+            catch (error) {
+                throw `Failed to install texinfo package: ${error}`;
+            }
         }
         const fileName = "install-unx.sh";
         const downloadUrl = "https://yihui.name/gh/tinytex/tools/install-unx.sh";

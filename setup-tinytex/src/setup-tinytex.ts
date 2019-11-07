@@ -9,6 +9,7 @@ import * as fs from "fs";
 
 const IS_WINDOWS = process.platform === "win32";
 const IS_MAC = process.platform === "darwin";
+const IS_LINUX = !(IS_WINDOWS || IS_MAC);
 
 if (!tempDirectory) {
   let baseLocation;
@@ -42,11 +43,13 @@ export async function getTinyTex() {
 }
 
 async function installTinyTexPosix() {
-  // We need to install texinfo for texi2dvi
-  try {
-    await exec.exec("apt install", ["-y", "texinfo"]);
-  } catch (error) {
-    throw `Failed to install texinfo package: ${error}`;
+  // We need to install texinfo for texi2dvi, but only on linux
+  if (IS_LINUX) {
+    try {
+      await exec.exec("sudo apt", ["install", "-y", "texinfo"]);
+    } catch (error) {
+      throw `Failed to install texinfo package: ${error}`;
+    }
   }
 
   const fileName = "install-unx.sh";
