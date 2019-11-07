@@ -141,7 +141,8 @@ function acquireRUbuntu(version) {
             throw new Error("Temp directory not set");
         }
         try {
-            yield exec.exec("sudo apt-get", ["install", "-y", "gdebi-core"]);
+            yield exec.exec("sudo DEBIAN_FRONTEND=noninteractive apt-get update -qq");
+            yield exec.exec("sudo DEBIAN_FRONTEND=noninteractive apt-get install gdebi-core");
             yield exec.exec("sudo gdebi", [
                 "--non-interactive",
                 path.join(tempDirectory, fileName)

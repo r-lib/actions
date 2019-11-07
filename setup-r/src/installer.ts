@@ -120,7 +120,10 @@ async function acquireRUbuntu(version: string): Promise<string> {
   }
 
   try {
-    await exec.exec("sudo apt-get", ["install", "-y", "gdebi-core"]);
+    await exec.exec("sudo DEBIAN_FRONTEND=noninteractive apt-get update -qq");
+    await exec.exec(
+      "sudo DEBIAN_FRONTEND=noninteractive apt-get install gdebi-core"
+    );
     await exec.exec("sudo gdebi", [
       "--non-interactive",
       path.join(tempDirectory, fileName)
