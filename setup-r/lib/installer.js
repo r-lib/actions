@@ -25,6 +25,7 @@ const path = __importStar(require("path"));
 const fs_1 = require("fs");
 const restm = __importStar(require("typed-rest-client/RestClient"));
 const semver = __importStar(require("semver"));
+const osInfo = __importStar(require("linux-os-info"));
 const IS_WINDOWS = process.platform === "win32";
 const IS_MAC = process.platform === "darwin";
 if (!tempDirectory) {
@@ -314,7 +315,9 @@ function getDownloadUrlUbuntu(filename) {
     if (filename == "devel") {
         throw new Error("R-devel not currently available on ubuntu!");
     }
-    return util.format("https://cdn.rstudio.com/r/ubuntu-1804/pkgs/%s", filename);
+    const info = osInfo.osInfo();
+    const versionStr = info.version_id.replace(/[.]/g, "");
+    return util.format("https://cdn.rstudio.com/r/ubuntu-%s/pkgs/%s", versionStr, filename);
 }
 function getFileNameWindows(version) {
     const filename = util.format("R-%s-win.exe", version);

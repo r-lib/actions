@@ -9,6 +9,7 @@ import * as path from "path";
 import { promises as fs } from "fs";
 import * as restm from "typed-rest-client/RestClient";
 import * as semver from "semver";
+import * as osInfo from "linux-os-info";
 
 const IS_WINDOWS = process.platform === "win32";
 const IS_MAC = process.platform === "darwin";
@@ -323,7 +324,15 @@ function getDownloadUrlUbuntu(filename: string): string {
   if (filename == "devel") {
     throw new Error("R-devel not currently available on ubuntu!");
   }
-  return util.format("https://cdn.rstudio.com/r/ubuntu-1804/pkgs/%s", filename);
+
+  const info = osInfo.osInfo();
+  const versionStr = info.version_id.replace(/[.]/g, "");
+
+  return util.format(
+    "https://cdn.rstudio.com/r/ubuntu-%s/pkgs/%s",
+    versionStr,
+    filename
+  );
 }
 
 function getFileNameWindows(version: string): string {
