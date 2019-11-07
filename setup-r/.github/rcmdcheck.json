@@ -4,7 +4,7 @@
             "owner": "rcmdcheck",
             "pattern": [
                 {
-                    "regexp": "^(.*) [.][.][.] (ERROR|NOTE|WARNING)$",
+                    "regexp": "^(.*) [.][.][.] (ERROR|WARNING)$",
                     "severity": 2
                 },
                 {
