@@ -42,6 +42,13 @@ export async function getTinyTex() {
 }
 
 async function installTinyTexPosix() {
+  // We need to install texinfo for texi2dvi
+  try {
+    await exec.exec("apt install", ["-y", "texinfo"]);
+  } catch (error) {
+    throw `Failed to install texinfo package: ${error}`;
+  }
+
   const fileName = "install-unx.sh";
   const downloadUrl = "https://yihui.name/gh/tinytex/tools/install-unx.sh";
   let downloadPath: string | null = null;
