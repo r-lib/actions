@@ -9,7 +9,7 @@ import * as path from "path";
 import { promises as fs } from "fs";
 import * as restm from "typed-rest-client/RestClient";
 import * as semver from "semver";
-import * as osInfo from "linux-os-info";
+import osInfo from "linux-os-info";
 
 const IS_WINDOWS = process.platform === "win32";
 const IS_MAC = process.platform === "darwin";
@@ -326,7 +326,7 @@ function getDownloadUrlUbuntu(filename: string): string {
   }
 
   try {
-    const info = osInfo.linuxOsInfo({ mode: "sync" });
+    const info = osInfo({ mode: "sync" });
     const versionStr = info.version_id.replace(/[.]/g, "");
 
     return util.format(

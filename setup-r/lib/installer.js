@@ -14,6 +14,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
     result["default"] = mod;
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 let tempDirectory = process.env["RUNNER_TEMP"] || "";
 const core = __importStar(require("@actions/core"));
@@ -25,7 +28,7 @@ const path = __importStar(require("path"));
 const fs_1 = require("fs");
 const restm = __importStar(require("typed-rest-client/RestClient"));
 const semver = __importStar(require("semver"));
-const osInfo = __importStar(require("linux-os-info"));
+const linux_os_info_1 = __importDefault(require("linux-os-info"));
 const IS_WINDOWS = process.platform === "win32";
 const IS_MAC = process.platform === "darwin";
 if (!tempDirectory) {
@@ -316,7 +319,7 @@ function getDownloadUrlUbuntu(filename) {
         throw new Error("R-devel not currently available on ubuntu!");
     }
     try {
-        const info = osInfo.linuxOsInfo({ mode: 'sync' });
+        const info = linux_os_info_1.default({ mode: "sync" });
         const versionStr = info.version_id.replace(/[.]/g, "");
         return util.format("https://cdn.rstudio.com/r/ubuntu-%s/pkgs/%s", versionStr, filename);
     }
