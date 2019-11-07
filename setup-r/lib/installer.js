@@ -315,9 +315,14 @@ function getDownloadUrlUbuntu(filename) {
     if (filename == "devel") {
         throw new Error("R-devel not currently available on ubuntu!");
     }
-    const info = osInfo.linuxOsInfo({ mode: 'sync' });
-    const versionStr = info.version_id.replace(/[.]/g, "");
-    return util.format("https://cdn.rstudio.com/r/ubuntu-%s/pkgs/%s", versionStr, filename);
+    try {
+        const info = osInfo.linuxOsInfo({ mode: 'sync' });
+        const versionStr = info.version_id.replace(/[.]/g, "");
+        return util.format("https://cdn.rstudio.com/r/ubuntu-%s/pkgs/%s", versionStr, filename);
+    }
+    catch (error) {
+        throw `Failed to get OS info: ${error}`;
+    }
 }
 function getFileNameWindows(version) {
     const filename = util.format("R-%s-win.exe", version);
