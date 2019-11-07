@@ -54,7 +54,13 @@ function getR(version, rtoolsVersion) {
             core.debug(`Tool found in cache ${toolPath}`);
         }
         else {
-            yield acquireR(version, rtoolsVersion);
+            try {
+                yield acquireR(version, rtoolsVersion);
+            }
+            catch (error) {
+                core.debug(error);
+                throw `Failed to get R ${version}: ${error}`;
+            }
         }
         setREnvironmentVariables();
         setupRLibrary();
@@ -63,30 +69,36 @@ function getR(version, rtoolsVersion) {
 exports.getR = getR;
 function acquireR(version, rtoolsVersion) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (IS_WINDOWS) {
-            yield acquireRWindows(version);
-            acquireRtools(rtoolsVersion);
-        }
-        else if (IS_MAC) {
-            acquireRMacOS(version);
-            installFortranMacOS();
-        }
-        else {
-            let returnCode = 1;
-            try {
-                returnCode = yield exec.exec("R", ["--version"], {
-                    ignoreReturnCode: true,
-                    silent: true
-                });
+        try {
+            if (IS_WINDOWS) {
+                yield acquireRWindows(version);
+                acquireRtools(rtoolsVersion);
             }
-            catch (e) { }
-            core.debug(`returnCode: ${returnCode}`);
-            if (returnCode != 0) {
-                // We only want to acquire R here if it
-                // doesn't already exist (because you are running in a container that
-                // already includes it)
-                acquireRUbuntu(version);
+            else if (IS_MAC) {
+                acquireRMacOS(version);
+                installFortranMacOS();
             }
+            else {
+                let returnCode = 1;
+                try {
+                    returnCode = yield exec.exec("R", ["--version"], {
+                        ignoreReturnCode: true,
+                        silent: true
+                    });
+                }
+                catch (e) { }
+                core.debug(`returnCode: ${returnCode}`);
+                if (returnCode != 0) {
+                    // We only want to acquire R here if it
+                    // doesn't already exist (because you are running in a container that
+                    // already includes it)
+                    acquireRUbuntu(version);
+                }
+            }
+        }
+        catch (error) {
+            core.debug(error);
+            throw `Failed to get R ${version}: ${error}`;
         }
     });
 }

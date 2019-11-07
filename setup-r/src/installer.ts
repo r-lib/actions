@@ -39,7 +39,13 @@ export async function getR(version: string, rtoolsVersion: string) {
   if (toolPath) {
     core.debug(`Tool found in cache ${toolPath}`);
   } else {
-    await acquireR(version, rtoolsVersion);
+    try {
+      await acquireR(version, rtoolsVersion);
+    } catch (error) {
+      core.debug(error);
+
+      throw `Failed to get R ${version}: ${error}`;
+    }
   }
 
   setREnvironmentVariables();
@@ -47,28 +53,34 @@ export async function getR(version: string, rtoolsVersion: string) {
 }
 
 async function acquireR(version: string, rtoolsVersion: string) {
-  if (IS_WINDOWS) {
-    await acquireRWindows(version);
-    acquireRtools(rtoolsVersion);
-  } else if (IS_MAC) {
-    acquireRMacOS(version);
-    installFortranMacOS();
-  } else {
-    let returnCode = 1;
-    try {
-      returnCode = await exec.exec("R", ["--version"], {
-        ignoreReturnCode: true,
-        silent: true
-      });
-    } catch (e) {}
+  try {
+    if (IS_WINDOWS) {
+      await acquireRWindows(version);
+      acquireRtools(rtoolsVersion);
+    } else if (IS_MAC) {
+      acquireRMacOS(version);
+      installFortranMacOS();
+    } else {
+      let returnCode = 1;
+      try {
+        returnCode = await exec.exec("R", ["--version"], {
+          ignoreReturnCode: true,
+          silent: true
+        });
+      } catch (e) {}
 
-    core.debug(`returnCode: ${returnCode}`);
-    if (returnCode != 0) {
-      // We only want to acquire R here if it
-      // doesn't already exist (because you are running in a container that
-      // already includes it)
-      acquireRUbuntu(version);
+      core.debug(`returnCode: ${returnCode}`);
+      if (returnCode != 0) {
+        // We only want to acquire R here if it
+        // doesn't already exist (because you are running in a container that
+        // already includes it)
+        acquireRUbuntu(version);
+      }
     }
+  } catch (error) {
+    core.debug(error);
+
+    throw `Failed to get R ${version}: ${error}`;
   }
 }
 
