@@ -325,7 +325,7 @@ function getDownloadUrlUbuntu(filename: string): string {
     throw new Error("R-devel not currently available on ubuntu!");
   }
 
-  const info = osInfo.osInfo();
+  const info = osInfo.linuxOsInfo();
   const versionStr = info.version_id.replace(/[.]/g, "");
 
   return util.format(
