@@ -1,5 +1,6 @@
 
-  - [Quickstart CI](#quickstart-ci-workflow) - A simple CI workflow
+  - [Quickstart CI](#quickstart-ci-workflow) - A simple CI workflow to
+    check with the release version of R.
   - [Tidyverse CI](#tidyverse-ci-workflow) - A more complex CI workflow
   - [Pull Request Commands](#commands-workflow) - Adds `/document` and
     `/style` commands for pull requests.
@@ -8,7 +9,7 @@
 
 ## Quickstart CI workflow
 
-This workflow installs latest stable R version on macOS and runs R CMD
+This workflow installs latest release R version on macOS and runs R CMD
 check via the [rcmdcheck](https://github.com/r-lib/rcmdcheck) package.
 
 ### When can it be used?
@@ -57,10 +58,10 @@ CI workflow.
 ``` yaml
 on: [push, pull_request]
 
-name: R-cmd-check
+name: R-CMD-check
 
 jobs:
-  CI:
+  R-CMD-check:
     runs-on: ${{ matrix.config.os }}
 
     name: ${{ matrix.config.os }} (${{ matrix.config.r }})
