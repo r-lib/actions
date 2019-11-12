@@ -23,11 +23,10 @@ check via the [rcmdcheck](https://github.com/r-lib/rcmdcheck) package.
 ``` yaml
 on: [push, pull_request]
 
-name: R
+name: R-CMD-check
 
 jobs:
-  check:
-    name: Check
+  R-CMD-check:
     runs-on: macOS-latest
     steps:
       - uses: actions/checkout@v1
