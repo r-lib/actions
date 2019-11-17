@@ -77,7 +77,7 @@ print_yaml("render-readme.yaml")
 
 ## Build pkgdown site
 
-This example build a pkgdown site for a repository and pushes the built package
+This example builds a pkgdown site for a repository and pushes the built package
 to the gh-pages branch.
 
 ```{r echo = FALSE, results = "asis"}
