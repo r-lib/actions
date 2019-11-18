@@ -1,0 +1,10 @@
+name: 'Run rchk tests'
+description: 'Run rchk tests'
+inputs:
+  apt:
+    default: ''
+  package:
+    default: ''
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
