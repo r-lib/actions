@@ -370,6 +370,10 @@ function setREnvironmentVariables() {
 }
 
 async function determineVersion(version: string): Promise<string> {
+  if (version.toLowerCase() == "latest" || version.toLowerCase() == "release") {
+    version = "3.x";
+  }
+
   if (!version.endsWith(".x")) {
     const versionPart = version.split(".");
 

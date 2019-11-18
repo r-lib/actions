@@ -348,6 +348,9 @@ function setREnvironmentVariables() {
 }
 function determineVersion(version) {
     return __awaiter(this, void 0, void 0, function* () {
+        if (version.toLowerCase() == 'latest' || version.toLowerCase() == 'release') {
+            version = '3.x';
+        }
         if (!version.endsWith(".x")) {
             const versionPart = version.split(".");
             if (versionPart[1] == null || versionPart[2] == null) {
