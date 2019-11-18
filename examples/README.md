@@ -230,7 +230,7 @@ jobs:
 
 ## Build pkgdown site
 
-This example build a pkgdown site for a repository and pushes the built
+This example builds a pkgdown site for a repository and pushes the built
 package to the gh-pages branch.
 
 ``` yaml
