@@ -1,5 +1,6 @@
 ^pr-fetch$
 ^pr-push$
+^run-rchk$
 ^setup-r$
 ^setup-pandoc$
 ^setup-tinytex$
