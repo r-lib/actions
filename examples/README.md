@@ -221,8 +221,8 @@ jobs:
         run: Rscript -e 'rmarkdown::render("examples/README.Rmd")'
       - name: Commit results
         run: |
-          git commit examples/README.md -m 'Re-build README.Rmd'
-          git push https://${{github.actor}}:${{secrets.GITHUB_TOKEN}}@github.com/${{github.repository}}.git HEAD:master
+          git commit examples/README.md -m 'Re-build README.Rmd' || echo "No changes to commit"
+          git push https://${{github.actor}}:${{secrets.GITHUB_TOKEN}}@github.com/${{github.repository}}.git HEAD:${{ github.ref }} || echo "No changes to commit"
 ```
 
 ## Build pkgdown site
