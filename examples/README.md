@@ -55,7 +55,13 @@ CI workflow.
 <!-- end list -->
 
 ``` yaml
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 
 name: R-CMD-check
 
