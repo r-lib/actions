@@ -1,6 +1,6 @@
 # GitHub Actions for the R language
 
-[![R build status](https://github.com/r-lib/actions/workflows/R/badge.svg)](https://github.com/r-lib/actions/actions?workflow=R)
+[![R build status](https://github.com/r-lib/actions/workflows/R-CMD-check/badge.svg)](https://github.com/r-lib/actions/actions?workflow=R-CMD-check)
 [![RStudio community](https://img.shields.io/badge/community-github--actions-blue?style=social&logo=rstudio&logoColor=75AADB)](https://community.rstudio.com/new-topic?category=Package%20development&tags=github-actions)
 
 This repository stores [GitHub Actions](https://github.com/features/actions), which can be used to do a variety of CI and CD tasks for R projects.
