@@ -10,6 +10,7 @@ This repository stores [GitHub Actions](https://github.com/features/actions), wh
 1. [r-lib/actions/setup-tinytex](https://github.com/r-lib/actions/tree/master/setup-tinytex) - Sets up LaTeX with [tinytex](https://yihui.name/tinytex)
 1. [r-lib/actions/pr-fetch](https://github.com/r-lib/actions/tree/master/pr-fetch) - Fetches changes of a PR associated with an event
 1. [r-lib/actions/pr-push](https://github.com/r-lib/actions/tree/master/pr-push) - Pushes changes to a PR associated with an event
+1. [r-lib/actions/run-rchk](https://github.com/r-lib/actions/tree/master/run-rchk) - Runs [rchk](https://github.com/kalibera/rchk) tests to detect memory protection errors in C source code.
 
 ## Examples
 
