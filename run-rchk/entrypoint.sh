@@ -26,16 +26,16 @@ echo "running rchk tests for $PACKAGE"
 cd /opt/R-svn/
 . /opt/rchk/scripts/cmpconfig.inc
 /opt/rchk/scripts/check_package.sh $PACKAGE
-if [ $(cat packages/lib/$PACKAGE/libs/$PACKAGE.so.bcheck | wc -l) -gt 1 ]; then
+if [ $(cat packages/lib/$PACKAGE/libs/$PACKAGE.so.bcheck | wc -l) -gt 3 ]; then
   FAIL=1
 fi
-if [ $(cat packages/lib/$PACKAGE/libs/$PACKAGE.so.maacheck | wc -l) -gt 1 ]; then
+if [ $(cat packages/lib/$PACKAGE/libs/$PACKAGE.so.maacheck | wc -l) -gt 3 ]; then
   FAIL=1
 fi
 cat packages/lib/$PACKAGE/libs/$PACKAGE.so.maacheck
 cat packages/lib/$PACKAGE/libs/$PACKAGE.so.bcheck
 
-if [ -z "$FAIL" ]; then
+if [ "$FAIL" = 1 ]; then
   echo "rchk tests failed."
   exit 1
 else
