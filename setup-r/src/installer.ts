@@ -59,8 +59,8 @@ async function acquireR(version: string, rtoolsVersion: string) {
       await acquireRWindows(version);
       acquireRtools(rtoolsVersion);
     } else if (IS_MAC) {
-      acquireRMacOS(version);
       installFortranMacOS();
+      await acquireRMacOS(version);
       if (core.getInput("remove-openmp-macos")) {
         removeOpenmpFlags();
       }
