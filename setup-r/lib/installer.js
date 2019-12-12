@@ -79,8 +79,8 @@ function acquireR(version, rtoolsVersion) {
                 acquireRtools(rtoolsVersion);
             }
             else if (IS_MAC) {
-                acquireRMacOS(version);
                 installFortranMacOS();
+                yield acquireRMacOS(version);
                 if (core.getInput("remove-openmp-macos")) {
                     removeOpenmpFlags();
                 }
