@@ -81,6 +81,9 @@ function acquireR(version, rtoolsVersion) {
             else if (IS_MAC) {
                 acquireRMacOS(version);
                 installFortranMacOS();
+                if (core.getInput("remove-openmp-macos")) {
+                    removeOpenmpFlags();
+                }
             }
             else {
                 let returnCode = 1;
@@ -114,6 +117,23 @@ function installFortranMacOS() {
         catch (error) {
             core.debug(error);
             throw `Failed to install gfortan: ${error}`;
+        }
+    });
+}
+function removeOpenmpFlags() {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            exec.exec("sed", [
+                "-i",
+                ".bak",
+                "-e",
+                "s/-fopenmp//g",
+                "/Library/Frameworks/R.framework/Resources/etc/Makeconf"
+            ]);
+        }
+        catch (error) {
+            core.debug(error);
+            throw `Failed to remove OpenMP flags: ${error}`;
         }
     });
 }
@@ -348,8 +368,8 @@ function setREnvironmentVariables() {
 }
 function determineVersion(version) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (version.toLowerCase() == 'latest' || version.toLowerCase() == 'release') {
-            version = '3.x';
+        if (version.toLowerCase() == "latest" || version.toLowerCase() == "release") {
+            version = "3.x";
         }
         if (!version.endsWith(".x")) {
             const versionPart = version.split(".");

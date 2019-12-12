@@ -61,6 +61,9 @@ async function acquireR(version: string, rtoolsVersion: string) {
     } else if (IS_MAC) {
       acquireRMacOS(version);
       installFortranMacOS();
+      if (core.getInput("remove-openmp-macos")) {
+        removeOpenmpFlags();
+      }
     } else {
       let returnCode = 1;
       try {
@@ -92,6 +95,22 @@ async function installFortranMacOS() {
     core.debug(error);
 
     throw `Failed to install gfortan: ${error}`;
+  }
+}
+
+async function removeOpenmpFlags() {
+  try {
+    exec.exec("sed", [
+      "-i",
+      ".bak",
+      "-e",
+      "s/-fopenmp//g",
+      "/Library/Frameworks/R.framework/Resources/etc/Makeconf"
+    ]);
+  } catch (error) {
+    core.debug(error);
+
+    throw `Failed to remove OpenMP flags: ${error}`;
   }
 }
 
