@@ -75,14 +75,12 @@ function acquireR(version, rtoolsVersion) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             if (IS_WINDOWS) {
-                yield acquireRWindows(version);
-                acquireRtools(rtoolsVersion);
+                yield Promise.all([acquireRWindows(version), acquireRtools(rtoolsVersion)]);
             }
             else if (IS_MAC) {
-                installFortranMacOS();
-                yield acquireRMacOS(version);
+                yield Promise.all([installFortranMacOS(), acquireRMacOS(version)]);
                 if (core.getInput("remove-openmp-macos")) {
-                    removeOpenmpFlags();
+                    yield removeOpenmpFlags();
                 }
             }
             else {
@@ -99,7 +97,7 @@ function acquireR(version, rtoolsVersion) {
                     // We only want to acquire R here if it
                     // doesn't already exist (because you are running in a container that
                     // already includes it)
-                    acquireRUbuntu(version);
+                    yield acquireRUbuntu(version);
                 }
             }
         }
@@ -112,7 +110,7 @@ function acquireR(version, rtoolsVersion) {
 function installFortranMacOS() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            exec.exec("brew", ["cask", "install", "gfortran"]);
+            yield exec.exec("brew", ["cask", "install", "gfortran"]);
         }
         catch (error) {
             core.debug(error);
@@ -123,7 +121,7 @@ function installFortranMacOS() {
 function removeOpenmpFlags() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            exec.exec("sed", [
+            yield exec.exec("sed", [
                 "-i",
                 ".bak",
                 "-e",
