@@ -30,7 +30,7 @@ function run() {
                 "-e",
                 "x <- goodpractice::goodpractice()",
                 "-e",
-                'capture.outupt(print(x), file = ".goodpractice")'
+                'capture.output(print(x), file = ".goodpractice")'
             ]);
             const results = fs.readFileSync(".goodpractice").toString();
             const finishedCheck = yield octokit.checks.update(Object.assign({}, context.repo, { check_run_id: check.data.id, name: check.data.name, output: {

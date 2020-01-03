@@ -22,7 +22,7 @@ async function run() {
       "-e",
       "x <- goodpractice::goodpractice()",
       "-e",
-      'capture.outupt(print(x), file = ".goodpractice")'
+      'capture.output(print(x), file = ".goodpractice")'
     ]);
 
     const results = fs.readFileSync(".goodpractice").toString();
