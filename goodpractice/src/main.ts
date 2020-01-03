@@ -20,7 +20,7 @@ async function run() {
 
     await exec.exec("Rscript", [
       "-e",
-      "x <- goodpractice::goodpracice()",
+      "x <- goodpractice::goodpractice()",
       "-e",
       'capture.outupt(print(x), file = ".goodpractice")'
     ]);

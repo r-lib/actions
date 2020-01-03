@@ -28,7 +28,7 @@ function run() {
             const check = yield octokit.checks.create(Object.assign({}, context.repo, { name: "goodpractice", head_sha: context.sha, status: "in_progress" }));
             yield exec.exec("Rscript", [
                 "-e",
-                "x <- goodpractice::goodpracice()",
+                "x <- goodpractice::goodpractice()",
                 "-e",
                 'capture.outupt(print(x), file = ".goodpractice")'
             ]);
