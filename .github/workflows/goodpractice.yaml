@@ -1,0 +1,14 @@
+on: pull_request
+
+jobs:
+  goodpractice:
+    name: goodpractice
+    runs-on: macOS-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: r-lib/actions/setup-r@master
+      - name: Install dependencies
+        run: Rscript -e "install.packages(c('remotes'))" -e "remotes::install_deps(dependencies = TRUE)"
+      - uses: r-lib/actions/goodpractice@goodpractice
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
