@@ -36,7 +36,7 @@ function run() {
             const finishedCheck = yield octokit.checks.update(Object.assign({}, context.repo, { check_run_id: check.data.id, name: check.data.name, output: {
                     title: "goodpractice results",
                     summary: results
-                }, status: "completed" }));
+                }, status: "completed", conclusion: "success" }));
         }
         catch (error) {
             core.setFailed(error.message);

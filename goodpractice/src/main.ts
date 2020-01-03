@@ -35,7 +35,8 @@ async function run() {
         title: "goodpractice results",
         summary: results
       },
-      status: "completed"
+      status: "completed",
+      conclusion: "success"
     });
   } catch (error) {
     core.setFailed(error.message);
