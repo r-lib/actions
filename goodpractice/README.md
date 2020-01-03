@@ -24,7 +24,7 @@ jobs:
       - uses: actions/checkout@v1
       - uses: r-lib/actions/setup-r@master
       - name: Install dependencies
-        run: Rscript -e "install.packages(c('remotes'))" -e "remotes::install_deps(dependencies = TRUE)"
+        run: Rscript -e "install.packages(c('remotes', 'goodpractice'))" -e "remotes::install_deps(dependencies = TRUE)"
       - uses: r-lib/actions/goodpractice@master
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}

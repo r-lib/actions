@@ -1,10 +1,9 @@
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -22,16 +21,26 @@ const exec = __importStar(require("@actions/exec"));
 const fs = __importStar(require("fs"));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
-        const token = core.getInput('repo-token', { required: true });
-        const octokit = new github.GitHub(token);
-        const context = github.context;
-        const check = yield octokit.checks.create(Object.assign(Object.assign({}, context.repo), { name: 'goodpractice', head_sha: context.sha, status: 'in_progress' }));
-        yield exec.exec("Rscript", ['-e', 'x <- goodpractice::goodpracice()', '-e', 'capture.outupt(print(x), file = ".goodpractice")']);
-        const results = fs.readFileSync(".goodpractice").toString();
-        const finishedCheck = yield octokit.checks.update(Object.assign(Object.assign({}, context.repo), { check_run_id: check.data.id, name: check.data.name, output: {
-                title: 'goodpractice results',
-                summary: results
-            }, status: 'completed' }));
+        try {
+            const token = core.getInput("repo-token", { required: true });
+            const octokit = new github.GitHub(token);
+            const context = github.context;
+            const check = yield octokit.checks.create(Object.assign({}, context.repo, { name: "goodpractice", head_sha: context.sha, status: "in_progress" }));
+            yield exec.exec("Rscript", [
+                "-e",
+                "x <- goodpractice::goodpracice()",
+                "-e",
+                'capture.outupt(print(x), file = ".goodpractice")'
+            ]);
+            const results = fs.readFileSync(".goodpractice").toString();
+            const finishedCheck = yield octokit.checks.update(Object.assign({}, context.repo, { check_run_id: check.data.id, name: check.data.name, output: {
+                    title: "goodpractice results",
+                    summary: results
+                }, status: "completed" }));
+        }
+        catch (error) {
+            core.setFailed(error.message);
+        }
     });
 }
 run();
