@@ -25,7 +25,6 @@ function run() {
             const token = core.getInput("repo-token", { required: true });
             const octokit = new github.GitHub(token);
             const context = github.context;
-            const check = yield octokit.checks.create(Object.assign({}, context.repo, { name: "goodpractice", head_sha: context.sha, status: "in_progress" }));
             yield exec.exec("Rscript", [
                 "-e",
                 "x <- goodpractice::goodpractice()",
@@ -33,10 +32,7 @@ function run() {
                 'capture.output(print(x), file = ".goodpractice")'
             ]);
             const results = fs.readFileSync(".goodpractice").toString();
-            const finishedCheck = yield octokit.checks.update(Object.assign({}, context.repo, { check_run_id: check.data.id, name: check.data.name, output: {
-                    title: "goodpractice results",
-                    summary: results
-                }, status: "completed", conclusion: "success" }));
+            const check = yield octokit.issues.createComment(Object.assign({}, context.repo, { issue_number: context.issue.number, body: results }));
         }
         catch (error) {
             core.setFailed(error.message);

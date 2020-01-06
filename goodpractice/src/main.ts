@@ -11,13 +11,6 @@ async function run() {
 
     const context = github.context;
 
-    const check = await octokit.checks.create({
-      ...context.repo,
-      name: "goodpractice",
-      head_sha: context.sha,
-      status: "in_progress"
-    });
-
     await exec.exec("Rscript", [
       "-e",
       "x <- goodpractice::goodpractice()",
@@ -27,16 +20,10 @@ async function run() {
 
     const results = fs.readFileSync(".goodpractice").toString();
 
-    const finishedCheck = await octokit.checks.update({
+    const check = await octokit.issues.createComment({
       ...context.repo,
-      check_run_id: check.data.id,
-      name: check.data.name,
-      output: {
-        title: "goodpractice results",
-        summary: results
-      },
-      status: "completed",
-      conclusion: "success"
+      issue_number: context.issue.number,
+      body: results
     });
   } catch (error) {
     core.setFailed(error.message);
