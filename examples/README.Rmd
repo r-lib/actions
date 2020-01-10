@@ -78,7 +78,9 @@ print_yaml("render-readme.yaml")
 ## Build pkgdown site
 
 This example builds a pkgdown site for a repository and pushes the built package
-to the gh-pages branch.
+to the gh-pages branch. **Note** you need to add a `DEPLOY_PAT` secret to your
+repository, however this personal access token _only_ needs the `public_repo`
+scope.
 
 ```{r echo = FALSE, results = "asis"}
 print_yaml("pkgdown.yaml")
