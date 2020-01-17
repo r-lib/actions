@@ -6,6 +6,15 @@
     `/style` commands for pull requests.
   - [Render README](#render-readme) - Render README.Rmd when it changes
     and commit the result
+  - [Build pkgdown site](#build-pkgdown-site) - Build a \[pkgdown\] site
+    for an R package and deploy it to [GitHub
+    Pages](https://pages.github.com/).
+  - [Build bookdown site](#build-bookdown-site) - Build a
+    [bookdown](https://bookdown.org) site and deploy it to
+    [netlify](https://www.netlify.com/).
+  - [Build blogdown site](#build-blogdown-site) - Build a
+    [blogdown](https://bookdown.org/yihui/blogdown/) site and deploy it
+    to [netlify](https://www.netlify.com/).
 
 ## Quickstart CI workflow
 
@@ -242,8 +251,10 @@ jobs:
 
 ## Build pkgdown site
 
-This example builds a pkgdown site for a repository and pushes the built
-package to the gh-pages branch.
+This example builds a \[pkgdown\] site for a repository and pushes the
+built package to [GitHub Pages](https://pages.github.com/). **Note** you
+need to add a `DEPLOY_PAT` secret to your repository, however this
+personal access token *only* needs the `public_repo` scope.
 
 ``` yaml
 on:
@@ -268,5 +279,141 @@ jobs:
         run: R CMD INSTALL .
       - name: Deploy package
         run: |
-          Rscript -e "pkgdown:::deploy_local(new_process = FALSE, remote_url = 'https://x-access-token:${{secrets.GITHUB_TOKEN}}@github.com/${{github.repository}}.git')"
+          pkgdown:::deploy_local(new_process = FALSE, remote_url = 'https://x-access-token:${{secrets.DEPLOY_PAT}}@github.com/${{github.repository}}.git')
+        shell: Rscript {0}
+```
+
+## Build bookdown site
+
+This example builds a [bookdown](https://bookdown.org) site for a
+repository and then deploys the book via
+[netlify](https://www.netlify.com/). It uses
+[renv](https://rstudio.github.io/renv/) to ensure the package versions
+remain consistent across builds. You will need to run `renv::snapshot()`
+locally and commit the `renv.lock` file before using this workflow, see
+[Using renv with Continous
+Integeration](https://rstudio.github.io/renv/articles/ci.html) for
+additional information. **Note** you need to add a `NETLIFY_AUTH_TOKEN`
+secret to your repository for the netlify deploy.
+
+``` yaml
+jobs:
+  build:
+    runs-on: macOS-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@master
+
+      - name: Setup R
+        uses: r-lib/actions/setup-r@master
+
+      - name: Install pandoc and pandoc citeproc
+        run: |
+          brew install pandoc
+          brew install pandoc-citeproc
+
+      - name: Cache Renv packages
+        uses: actions/cache@v1
+        with:
+          path: $HOME/.local/share/renv
+          key: r-${{ hashFiles('renv.lock') }}
+          restore-keys: r-
+
+      - name: Cache bookdown results
+        uses: actions/cache@v1
+        with:
+          path: _bookdown_files
+          key: bookdown-${{ hashFiles('**/*Rmd') }}
+          restore-keys: bookdown-
+
+      - name: Install packages
+        run: |
+          R -e 'install.packages("renv")'
+          R -e 'renv::restore()'
+
+      - name: Build site
+        run: Rscript -e 'bookdown::render_book("index.Rmd", quiet = TRUE)'
+
+      - name: Install npm
+        uses: actions/setup-node@v1
+
+      - name: Deploy to Netlify
+        # NETLIFY_AUTH_TOKEN added in the repo's secrets
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+        run: |
+          npm install netlify-cli -g
+          netlify deploy --prod --dir _book
+```
+
+## Build blogdown site
+
+This example builds a [blogdown](https://bookdown.org/yihui/blogdown/)
+site for a repository and then deploys the book via
+[netlify](https://www.netlify.com/). It uses
+[renv](https://rstudio.github.io/renv/) to ensure the package versions
+remain consistent across builds. You will need to run `renv::snapshot()`
+locally and commit the `renv.lock` file before using this workflow, see
+[Using renv with Continous
+Integeration](https://rstudio.github.io/renv/articles/ci.html) for
+additional information. **Note** you need to add a `NETLIFY_AUTH_TOKEN`
+secret to your repository for the netlify deploy.
+
+``` yaml
+on:
+  push:
+    branches: master
+
+jobs:
+  build:
+    runs-on: macOS-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@master
+
+      - name: Setup R
+        uses: r-lib/actions/setup-r@master
+
+      - name: Install pandoc and pandoc citeproc
+        run: |
+          brew install pandoc
+          brew install pandoc-citeproc
+
+      - name: Cache Renv packages
+        uses: actions/cache@v1
+        with:
+          path: $HOME/.local/share/renv
+          key: r-${{ hashFiles('renv.lock') }}
+          restore-keys: r-
+
+      - name: Cache bookdown results
+        uses: actions/cache@v1
+        with:
+          path: _bookdown_files
+          key: bookdown-${{ hashFiles('**/*Rmd') }}
+          restore-keys: bookdown-
+
+      - name: Install packages
+        run: |
+          R -e 'install.packages("renv")'
+          R -e 'renv::restore()'
+
+      - name: Install hugo
+        run: |
+          R -e 'blogdown::install_hugo()'
+
+      - name: Build site
+        run: |
+          R -e 'blogdown::build_site(TRUE)'
+
+      - name: Install npm
+        uses: actions/setup-node@v1
+
+      - name: Deploy to Netlify
+        # NETLIFY_AUTH_TOKEN added in the repo's secrets
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+        run: |
+          npm install netlify-cli -g
+          netlify deploy --prod
 ```
