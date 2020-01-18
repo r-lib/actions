@@ -297,6 +297,10 @@ additional information. **Note** you need to add a `NETLIFY_AUTH_TOKEN`
 secret to your repository for the netlify deploy.
 
 ``` yaml
+on:
+  push:
+    branches: master
+
 jobs:
   build:
     runs-on: macOS-latest
