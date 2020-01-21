@@ -8,4 +8,5 @@ Authors@R:
              email = "james.hester@rstudio.com"))
 Description: This is a simple package used to test the workflow files.
 Imports: xml2, curl
+Suggests: covr
 License: GPL (>= 2)
