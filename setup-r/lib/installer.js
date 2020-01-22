@@ -75,7 +75,10 @@ function acquireR(version, rtoolsVersion) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             if (IS_WINDOWS) {
-                yield Promise.all([acquireRWindows(version), acquireRtools(rtoolsVersion)]);
+                yield Promise.all([
+                    acquireRWindows(version),
+                    acquireRtools(rtoolsVersion)
+                ]);
             }
             else if (IS_MAC) {
                 yield Promise.all([installFortranMacOS(), acquireRMacOS(version)]);
@@ -316,7 +319,7 @@ function getFileNameMacOS(version) {
 }
 function getDownloadUrlMacOS(version) {
     if (version == "devel") {
-        return "https://mac.r-project.org/el-capitan/R-devel/R-devel-el-capitan.pkg";
+        return "http://mac.r-project.org/el-capitan/R-devel/R-devel-el-capitan-signed.pkg";
     }
     const filename = getFileNameMacOS(version);
     if (semver.eq(version, "3.2.5")) {
