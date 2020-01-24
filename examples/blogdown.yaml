@@ -2,6 +2,8 @@ on:
   push:
     branches: master
 
+name: blogdown
+
 jobs:
   build:
     runs-on: macOS-latest
