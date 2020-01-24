@@ -2,6 +2,8 @@ on:
   push:
     branches: master
 
+name: bookdown
+
 jobs:
   build:
     runs-on: macOS-latest
