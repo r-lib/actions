@@ -301,6 +301,8 @@ on:
   push:
     branches: master
 
+name: bookdown
+
 jobs:
   build:
     runs-on: macOS-latest
@@ -368,6 +370,8 @@ secret to your repository for the netlify deploy.
 on:
   push:
     branches: master
+
+name: blogdown
 
 jobs:
   build:
