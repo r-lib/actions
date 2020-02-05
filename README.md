@@ -43,6 +43,13 @@ If your build fails and you are unsure of why here are some useful strategies fo
    in one of the R specifc actions listed above, open an [issue
    here](https://github.com/r-lib/actions/issues/new/choose).
 
+## Additional resources
+
+- [GitHub Actions with R](https://ropenscilabs.github.io/actions_sandbox/) - a short online book about using GitHub Actions with R, produced as part of the [rOpenSci OzUnconf](https://ozunconf19.ropensci.org/).
+- [GitHub Actions advent calendar](https://www.edwardthomson.com/blog/github_actions_advent_calendar.html) a series of blogposts by one of the GitHub Actions Product Managers
+  highlighting features of GitHub Actions.
+- [Awesome Actions](https://github.com/sdras/awesome-actions#awesome-actions---) - a curated list of custom actions. **Note** many of these are from early in the GitHub Actions beta and may no longer work.
+
 ## License ![CC0 licensed](https://img.shields.io/github/license/r-lib/actions)
 
 All examples in this repository are published with the [CC0](./LICENSE) license.
