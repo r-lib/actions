@@ -1,6 +1,7 @@
 FROM rhub/ubuntu-rchk
 
 USER root
+RUN apt-get update
 RUN apt-get install sudo -y
 
 RUN echo "docker ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/user && \
