@@ -27,11 +27,10 @@ If your build fails and you are unsure of why here are some useful strategies fo
 1. Figure out what caused the error. Look for the _first_ time the word
    'error' appears in the build log. Quite often errors at the end of the log are caused
    by an earlier issue, so it is best to look for the root cause.
-1. Take advantage of [GitHub's code search](https://github.com/search?q=path%3A.github%2Fworkflows) to find similar yaml files. Use
-   'path:.github/workflows' to restrict your search to GitHub Action workflow
-   files and also include additional terms specific to your problem. e.g. If you
-   need to figure out how to install geospatial libraries such as
-   [gdal](https://gdal.org/) use a search like ['gdal path:.github/workflows'](https://github.com/search?q=gdal+path%3A.github%2Fworkflows).
+1. Take advantage of [GitHub's code search](https://github.com/search?q=path%3A.github%2Fworkflows) to find similar yaml files.
+   Use 'path:.github/workflows' to restrict your search to GitHub Action workflow files and also include additional terms specific to your problem.
+   e.g. If you need to figure out how to install geospatial libraries such as [gdal](https://gdal.org/) use a search like ['gdal path:.github/workflows'](https://github.com/search?q=gdal+path%3A.github%2Fworkflows).
+   If you want to restrict results only to GitHub Actions workflows that use R you can add search for ['"setup-r" path:.github/workflows](https://github.com/search?q=%22setup-r%22+path%3A.github%2Fworkflows)
 1. Open an issue on [![RStudio
    community](https://img.shields.io/badge/community-github--actions-blue?style=social&logo=rstudio&logoColor=75AADB)](https://community.rstudio.com/new-topic?category=Package%20development&tags=github-actions)
    about your problem. Be sure to link to the workflow file you are using and a
