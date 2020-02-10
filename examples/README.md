@@ -107,9 +107,9 @@ jobs:
       - uses: r-lib/actions/setup-pandoc@master
 
       - name: Query dependencies
-        run: >
-          Rscript
-            -e "install.packages('remotes')"
+        run:
+          Rscript \
+            -e "install.packages('remotes')" \
             -e "saveRDS(remotes::dev_package_deps(dependencies = TRUE), 'depends.Rds', version = 2)"
 
       - name: Cache R packages
@@ -130,16 +130,15 @@ jobs:
           sudo -s eval "$sysreqs"
 
       - name: Install dependencies
-        run: >
-          Rscript
-            -e "library(remotes)"
-            -e "update(readRDS('depends.Rds'))"
+        run:
+          Rscript \
+            -e "library(remotes)" \
+            -e "update(readRDS('depends.Rds'))" \
             -e "remotes::install_cran('rcmdcheck')"
 
       - name: Check
-        run: >
-          Rscript
-            -e "rcmdcheck::rcmdcheck(args = '--no-manual', error_on = 'warning', check_dir = 'check')"
+        run:
+          Rscript -e "rcmdcheck::rcmdcheck(args = '--no-manual', error_on = 'warning', check_dir = 'check')"
 
       - name: Upload check results
         if: failure()
@@ -150,8 +149,8 @@ jobs:
 
       - name: Test coverage
         if: matrix.config.os == 'macOS-latest' && matrix.config.r == '3.6'
-        run: >
-          Rscript
+        run:
+          Rscript \
             -e 'covr::codecov(token = "${{secrets.CODECOV_TOKEN}}")'
 ```
 
