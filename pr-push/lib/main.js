@@ -33,9 +33,8 @@ function run() {
                 pull_number: issue.number
             });
             const headBranch = pr.head.ref;
-            const headCloneURL = pr.head.repo.clone_url;
-            const headCloneURL2 = headCloneURL.replace("https://", `https://x-access-token:${token}@`);
-            yield exec.exec("git", ["push", headCloneURL2, `HEAD:${headBranch}`]);
+            const headCloneURL = pr.head.repo.clone_url.replace("https://", `https://x-access-token:${token}@`);
+            yield exec.exec("git", ["push", headCloneURL, `HEAD:${headBranch}`]);
         }
         catch (error) {
             core.setFailed(error.message);
