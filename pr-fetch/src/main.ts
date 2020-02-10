@@ -22,14 +22,12 @@ async function run() {
     });
 
     const headBranch: string = pr.head.ref;
-    const headCloneURL: string = pr.head.repo.clone_url;
-
-    const headCloneURL2: string = headCloneURL.replace(
+    const headCloneURL: string = pr.head.repo.clone_url.replace(
       "https://",
       `https://x-access-token:${token}@`
     );
 
-    await exec.exec("git", ["remote", "add", "pr", headCloneURL2]);
+    await exec.exec("git", ["remote", "add", "pr", headCloneURL]);
     await exec.exec("git", ["fetch", "pr", headBranch]);
     await exec.exec("git", ["checkout", "-b", headBranch, `pr/${headBranch}`]);
   } catch (error) {
