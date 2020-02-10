@@ -151,9 +151,9 @@ jobs:
 ## Commands workflow
 
 This workflow enables the use of 2 R specific commands in pull request
-issue comments. `/document` will use
+issue comments. `\document` will use
 [roxygen2](https://roxygen2.r-lib.org/) to rebuild the documentation for
-the package and commit the result to the pull request. `/style` will use
+the package and commit the result to the pull request. `\style` will use
 [styler](https://styler.r-lib.org/) to restyle your package.
 
 ## When it can they be used?
@@ -193,7 +193,7 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
   style:
     if: startsWith(github.event.comment.body, '/style')
-    name: document
+    name: style
     runs-on: macOS-latest
     steps:
       - uses: actions/checkout@master
@@ -203,12 +203,12 @@ jobs:
       - uses: r-lib/actions/setup-r@master
       - name: Install dependencies
         run: Rscript -e 'install.packages("styler")'
-      - name: style
+      - name: Style
         run: Rscript -e 'styler::style_pkg()'
       - name: commit
         run: |
           git add \*.R
-          git commit -m 'style'
+          git commit -m 'Style'
       - uses: r-lib/actions/pr-push@master
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
