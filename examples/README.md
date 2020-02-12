@@ -129,7 +129,7 @@ jobs:
 
       - name: Install dependencies
         run:
-          Rscript -e "library(remotes)" -e "update(readRDS('depends.Rds'))" -e "remotes::install_cran('rcmdcheck')"
+          Rscript -e "library(remotes)" -e "deps <- readRDS('depends.Rds')" -e "deps$installed <- vapply(deps$package, remotes:::local_sha, character(1))" -e "update(deps)" -e "remotes::install_cran('rcmdcheck')"
 
       - name: Check
         run:
