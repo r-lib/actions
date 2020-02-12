@@ -20,5 +20,5 @@ jobs:
         run: R CMD INSTALL .
       - name: Deploy package
         run: |
-          pkgdown:::deploy_local(new_process = FALSE, remote_url = 'https://x-access-token:${{secrets.DEPLOY_PAT}}@github.com/${{github.repository}}.git')
+          { url <- 'https://x-access-token:${{secrets.DEPLOY_PAT}}@github.com/${{github.repository}}.git'; pkgdown:::deploy_local(new_process = FALSE, remote_url = url) }
         shell: Rscript {0}
