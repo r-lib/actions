@@ -302,8 +302,8 @@ async function setupRLibrary() {
   core.debug("R profile is at " + profilePath);
   await fs.writeFile(
     profilePath,
-    `options(repos = '${process.env["CRAN"] ||
-      "https://cloud.r-project.org"}', crayon.enabled = ${core.getInput(
+    `options(repos = c("CRAN" = '${process.env["CRAN"] ||
+      "https://cloud.r-project.org"}'), crayon.enabled = ${core.getInput(
       "crayon.enabled"
     )}, Ncpus = ${core.getInput("Ncpus")})\n`
   );
