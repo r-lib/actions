@@ -54,9 +54,9 @@ print_yaml("check-full.yaml")
 ## Commands workflow
 
 This workflow enables the use of 2 R specific commands in pull request issue
-comments. `\document` will use [roxygen2](https://roxygen2.r-lib.org/) to
+comments. `/document` will use [roxygen2](https://roxygen2.r-lib.org/) to
 rebuild the documentation for the package and commit the result to the pull
-request. `\style` will use [styler](https://styler.r-lib.org/) to restyle your
+request. `/style` will use [styler](https://styler.r-lib.org/) to restyle your
 package.
 
 ## When it can they be used?
