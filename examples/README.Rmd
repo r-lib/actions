@@ -80,65 +80,10 @@ print_yaml("render-readme.yaml")
 
 ## Build pkgdown site
 
-This example builds a [pkgdown](https://pkgdown.r-lib.org/) site for a 
-repository and pushes the built package to [GitHub Pages]. 
-
-**Note** you need 
-to add a `DEPLOY_PAT` secret to your repository, however this personal access 
-token _only_ needs the `public_repo` scope, as well as have a `gh-pages` 
-branch in your git repository. 
-
-In this context:
-
-  - *your repository* is the GitHub package-repository for which 
-  you want to deploy a pkgdown site
-  - `{repo}` is the name of your repository,
-  - `{user}` is your GitHub user name or organization name, as the case may be.
-
-1. Open a couple of web pages at GitHub:
-
-   - Your account's **tokens** page: <https://github.com/settings/tokens>.
-   - Your repository's **secrets** page: 
-    `https://github.com/{user}/{repo}/settings/secrets`
-
-2. Create a Personal Access Token (PAT) at your account's **tokens** page.
-
-   - The only scope that this PAT needs is `public_repo`.
-   - You may wish to name the token `pkgdown-{repo}`. 
-   - As soon as you have created the PAT, save it to your clipboard.
-
-3. On your repository's **secrets** page:
-
-   - Click "Add a new secret".
-   - In the "Name" field, type `DEPLOY_PAT`.
-   - In the "Value" field, paste the PAT from your clipboard.
-   - Click "Add Secret".
-  
-4. At this point (certainly at some point), you may wish to close your 
-  **tokens** page to remove the visibility of your PAT.
-
-Your pkgdown site will be deployed on the `gh-pages` branch of your
-repository. Paraphrasing from the 
-[pkgdown documentation](https://pkgdown.r-lib.org/reference/deploy_site_github.html#setup),
-you need to make sure that a `gh-pages` branch exists. 
-The simplest way to do so is to run the following git commands locally:
-  
-```
-git checkout --orphan gh-pages
-git rm -rf .
-git commit --allow-empty -m 'Initial gh-pages commit'
-git push origin gh-pages
-git checkout master
-```
-
-We recommend doing this outside of RStudio (with the project closed) 
-as from RStudio's perspective you end up deleting all the files and then 
-re-creating them.
-
-At this point, upon the next push to the `master` branch at GitHub, the action
-will build and deploy your pkgdown site. At your repository's settings page
-(`https://github.com/{user}/{repo}/settings`), you will want to make sure that 
-the "source" for your repository's GitHub pages is set to "gh-pages branch". 
+This example builds a [pkgdown] site for a repository and pushes the built package
+to [GitHub Pages]. **Note** you need to add a `DEPLOY_PAT` secret to your
+repository, however this personal access token _only_ needs the `public_repo`
+scope.
 
 ```{r echo = FALSE, results = "asis"}
 print_yaml("pkgdown.yaml")
