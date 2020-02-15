@@ -310,7 +310,8 @@ locally and commit the `renv.lock` file before using this workflow, see
 [Using renv with Continous
 Integeration](https://rstudio.github.io/renv/articles/ci.html) for
 additional information. **Note** you need to add a `NETLIFY_AUTH_TOKEN`
-secret to your repository for the netlify deploy.
+secret to your repository for the netlify deploy (see [Managing
+secrets](#managing-secrets) section for details).
 
 ``` yaml
 on:
@@ -380,7 +381,8 @@ locally and commit the `renv.lock` file before using this workflow, see
 [Using renv with Continous
 Integeration](https://rstudio.github.io/renv/articles/ci.html) for
 additional information. **Note** you need to add a `NETLIFY_AUTH_TOKEN`
-secret to your repository for the netlify deploy.
+secret to your repository for the netlify deploy (see [Managing
+secrets](#managing-secrets) section for details).
 
 ``` yaml
 on:
