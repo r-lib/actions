@@ -41,9 +41,13 @@ jobs:
       - uses: actions/checkout@v1
       - uses: r-lib/actions/setup-r@master
       - name: Install dependencies
-        run: Rscript -e "install.packages(c('remotes', 'rcmdcheck'))" -e "remotes::install_deps(dependencies = TRUE)"
+        run: |
+          install.packages(c("remotes", "rcmdcheck"))
+          remotes::install_deps(dependencies = TRUE)
+        shell: Rscript {0}
       - name: Check
-        run: Rscript -e "rcmdcheck::rcmdcheck(args = '--no-manual', error_on = 'error')"
+        run: rcmdcheck::rcmdcheck(args = "--no-manual", error_on = "error")
+        shell: Rscript {0}
 ```
 
 ## Tidyverse CI workflow
@@ -107,8 +111,10 @@ jobs:
       - uses: r-lib/actions/setup-pandoc@master
 
       - name: Query dependencies
-        run:
-          Rscript -e "install.packages('remotes')" -e "saveRDS(remotes::dev_package_deps(dependencies = TRUE), 'depends.Rds', version = 2)"
+        run: |
+          install.packages('remotes')
+          saveRDS(remotes::dev_package_deps(dependencies = TRUE), "depends.Rds", version = 2)
+        shell: Rscript {0}
 
       - name: Cache R packages
         if: runner.os != 'Windows'
@@ -128,12 +134,17 @@ jobs:
           sudo -s eval "$sysreqs"
 
       - name: Install dependencies
-        run:
-          Rscript -e "library(remotes)" -e "update(readRDS('depends.Rds'))" -e "remotes::install_cran('rcmdcheck')"
+        run: |
+          library(remotes)
+          deps <- readRDS("depends.Rds")
+          deps[["installed"]] <- vapply(deps[["package"]], remotes:::local_sha, character(1))
+          update(deps)
+          remotes::install_cran("rcmdcheck")
+        shell: Rscript {0}
 
       - name: Check
-        run:
-          Rscript -e "rcmdcheck::rcmdcheck(args = '--no-manual', error_on = 'warning', check_dir = 'check')"
+        run: rcmdcheck::rcmdcheck(args = "--no-manual", error_on = "warning", check_dir = "check")
+        shell: Rscript {0}
 
       - name: Upload check results
         if: failure()
@@ -144,16 +155,16 @@ jobs:
 
       - name: Test coverage
         if: matrix.config.os == 'macOS-latest' && matrix.config.r == '3.6'
-        run:
-          Rscript -e 'covr::codecov(token = "${{secrets.CODECOV_TOKEN}}")'
+        run: covr::codecov(token = "${{secrets.CODECOV_TOKEN}}")
+        shell: Rscript {0}
 ```
 
 ## Commands workflow
 
 This workflow enables the use of 2 R specific commands in pull request
-issue comments. `\document` will use
+issue comments. `/document` will use
 [roxygen2](https://roxygen2.r-lib.org/) to rebuild the documentation for
-the package and commit the result to the pull request. `\style` will use
+the package and commit the result to the pull request. `/style` will use
 [styler](https://styler.r-lib.org/) to restyle your package.
 
 ## When it can they be used?
@@ -334,14 +345,14 @@ jobs:
       - uses: r-lib/actions/setup-pandoc@master
       - name: Install dependencies
         run: |
-          Rscript -e 'install.packages("remotes")' \
-                  -e 'remotes::install_deps(dependencies = TRUE)' \
-                  -e 'remotes::install_github("jimhester/pkgdown@github-actions-deploy")'
+          install.packages("remotes")
+          remotes::install_deps(dependencies = TRUE)
+          remotes::install_github("jimhester/pkgdown@github-actions-deploy2")
+        shell: Rscript {0}
       - name: Install package
         run: R CMD INSTALL .
       - name: Deploy package
-        run: |
-          pkgdown:::deploy_local(new_process = FALSE, remote_url = 'https://x-access-token:${{secrets.DEPLOY_PAT}}@github.com/${{github.repository}}.git')
+        run: pkgdown:::deploy_local(new_process = FALSE)
         shell: Rscript {0}
 ```
 
