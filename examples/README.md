@@ -268,9 +268,7 @@ jobs:
 ## Build pkgdown site
 
 This example builds a \[pkgdown\] site for a repository and pushes the
-built package to [GitHub Pages](https://pages.github.com/). **Note** you
-need to add a `DEPLOY_PAT` secret to your repository, however this
-personal access token *only* needs the `public_repo` scope.
+built package to [GitHub Pages](https://pages.github.com/).
 
 ``` yaml
 on:
@@ -295,7 +293,7 @@ jobs:
       - name: Install package
         run: R CMD INSTALL .
       - name: Deploy package
-        run: pkgdown:::deploy_to_branch(new_process = FALSE)
+        run: pkgdown::deploy_to_branch(new_process = FALSE)
         shell: Rscript {0}
 ```
 
