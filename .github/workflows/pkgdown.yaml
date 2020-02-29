@@ -8,7 +8,7 @@ jobs:
   pkgdown:
     runs-on: macOS-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2
       - uses: r-lib/actions/setup-r@master
       - uses: r-lib/actions/setup-pandoc@master
       - name: Install dependencies
