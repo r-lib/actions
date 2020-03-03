@@ -41,6 +41,8 @@ If your build fails and you are unsure of why here are some useful strategies fo
 1. If you have done all of the above and are __absolutely__ sure there is a bug
    in one of the R specifc actions listed above, open an [issue
    here](https://github.com/r-lib/actions/issues/new/choose).
+   
+> If using a general search engine or GitHub search about your problem/idea, please note that content published prior to the Fall 2019 is probably outdated because the beta version of GitHub Actions was different. More recent posts or answers could be outdated too since GitHub Actions evolve, so refer to [GitHub Actions official docs](https://help.github.com/en/actions) in case of doubt (and to existing working workflows) and [GitHub changelog](https://github.blog/changelog/).
 
 ## Additional resources
 
