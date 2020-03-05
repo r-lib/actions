@@ -55,7 +55,6 @@ async function installPandocMac(version: string) {
   );
   let downloadPath: string | null = null;
 
-
   try {
     downloadPath = await tc.downloadTool(downloadUrl);
   } catch (error) {
@@ -100,12 +99,21 @@ async function installPandocWindows(version: string) {
   const toolPath = await tc.cacheDir(extPath, "pandoc", version);
 
   // It extracts to this folder
-  const toolRoot = path.join(
-    toolPath,
-    util.format("pandoc-%s-windows-x86_64", version)
-  );
+  const toolRoot = path.join(toolPath, pandocSubdir(version));
 
   core.addPath(toolRoot);
+}
+
+function pandocSubdir(version: string) {
+  if (version >= "2.9.2") {
+    return util.format("pandoc-%s", version);
+  }
+
+  if (version == "2.9.1") {
+    return "";
+  }
+
+  return util.format("pandoc-%s-windows-x86_64", version);
 }
 
 async function installPandocLinux(version: string) {

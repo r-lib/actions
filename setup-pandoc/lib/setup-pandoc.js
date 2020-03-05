@@ -72,7 +72,12 @@ function installPandocMac(version) {
         const fileName = util.format("pandoc-%s-macOS.pkg", version);
         const downloadUrl = util.format("https://github.com/jgm/pandoc/releases/download/%s/%s", version, fileName);
         let downloadPath = null;
-        downloadPath = yield tc.downloadTool(downloadUrl);
+        try {
+            downloadPath = yield tc.downloadTool(downloadUrl);
+        }
+        catch (error) {
+            throw `Failed to download Pandoc ${version}: ${error}`;
+        }
         yield io.mv(downloadPath, path.join(tempDirectory, fileName));
         exec.exec("sudo installer", [
             "-pkg",
@@ -87,7 +92,12 @@ function installPandocWindows(version) {
         const fileName = util.format("pandoc-%s-windows-x86_64.zip", version);
         const downloadUrl = util.format("https://github.com/jgm/pandoc/releases/download/%s/%s", version, fileName);
         let downloadPath = null;
-        downloadPath = yield tc.downloadTool(downloadUrl);
+        try {
+            downloadPath = yield tc.downloadTool(downloadUrl);
+        }
+        catch (error) {
+            throw `Failed to download Pandoc ${version}: ${error}`;
+        }
         //
         // Extract
         //
@@ -98,16 +108,30 @@ function installPandocWindows(version) {
         extPath = yield tc.extractZip(downloadPath);
         const toolPath = yield tc.cacheDir(extPath, "pandoc", version);
         // It extracts to this folder
-        const toolRoot = path.join(toolPath, util.format("pandoc-%s-windows-x86_64", version));
+        const toolRoot = path.join(toolPath, pandocSubdir(version));
         core.addPath(toolRoot);
     });
+}
+function pandocSubdir(version) {
+    if (version >= "2.9.2") {
+        return (util.format("pandoc-%s", version));
+    }
+    if (version == "2.9.1") {
+        return ("");
+    }
+    return (util.format("pandoc-%s-windows-x86_64", version));
 }
 function installPandocLinux(version) {
     return __awaiter(this, void 0, void 0, function* () {
         const fileName = util.format("pandoc-%s-1-amd64.deb", version);
         const downloadUrl = util.format("https://github.com/jgm/pandoc/releases/download/%s/%s", version, fileName);
         let downloadPath = null;
-        downloadPath = yield tc.downloadTool(downloadUrl);
+        try {
+            downloadPath = yield tc.downloadTool(downloadUrl);
+        }
+        catch (error) {
+            throw `Failed to download Pandoc ${version}: ${error}`;
+        }
         yield io.mv(downloadPath, path.join(tempDirectory, fileName));
         try {
             yield exec.exec("sudo apt-get", ["install", "-y", "gdebi-core"]);
