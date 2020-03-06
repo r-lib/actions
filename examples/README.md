@@ -154,7 +154,7 @@ jobs:
 
       - name: Test coverage
         if: matrix.config.os == 'macOS-latest' && matrix.config.r == '3.6'
-        run: covr::codecov(token = "${{secrets.CODECOV_TOKEN}}")
+        run: covr::codecov()
         shell: Rscript {0}
 ```
 
