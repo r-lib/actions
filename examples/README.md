@@ -272,7 +272,7 @@ on:
   push:
     branches: master
 
-name: Pkgdown
+name: pkgdown
 
 jobs:
   pkgdown:
