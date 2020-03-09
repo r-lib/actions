@@ -312,7 +312,7 @@ async function setupRLibrary() {
        ),
        crayon.enabled = ${core.getInput("crayon.enabled")},
        Ncpus = ${core.getInput("Ncpus")}
-     )\n\n`
+     )\n`
   );
 
   // Make R_LIBS_USER
