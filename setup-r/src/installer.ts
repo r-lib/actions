@@ -305,13 +305,13 @@ async function setupRLibrary() {
   let cran = `'${process.env["CRAN"] || "https://cloud.r-project.org"}'`;
   await fs.writeFile(
     profilePath,
-    `options(
-       repos = c(
-         RSPM = ${rspm},
-         CRAN = ${cran}
-       ),
-       crayon.enabled = ${core.getInput("crayon.enabled")},
-       Ncpus = ${core.getInput("Ncpus")}
+    `options(\
+       repos = c(\
+         RSPM = ${rspm},\
+         CRAN = ${cran}\
+       ),\
+       crayon.enabled = ${core.getInput("crayon.enabled")},\
+       Ncpus = ${core.getInput("Ncpus")}\
      )\n`
   );
 

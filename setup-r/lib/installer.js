@@ -309,13 +309,13 @@ function setupRLibrary() {
         core.debug("R profile is at " + profilePath);
         let rspm = process.env["RSPM"] ? `'${process.env["RSPM"]}'` : "NULL";
         let cran = `'${process.env["CRAN"] || "https://cloud.r-project.org"}'`;
-        yield fs_1.promises.writeFile(profilePath, `options(
-       repos = c(
-         RSPM = ${rspm},
-         CRAN = ${cran}
-       ),
-       crayon.enabled = ${core.getInput("crayon.enabled")},
-       Ncpus = ${core.getInput("Ncpus")}
+        yield fs_1.promises.writeFile(profilePath, `options(\
+       repos = c(\
+         RSPM = ${rspm},\
+         CRAN = ${cran}\
+       ),\
+       crayon.enabled = ${core.getInput("crayon.enabled")},\
+       Ncpus = ${core.getInput("Ncpus")}\
      )\n`);
         // Make R_LIBS_USER
         io.mkdirP(process.env["R_LIBS_USER"] || path.join(tempDirectory, "Library"));
