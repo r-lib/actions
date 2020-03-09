@@ -300,12 +300,15 @@ async function setupRLibrary() {
     profilePath = path.join(process.env["HOME"] || "/Users", ".Rprofile");
   }
   core.debug("R profile is at " + profilePath);
+
+  let rspm = `"${process.env["RSPM"]}"` || "NULL";
+  let cran = `"${process.env["CRAN"]}"` || '"https://cloud-r-project.org"';
   await fs.writeFile(
     profilePath,
     `options(
        repos = c(
-         RSPM = ${'process.env["RSPM"]' || "NULL"},
-         CRAN = ${'process.env["CRAN"]' || '"https://cloud.r-project.org"'}
+         RSPM = ${cran},
+         CRAN = ${rspm}
        ),
        crayon.enabled = ${core.getInput("crayon.enabled")},
        Ncpus = ${core.getInput("Ncpus")}
