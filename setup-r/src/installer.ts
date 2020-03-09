@@ -307,8 +307,8 @@ async function setupRLibrary() {
     profilePath,
     `options(
        repos = c(
-         RSPM = ${cran},
-         CRAN = ${rspm}
+         RSPM = ${rspm},
+         CRAN = ${cran}
        ),
        crayon.enabled = ${core.getInput("crayon.enabled")},
        Ncpus = ${core.getInput("Ncpus")}

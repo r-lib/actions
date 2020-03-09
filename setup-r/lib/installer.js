@@ -311,8 +311,8 @@ function setupRLibrary() {
         let cran = `"${process.env["CRAN"]}"` || '"https://cloud-r-project.org"';
         yield fs_1.promises.writeFile(profilePath, `options(
        repos = c(
-         RSPM = ${cran},
-         CRAN = ${rspm}
+         RSPM = ${rspm},
+         CRAN = ${cran}
        ),
        crayon.enabled = ${core.getInput("crayon.enabled")},
        Ncpus = ${core.getInput("Ncpus")}
