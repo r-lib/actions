@@ -221,7 +221,7 @@ async function acquireRMacOS(version: string): Promise<string> {
 
 async function acquireRWindows(version: string): Promise<string> {
   let fileName: string = getFileNameWindows(version);
-  let downloadUrl: string = getDownloadUrlWindows(version);
+  let downloadUrl: string = await getDownloadUrlWindows(version);
   let downloadPath: string | null = null;
   try {
     downloadPath = await tc.downloadTool(downloadUrl);
@@ -374,14 +374,22 @@ function getFileNameWindows(version: string): string {
   return filename;
 }
 
-function getDownloadUrlWindows(version: string): string {
+async function getDownloadUrlWindows(version: string): Promise<string> {
   if (version == "devel") {
     return "https://cloud.r-project.org/bin/windows/base/R-devel-win.exe";
   }
 
   const filename: string = getFileNameWindows(version);
 
-  // old seems to have even the release version, so just use it conditionally
+  const latestVersion: string = await getLatestVersion("3.x");
+
+  if (version == latestVersion) {
+    return util.format(
+      "https://cloud.r-project.org/bin/windows/base/%s",
+      filename
+    );
+  }
+
   return util.format(
     "https://cloud.r-project.org/bin/windows/base/old/%s/%s",
     version,

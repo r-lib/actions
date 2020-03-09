@@ -238,7 +238,7 @@ function acquireRMacOS(version) {
 function acquireRWindows(version) {
     return __awaiter(this, void 0, void 0, function* () {
         let fileName = getFileNameWindows(version);
-        let downloadUrl = getDownloadUrlWindows(version);
+        let downloadUrl = yield getDownloadUrlWindows(version);
         let downloadPath = null;
         try {
             downloadPath = yield tc.downloadTool(downloadUrl);
@@ -362,12 +362,17 @@ function getFileNameWindows(version) {
     return filename;
 }
 function getDownloadUrlWindows(version) {
-    if (version == "devel") {
-        return "https://cloud.r-project.org/bin/windows/base/R-devel-win.exe";
-    }
-    const filename = getFileNameWindows(version);
-    // old seems to have even the release version, so just use it conditionally
-    return util.format("https://cloud.r-project.org/bin/windows/base/old/%s/%s", version, filename);
+    return __awaiter(this, void 0, void 0, function* () {
+        if (version == "devel") {
+            return "https://cloud.r-project.org/bin/windows/base/R-devel-win.exe";
+        }
+        const filename = getFileNameWindows(version);
+        const latestVersion = yield getLatestVersion("3.x");
+        if (version == latestVersion) {
+            return util.format("https://cloud.r-project.org/bin/windows/base/%s", filename);
+        }
+        return util.format("https://cloud.r-project.org/bin/windows/base/old/%s/%s", version, filename);
+    });
 }
 function setREnvironmentVariables() {
     core.exportVariable("R_LIBS_USER", path.join(tempDirectory, "Library"));
