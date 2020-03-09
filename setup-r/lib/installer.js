@@ -307,7 +307,7 @@ function setupRLibrary() {
             profilePath = path.join(process.env["HOME"] || "/Users", ".Rprofile");
         }
         core.debug("R profile is at " + profilePath);
-        let rspm = process.env["RSPM"] ? `'${process.env["CRAN"]}'` : "NULL";
+        let rspm = process.env["RSPM"] ? `'${process.env["RSPM"]}'` : "NULL";
         let cran = `'${process.env["CRAN"]} || "https://cloud-r-project.org"'`;
         yield fs_1.promises.writeFile(profilePath, `options(
        repos = c(
