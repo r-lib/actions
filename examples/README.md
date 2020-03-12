@@ -169,7 +169,7 @@ on:
   push:
     branches: master
 
-name: Test Coverage
+name: Test coverage
 
 jobs:
   coverage:
@@ -203,6 +203,7 @@ jobs:
 
       - name: Test coverage
         run: covr::codecov()
+        shell: Rscript {0}
 ```
 
 ## Commands workflow
