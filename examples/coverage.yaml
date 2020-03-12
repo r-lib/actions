@@ -2,10 +2,10 @@ on:
   push:
     branches: master
 
-name: Test coverage
+name: test-coverage
 
 jobs:
-  coverage:
+  test-coverage:
     runs-on: macOS-latest
     steps:
       - uses: actions/checkout@v2
