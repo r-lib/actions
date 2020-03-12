@@ -158,20 +158,51 @@ jobs:
         shell: Rscript {0}
 ```
 
-This configuration assumes that your package has already been configured
-to use `covr` such that it is mentioned under `Suggests` in the
-`DESCRIPTION` file (this can e.g. be obtained with
-`usethis::use_coverage()`. If you prefer to avoid mentioning `covr` in
-`Suggests`, you can install `covr` as a part of the coverage step by
-changing the “name: Test coverage” part to something like this
+## Test coverage workflow
 
-``` 
-      - name: Test coverage
-        if: matrix.config.os == 'macOS-latest' && matrix.config.r == '3.6'
-        run:  |
-          install.packages('covr')
-          covr::codecov(token = "${{secrets.CODECOV_TOKEN}}")
+This example uses the [covr](https://covr.r-lib.org) package to query
+the test coverage of your package and upload the result to
+[codecov.io](https://codecov.io)
+
+``` yaml
+on:
+  push:
+    branches: master
+
+name: Test Coverage
+
+jobs:
+  coverage:
+    runs-on: macOS-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: r-lib/actions/setup-r@master
+
+      - uses: r-lib/actions/setup-pandoc@master
+
+      - name: Query dependencies
+        run: |
+          install.packages('remotes')
+          saveRDS(remotes::dev_package_deps(dependencies = TRUE), "depends.Rds", version = 2)
         shell: Rscript {0}
+
+      - name: Cache R packages
+        uses: actions/cache@v1
+        with:
+          path: ${{ env.R_LIBS_USER }}
+          key: macOS-r-3.6-${{ hashFiles('depends.Rds') }}
+          restore-keys: macOS-r-3.6-
+
+      - name: Install dependencies
+        run: |
+          install.packages(c("remotes"))
+          remotes::install_deps(dependencies = TRUE)
+          remotes::install_cran("covr")
+        shell: Rscript {0}
+
+      - name: Test coverage
+        run: covr::codecov()
 ```
 
 ## Commands workflow
@@ -295,16 +326,34 @@ jobs:
     runs-on: macOS-latest
     steps:
       - uses: actions/checkout@v2
+
       - uses: r-lib/actions/setup-r@master
+
       - uses: r-lib/actions/setup-pandoc@master
+
+      - name: Query dependencies
+        run: |
+          install.packages('remotes')
+          saveRDS(remotes::dev_package_deps(dependencies = TRUE), "depends.Rds", version = 2)
+        shell: Rscript {0}
+
+      - name: Cache R packages
+        uses: actions/cache@v1
+        with:
+          path: ${{ env.R_LIBS_USER }}
+          key: macOS-r-3.6-${{ hashFiles('depends.Rds') }}
+          restore-keys: macOS-r-3.6-
+
       - name: Install dependencies
         run: |
           install.packages("remotes")
           remotes::install_deps(dependencies = TRUE)
           remotes::install_dev("pkgdown")
         shell: Rscript {0}
+
       - name: Install package
         run: R CMD INSTALL .
+
       - name: Deploy package
         run: pkgdown::deploy_to_branch(new_process = FALSE)
         shell: Rscript {0}
