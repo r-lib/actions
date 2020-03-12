@@ -162,7 +162,11 @@ the test coverage of your package and upload the result to
 ``` yaml
 on:
   push:
-    branches: master
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 
 name: test-coverage
 
