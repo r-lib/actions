@@ -151,11 +151,6 @@ jobs:
         with:
           name: ${{ runner.os }}-r${{ matrix.config.r }}-results
           path: check
-
-      - name: Test coverage
-        if: matrix.config.os == 'macOS-latest' && matrix.config.r == '3.6'
-        run: covr::codecov()
-        shell: Rscript {0}
 ```
 
 ## Test coverage workflow
