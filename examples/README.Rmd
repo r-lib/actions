@@ -59,7 +59,7 @@ coverage of your package and upload the result to
 [codecov.io](https://codecov.io)
 
 ```{r echo = FALSE, results = "asis"}
-print_yaml("coverage.yaml")
+print_yaml("test-coverage.yaml")
 ```
 
 ## Commands workflow
