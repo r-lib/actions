@@ -6,8 +6,8 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>A Simple Test Description File to Test Packages • testpackage</title>
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.1/css/all.min.css" integrity="sha256-PbSmjxuVAzJ6FPvNYsrXygfGhNJYyZ2GktDbkMBqQZg=" crossorigin="anonymous">
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.1/css/all.min.css" integrity="sha256-PbSmjxuVAzJ6FPvNYsrXygfGhNJYyZ2GktDbkMBqQZg=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.1/css/v4-shims.min.css" integrity="sha256-A6jcAdwFD48VMjlI3GDxUd+eCQa7/KWy6G9oe/ovaPA=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
 <script src="pkgdown.js"></script><meta property="og:title" content="A Simple Test Description File to Test Packages">
@@ -101,16 +101,30 @@
 <p>If using a general search engine or GitHub search about your problem/idea, please note that content published prior to the Fall 2019 is probably outdated because the beta version of GitHub Actions was different. More recent posts or answers could be outdated too since GitHub Actions evolve, so refer to <a href="https://help.github.com/en/actions">GitHub Actions official docs</a> in case of doubt (and to existing working workflows) and <a href="https://github.blog/changelog/">GitHub changelog</a>.</p>
 </blockquote>
 </div>
+<div id="common-questions" class="section level2">
+<h2 class="hasAnchor">
+<a href="#common-questions" class="anchor"></a>Common questions</h2>
+<ol>
+<li>
+<em>Does GitHub Actions support <code>[ci skip]</code> or similar syntax to automatically skip a build?</em>
+ Not by default, however you can enable it in any of your workflows by adding the following <a href="https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idif">conditional</a>, e.g. 
+ <code>if: !contains(github.event.head_commit.message, '[ci skip]')</code>
+</li>
+<li>
+<em>Does the <code>setup-r</code> action support R-devel?</em>
+ Not currently, as there are not currently any daily R binaries built for R-devel. Though this support is planned in the future.</li>
+</ol>
+</div>
 <div id="additional-resources" class="section level2">
 <h2 class="hasAnchor">
 <a href="#additional-resources" class="anchor"></a>Additional resources</h2>
 <ul>
 <li>
-<a href="https://ropenscilabs.github.io/actions_sandbox/">GitHub Actions with R</a> - a short online book about using GitHub Actions with R, produced as part of the <a href="https://ozunconf19.ropensci.org/">rOpenSci OzUnconf</a>.</li>
-<li>
 <a href="https://www.jimhester.com/talk/2020-rsc-github-actions/">GitHub Actions for R</a>, Jim Hester’s talk at rstudio::conf 2020. <a href="https://resources.rstudio.com/rstudio-conf-2020/azure-pipelines-and-github-actions-jim-hester">Recording</a>, <a href="https://speakerdeck.com/jimhester/github-actions-for-r">slidedeck</a>.</li>
 <li>
-<a href="https://www.edwardthomson.com/blog/github_actions_advent_calendar.html">GitHub Actions advent calendar</a> a series of blogposts by one of the GitHub Actions Product Managers highlighting features of GitHub Actions.</li>
+<a href="https://www.edwardthomson.com/blog/github_actions_advent_calendar.html">GitHub Actions advent calendar</a> a series of blogposts by Edward Thomson, one of the GitHub Actions product managers highlighting features of GitHub Actions.</li>
+<li>
+<a href="https://ropenscilabs.github.io/actions_sandbox/">GitHub Actions with R</a> - a short online book about using GitHub Actions with R, produced as part of the <a href="https://ozunconf19.ropensci.org/">rOpenSci OzUnconf</a>.</li>
 <li>
 <a href="https://github.com/sdras/awesome-actions#awesome-actions---">Awesome Actions</a> - a curated list of custom actions. <strong>Note</strong> many of these are from early in the GitHub Actions beta and may no longer work.</li>
 </ul>
