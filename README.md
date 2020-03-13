@@ -44,12 +44,20 @@ If your build fails and you are unsure of why here are some useful strategies fo
    
 > If using a general search engine or GitHub search about your problem/idea, please note that content published prior to the Fall 2019 is probably outdated because the beta version of GitHub Actions was different. More recent posts or answers could be outdated too since GitHub Actions evolve, so refer to [GitHub Actions official docs](https://help.github.com/en/actions) in case of doubt (and to existing working workflows) and [GitHub changelog](https://github.blog/changelog/).
 
+## Common questions
+
+1. *Does GitHub Actions support `[ci skip]` or similar syntax to automatically skip a build?*\
+  Not by default, however you can enable it in any of your workflows by adding the following [conditional](https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idif), e.g. \
+  `if: !contains(github.event.head_commit.message, '[ci skip]')`
+2. *Does the `setup-r` action support R-devel?*\
+  Not currently, as there are not currently any daily R binaries built for R-devel. Though this support is planned in the future.
+
 ## Additional resources
 
-- [GitHub Actions with R](https://ropenscilabs.github.io/actions_sandbox/) - a short online book about using GitHub Actions with R, produced as part of the [rOpenSci OzUnconf](https://ozunconf19.ropensci.org/).
 - [GitHub Actions for R](https://www.jimhester.com/talk/2020-rsc-github-actions/), Jim Hester's talk at rstudio::conf 2020. [Recording](https://resources.rstudio.com/rstudio-conf-2020/azure-pipelines-and-github-actions-jim-hester), [slidedeck](https://speakerdeck.com/jimhester/github-actions-for-r).
-- [GitHub Actions advent calendar](https://www.edwardthomson.com/blog/github_actions_advent_calendar.html) a series of blogposts by one of the GitHub Actions Product Managers
+- [GitHub Actions advent calendar](https://www.edwardthomson.com/blog/github_actions_advent_calendar.html) a series of blogposts by Edward Thomson, one of the GitHub Actions product managers
   highlighting features of GitHub Actions.
+- [GitHub Actions with R](https://ropenscilabs.github.io/actions_sandbox/) - a short online book about using GitHub Actions with R, produced as part of the [rOpenSci OzUnconf](https://ozunconf19.ropensci.org/).
 - [Awesome Actions](https://github.com/sdras/awesome-actions#awesome-actions---) - a curated list of custom actions. **Note** many of these are from early in the GitHub Actions beta and may no longer work.
 
 ## License ![CC0 licensed](https://img.shields.io/github/license/r-lib/actions)
