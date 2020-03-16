@@ -120,6 +120,19 @@ You will need to run `renv::snapshot()` locally and commit the `renv.lock` file 
 print_yaml("blogdown.yaml")
 ```
 
+## Docker based workflow
+
+If you develop locally with docker or are used to using other docker based CI
+services and already have a docker container with all of your R and system
+dependencies you can use that in GitHub Actions by adapting the following
+workflow. This example workflow assumes you build some model in `fit_model.R`
+and then have a report in `report.Rmd`. It then uploads the rendered html from
+the report as a build artifact.
+
+```{r echo = FALSE, results = "asis"}
+print_yaml("docker.yaml")
+```
+
 [GitHub Pages]: https://pages.github.com/
 [renv]: https://rstudio.github.io/renv/
 [bookdown]: https://bookdown.org

@@ -1,0 +1,14 @@
+on: [push]
+jobs:
+  job1:
+    runs-on: ubuntu-latest
+    container: rocker/verse
+    steps:
+      - uses: actions/checkout@v1
+      - run: Rscript fit_model.R
+      - run: Rscript -e 'rmarkdown::render("report.Rmd")'
+      - name: Upload results
+        uses: actions/upload-artifact@master
+        with:
+          name: results
+          path: report.html
