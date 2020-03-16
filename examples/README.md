@@ -6,9 +6,9 @@
     `/style` commands for pull requests.
   - [Render README](#render-readme) - Render README.Rmd when it changes
     and commit the result
-  - [Build pkgdown site](#build-pkgdown-site) - Build a \[pkgdown\] site
-    for an R package and deploy it to [GitHub
-    Pages](https://pages.github.com/).
+  - [Build pkgdown site](#build-pkgdown-site) - Build a
+    [pkgdown](https://pkgdown.r-lib.org/) site for an R package and
+    deploy it to [GitHub Pages](https://pages.github.com/).
   - [Build bookdown site](#build-bookdown-site) - Build a
     [bookdown](https://bookdown.org) site and deploy it to
     [netlify](https://www.netlify.com/).
@@ -311,8 +311,9 @@ jobs:
 
 ## Build pkgdown site
 
-This example builds a \[pkgdown\] site for a repository and pushes the
-built package to [GitHub Pages](https://pages.github.com/).
+This example builds a [pkgdown](https://pkgdown.r-lib.org/) site for a
+repository and pushes the built package to [GitHub
+Pages](https://pages.github.com/).
 
 ``` yaml
 on:
