@@ -499,6 +499,32 @@ jobs:
           netlify deploy --prod
 ```
 
+## Docker based workflow
+
+If you develop locally with docker or are used to using other docker
+based CI services and already have a docker container with all of your R
+and system dependencies you can use that in GitHub Actions by adapting
+the following workflow. This example workflow assumes you build some
+model in `fit_model.R` and then have a report in `report.Rmd`. It then
+uploads the rendered html from the report as a build artifact.
+
+``` yaml
+on: [push]
+jobs:
+  job1:
+    runs-on: ubuntu-latest
+    container: rocker/verse
+    steps:
+      - uses: actions/checkout@v1
+      - run: Rscript fit_model.R
+      - run: Rscript -e 'rmarkdown::render("report.Rmd")'
+      - name: Upload results
+        uses: actions/upload-artifact@master
+        with:
+          name: results
+          path: report.html
+```
+
 ## Managing secrets
 
 In some cases, your action may need to access an external resource to
