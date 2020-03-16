@@ -133,12 +133,6 @@ the report as a build artifact.
 print_yaml("docker.yaml")
 ```
 
-[GitHub Pages]: https://pages.github.com/
-[renv]: https://rstudio.github.io/renv/
-[bookdown]: https://bookdown.org
-[blogdown]: https://bookdown.org/yihui/blogdown/
-[netlify]: https://www.netlify.com/
-
 ## Managing secrets
 
 In some cases, your action may need to access an external resource to deploy a result of your action. 
@@ -165,4 +159,11 @@ Netlify has a [process for creating a PAT using their UI](https://docs.netlify.c
    - In the "Value" field, paste the token from your clipboard.
    - Click "Add Secret".
    
-5. At this point (certainly at some point), you may wish to close your **tokens** page to remove the visibility of your token.   
+5. At this point (certainly at some point), you may wish to close your **tokens** page to remove the visibility of your token.
+
+[GitHub Pages]: https://pages.github.com/
+[renv]: https://rstudio.github.io/renv/
+[pkgdown]: https://pkgdown.r-lib.org/
+[bookdown]: https://bookdown.org
+[blogdown]: https://bookdown.org/yihui/blogdown/
+[netlify]: https://www.netlify.com/
