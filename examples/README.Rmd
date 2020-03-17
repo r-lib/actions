@@ -62,6 +62,14 @@ coverage of your package and upload the result to
 print_yaml("test-coverage.yaml")
 ```
 
+## Linting workflow
+
+This example uses the [lintr](https://github.com/jimhester/lintr) package to lint your package and return the results as build annotations.
+
+```{r echo = FALSE, results = "asis"}
+print_yaml("lint.yaml")
+```
+
 ## Commands workflow
 
 This workflow enables the use of 2 R specific commands in pull request issue
