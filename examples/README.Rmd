@@ -12,6 +12,8 @@ print_yaml <- function(filename) {
 - [Tidyverse CI](#tidyverse-ci-workflow) - A more complex CI workflow
 - [Pull Request Commands](#commands-workflow) - Adds `/document` and `/style` commands for pull requests.
 - [Render README](#render-readme) - Render README.Rmd when it changes and commit the result
+- [Test coverage](#test-coverage-workflow) - Run `covr::codecov()` on an R package.
+- [lint](#lint-workflow) - Run `lintr::lint_package()` on an R package.
 - [Build pkgdown site](#build-pkgdown-site) - Build a [pkgdown] site for an R package and deploy it to [GitHub Pages].
 - [Build bookdown site](#build-bookdown-site) - Build a [bookdown] site and deploy it to [netlify].
 - [Build blogdown site](#build-blogdown-site) - Build a [blogdown] site and deploy it to [netlify].
@@ -42,7 +44,7 @@ what the tidyverse teams uses on their repositories, but is overkill
 for less widely used packages, which are better off using the simpler
 quickstart CI workflow.
 
-## When it can be used?
+### When it can be used?
 
 1. You have a complex R package
 2. With OS-specific code
@@ -62,7 +64,7 @@ coverage of your package and upload the result to
 print_yaml("test-coverage.yaml")
 ```
 
-## Linting workflow
+## Lint workflow
 
 This example uses the [lintr](https://github.com/jimhester/lintr) package to lint your package and return the results as build annotations.
 
