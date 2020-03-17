@@ -6,6 +6,10 @@
     `/style` commands for pull requests.
   - [Render README](#render-readme) - Render README.Rmd when it changes
     and commit the result
+  - [Test coverage](#test-coverage-workflow) - Run `covr::codecov()` on
+    an R package.
+  - [lint](#lint-workflow) - Run `lintr::lint_package()` on an R
+    package.
   - [Build pkgdown site](#build-pkgdown-site) - Build a
     [pkgdown](https://pkgdown.r-lib.org/) site for an R package and
     deploy it to [GitHub Pages](https://pages.github.com/).
@@ -61,7 +65,7 @@ tidyverse teams uses on their repositories, but is overkill for less
 widely used packages, which are better off using the simpler quickstart
 CI workflow.
 
-## When it can be used?
+### When it can be used?
 
 1.  You have a complex R package
 2.  With OS-specific code
@@ -205,7 +209,7 @@ jobs:
         shell: Rscript {0}
 ```
 
-## Linting workflow
+## Lint workflow
 
 This example uses the [lintr](https://github.com/jimhester/lintr)
 package to lint your package and return the results as build
