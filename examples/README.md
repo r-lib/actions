@@ -205,6 +205,56 @@ jobs:
         shell: Rscript {0}
 ```
 
+## Linting workflow
+
+This example uses the [lintr](https://github.com/jimhester/lintr)
+package to lint your package and return the results as build
+annotations.
+
+``` yaml
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+name: lint
+
+jobs:
+  lint:
+    runs-on: macOS-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: r-lib/actions/setup-r@master
+
+      - name: Query dependencies
+        run: |
+          install.packages('remotes')
+          saveRDS(remotes::dev_package_deps(dependencies = TRUE), "depends.Rds", version = 2)
+        shell: Rscript {0}
+
+      - name: Cache R packages
+        uses: actions/cache@v1
+        with:
+          path: ${{ env.R_LIBS_USER }}
+          key: macOS-r-3.6-${{ hashFiles('depends.Rds') }}
+          restore-keys: macOS-r-3.6-
+
+      - name: Install dependencies
+        run: |
+          install.packages(c("remotes"))
+          remotes::install_deps(dependencies = TRUE)
+          remotes::install_cran("lintr")
+        shell: Rscript {0}
+
+      - name: Lint
+        run: lintr::lint_package()
+        shell: Rscript {0}
+```
+
 ## Commands workflow
 
 This workflow enables the use of 2 R specific commands in pull request
