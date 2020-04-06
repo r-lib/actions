@@ -327,7 +327,7 @@ function getFileNameMacOS(version) {
 }
 function getDownloadUrlMacOS(version) {
     if (version == "devel") {
-        return "http://mac.r-project.org/high-sierra/R-4.0-branch/R-4.0-branch.pkg";
+        return "https://mac.r-project.org/high-sierra/R-devel/R-devel.pkg";
     }
     const filename = getFileNameMacOS(version);
     if (semver.eq(version, "3.2.5")) {
