@@ -7,9 +7,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>A Simple Test Description File to Test Packages • testpackage</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.1/css/all.min.css" integrity="sha256-PbSmjxuVAzJ6FPvNYsrXygfGhNJYyZ2GktDbkMBqQZg=" crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.1/css/v4-shims.min.css" integrity="sha256-A6jcAdwFD48VMjlI3GDxUd+eCQa7/KWy6G9oe/ovaPA=" crossorigin="anonymous">
-<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="bootstrap-toc.css">
+<script src="bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
+<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
 <script src="pkgdown.js"></script><meta property="og:title" content="A Simple Test Description File to Test Packages">
 <meta property="og:description" content="This is a simple package used to test the workflow files.">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -17,7 +18,7 @@
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 </head>
-<body>
+<body data-spy="scroll" data-target="#toc">
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -90,8 +91,8 @@
 <a href="#where-to-find-help" class="anchor"></a>Where to find help</h2>
 <p>If your build fails and you are unsure of why here are some useful strategies for getting help.</p>
 <ol>
-<li>Figure out what caused the error. Look for the <em>first</em> time the word ‘error’ appears in the build log. Quite often errors at the end of the log are caused by an earlier issue, so it is best to look for the root cause.</li>
-<li>Take advantage of <a href="https://github.com/search?q=path%3A.github%2Fworkflows">GitHub’s code search</a> to find similar yaml files. Use ‘path:.github/workflows’ to restrict your search to GitHub Action workflow files and also include additional terms specific to your problem. e.g. If you need to figure out how to install geospatial libraries such as <a href="https://gdal.org/">gdal</a> use a search like <a href="https://github.com/search?q=gdal+path%3A.github%2Fworkflows">‘gdal path:.github/workflows’</a>. If you want to restrict results only to GitHub Actions workflows that use R you can add search for <a href="https://github.com/search?q=%22setup-r%22+path%3A.github%2Fworkflows">’“setup-r” path:.github/workflows</a>
+<li>Figure out what caused the error. Look for the <em>first</em> time the word âerrorâ appears in the build log. Quite often errors at the end of the log are caused by an earlier issue, so it is best to look for the root cause.</li>
+<li>Take advantage of <a href="https://github.com/search?q=path%3A.github%2Fworkflows">GitHubâs code search</a> to find similar yaml files. Use âpath:.github/workflowsâ to restrict your search to GitHub Action workflow files and also include additional terms specific to your problem. e.g.Â If you need to figure out how to install geospatial libraries such as <a href="https://gdal.org/">gdal</a> use a search like <a href="https://github.com/search?q=gdal+path%3A.github%2Fworkflows">âgdal path:.github/workflowsâ</a>. If you want to restrict results only to GitHub Actions workflows that use R you can add search for <a href="https://github.com/search?q=%22setup-r%22+path%3A.github%2Fworkflows">ââsetup-râ path:.github/workflows</a>
 </li>
 <li>Open an issue on <a href="https://community.rstudio.com/new-topic?category=Package%20development&amp;tags=github-actions"><img src="https://img.shields.io/badge/community-github--actions-blue?style=social&amp;logo=rstudio&amp;logoColor=75AADB" alt="RStudio community"></a> about your problem. Be sure to link to the workflow file you are using and a failing build to help others help you.</li>
 <li>If your issue seems related to GitHub Actions, but is not R specific open an issue at the <a href="https://github.community/t5/GitHub-Actions/bd-p/actions">GitHub Actions Community</a> page.</li>
@@ -107,7 +108,7 @@
 <ol>
 <li>
 <em>Does GitHub Actions support <code>[ci skip]</code> or similar syntax to automatically skip a build?</em>
- Not by default, however you can enable it in any of your workflows by adding the following <a href="https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idif">conditional</a>, e.g. 
+ Not by default, however you can enable it in any of your workflows by adding the following <a href="https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idif">conditional</a>, e.g.Â 
  <code>if: !contains(github.event.head_commit.message, '[ci skip]')</code>
 </li>
 <li>
@@ -120,7 +121,7 @@
 <a href="#additional-resources" class="anchor"></a>Additional resources</h2>
 <ul>
 <li>
-<a href="https://www.jimhester.com/talk/2020-rsc-github-actions/">GitHub Actions for R</a>, Jim Hester’s talk at rstudio::conf 2020. <a href="https://resources.rstudio.com/rstudio-conf-2020/azure-pipelines-and-github-actions-jim-hester">Recording</a>, <a href="https://speakerdeck.com/jimhester/github-actions-for-r">slidedeck</a>.</li>
+<a href="https://www.jimhester.com/talk/2020-rsc-github-actions/">GitHub Actions for R</a>, Jim Hesterâs talk at rstudio::conf 2020. <a href="https://resources.rstudio.com/rstudio-conf-2020/azure-pipelines-and-github-actions-jim-hester">Recording</a>, <a href="https://speakerdeck.com/jimhester/github-actions-for-r">slidedeck</a>.</li>
 <li>
 <a href="https://www.edwardthomson.com/blog/github_actions_advent_calendar.html">GitHub Actions advent calendar</a> a series of blogposts by Edward Thomson, one of the GitHub Actions product managers highlighting features of GitHub Actions.</li>
 <li>
@@ -157,7 +158,6 @@
 <ul class="list-unstyled">
 <li><a href="https://github.com/r-lib/actions/actions?workflow=R-CMD-check"><img src="https://github.com/r-lib/actions/workflows/R-CMD-check/badge.svg" alt="R build status"></a></li>
 <li><a href="https://community.rstudio.com/new-topic?category=Package%20development&amp;tags=github-actions"><img src="https://img.shields.io/badge/community-github--actions-blue?style=social&amp;logo=rstudio&amp;logoColor=75AADB" alt="RStudio community"></a></li>
-<li><a href="https://community.rstudio.com/new-topic?category=Package%20development&amp;tags=github-actions"><img src="https://img.shields.io/badge/community-github--actions-blue?style=social&amp;logo=rstudio&amp;logoColor=75AADB" alt="RStudio community"></a></li>
 </ul>
 </div>
 </div>
@@ -169,7 +169,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.0.9000.</p>
 </div>
 
       </footer>
