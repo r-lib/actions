@@ -11,6 +11,10 @@ This action sets up an R environment for use in actions by:
   - `CI=true`
   - `TZ=UTC`
   - `R_LIBS_USER=tempdir/Library`
+  - `R_COMPILE_AND_INSTALL_PACKAGES=never`
+     to install outdated binary R packages even when fresher sources are available.
+     Binary packages are sometimes available later than sources from CRAN and other repositories, and installation from sources can be slow and require additional system dependencies.
+     See `install.packages.compile.from.source` in [`help("options")`](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/options) and section on binary packages in [`help("install.packages")`](https://www.rdocumentation.org/packages/utils/versions/3.6.2/topics/install.packages)
 - Removing the `-fopenmp` flags from Makeconf on macOS, which are not supported
   with Apple's default Command Line Tools compilers.
 
