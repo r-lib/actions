@@ -26,8 +26,10 @@
 
 This workflow installs latest release R version on macOS and runs R CMD
 check via the [rcmdcheck](https://github.com/r-lib/rcmdcheck) package.
+If this is the first time you have used CI for a project this is
+probably what you want to use.
 
-### When can it be used?
+### When should you use it?
 
 1.  You have a simple R package
 2.  There is no OS-specific code
@@ -56,6 +58,103 @@ jobs:
         shell: Rscript {0}
 ```
 
+## Standard CI workflow
+
+This workflow runs R CMD check via the
+[rcmdcheck](https://github.com/r-lib/rcmdcheck) package on the three
+major OSs (linux, macOS and Windows) with the current release version of
+R, and R-devel. If you plan to someday submit your package to CRAN or
+Bioconductor this is likely the workflow you want to use.
+
+### When should you use it?
+
+1.  You plan to submit your package to CRAN or Bioconductor
+2.  Your package has OS-specific code
+
+<!-- end list -->
+
+``` yaml
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+name: R-CMD-check
+
+jobs:
+  R-CMD-check:
+    runs-on: ${{ matrix.config.os }}
+
+    name: ${{ matrix.config.os }} (${{ matrix.config.r }})
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - {os: windows-latest, r: '3.6'}
+          - {os: macOS-latest, r: '3.6'}
+          - {os: macOS-latest, r: 'devel'}
+          - {os: ubuntu-16.04, r: '3.6', rspm: "https://demo.rstudiopm.com/all/__linux__/xenial/latest"}
+
+    env:
+      R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
+      RSPM: ${{ matrix.config.rspm }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: r-lib/actions/setup-r@master
+        with:
+          r-version: ${{ matrix.config.r }}
+
+      - uses: r-lib/actions/setup-pandoc@master
+
+      - name: Query dependencies
+        run: |
+          install.packages('remotes')
+          saveRDS(remotes::dev_package_deps(dependencies = TRUE), "depends.Rds", version = 2)
+        shell: Rscript {0}
+
+      - name: Cache R packages
+        if: runner.os != 'Windows'
+        uses: actions/cache@v1
+        with:
+          path: ${{ env.R_LIBS_USER }}
+          key: ${{ runner.os }}-r-${{ matrix.config.r }}-${{ hashFiles('depends.Rds') }}
+          restore-keys: ${{ runner.os }}-r-${{ matrix.config.r }}-
+
+      - name: Install system dependencies
+        if: runner.os == 'Linux'
+        env:
+          RHUB_PLATFORM: linux-x86_64-ubuntu-gcc
+        run: |
+          Rscript -e "remotes::install_github('r-hub/sysreqs')"
+          sysreqs=$(Rscript -e "cat(sysreqs::sysreq_commands('DESCRIPTION'))")
+          sudo -s eval "$sysreqs"
+
+      - name: Install dependencies
+        run: |
+          remotes::install_deps(dependencies = TRUE)
+          remotes::install_cran("rcmdcheck")
+        shell: Rscript {0}
+
+      - name: Check
+        env:
+          _R_CHECK_CRAN_INCOMING_REMOTE_: false
+        run: rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), error_on = "warning", check_dir = "check")
+        shell: Rscript {0}
+
+      - name: Upload check results
+        if: failure()
+        uses: actions/upload-artifact@master
+        with:
+          name: ${{ runner.os }}-r${{ matrix.config.r }}-results
+          path: check
+```
+
 ## Tidyverse CI workflow
 
 This workflow installs the last 5 minor R versions and runs R CMD check
@@ -65,11 +164,12 @@ tidyverse teams uses on their repositories, but is overkill for less
 widely used packages, which are better off using the simpler quickstart
 CI workflow.
 
-### When it can be used?
+### When should you use it?
 
-1.  You have a complex R package
-2.  With OS-specific code
-3.  And you want to ensure compatibility with older R versions
+1.  You are a tidyverse developer
+2.  You have a complex R package
+3.  With OS-specific code
+4.  And you want to ensure compatibility with many older R versions
 
 <!-- end list -->
 
