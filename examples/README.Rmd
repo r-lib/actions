@@ -23,9 +23,10 @@ print_yaml <- function(filename) {
 
 This workflow installs latest release R version on macOS
 and runs R CMD check via the [rcmdcheck](https://github.com/r-lib/rcmdcheck)
-package.
+package. If this is the first time you have used CI for a project this is
+probably what you want to use.
 
-### When can it be used?
+### When should you use it?
 
 1. You have a simple R package
 2. There is no OS-specific code
@@ -33,6 +34,23 @@ package.
 
 ```{r echo = FALSE, results = "asis"}
 print_yaml("check-release.yaml")
+```
+
+## Standard CI workflow
+
+This workflow runs R CMD check via the
+[rcmdcheck](https://github.com/r-lib/rcmdcheck) package on the three major OSs
+(linux, macOS and Windows) with the current release version of R, and R-devel.
+If you plan to someday submit your package to CRAN or Bioconductor this is
+likely the workflow you want to use.
+
+### When should you use it?
+
+1. You plan to submit your package to CRAN or Bioconductor
+2. Your package has OS-specific code
+
+```{r echo = FALSE, results = "asis"}
+print_yaml("check-standard.yaml")
 ```
 
 ## Tidyverse CI workflow
@@ -44,11 +62,12 @@ what the tidyverse teams uses on their repositories, but is overkill
 for less widely used packages, which are better off using the simpler
 quickstart CI workflow.
 
-### When it can be used?
+### When should you use it?
 
-1. You have a complex R package
-2. With OS-specific code
-3. And you want to ensure compatibility with older R versions
+1. You are a tidyverse developer
+2. You have a complex R package
+3. With OS-specific code
+4. And you want to ensure compatibility with many older R versions
 
 ```{r echo = FALSE, results = "asis"}
 print_yaml("check-full.yaml")
