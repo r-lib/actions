@@ -82,7 +82,11 @@ function acquireR(version, rtoolsVersion) {
                 ]);
             }
             else if (IS_MAC) {
-                yield Promise.all([acquireFortranMacOS(), acquireQpdfMacOS(), acquireRMacOS(version)]);
+                yield Promise.all([
+                    acquireFortranMacOS(),
+                    acquireQpdfMacOS(),
+                    acquireRMacOS(version)
+                ]);
                 if (core.getInput("remove-openmp-macos")) {
                     yield removeOpenmpFlags();
                 }
@@ -314,7 +318,7 @@ function acquireRtools(version) {
 function acquireQpdfWindows() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            yield exec.exec("choco", ["install", "qpdf"]);
+            yield exec.exec("choco", ["install", "qpdf", "--no-progress"]);
         }
         catch (error) {
             core.debug(error);
@@ -352,7 +356,7 @@ function getFileNameMacOS(version) {
 }
 function getDownloadUrlMacOS(version) {
     if (version == "devel") {
-        return "https://mac.r-project.org/high-sierra/R-devel/R-devel.pkg";
+        return "http://mac.r-project.org/el-capitan/R-devel/R-devel-el-capitan-signed.pkg";
     }
     const filename = getFileNameMacOS(version);
     if (semver.eq(version, "3.2.5")) {
