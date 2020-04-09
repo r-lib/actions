@@ -58,10 +58,15 @@ async function acquireR(version: string, rtoolsVersion: string) {
     if (IS_WINDOWS) {
       await Promise.all([
         acquireRWindows(version),
-        acquireRtools(rtoolsVersion)
+        acquireRtools(rtoolsVersion),
+        acquireQpdfWindows()
       ]);
     } else if (IS_MAC) {
-      await Promise.all([installFortranMacOS(), acquireRMacOS(version)]);
+      await Promise.all([
+        acquireFortranMacOS(),
+        acquireQpdfMacOS(),
+        acquireRMacOS(version)
+      ]);
       if (core.getInput("remove-openmp-macos")) {
         await removeOpenmpFlags();
       }
@@ -89,13 +94,24 @@ async function acquireR(version: string, rtoolsVersion: string) {
   }
 }
 
-async function installFortranMacOS() {
+async function acquireFortranMacOS() {
   try {
     await exec.exec("brew", ["cask", "install", "gfortran"]);
   } catch (error) {
     core.debug(error);
 
     throw `Failed to install gfortan: ${error}`;
+  }
+}
+
+async function acquireQpdfMacOS() {
+  // qpdf is needed by `--as-cran`
+  try {
+    await exec.exec("brew", ["install", "qpdf"]);
+  } catch (error) {
+    core.debug(error);
+
+    throw `Failed to install qpdf: ${error}`;
   }
 }
 
@@ -141,8 +157,9 @@ async function acquireRUbuntu(version: string): Promise<string> {
 
   try {
     await exec.exec("sudo DEBIAN_FRONTEND=noninteractive apt-get update -qq");
+    // install gdbi-core and also qpdf, which is used by `--as-cran`
     await exec.exec(
-      "sudo DEBIAN_FRONTEND=noninteractive apt-get install gdebi-core"
+      "sudo DEBIAN_FRONTEND=noninteractive apt-get install gdebi-core qpdf"
     );
     await exec.exec("sudo gdebi", [
       "--non-interactive",
@@ -286,6 +303,16 @@ async function acquireRtools(version: string) {
 
   core.addPath(`C:\\Rtools\\bin`);
   core.addPath(`C:\\Rtools\\mingw_64\\bin`);
+}
+
+async function acquireQpdfWindows() {
+  try {
+    await exec.exec("choco", ["install", "qpdf"]);
+  } catch (error) {
+    core.debug(error);
+
+    throw `Failed to install qpdf: ${error}`;
+  }
 }
 
 async function setupRLibrary() {
