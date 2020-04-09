@@ -399,6 +399,8 @@ jobs:
         run: Rscript -e 'roxygen2::roxygenise()'
       - name: commit
         run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
           git add man/\* NAMESPACE
           git commit -m 'Document'
       - uses: r-lib/actions/pr-push@master
@@ -420,6 +422,8 @@ jobs:
         run: Rscript -e 'styler::style_pkg()'
       - name: commit
         run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
           git add \*.R
           git commit -m 'Style'
       - uses: r-lib/actions/pr-push@master
@@ -461,6 +465,8 @@ jobs:
         run: Rscript -e 'rmarkdown::render("examples/README.Rmd")'
       - name: Commit results
         run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
           git commit examples/README.md -m 'Re-build README.Rmd' || echo "No changes to commit"
           git push https://${{github.actor}}:${{secrets.GITHUB_TOKEN}}@github.com/${{github.repository}}.git HEAD:${{ github.ref }} || echo "No changes to commit"
 ```
