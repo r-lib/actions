@@ -77,11 +77,12 @@ function acquireR(version, rtoolsVersion) {
             if (IS_WINDOWS) {
                 yield Promise.all([
                     acquireRWindows(version),
-                    acquireRtools(rtoolsVersion)
+                    acquireRtools(rtoolsVersion),
+                    acquireQpdfWindows()
                 ]);
             }
             else if (IS_MAC) {
-                yield Promise.all([installFortranMacOS(), acquireRMacOS(version)]);
+                yield Promise.all([acquireFortranMacOS(), acquireQpdfMacOS(), acquireRMacOS(version)]);
                 if (core.getInput("remove-openmp-macos")) {
                     yield removeOpenmpFlags();
                 }
@@ -110,7 +111,7 @@ function acquireR(version, rtoolsVersion) {
         }
     });
 }
-function installFortranMacOS() {
+function acquireFortranMacOS() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             yield exec.exec("brew", ["cask", "install", "gfortran"]);
@@ -118,6 +119,18 @@ function installFortranMacOS() {
         catch (error) {
             core.debug(error);
             throw `Failed to install gfortan: ${error}`;
+        }
+    });
+}
+function acquireQpdfMacOS() {
+    return __awaiter(this, void 0, void 0, function* () {
+        // qpdf is needed by `--as-cran`
+        try {
+            yield exec.exec("brew", ["install", "qpdf"]);
+        }
+        catch (error) {
+            core.debug(error);
+            throw `Failed to install qpdf: ${error}`;
         }
     });
 }
@@ -163,7 +176,8 @@ function acquireRUbuntu(version) {
         }
         try {
             yield exec.exec("sudo DEBIAN_FRONTEND=noninteractive apt-get update -qq");
-            yield exec.exec("sudo DEBIAN_FRONTEND=noninteractive apt-get install gdebi-core");
+            // install gdbi-core and also qpdf, which is used by `--as-cran`
+            yield exec.exec("sudo DEBIAN_FRONTEND=noninteractive apt-get install gdebi-core qpdf");
             yield exec.exec("sudo gdebi", [
                 "--non-interactive",
                 path.join(tempDirectory, fileName)
@@ -295,6 +309,17 @@ function acquireRtools(version) {
         }
         core.addPath(`C:\\Rtools\\bin`);
         core.addPath(`C:\\Rtools\\mingw_64\\bin`);
+    });
+}
+function acquireQpdfWindows() {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            yield exec.exec("choco", ["install", "qpdf"]);
+        }
+        catch (error) {
+            core.debug(error);
+            throw `Failed to install qpdf: ${error}`;
+        }
     });
 }
 function setupRLibrary() {
