@@ -307,7 +307,7 @@ async function acquireRtools(version: string) {
 
 async function acquireQpdfWindows() {
   try {
-    await exec.exec("choco", ["install", "qpdf"]);
+    await exec.exec("choco", ["install", "qpdf", "--no-progress"]);
   } catch (error) {
     core.debug(error);
 
