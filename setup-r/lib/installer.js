@@ -84,7 +84,7 @@ function acquireR(version, rtoolsVersion) {
             else if (IS_MAC) {
                 yield Promise.all([
                     acquireFortranMacOS(),
-                    acquireQpdfMacOS(),
+                    acquireUtilsMacOS(),
                     acquireRMacOS(version)
                 ]);
                 if (core.getInput("remove-openmp-macos")) {
@@ -126,11 +126,11 @@ function acquireFortranMacOS() {
         }
     });
 }
-function acquireQpdfMacOS() {
+function acquireUtilsMacOS() {
     return __awaiter(this, void 0, void 0, function* () {
         // qpdf is needed by `--as-cran`
         try {
-            yield exec.exec("brew", ["install", "qpdf"]);
+            yield exec.exec("brew", ["install", "qpdf", "pkgconfig"]);
         }
         catch (error) {
             core.debug(error);
