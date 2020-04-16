@@ -682,6 +682,33 @@ jobs:
           path: report.html
 ```
 
+## Forcing binaries
+
+Though code repositories such as [CRAN](http://cran.r-project.org) or
+[RStudio](http://rstudio.com) RSPM provide R packages in binary (=
+pre-compiled) form for some platforms, these binaries can sometimes be
+missing our lag behind the package sources published on the repository.
+The [setup-r](https://github.com/r-lib/actions/tree/master/setup-r)
+action, and all example workflows utilizing it follow the
+`install.packages.compile.from.source` options() default and will
+install from source when a binary is out of date. Installing from source
+can be slow and require additional system dependencies, but ensures that
+your workflow runs against the current versions of dependencies.
+
+To always use binaries, even if they are out of date, set the
+environment variable `R_COMPILE_AND_INSTALL_PACKAGES=never`. You can set
+an environment variable by passing it as a name-value pair to the
+`jobs.<job_id>.env` keyword, as in this partial example:
+
+``` yaml
+jobs:
+  R-CMD-check:
+   # missing yaml here
+    env:
+      R_COMPILE_AND_INSTALL_PACKAGES: never
+   # missing yaml here
+```
+
 ## Managing secrets
 
 In some cases, your action may need to access an external resource to
