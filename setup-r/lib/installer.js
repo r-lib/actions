@@ -130,7 +130,7 @@ function acquireUtilsMacOS() {
     return __awaiter(this, void 0, void 0, function* () {
         // qpdf is needed by `--as-cran`
         try {
-            yield exec.exec("brew", ["install", "qpdf", "pkgconfig"]);
+            yield exec.exec("brew", ["install", "qpdf", "pkgconfig", "checkbashisms"]);
         }
         catch (error) {
             core.debug(error);

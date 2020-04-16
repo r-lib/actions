@@ -107,7 +107,7 @@ async function acquireFortranMacOS() {
 async function acquireUtilsMacOS() {
   // qpdf is needed by `--as-cran`
   try {
-    await exec.exec("brew", ["install", "qpdf", "pkgconfig"]);
+    await exec.exec("brew", ["install", "qpdf", "pkgconfig", "checkbashisms"]);
   } catch (error) {
     core.debug(error);
 
