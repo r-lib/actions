@@ -402,7 +402,6 @@ function setREnvironmentVariables() {
   core.exportVariable("CI", "true");
   core.exportVariable("TZ", "UTC");
   core.exportVariable("NOT_CRAN", "true");
-  core.exportVariable("R_COMPILE_AND_INSTALL_PACKAGES", "never");
 }
 
 async function determineVersion(version: string): Promise<string> {
