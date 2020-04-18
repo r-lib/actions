@@ -290,8 +290,10 @@ function acquireRWindows(version) {
 }
 function acquireRtools(version) {
     return __awaiter(this, void 0, void 0, function* () {
-        let fileName = util.format("Rtools%s.exe", version);
+        const rtools4 = version.charAt(0) == '4';
+        let fileName = util.format(rtools4 ? "rtools%s-x86_64.exe" : "Rtools%s.exe", version);
         let downloadUrl = util.format("http://cloud.r-project.org/bin/windows/Rtools/%s", fileName);
+        console.log(`Downloading ${downloadUrl}...`);
         let downloadPath = null;
         try {
             downloadPath = yield tc.downloadTool(downloadUrl);
@@ -311,8 +313,14 @@ function acquireRtools(version) {
             core.debug(error);
             throw `Failed to install Rtools: ${error}`;
         }
-        core.addPath(`C:\\Rtools\\bin`);
-        core.addPath(`C:\\Rtools\\mingw_64\\bin`);
+        if (rtools4) {
+            core.addPath(`C:\\rtools40\\mingw64\\bin`);
+            core.addPath(`C:\\rtools40\\usr\\bin`);
+        }
+        else {
+            core.addPath(`C:\\Rtools\\bin`);
+            core.addPath(`C:\\Rtools\\mingw_64\\bin`);
+        }
     });
 }
 function acquireQpdfWindows() {
