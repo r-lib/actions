@@ -6,8 +6,8 @@ inputs:
     description: 'Version range or exact version of an R version to use.'
     default: '3.x'
   rtools-version:
-    description: 'Exact version of Rtools to use.'
-    default: '35'
+    description: 'Exact version of Rtools to use. Default uses latest suitable
+    rtools for the given version of R.'
   Ncpus:
     description: 'Value to set the R option `Ncpus` to.'
     default: '1'

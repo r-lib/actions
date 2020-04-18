@@ -7,8 +7,7 @@ async function run() {
     core.debug(`started action`);
     let version = core.getInput("r-version");
     core.debug(`got version ${version}`);
-    let rtoolsVersion = core.getInput("rtools-version");
-    core.debug(`got rtools-version ${rtoolsVersion}`);
+    let rtoolsVersion = core.getInput("rtools-version") || (version.charAt(0) == '3' ? '35' : '40');
 
     await getR(version, rtoolsVersion);
 

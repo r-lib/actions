@@ -275,11 +275,13 @@ async function acquireRWindows(version: string): Promise<string> {
 }
 
 async function acquireRtools(version: string) {
-  let fileName: string = util.format("Rtools%s.exe", version);
+  const rtools4 = version.charAt(0) == '4';
+  let fileName: string = util.format(rtools4 ? "rtools%s-x86_64.exe" : "Rtools%s.exe", version);
   let downloadUrl: string = util.format(
     "http://cloud.r-project.org/bin/windows/Rtools/%s",
     fileName
   );
+  console.log(`Downloading ${downloadUrl}...`);
   let downloadPath: string | null = null;
   try {
     downloadPath = await tc.downloadTool(downloadUrl);
@@ -300,9 +302,13 @@ async function acquireRtools(version: string) {
 
     throw `Failed to install Rtools: ${error}`;
   }
-
-  core.addPath(`C:\\Rtools\\bin`);
-  core.addPath(`C:\\Rtools\\mingw_64\\bin`);
+  if(rtools4){
+    core.addPath(`C:\\rtools40\\usr\\bin`);
+    core.addPath(`C:\\rtools40\\mingw64\\bin`);
+  } else {
+    core.addPath(`C:\\Rtools\\bin`);
+    core.addPath(`C:\\Rtools\\mingw_64\\bin`);
+  }
 }
 
 async function acquireQpdfWindows() {
