@@ -684,13 +684,14 @@ jobs:
 
 ## Forcing binaries
 
-Though code repositories such as [CRAN](http://cran.r-project.org) or
-[RStudio](http://rstudio.com) RSPM provide R packages in binary (=
-pre-compiled) form for some platforms, these binaries can sometimes be
-missing our lag behind the package sources published on the repository.
-The [setup-r](https://github.com/r-lib/actions/tree/master/setup-r)
-action, and all example workflows utilizing it follow the
-`install.packages.compile.from.source` options() default and will
+Code repositories such as [CRAN](http://cran.r-project.org) or
+[RStudio](http://rstudio.com)’s RSPM provide R packages in binary (=
+pre-compiled) form for some platforms, but these binaries can sometimes
+be missing our lag behind the package sources published on the
+repository. The
+[setup-r](https://github.com/r-lib/actions/tree/master/setup-r) action,
+and all example workflows utilizing it follow the
+`install.packages.compile.from.source` `options()` default and will
 install from source when a binary is out of date. Installing from source
 can be slow and require additional system dependencies, but ensures that
 your workflow runs against the current versions of dependencies.
@@ -708,6 +709,11 @@ jobs:
       R_COMPILE_AND_INSTALL_PACKAGES: never
    # missing yaml here
 ```
+
+You can learn more about packages in source and binary form
+[here](https://r-pkgs.org/package-structure-state.html#binary-package)
+and
+[here](https://www.jumpingrivers.com/blog/faster-r-package-installation-rstudio/).
 
 ## Managing secrets
 
