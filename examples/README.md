@@ -710,6 +710,14 @@ jobs:
    # missing yaml here
 ```
 
+`R_COMPILE_AND_INSTALL_PACKAGES: never` does what it says on the tin: it
+will never install from source. If there is *no* binary for the package,
+or none meeting the minimum version required in your `DESCRIPTION`, the
+installation of R package dependencies will be incomplete. This can lead
+to confusing errors, because while dependency installation will *not*
+fail in this situation, later steps in your workflow may fail because of
+the missing package(s).
+
 You can learn more about packages in source and binary form
 [here](https://r-pkgs.org/package-structure-state.html#binary-package)
 and
