@@ -129,7 +129,7 @@ print_yaml("pkgdown.yaml")
 
 ## Build bookdown site
 
-This example builds a [bookdown] site for a repository and then deploys the book via [netlify].
+This example builds a [bookdown] site for a repository and then deploys the site via [netlify].
 It uses [renv] to ensure the package versions remain consistent across builds.
 You will need to run `renv::snapshot()` locally and commit the `renv.lock` file before using this workflow, see [Using renv with Continous Integeration](https://rstudio.github.io/renv/articles/ci.html) for additional information.
 **Note** you need to add a `NETLIFY_AUTH_TOKEN` secret to your repository for the netlify deploy (see [Managing secrets](#managing-secrets) section for details).

@@ -58,10 +58,15 @@ async function acquireR(version: string, rtoolsVersion: string) {
     if (IS_WINDOWS) {
       await Promise.all([
         acquireRWindows(version),
-        acquireRtools(rtoolsVersion)
+        acquireRtools(rtoolsVersion),
+        acquireQpdfWindows()
       ]);
     } else if (IS_MAC) {
-      await Promise.all([installFortranMacOS(), acquireRMacOS(version)]);
+      await Promise.all([
+        acquireFortranMacOS(),
+        acquireUtilsMacOS(),
+        acquireRMacOS(version)
+      ]);
       if (core.getInput("remove-openmp-macos")) {
         await removeOpenmpFlags();
       }
@@ -89,13 +94,24 @@ async function acquireR(version: string, rtoolsVersion: string) {
   }
 }
 
-async function installFortranMacOS() {
+async function acquireFortranMacOS() {
   try {
     await exec.exec("brew", ["cask", "install", "gfortran"]);
   } catch (error) {
     core.debug(error);
 
     throw `Failed to install gfortan: ${error}`;
+  }
+}
+
+async function acquireUtilsMacOS() {
+  // qpdf is needed by `--as-cran`
+  try {
+    await exec.exec("brew", ["install", "qpdf", "pkgconfig", "checkbashisms"]);
+  } catch (error) {
+    core.debug(error);
+
+    throw `Failed to install qpdf: ${error}`;
   }
 }
 
@@ -141,8 +157,9 @@ async function acquireRUbuntu(version: string): Promise<string> {
 
   try {
     await exec.exec("sudo DEBIAN_FRONTEND=noninteractive apt-get update -qq");
+    // install gdbi-core and also qpdf, which is used by `--as-cran`
     await exec.exec(
-      "sudo DEBIAN_FRONTEND=noninteractive apt-get install gdebi-core"
+      "sudo DEBIAN_FRONTEND=noninteractive apt-get install gdebi-core qpdf"
     );
     await exec.exec("sudo gdebi", [
       "--non-interactive",
@@ -258,11 +275,13 @@ async function acquireRWindows(version: string): Promise<string> {
 }
 
 async function acquireRtools(version: string) {
-  let fileName: string = util.format("Rtools%s.exe", version);
+  const rtools4 = version.charAt(0) == '4';
+  let fileName: string = util.format(rtools4 ? "rtools%s-x86_64.exe" : "Rtools%s.exe", version);
   let downloadUrl: string = util.format(
     "http://cloud.r-project.org/bin/windows/Rtools/%s",
     fileName
   );
+  console.log(`Downloading ${downloadUrl}...`);
   let downloadPath: string | null = null;
   try {
     downloadPath = await tc.downloadTool(downloadUrl);
@@ -283,9 +302,23 @@ async function acquireRtools(version: string) {
 
     throw `Failed to install Rtools: ${error}`;
   }
+  if(rtools4){
+    core.addPath(`C:\\rtools40\\usr\\bin`);
+    core.addPath(`C:\\rtools40\\mingw64\\bin`);
+  } else {
+    core.addPath(`C:\\Rtools\\bin`);
+    core.addPath(`C:\\Rtools\\mingw_64\\bin`);
+  }
+}
 
-  core.addPath(`C:\\Rtools\\bin`);
-  core.addPath(`C:\\Rtools\\mingw_64\\bin`);
+async function acquireQpdfWindows() {
+  try {
+    await exec.exec("choco", ["install", "qpdf", "--no-progress"]);
+  } catch (error) {
+    core.debug(error);
+
+    throw `Failed to install qpdf: ${error}`;
+  }
 }
 
 async function setupRLibrary() {
@@ -326,7 +359,7 @@ function getFileNameMacOS(version: string): string {
 
 function getDownloadUrlMacOS(version: string): string {
   if (version == "devel") {
-    return "http://mac.r-project.org/el-capitan/R-devel/R-devel-el-capitan-signed.pkg";
+    return "https://mac.r-project.org/high-sierra/R-devel/R-devel.pkg";
   }
   const filename: string = getFileNameMacOS(version);
 
