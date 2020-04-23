@@ -5,6 +5,7 @@ import * as exec from "@actions/exec";
 async function run() {
   try {
     const token: string = core.getInput("repo-token", { required: true });
+    const cli_args: string = core.getInput("args");
 
     const client: github.GitHub = new github.GitHub(token);
 
@@ -27,7 +28,7 @@ async function run() {
       `https://x-access-token:${token}@`
     );
 
-    await exec.exec("git", ["push", headCloneURL, `HEAD:${headBranch}`]);
+    await exec.exec("git", ["push", headCloneURL, cli_args, `HEAD:${headBranch}`]);
   } catch (error) {
     core.setFailed(error.message);
   }
