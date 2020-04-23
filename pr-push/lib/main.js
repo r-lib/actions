@@ -23,6 +23,7 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const token = core.getInput("repo-token", { required: true });
+            const cli_args = core.getInput("args");
             const client = new github.GitHub(token);
             const context = github.context;
             const issue = context.issue;
@@ -34,7 +35,7 @@ function run() {
             });
             const headBranch = pr.head.ref;
             const headCloneURL = pr.head.repo.clone_url.replace("https://", `https://x-access-token:${token}@`);
-            yield exec.exec("git", ["push", headCloneURL, `HEAD:${headBranch}`]);
+            yield exec.exec("git", ["push", headCloneURL, cli_args, `HEAD:${headBranch}`]);
         }
         catch (error) {
             core.setFailed(error.message);
