@@ -314,8 +314,8 @@ function acquireRtools(version) {
             throw `Failed to install Rtools: ${error}`;
         }
         if (rtools4) {
-            core.addPath(`C:\\rtools40\\mingw64\\bin`);
             core.addPath(`C:\\rtools40\\usr\\bin`);
+            core.addPath(`C:\\rtools40\\mingw64\\bin`);
         }
         else {
             core.addPath(`C:\\Rtools\\bin`);
@@ -419,8 +419,9 @@ function setREnvironmentVariables() {
 }
 function determineVersion(version) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (version.toLowerCase() == "latest" || version.toLowerCase() == "release") {
-            version = "3.x";
+        version = version.toLowerCase();
+        if (version == "latest" || version == "release" || version == "oldrel") {
+            return yield getNamedVersion(version);
         }
         if (!version.endsWith(".x")) {
             const versionPart = version.split(".");
@@ -448,6 +449,14 @@ function normalizeVersion(version) {
         return version.concat(".0");
     }
     return version;
+}
+function getNamedVersion(version) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let rest = new restm.RestClient("setup-r");
+        let tags = (yield rest.get(util.format("https://rversions.r-pkg.org/r-versions/r-%s", version)))
+            .result || [];
+        return tags[0].version;
+    });
 }
 function getAvailableVersions() {
     return __awaiter(this, void 0, void 0, function* () {
