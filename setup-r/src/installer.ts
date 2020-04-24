@@ -275,8 +275,11 @@ async function acquireRWindows(version: string): Promise<string> {
 }
 
 async function acquireRtools(version: string) {
-  const rtools4 = version.charAt(0) == '4';
-  let fileName: string = util.format(rtools4 ? "rtools%s-x86_64.exe" : "Rtools%s.exe", version);
+  const rtools4 = version.charAt(0) == "4";
+  let fileName: string = util.format(
+    rtools4 ? "rtools%s-x86_64.exe" : "Rtools%s.exe",
+    version
+  );
   let downloadUrl: string = util.format(
     "http://cloud.r-project.org/bin/windows/Rtools/%s",
     fileName
@@ -302,7 +305,7 @@ async function acquireRtools(version: string) {
 
     throw `Failed to install Rtools: ${error}`;
   }
-  if(rtools4){
+  if (rtools4) {
     core.addPath(`C:\\rtools40\\usr\\bin`);
     core.addPath(`C:\\rtools40\\mingw64\\bin`);
   } else {
@@ -438,8 +441,9 @@ function setREnvironmentVariables() {
 }
 
 async function determineVersion(version: string): Promise<string> {
-  if (version.toLowerCase() == "latest" || version.toLowerCase() == "release") {
-    version = "3.x";
+  version = version.toLowerCase();
+  if (version == "latest" || version == "release" || version == "oldrel") {
+    return await getNamedVersion(version);
   }
 
   if (!version.endsWith(".x")) {
@@ -475,6 +479,16 @@ function normalizeVersion(version: string): string {
 
 interface IRRef {
   version: string;
+}
+
+async function getNamedVersion(version: string): Promise<string> {
+  let rest: restm.RestClient = new restm.RestClient("setup-r");
+  let tags: IRRef[] =
+    (await rest.get<IRRef[]>(
+      util.format("https://rversions.r-pkg.org/r-versions/r-%s", version)
+    )).result || [];
+
+  return tags[0].version;
 }
 
 async function getAvailableVersions(): Promise<string[]> {
