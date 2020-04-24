@@ -485,7 +485,7 @@ async function getNamedVersion(version: string): Promise<string> {
   let rest: restm.RestClient = new restm.RestClient("setup-r");
   let tags: IRRef[] =
     (await rest.get<IRRef[]>(
-      util.format("https://rversions.r-pkg.org/r-versions/r-%s", version)
+      util.format("https://rversions.r-pkg.org/r-%s", version)
     )).result || [];
 
   return tags[0].version;
