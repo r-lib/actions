@@ -417,7 +417,7 @@ async function getDownloadUrlWindows(version: string): Promise<string> {
 
   const filename: string = getFileNameWindows(version);
 
-  const releaseVersion: string = await getNamedVersion("release", "win");
+  const releaseVersion: string = await getReleaseVersion("win");
 
   if (version == releaseVersion) {
     return util.format(
@@ -444,10 +444,14 @@ async function determineVersion(version: string): Promise<string> {
   // There is no linux endpoint, so we just use the tarball one for linux.
 
   version = version.toLowerCase();
-  if (version == "latest" || version == "release" || version == "oldrel") {
+  if (version == "latest" || version == "release") {
     let platform = IS_MAC ? "macos" : IS_WINDOWS ? "win" : "tarball";
 
-    return await getNamedVersion(version, platform);
+    return await getReleaseVersion(platform);
+  }
+
+  if (version == "oldrel") {
+    return await getOldrelVersion();
   }
 
   if (!version.endsWith(".x")) {
@@ -485,15 +489,21 @@ interface IRRef {
   version: string;
 }
 
-async function getNamedVersion(
-  version: string,
-  platform: string
-): Promise<string> {
+async function getReleaseVersion(platform: string): Promise<string> {
   let rest: restm.RestClient = new restm.RestClient("setup-r");
   let tags: IRRef[] =
     (await rest.get<IRRef[]>(
-      util.format("https://rversions.r-pkg.org/r-%s-%s", version, platform)
+      util.format("https://rversions.r-pkg.org/r-release-%s", platform)
     )).result || [];
+
+  return tags[0].version;
+}
+
+async function getOldrelVersion(): Promise<string> {
+  let rest: restm.RestClient = new restm.RestClient("setup-r");
+  let tags: IRRef[] =
+    (await rest.get<IRRef[]>("https://rversions.r-pkg.org/r-oldrel")).result ||
+    [];
 
   return tags[0].version;
 }

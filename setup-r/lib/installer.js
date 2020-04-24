@@ -404,7 +404,7 @@ function getDownloadUrlWindows(version) {
             return "https://cloud.r-project.org/bin/windows/base/R-devel-win.exe";
         }
         const filename = getFileNameWindows(version);
-        const releaseVersion = yield getNamedVersion("release", "win");
+        const releaseVersion = yield getReleaseVersion("win");
         if (version == releaseVersion) {
             return util.format("https://cloud.r-project.org/bin/windows/base/%s", filename);
         }
@@ -421,11 +421,12 @@ function determineVersion(version) {
     return __awaiter(this, void 0, void 0, function* () {
         // There is no linux endpoint, so we just use the tarball one for linux.
         version = version.toLowerCase();
-        if (version == "latest" || version == "release" || version == "oldrel") {
-            let platform = IS_MAC ? "macos" :
-                IS_WINDOWS ? "win" :
-                    "tarball";
-            return yield getNamedVersion(version, platform);
+        if (version == "latest" || version == "release") {
+            let platform = IS_MAC ? "macos" : IS_WINDOWS ? "win" : "tarball";
+            return yield getReleaseVersion(platform);
+        }
+        if (version == "oldrel") {
+            return yield getOldrelVersion();
         }
         if (!version.endsWith(".x")) {
             const versionPart = version.split(".");
@@ -454,10 +455,18 @@ function normalizeVersion(version) {
     }
     return version;
 }
-function getNamedVersion(version, platform) {
+function getReleaseVersion(platform) {
     return __awaiter(this, void 0, void 0, function* () {
         let rest = new restm.RestClient("setup-r");
-        let tags = (yield rest.get(util.format("https://rversions.r-pkg.org/r-%s-%s", version, platform))).result || [];
+        let tags = (yield rest.get(util.format("https://rversions.r-pkg.org/r-release-%s", platform))).result || [];
+        return tags[0].version;
+    });
+}
+function getOldrelVersion() {
+    return __awaiter(this, void 0, void 0, function* () {
+        let rest = new restm.RestClient("setup-r");
+        let tags = (yield rest.get("https://rversions.r-pkg.org/r-oldrel")).result ||
+            [];
         return tags[0].version;
     });
 }
