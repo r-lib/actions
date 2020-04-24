@@ -290,7 +290,7 @@ function acquireRWindows(version) {
 }
 function acquireRtools(version) {
     return __awaiter(this, void 0, void 0, function* () {
-        const rtools4 = version.charAt(0) == '4';
+        const rtools4 = version.charAt(0) == "4";
         let fileName = util.format(rtools4 ? "rtools%s-x86_64.exe" : "Rtools%s.exe", version);
         let downloadUrl = util.format("http://cloud.r-project.org/bin/windows/Rtools/%s", fileName);
         console.log(`Downloading ${downloadUrl}...`);
@@ -453,8 +453,7 @@ function normalizeVersion(version) {
 function getNamedVersion(version) {
     return __awaiter(this, void 0, void 0, function* () {
         let rest = new restm.RestClient("setup-r");
-        let tags = (yield rest.get(util.format("https://rversions.r-pkg.org/r-versions/r-%s", version)))
-            .result || [];
+        let tags = (yield rest.get(util.format("https://rversions.r-pkg.org/r-%s", version))).result || [];
         return tags[0].version;
     });
 }
