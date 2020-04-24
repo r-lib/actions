@@ -404,8 +404,8 @@ function getDownloadUrlWindows(version) {
             return "https://cloud.r-project.org/bin/windows/base/R-devel-win.exe";
         }
         const filename = getFileNameWindows(version);
-        const latestVersion = yield getLatestVersion("3.x");
-        if (version == latestVersion) {
+        const releaseVersion = yield getNamedVersion("release", "win");
+        if (version == releaseVersion) {
             return util.format("https://cloud.r-project.org/bin/windows/base/%s", filename);
         }
         return util.format("https://cloud.r-project.org/bin/windows/base/old/%s/%s", version, filename);
@@ -419,9 +419,13 @@ function setREnvironmentVariables() {
 }
 function determineVersion(version) {
     return __awaiter(this, void 0, void 0, function* () {
+        // There is no linux endpoint, so we just use the tarball one for linux.
         version = version.toLowerCase();
         if (version == "latest" || version == "release" || version == "oldrel") {
-            return yield getNamedVersion(version);
+            let platform = IS_MAC ? "macos" :
+                IS_WINDOWS ? "win" :
+                    "tarball";
+            return yield getNamedVersion(version, platform);
         }
         if (!version.endsWith(".x")) {
             const versionPart = version.split(".");
@@ -450,10 +454,10 @@ function normalizeVersion(version) {
     }
     return version;
 }
-function getNamedVersion(version) {
+function getNamedVersion(version, platform) {
     return __awaiter(this, void 0, void 0, function* () {
         let rest = new restm.RestClient("setup-r");
-        let tags = (yield rest.get(util.format("https://rversions.r-pkg.org/r-%s", version))).result || [];
+        let tags = (yield rest.get(util.format("https://rversions.r-pkg.org/r-%s-%s", version, platform))).result || [];
         return tags[0].version;
     });
 }
