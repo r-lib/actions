@@ -417,9 +417,9 @@ async function getDownloadUrlWindows(version: string): Promise<string> {
 
   const filename: string = getFileNameWindows(version);
 
-  const latestVersion: string = await getLatestVersion("3.x");
+  const releaseVersion: string = await getNamedVersion("release", "win");
 
-  if (version == latestVersion) {
+  if (version == releaseVersion) {
     return util.format(
       "https://cloud.r-project.org/bin/windows/base/%s",
       filename
@@ -441,9 +441,13 @@ function setREnvironmentVariables() {
 }
 
 async function determineVersion(version: string): Promise<string> {
+  // There is no linux endpoint, so we just use the tarball one for linux.
+
   version = version.toLowerCase();
   if (version == "latest" || version == "release" || version == "oldrel") {
-    return await getNamedVersion(version);
+    let platform = IS_MAC ? "macos" : IS_WINDOWS ? "win" : "tarball";
+
+    return await getNamedVersion(version, platform);
   }
 
   if (!version.endsWith(".x")) {
@@ -481,11 +485,14 @@ interface IRRef {
   version: string;
 }
 
-async function getNamedVersion(version: string): Promise<string> {
+async function getNamedVersion(
+  version: string,
+  platform: string
+): Promise<string> {
   let rest: restm.RestClient = new restm.RestClient("setup-r");
   let tags: IRRef[] =
     (await rest.get<IRRef[]>(
-      util.format("https://rversions.r-pkg.org/r-%s", version)
+      util.format("https://rversions.r-pkg.org/r-%s-%s", version, platform)
     )).result || [];
 
   return tags[0].version;
