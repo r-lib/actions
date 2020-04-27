@@ -6,6 +6,7 @@ inputs:
     description: 'Token for the repo. Can be passed in using {{ secrets.GITHUB_TOKEN }}'
   args:
     description: 'String of additional command line args to `git push`'
+    default: '-q'
 runs:
   using: 'node12'
   main: 'lib/main.js'
