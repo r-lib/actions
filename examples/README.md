@@ -94,10 +94,10 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {os: windows-latest, r: '3.6'}
-          - {os: macOS-latest, r: '3.6'}
+          - {os: windows-latest, r: 'release'}
+          - {os: macOS-latest, r: 'release'}
           - {os: macOS-latest, r: 'devel'}
-          - {os: ubuntu-16.04, r: '3.6', rspm: "https://demo.rstudiopm.com/all/__linux__/xenial/latest"}
+          - {os: ubuntu-16.04, r: 'release', rspm: "https://demo.rstudiopm.com/all/__linux__/xenial/latest"}
 
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
@@ -194,14 +194,14 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {os: windows-latest, r: '3.6'}
-          - {os: macOS-latest, r: '3.6'}
-          - {os: macOS-latest, r: 'devel'}
-          - {os: ubuntu-16.04, r: '3.2', rspm: "https://demo.rstudiopm.com/all/__linux__/xenial/latest"}
-          - {os: ubuntu-16.04, r: '3.3', rspm: "https://demo.rstudiopm.com/all/__linux__/xenial/latest"}
-          - {os: ubuntu-16.04, r: '3.4', rspm: "https://demo.rstudiopm.com/all/__linux__/xenial/latest"}
-          - {os: ubuntu-16.04, r: '3.5', rspm: "https://demo.rstudiopm.com/all/__linux__/xenial/latest"}
-          - {os: ubuntu-16.04, r: '3.6', rspm: "https://demo.rstudiopm.com/all/__linux__/xenial/latest"}
+          - {os: macOS-latest,   r: 'devel'}
+          - {os: macOS-latest,   r: '4.0'}
+          - {os: windows-latest, r: '4.0'}
+          - {os: ubuntu-16.04,   r: '4.0', rspm: "https://demo.rstudiopm.com/all/__linux__/xenial/latest"}
+          - {os: ubuntu-16.04,   r: '3.6', rspm: "https://demo.rstudiopm.com/all/__linux__/xenial/latest"}
+          - {os: ubuntu-16.04,   r: '3.5', rspm: "https://demo.rstudiopm.com/all/__linux__/xenial/latest"}
+          - {os: ubuntu-16.04,   r: '3.4', rspm: "https://demo.rstudiopm.com/all/__linux__/xenial/latest"}
+          - {os: ubuntu-16.04,   r: '3.3', rspm: "https://demo.rstudiopm.com/all/__linux__/xenial/latest"}
 
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
