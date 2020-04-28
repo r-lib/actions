@@ -179,6 +179,8 @@ function acquireRUbuntu(version) {
             throw new Error("Temp directory not set");
         }
         try {
+            // Important backports needed for CRAN packages, including libgit2
+            yield exec.exec("sudo DEBIAN_FRONTEND=noninteractive add-apt-repository -y ppa:cran/travis");
             yield exec.exec("sudo DEBIAN_FRONTEND=noninteractive apt-get update -qq");
             // install gdbi-core and also qpdf, which is used by `--as-cran`
             yield exec.exec("sudo DEBIAN_FRONTEND=noninteractive apt-get install gdebi-core qpdf");
