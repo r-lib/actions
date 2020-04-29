@@ -4,7 +4,7 @@ author: 'Jim Hester'
 inputs:
   r-version:
     description: 'Version range or exact version of an R version to use.'
-    default: 'release'
+    default: '4.x'
   rtools-version:
     description: 'Exact version of Rtools to use. Default uses latest suitable
     rtools for the given version of R.'
