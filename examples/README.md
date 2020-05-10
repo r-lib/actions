@@ -709,6 +709,31 @@ jobs:
           path: report.html
 ```
 
+## Bioconductor-friendly workflow
+
+[Bioconductor](http://bioconductor.org/) is a repository for tools for
+the analysis and comprehension of high-throughput genomic data that
+hosts close to 2,000 R packages. It follows a six month release cycle
+while R has a yearly release cycle. `biocthis` contains a
+user-contributed workflow that is Bioconductor-friendly described in
+detail at[the `biocthis` introductory vignette](https://lcolladotor.github.io/biocthis/articles/biocthis.html#use-bioc-github-action-).
+You can add this workflow using the following R code:
+
+``` r
+## If needed
+remotes::install_github("lcolladotor/biocthis")
+
+## Create a GitHub Actions (GHA) workflow that is Bioconductor-friendly
+biocthis::use_bioc_github_action()
+
+## You can also use this GHA workflow without installing biocthis
+usethis::use_github_action(
+    "check-bioc",
+    "https://bit.ly/biocthis_gha",
+    "check-bioc.yml"
+)
+```
+
 ## Forcing binaries
 
 Code repositories such as [CRAN](http://cran.r-project.org) or
