@@ -716,7 +716,8 @@ the analysis and comprehension of high-throughput genomic data that
 hosts close to 2,000 R packages. It follows a six month release cycle
 while R has a yearly release cycle. `biocthis` contains a
 user-contributed workflow that is Bioconductor-friendly described in
-detail at[the `biocthis` introductory vignette](https://lcolladotor.github.io/biocthis/articles/biocthis.html#use-bioc-github-action-).
+detail at[the `biocthis` introductory
+vignette](https://lcolladotor.github.io/biocthis/articles/biocthis.html#use-bioc-github-action-).
 You can add this workflow using the following R code:
 
 ``` r
