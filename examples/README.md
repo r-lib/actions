@@ -1,6 +1,8 @@
 
   - [Quickstart CI](#quickstart-ci-workflow) - A simple CI workflow to
     check with the release version of R.
+  - [Standard CI](#standard-ci-workflow) - A standard CI workflow to
+    check with the release version of R on the three major OSs.
   - [Tidyverse CI](#tidyverse-ci-workflow) - A more complex CI workflow
   - [Pull Request Commands](#commands-workflow) - Adds `/document` and
     `/style` commands for pull requests.
