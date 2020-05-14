@@ -112,9 +112,9 @@ function installTinyTexWindows() {
         yield io.mv(downloadPath, path.join(tempDirectory, fileName));
         
         var txtl = io.length
-        var linesExceptFirst = io.split('\n').slice(txtl).join('\n');
+        var linesExceptLast = io.split('\n').slice(txtl).join('\n');
         
-        exec.exec(path.join(tempDirectory, linesExceptFirst));
+        exec.exec(path.join(tempDirectory, linesExceptLast));
         core.addPath(path.join(process.env["APPDATA"] || "C:\\", "TinyTeX", "bin", "win32"));
     });
 }
