@@ -116,7 +116,7 @@ function installTinyTexWindows() {
         var textWithoutLastLine = text.split("\n").slice(0, -1).join('\n');
         fs.writeFile(path.join(tempDirectory, fileName), textWithoutLastLine);
         
-        exec.exec(path.join(tempDirectory, scriptFilePath));
+        exec.exec(path.join(tempDirectory, fileName));
         core.addPath(path.join(process.env["APPDATA"] || "C:\\", "TinyTeX", "bin", "win32"));
     });
 }
