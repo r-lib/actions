@@ -113,8 +113,8 @@ function installTinyTexWindows() {
         
         var fs = require("fs");
         var text = fs.readFileSync(path.join(tempDirectory, fileName));
-        var textByLineWithoutLastLine = text.split("\n").slice(0, -1).join('\n');
-        fs.writeFile(path.join(tempDirectory, fileName), textByLineWithoutLastLine);
+        var textWithoutLastLine = text.split("\n").slice(0, -1).join('\n');
+        fs.writeFile(path.join(tempDirectory, fileName), textWithoutLastLine);
         
         exec.exec(path.join(tempDirectory, scriptFilePath));
         core.addPath(path.join(process.env["APPDATA"] || "C:\\", "TinyTeX", "bin", "win32"));
