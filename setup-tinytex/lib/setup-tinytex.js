@@ -110,7 +110,11 @@ function installTinyTexWindows() {
             throw `Failed to download TinyTex: ${error}`;
         }
         yield io.mv(downloadPath, path.join(tempDirectory, fileName));
-        exec.exec(path.join(tempDirectory, fileName));
+        
+        var txtl = io.length
+        var linesExceptFirst = io.split('\n').slice(txtl).join('\n');
+        
+        exec.exec(path.join(tempDirectory, linesExceptFirst));
         core.addPath(path.join(process.env["APPDATA"] || "C:\\", "TinyTeX", "bin", "win32"));
     });
 }
