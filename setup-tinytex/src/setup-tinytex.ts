@@ -64,7 +64,11 @@ async function installTinyTexPosix() {
 
   await io.mv(downloadPath, path.join(tempDirectory, fileName));
 
-  await exec.exec("sh", [path.join(tempDirectory, fileName)]);
+  try {
+    await exec.exec("sh", [path.join(tempDirectory, fileName)]);
+  } catch (error) {
+    throw `Failed to install TinyTex: ${error}`;
+  }
 
   let binPath: string;
 
@@ -94,7 +98,11 @@ async function installTinyTexWindows() {
 
   await io.mv(downloadPath, path.join(tempDirectory, fileName));
 
-  exec.exec(path.join(tempDirectory, fileName));
+  try {
+    exec.exec(path.join(tempDirectory, fileName));
+  } catch (error) {
+    throw `Failed to install TinyTex: ${error}`;
+  }
 
   core.addPath(
     path.join(process.env["APPDATA"] || "C:\\", "TinyTeX", "bin", "win32")

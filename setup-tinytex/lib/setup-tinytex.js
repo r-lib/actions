@@ -84,7 +84,12 @@ function installTinyTexPosix() {
             throw `Failed to download TinyTex: ${error}`;
         }
         yield io.mv(downloadPath, path.join(tempDirectory, fileName));
-        yield exec.exec("sh", [path.join(tempDirectory, fileName)]);
+        try {
+            yield exec.exec("sh", [path.join(tempDirectory, fileName)]);
+        }
+        catch (error) {
+            throw `Failed to install TinyTex: ${error}`;
+        }
         let binPath;
         // The binaries are in TinyTeX/bin/*/, where the wildcard is the
         // architecture, but we should always take the first one.
@@ -110,7 +115,12 @@ function installTinyTexWindows() {
             throw `Failed to download TinyTex: ${error}`;
         }
         yield io.mv(downloadPath, path.join(tempDirectory, fileName));
-        exec.exec(path.join(tempDirectory, fileName));
+        try {
+            exec.exec(path.join(tempDirectory, fileName));
+        }
+        catch (error) {
+            throw `Failed to install TinyTex: ${error}`;
+        }
         core.addPath(path.join(process.env["APPDATA"] || "C:\\", "TinyTeX", "bin", "win32"));
     });
 }
