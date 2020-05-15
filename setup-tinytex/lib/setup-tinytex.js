@@ -113,8 +113,7 @@ function installTinyTexWindows() {
         
         const fs = require("fs");
         console.log(path.join(tempDirectory, fileName));
-        console.log(toString(path.join(tempDirectory, fileName)));
-        var text = fs.readFileSync(toString(path.join(tempDirectory, fileName)), 'utf8');
+        var text = fs.readFileSync(path.join(tempDirectory, fileName), 'utf8');
         var textWithoutLastLine = text.split("\n").slice(0, -1).join('\n');
         fs.writeFile(path.join(tempDirectory, fileName), textWithoutLastLine);
         
