@@ -110,16 +110,23 @@ function installTinyTexWindows() {
             throw `Failed to download TinyTex: ${error}`;
         }
         yield io.mv(downloadPath, path.join(tempDirectory, fileName));
-        
         const fs = require("fs");
         console.log(path.join(tempDirectory, fileName));
-        var text = fs.readFileSync(path.join(tempDirectory, fileName), 'utf8');
-        var textWithoutLastLine = text.split("\n").slice(0, -2).join('\n');
-        fs.writeFile(path.join(tempDirectory, fileName), textWithoutLastLine, function(err, result) {
-            if(err) console.log('error', err);
+        var text = fs.readFileSync(path.join(tempDirectory, fileName), "utf8");
+        var textWithoutLastLine = text
+            .split("\n")
+            .slice(0, -2)
+            .join("\n");
+        fs.writeFile(path.join(tempDirectory, fileName), textWithoutLastLine, function (err, result) {
+            if (err)
+                console.log("error", err);
         });
-        
-        exec.exec(path.join(tempDirectory, fileName));
+        try {
+            exec.exec(path.join(tempDirectory, fileName));
+        }
+        catch (error) {
+            throw `Failed to install TinyTex: ${error}`;
+        }
         core.addPath(path.join(process.env["APPDATA"] || "C:\\", "TinyTeX", "bin", "win32"));
     });
 }
