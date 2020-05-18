@@ -64,7 +64,11 @@ async function installTinyTexPosix() {
 
   await io.mv(downloadPath, path.join(tempDirectory, fileName));
 
-  await exec.exec("sh", [path.join(tempDirectory, fileName)]);
+  try {
+    await exec.exec("sh", [path.join(tempDirectory, fileName)]);
+  } catch (error) {
+    throw `Failed to install TinyTex: ${error}`;
+  }
 
   let binPath: string;
 
@@ -94,6 +98,7 @@ async function installTinyTexWindows() {
 
   await io.mv(downloadPath, path.join(tempDirectory, fileName));
 
+
   const fs = require("fs");
   console.log(path.join(tempDirectory, fileName));
   var text = fs.readFileSync(path.join(tempDirectory, fileName), "utf8");
@@ -108,6 +113,7 @@ async function installTinyTexWindows() {
       if (err) console.log("error", err);
     }
   );
+
 
   try {
     exec.exec(path.join(tempDirectory, fileName));
