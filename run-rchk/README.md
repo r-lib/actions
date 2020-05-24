@@ -15,7 +15,7 @@ Basic:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-    - uses r-lib/actions/run-rchk@master
+    - uses: r-lib/actions/run-rchk@master
       with:
         apt: <any apt dependencies, optional>
         package: <R package name, optional>
