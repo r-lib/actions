@@ -39,7 +39,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: Setup R
-        uses: actions/setup-R@v1
+        uses: r-lib/actions/setup-R@v1
         with:
           r-version: ${{ matrix.R }}
       - run: Rscript -e 'print("hello")'
@@ -51,4 +51,4 @@ The scripts and documentation in this project are released under the [MIT Licens
 
 # Contributions
 
-Contributions are welcome!  See [Contributor's Guide](docs/contributors.md)
+Contributions are welcome! See [Contributor's Guide](docs/contributors.md)
