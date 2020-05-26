@@ -356,7 +356,7 @@ async function setupRLibrary() {
          CRAN = ${cran}\
        ),\
        crayon.enabled = ${core.getInput("crayon.enabled")},\
-       Ncpus = ${core.getInput("Ncpus")}\
+       Ncpus = ${core.getInput("Ncpus")},\
        HTTPUserAgent = ${user_agent}\
      )\n`
   );
