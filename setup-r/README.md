@@ -12,6 +12,8 @@ This action sets up an R environment for use in actions by:
   - `R_LIBS_USER=tempdir/Library`
 - Removing the `-fopenmp` flags from Makeconf on macOS, which are not supported
   with Apple's default Command Line Tools compilers.
+- Appending 'on GitHub Actions' to the default HTTP user agent. This is useful to
+  distinguish GitHub Actions package requests from other sources.
 
 # Usage
 
