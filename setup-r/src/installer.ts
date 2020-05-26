@@ -344,6 +344,10 @@ async function setupRLibrary() {
 
   let rspm = process.env["RSPM"] ? `'${process.env["RSPM"]}'` : "NULL";
   let cran = `'${process.env["CRAN"] || "https://cloud.r-project.org"}'`;
+  let user_agent =
+    core.getInput("http-user-agent") == "default"
+      ? 'sprintf("R/%s R (%s) on GitHub Actions", getRversion(), paste(getRversion(), R.version$platform, R.version$arch, R.version$os)'
+      : core.getInput("http-user-agent");
   await fs.writeFile(
     profilePath,
     `options(\
@@ -353,6 +357,7 @@ async function setupRLibrary() {
        ),\
        crayon.enabled = ${core.getInput("crayon.enabled")},\
        Ncpus = ${core.getInput("Ncpus")}\
+       HTTPUserAgent = ${user_agent}\
      )\n`
   );
 
