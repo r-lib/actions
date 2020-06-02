@@ -164,7 +164,7 @@ async function acquireRUbuntu(version: string): Promise<string> {
     await exec.exec("sudo DEBIAN_FRONTEND=noninteractive apt-get update -qq");
     // install gdbi-core and also qpdf, which is used by `--as-cran`
     await exec.exec(
-      "sudo DEBIAN_FRONTEND=noninteractive apt-get install gdebi-core qpdf"
+      "sudo DEBIAN_FRONTEND=noninteractive apt-get install gdebi-core qpdf devscripts"
     );
     await exec.exec("sudo gdebi", [
       "--non-interactive",
