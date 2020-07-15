@@ -29,11 +29,13 @@ if (!tempDirectory) {
   tempDirectory = path.join(baseLocation, "actions", "temp");
 }
 
-export async function getR(version: string, rtoolsVersion: string) {
+export async function getR(version: string) {
   const selected = await determineVersion(version);
   if (selected) {
     version = selected;
   }
+  let rtoolsVersion =
+    core.getInput("rtools-version") || (version.charAt(0) == "3" ? "35" : "40");
 
   let toolPath = tc.find("R", version);
 
