@@ -1,4 +1,4 @@
-Package: testpackage
+Package: actions
 Title: A Simple Test Description File to Test Packages
 Version: 1.0.0
 Authors@R: 
