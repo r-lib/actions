@@ -7,3 +7,5 @@
 ^examples$
 ^LICENSE$
 ^.github$
+^actions\.Rproj$
+^\.Rproj\.user$
