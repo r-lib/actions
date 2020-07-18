@@ -448,7 +448,8 @@ async function getDownloadUrlWindows(version: string): Promise<string> {
 function setREnvironmentVariables() {
   core.exportVariable("R_LIBS_USER", path.join(tempDirectory, "Library"));
   core.exportVariable("TZ", "UTC");
-  core.exportVariable("NOT_CRAN", "true");
+  if(!process.env["NOT_CRAN"])
+    core.exportVariable("NOT_CRAN", "true");
 }
 
 async function determineVersion(version: string): Promise<string> {
