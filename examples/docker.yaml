@@ -8,7 +8,7 @@ jobs:
       - run: Rscript fit_model.R
       - run: Rscript -e 'rmarkdown::render("report.Rmd")'
       - name: Upload results
-        uses: actions/upload-artifact@master
+        uses: actions/upload-artifact@main
         with:
           name: results
           path: report.html
