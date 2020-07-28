@@ -53,8 +53,7 @@ function getR(version) {
         if (selected) {
             version = selected;
         }
-        let rtoolsVersion = core.getInput("rtools-version") ||
-            (version.charAt(0) == "3" ? "35" : "40");
+        let rtoolsVersion = core.getInput("rtools-version") || (version.charAt(0) == "3" ? "35" : "40");
         let toolPath = tc.find("R", version);
         if (toolPath) {
             core.debug(`Tool found in cache ${toolPath}`);
@@ -390,9 +389,6 @@ function getFileNameUbuntu(version) {
     return filename;
 }
 function getDownloadUrlUbuntu(filename) {
-    if (filename == "devel") {
-        throw new Error("R-devel not currently available on ubuntu!");
-    }
     try {
         const info = linux_os_info_1.default({ mode: "sync" });
         const versionStr = info.version_id.replace(/[.]/g, "");

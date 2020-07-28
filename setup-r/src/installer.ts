@@ -399,10 +399,6 @@ function getFileNameUbuntu(version: string): string {
 }
 
 function getDownloadUrlUbuntu(filename: string): string {
-  if (filename == "devel") {
-    throw new Error("R-devel not currently available on ubuntu!");
-  }
-
   try {
     const info = osInfo({ mode: "sync" });
     const versionStr = info.version_id.replace(/[.]/g, "");
@@ -448,8 +444,7 @@ async function getDownloadUrlWindows(version: string): Promise<string> {
 function setREnvironmentVariables() {
   core.exportVariable("R_LIBS_USER", path.join(tempDirectory, "Library"));
   core.exportVariable("TZ", "UTC");
-  if(!process.env["NOT_CRAN"])
-    core.exportVariable("NOT_CRAN", "true");
+  if (!process.env["NOT_CRAN"]) core.exportVariable("NOT_CRAN", "true");
 }
 
 async function determineVersion(version: string): Promise<string> {
