@@ -31,7 +31,7 @@ function run() {
             console.log(`##[add-matcher]${path.join(matchersPath, "r.json")}`);
         }
         catch (error) {
-            core.setFailed(error.message);
+            core.setFailed(error);
         }
     });
 }
