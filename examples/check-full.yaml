@@ -50,7 +50,7 @@ jobs:
         shell: Rscript {0}
 
       - name: Cache R packages
-        if: !(runner.os == 'Windows' && matrix.config.r == '3.6') # On Windows, cache works only with R >= 4.0
+        if: ! (runner.os == 'Windows' && matrix.config.r == '3.6') # On Windows, cache works only with R >= 4.0
         uses: actions/cache@v1
         with:
           path: ${{ env.R_LIBS_USER }}
