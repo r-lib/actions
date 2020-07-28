@@ -36,7 +36,7 @@ function run() {
             const headCloneURL = pr.head.repo.clone_url.replace("https://", `https://x-access-token:${token}@`);
             yield exec.exec("git", ["remote", "add", "pr", headCloneURL]);
             yield exec.exec("git", ["fetch", "pr", headBranch]);
-            yield exec.exec("git", ["checkout", "-b", headBranch, `pr/${headBranch}`]);
+            yield exec.exec("git", ["checkout", "-b", `pr-${headBranch}`, `pr/${headBranch}`]);
         }
         catch (error) {
             core.setFailed(error.message);

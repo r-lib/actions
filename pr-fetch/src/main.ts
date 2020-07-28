@@ -29,7 +29,12 @@ async function run() {
 
     await exec.exec("git", ["remote", "add", "pr", headCloneURL]);
     await exec.exec("git", ["fetch", "pr", headBranch]);
-    await exec.exec("git", ["checkout", "-b", headBranch, `pr/${headBranch}`]);
+    await exec.exec("git", [
+      "checkout",
+      "-b",
+      `pr-${headBranch}`,
+      `pr/${headBranch}`
+    ]);
   } catch (error) {
     core.setFailed(error.message);
   }
