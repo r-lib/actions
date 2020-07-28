@@ -29,11 +29,13 @@ if (!tempDirectory) {
   tempDirectory = path.join(baseLocation, "actions", "temp");
 }
 
-export async function getR(version: string, rtoolsVersion: string) {
+export async function getR(version: string) {
   const selected = await determineVersion(version);
   if (selected) {
     version = selected;
   }
+  let rtoolsVersion =
+    core.getInput("rtools-version") || (version.charAt(0) == "3" ? "35" : "40");
 
   let toolPath = tc.find("R", version);
 
@@ -446,7 +448,8 @@ async function getDownloadUrlWindows(version: string): Promise<string> {
 function setREnvironmentVariables() {
   core.exportVariable("R_LIBS_USER", path.join(tempDirectory, "Library"));
   core.exportVariable("TZ", "UTC");
-  core.exportVariable("NOT_CRAN", "true");
+  if(!process.env["NOT_CRAN"])
+    core.exportVariable("NOT_CRAN", "true");
 }
 
 async function determineVersion(version: string): Promise<string> {

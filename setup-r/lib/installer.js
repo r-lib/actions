@@ -47,12 +47,14 @@ if (!tempDirectory) {
     }
     tempDirectory = path.join(baseLocation, "actions", "temp");
 }
-function getR(version, rtoolsVersion) {
+function getR(version) {
     return __awaiter(this, void 0, void 0, function* () {
         const selected = yield determineVersion(version);
         if (selected) {
             version = selected;
         }
+        let rtoolsVersion = core.getInput("rtools-version") ||
+            (version.charAt(0) == "3" ? "35" : "40");
         let toolPath = tc.find("R", version);
         if (toolPath) {
             core.debug(`Tool found in cache ${toolPath}`);
@@ -420,7 +422,8 @@ function getDownloadUrlWindows(version) {
 function setREnvironmentVariables() {
     core.exportVariable("R_LIBS_USER", path.join(tempDirectory, "Library"));
     core.exportVariable("TZ", "UTC");
-    core.exportVariable("NOT_CRAN", "true");
+    if (!process.env["NOT_CRAN"])
+        core.exportVariable("NOT_CRAN", "true");
 }
 function determineVersion(version) {
     return __awaiter(this, void 0, void 0, function* () {

@@ -155,7 +155,7 @@ jobs:
 
       - name: Upload check results
         if: failure()
-        uses: actions/upload-artifact@master
+        uses: actions/upload-artifact@main
         with:
           name: ${{ runner.os }}-r${{ matrix.config.r }}-results
           path: check
@@ -272,7 +272,7 @@ jobs:
 
       - name: Upload check results
         if: failure()
-        uses: actions/upload-artifact@master
+        uses: actions/upload-artifact@main
         with:
           name: ${{ runner.os }}-r${{ matrix.config.r }}-results
           path: check
@@ -706,7 +706,7 @@ jobs:
       - run: Rscript fit_model.R
       - run: Rscript -e 'rmarkdown::render("report.Rmd")'
       - name: Upload results
-        uses: actions/upload-artifact@master
+        uses: actions/upload-artifact@main
         with:
           name: results
           path: report.html
