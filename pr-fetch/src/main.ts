@@ -26,13 +26,14 @@ async function run() {
       "https://",
       `https://x-access-token:${token}@`
     );
+    const headRepoOwnerLogin: string = pr.head.repo.owner.login;
 
     await exec.exec("git", ["remote", "add", "pr", headCloneURL]);
     await exec.exec("git", ["fetch", "pr", headBranch]);
     await exec.exec("git", [
       "checkout",
       "-b",
-      `pr-${headBranch}`,
+      `${headRepoOwnerLogin}-${headBranch}`,
       `pr/${headBranch}`
     ]);
   } catch (error) {
