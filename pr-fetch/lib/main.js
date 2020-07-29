@@ -34,9 +34,15 @@ function run() {
             });
             const headBranch = pr.head.ref;
             const headCloneURL = pr.head.repo.clone_url.replace("https://", `https://x-access-token:${token}@`);
+            const headRepoOwnerLogin = pr.head.repo.owner.login;
             yield exec.exec("git", ["remote", "add", "pr", headCloneURL]);
             yield exec.exec("git", ["fetch", "pr", headBranch]);
-            yield exec.exec("git", ["checkout", "-b", `pr-${headBranch}`, `pr/${headBranch}`]);
+            yield exec.exec("git", [
+                "checkout",
+                "-b",
+                `${headRepoOwnerLogin}-${headBranch}`,
+                `pr/${headBranch}`
+            ]);
         }
         catch (error) {
             core.setFailed(error.message);
