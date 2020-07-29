@@ -349,7 +349,7 @@ function setupRLibrary() {
         core.debug("R profile is at " + profilePath);
         let rspm = process.env["RSPM"] ? `'${process.env["RSPM"]}'` : "NULL";
         let cran = `'${process.env["CRAN"] || "https://cloud.r-project.org"}'`;
-        let user_agent = core.getInput("http-user-agent") == "default"
+        let user_agent = core.getInput("http-user-agent") == "default" || core.getInput("http-user-agent") == ""
             ? 'sprintf("R/%s R (%s) on GitHub Actions", getRversion(), paste(getRversion(), R.version$platform, R.version$arch, R.version$os))'
             : core.getInput("http-user-agent");
         yield fs_1.promises.writeFile(profilePath, `options(\
