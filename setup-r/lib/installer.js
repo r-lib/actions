@@ -74,6 +74,9 @@ function getR(version) {
 exports.getR = getR;
 function acquireR(version, rtoolsVersion) {
     return __awaiter(this, void 0, void 0, function* () {
+        if (!core.getInput("install-r")) {
+            return;
+        }
         try {
             if (IS_WINDOWS) {
                 yield Promise.all([
@@ -93,21 +96,7 @@ function acquireR(version, rtoolsVersion) {
                 }
             }
             else {
-                let returnCode = 1;
-                try {
-                    returnCode = yield exec.exec("R", ["--version"], {
-                        ignoreReturnCode: true,
-                        silent: true
-                    });
-                }
-                catch (e) { }
-                core.debug(`returnCode: ${returnCode}`);
-                if (returnCode != 0) {
-                    // We only want to acquire R here if it
-                    // doesn't already exist (because you are running in a container that
-                    // already includes it)
-                    yield acquireRUbuntu(version);
-                }
+                yield acquireRUbuntu(version);
             }
         }
         catch (error) {

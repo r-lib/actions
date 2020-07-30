@@ -25,6 +25,8 @@ inputs:
     x86_64 darwin17.0) on GitHub Actions". Otherwise uses whatever value is
     set.'
     default: 'default'
+  install-r:
+    default: true
 runs:
   using: 'node12'
   main: 'lib/setup-r.js'

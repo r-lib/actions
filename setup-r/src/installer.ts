@@ -56,6 +56,10 @@ export async function getR(version: string) {
 }
 
 async function acquireR(version: string, rtoolsVersion: string) {
+  if (!core.getInput("install-r")) {
+    return;
+  }
+
   try {
     if (IS_WINDOWS) {
       await Promise.all([
@@ -73,21 +77,7 @@ async function acquireR(version: string, rtoolsVersion: string) {
         await removeOpenmpFlags();
       }
     } else {
-      let returnCode = 1;
-      try {
-        returnCode = await exec.exec("R", ["--version"], {
-          ignoreReturnCode: true,
-          silent: true
-        });
-      } catch (e) {}
-
-      core.debug(`returnCode: ${returnCode}`);
-      if (returnCode != 0) {
-        // We only want to acquire R here if it
-        // doesn't already exist (because you are running in a container that
-        // already includes it)
-        await acquireRUbuntu(version);
-      }
+      await acquireRUbuntu(version);
     }
   } catch (error) {
     core.debug(error);
