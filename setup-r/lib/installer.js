@@ -25,7 +25,7 @@ const tc = __importStar(require("@actions/tool-cache"));
 const io = __importStar(require("@actions/io"));
 const util = __importStar(require("util"));
 const path = __importStar(require("path"));
-const fs_1 = require("fs");
+const fs = __importStar(require("fs"));
 const restm = __importStar(require("typed-rest-client/RestClient"));
 const semver = __importStar(require("semver"));
 const linux_os_info_1 = __importDefault(require("linux-os-info"));
@@ -284,6 +284,12 @@ function acquireRtools(version) {
     return __awaiter(this, void 0, void 0, function* () {
         const rtools4 = version.charAt(0) == "4";
         let fileName = util.format(rtools4 ? "rtools%s-x86_64.exe" : "Rtools%s.exe", version);
+        // If Rtools is already installed just return, as there is a message box
+        // which hangs the build otherwise.
+        if (!rtools4 && fs.existsSync("C:\\Rtools") ||
+            rtools4 && fs.existsSync("C:\\rtools40")) {
+            return;
+        }
         let downloadUrl = util.format("http://cloud.r-project.org/bin/windows/Rtools/%s", fileName);
         console.log(`Downloading ${downloadUrl}...`);
         let downloadPath = null;
@@ -342,7 +348,7 @@ function setupRLibrary() {
             core.getInput("http-user-agent") == ""
             ? 'sprintf("R/%s R (%s) on GitHub Actions", getRversion(), paste(getRversion(), R.version$platform, R.version$arch, R.version$os))'
             : `"${core.getInput("http-user-agent")}"`;
-        yield fs_1.promises.writeFile(profilePath, `options(\
+        yield fs.promises.writeFile(profilePath, `options(\
        repos = c(\
          RSPM = ${rspm},\
          CRAN = ${cran}\

@@ -6,7 +6,7 @@ import * as tc from "@actions/tool-cache";
 import * as io from "@actions/io";
 import * as util from "util";
 import * as path from "path";
-import { promises as fs } from "fs";
+import * as fs from "fs";
 import * as restm from "typed-rest-client/RestClient";
 import * as semver from "semver";
 import osInfo from "linux-os-info";
@@ -277,6 +277,16 @@ async function acquireRtools(version: string) {
     rtools4 ? "rtools%s-x86_64.exe" : "Rtools%s.exe",
     version
   );
+
+  // If Rtools is already installed just return, as there is a message box
+  // which hangs the build otherwise.
+  if (
+    (!rtools4 && fs.existsSync("C:\\Rtools")) ||
+    (rtools4 && fs.existsSync("C:\\rtools40"))
+  ) {
+    return;
+  }
+
   let downloadUrl: string = util.format(
     "http://cloud.r-project.org/bin/windows/Rtools/%s",
     fileName
@@ -342,7 +352,7 @@ async function setupRLibrary() {
       ? 'sprintf("R/%s R (%s) on GitHub Actions", getRversion(), paste(getRversion(), R.version$platform, R.version$arch, R.version$os))'
       : `"${core.getInput("http-user-agent")}"`;
 
-  await fs.writeFile(
+  await fs.promises.writeFile(
     profilePath,
     `options(\
        repos = c(\
