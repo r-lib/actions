@@ -284,6 +284,9 @@ async function acquireRtools(version: string) {
     (!rtools4 && fs.existsSync("C:\\Rtools")) ||
     (rtools4 && fs.existsSync("C:\\rtools40"))
   ) {
+    core.debug(
+      "Skipping Rtools installation as a suitable Rtools is already installed"
+    );
     return;
   }
 
