@@ -287,7 +287,6 @@ async function acquireRtools(version: string) {
     core.debug(
       "Skipping Rtools installation as a suitable Rtools is already installed"
     );
-    return;
   } else {
     let downloadUrl: string = util.format(
       "http://cloud.r-project.org/bin/windows/Rtools/%s",

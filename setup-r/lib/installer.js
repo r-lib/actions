@@ -289,7 +289,6 @@ function acquireRtools(version) {
         if ((!rtools4 && fs.existsSync("C:\\Rtools")) ||
             (rtools4 && fs.existsSync("C:\\rtools40"))) {
             core.debug("Skipping Rtools installation as a suitable Rtools is already installed");
-            return;
         }
         else {
             let downloadUrl = util.format("http://cloud.r-project.org/bin/windows/Rtools/%s", fileName);
