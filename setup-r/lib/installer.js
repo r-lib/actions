@@ -291,26 +291,28 @@ function acquireRtools(version) {
             core.debug("Skipping Rtools installation as a suitable Rtools is already installed");
             return;
         }
-        let downloadUrl = util.format("http://cloud.r-project.org/bin/windows/Rtools/%s", fileName);
-        console.log(`Downloading ${downloadUrl}...`);
-        let downloadPath = null;
-        try {
-            downloadPath = yield tc.downloadTool(downloadUrl);
-            yield io.mv(downloadPath, path.join(tempDirectory, fileName));
-        }
-        catch (error) {
-            core.debug(error);
-            throw `Failed to download version ${version}: ${error}`;
-        }
-        try {
-            yield exec.exec(path.join(tempDirectory, fileName), [
-                "/VERYSILENT",
-                "/SUPPRESSMSGBOXES"
-            ]);
-        }
-        catch (error) {
-            core.debug(error);
-            throw `Failed to install Rtools: ${error}`;
+        else {
+            let downloadUrl = util.format("http://cloud.r-project.org/bin/windows/Rtools/%s", fileName);
+            console.log(`Downloading ${downloadUrl}...`);
+            let downloadPath = null;
+            try {
+                downloadPath = yield tc.downloadTool(downloadUrl);
+                yield io.mv(downloadPath, path.join(tempDirectory, fileName));
+            }
+            catch (error) {
+                core.debug(error);
+                throw `Failed to download version ${version}: ${error}`;
+            }
+            try {
+                yield exec.exec(path.join(tempDirectory, fileName), [
+                    "/VERYSILENT",
+                    "/SUPPRESSMSGBOXES"
+                ]);
+            }
+            catch (error) {
+                core.debug(error);
+                throw `Failed to install Rtools: ${error}`;
+            }
         }
         if (rtools4) {
             core.addPath(`C:\\rtools40\\usr\\bin`);
