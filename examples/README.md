@@ -645,7 +645,11 @@ jobs:
 
 This example builds a [bookdown](https://bookdown.org) site for a
 repository and pushes the built site to [GitHub
-Pages](https://pages.github.com/). It does *not* use renv.
+Pages](https://pages.github.com/). It does *not* use renv. This workflow
+will create the orphan `gh-pages` branch, but it does *not* turn on
+GitHub Pages. You must do that yourself in the repository’s settings. If
+your site isn’t working, the first troubleshooting step should be to
+turn GitHub Pages off, then on again.
 
 ``` yaml
 on:
