@@ -142,7 +142,7 @@ print_yaml("bookdown.yaml")
 ## Build bookdown site, alternative
 
 This example builds a [bookdown] site for a repository and pushes the built site
-to [GitHub Pages]. It does *not* use renv.
+to [GitHub Pages]. It does *not* use renv. This workflow will create the orphan `gh-pages` branch, but it does *not* turn on GitHub Pages. You must do that yourself in the repository's settings. If your site isn't working, the first troubleshooting step should be to turn GitHub Pages off, then on again.
 
 ```{r echo = FALSE, results = "asis"}
 print_yaml("bookdown-gh-pages.yaml")
