@@ -16,6 +16,7 @@ print_yaml <- function(filename) {
 - [lint](#lint-workflow) - Run `lintr::lint_package()` on an R package.
 - [Build pkgdown site](#build-pkgdown-site) - Build a [pkgdown] site for an R package and deploy it to [GitHub Pages].
 - [Build bookdown site](#build-bookdown-site) - Build a [bookdown] site and deploy it to [netlify].
+- [Build bookdown site, alternative](#build-bookdown-site-alternative) - Build a [bookdown] site and deploy it to [GitHub Pages].
 - [Build blogdown site](#build-blogdown-site) - Build a [blogdown] site and deploy it to [netlify].
 - [Managing secrets](#managing-secrets) - How to generate auth tokens and make them available to actions.
 
@@ -136,6 +137,15 @@ You will need to run `renv::snapshot()` locally and commit the `renv.lock` file 
 
 ```{r echo = FALSE, results = "asis"}
 print_yaml("bookdown.yaml")
+```
+
+## Build bookdown site, alternative
+
+This example builds a [bookdown] site for a repository and pushes the built site
+to [GitHub Pages]. It does *not* use renv.
+
+```{r echo = FALSE, results = "asis"}
+print_yaml("bookdown-gh-pages.yaml")
 ```
 
 ## Build blogdown site

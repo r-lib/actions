@@ -1,0 +1,92 @@
+on:
+  push:
+    branches: master
+
+name: bookdown
+
+jobs:
+  bookdown:
+    runs-on: macOS-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Setup R
+        uses: r-lib/actions/setup-r@master
+
+      - name: Install pandoc and pandoc citeproc
+        run: |
+          brew install pandoc
+          brew install pandoc-citeproc
+
+      - name: Query dependencies
+        run: |
+          install.packages('remotes')
+          saveRDS(remotes::dev_package_deps(dependencies = TRUE), ".github/depends.Rds", version = 2)
+          writeLines(sprintf("R-%i.%i", getRversion()$major, getRversion()$minor), ".github/R-version")
+        shell: Rscript {0}
+
+      - name: Cache R packages
+        uses: actions/cache@v1
+        with:
+          path: ${{ env.R_LIBS_USER }}
+          key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-${{ hashFiles('.github/depends.Rds') }}
+          restore-keys: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-
+
+      - name: Cache bookdown results
+        uses: actions/cache@v1
+        with:
+          path: _bookdown_files
+          key: bookdown-${{ hashFiles('**/*Rmd') }}
+          restore-keys: bookdown-
+
+      - name: Install dependencies
+        run: |
+          remotes::install_deps(dependencies = TRUE)
+          install.packages("bookdown")
+        shell: Rscript {0}
+
+      - name: Configure Git
+        run: |
+          git config --local user.name "$GITHUB_ACTOR"
+          git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
+
+      - name: Ensure origin/gh-pages exists
+        run: |
+          if ! git ls-remote --exit-code --heads origin gh-pages; then
+            git checkout --orphan gh-pages
+            git reset --hard
+            git commit --allow-empty -m "Initializing gh-pages branch"
+            git push origin gh-pages
+            git checkout master
+          fi
+
+      - name: Create a temporary directory to render in
+        run: |
+          DIR=$(mktemp -d)
+          echo "::set-env name=BOOKDOWN_OUTPUT_PATH::$DIR"
+
+      - name: Git prep
+        run: |
+          git branch -vv
+          git fetch --no-tags --depth=1 origin +refs/heads/gh-pages:refs/remotes/origin/gh-pages
+          git worktree add --track -B gh-pages $BOOKDOWN_OUTPUT_PATH origin/gh-pages
+          # git worktree add --checkout ${temporaryDeploymentDirectory} origin/${action.branch}
+
+      - name: Build site
+        run: |
+          Rscript -e 'bookdown::render_book("index.Rmd", quiet = TRUE, output_dir = Sys.getenv("BOOKDOWN_OUTPUT_PATH"))'
+
+      - name: Deploy to gh-pages
+        working-directory: ${{env.BOOKDOWN_OUTPUT_PATH}}
+        run: |
+          touch .nojekyll
+          git add --all
+          git commit --allow-empty -m "GHA render of ${GITHUB_SHA::8}"
+          git push --force origin gh-pages
+
+      - name: Clean up
+        run: |
+          git worktree remove $BOOKDOWN_OUTPUT_PATH
