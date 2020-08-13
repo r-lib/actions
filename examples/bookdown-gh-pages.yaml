@@ -73,7 +73,6 @@ jobs:
           git branch -vv
           git fetch --no-tags --depth=1 origin +refs/heads/gh-pages:refs/remotes/origin/gh-pages
           git worktree add --track -B gh-pages $BOOKDOWN_OUTPUT_PATH origin/gh-pages
-          # git worktree add --checkout ${temporaryDeploymentDirectory} origin/${action.branch}
 
       - name: Build site
         run: |
