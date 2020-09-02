@@ -143,7 +143,7 @@ jobs:
           while read -r cmd
           do
             eval sudo $cmd
-          done < <(Rscript -e 'cat(remotes::system_requirements("ubuntu", "20.04"), sep = "\n")')
+          done < <(Rscript -e 'req <- remotes::system_requirements("ubuntu", "20.04"); if (length(req) > 0) cat(req, sep = "\n")')
 
       - name: Install dependencies
         run: |
@@ -256,7 +256,7 @@ jobs:
           while read -r cmd
           do
             eval sudo $cmd
-          done < <(Rscript -e 'cat(remotes::system_requirements("ubuntu", "16.04"), sep = "\n")')
+          done < <(Rscript -e 'req <- remotes::system_requirements("ubuntu", "16.04"); if (length(req) > 0) cat(req, sep = "\n")')
 
       - name: Install dependencies
         run: |
