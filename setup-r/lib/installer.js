@@ -74,7 +74,7 @@ function getR(version) {
 exports.getR = getR;
 function acquireR(version, rtoolsVersion) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (!core.getInput("install-r")) {
+        if (core.getInput("install-r") !== 'true') {
             return;
         }
         try {

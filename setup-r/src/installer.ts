@@ -56,7 +56,7 @@ export async function getR(version: string) {
 }
 
 async function acquireR(version: string, rtoolsVersion: string) {
-  if (!core.getInput("install-r")) {
+  if (core.getInput("install-r") !== "true") {
     return;
   }
 
