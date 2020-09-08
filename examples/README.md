@@ -576,8 +576,8 @@ locally and commit the `renv.lock` file before using this workflow, see
 [Using renv with Continous
 Integeration](https://rstudio.github.io/renv/articles/ci.html) for
 additional information. **Note** you need to add a `NETLIFY_AUTH_TOKEN`
-secret to your repository for the netlify deploy (see [Managing
-secrets](#managing-secrets) section for details).
+and a `NETLIFY_SITE_ID` secret to your repository for the netlify deploy
+(see [Managing secrets](#managing-secrets) section for details).
 
 ``` yaml
 on:
@@ -649,8 +649,8 @@ locally and commit the `renv.lock` file before using this workflow, see
 [Using renv with Continous
 Integeration](https://rstudio.github.io/renv/articles/ci.html) for
 additional information. **Note** you need to add a `NETLIFY_AUTH_TOKEN`
-secret to your repository for the netlify deploy (see [Managing
-secrets](#managing-secrets) section for details).
+a `NETLIFY_SITE_ID` secret to your repository for the netlify deploy
+(see [Managing secrets](#managing-secrets) section for details).
 
 ``` yaml
 on:
@@ -807,7 +807,7 @@ and
 In some cases, your action may need to access an external resource to
 deploy a result of your action. For example, the [bookdown]() and
 [blogdown]() actions require access to your Netlify account. This access
-is managed using a personal access token, commonly called a PAT.
+is managed using a Personal Access Token, commonly called a PAT.
 
 Netlify has a [process for creating a PAT using their
 UI](https://docs.netlify.com/cli/get-started/#obtain-a-token-in-the-netlify-ui),
@@ -839,3 +839,8 @@ which we follow here.
 
 5.  At this point (certainly at some point), you may wish to close your
     **tokens** page to remove the visibility of your token.
+
+The `NETLIFY_SITE_ID` is not quite as personal as the PAT and is visible
+from your Netlify profile. This is the value of the **API ID** variable
+that is listed on your site dashboard under Settings \> General \> Site
+details \> Site information.
