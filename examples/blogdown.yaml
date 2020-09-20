@@ -22,7 +22,7 @@ jobs:
           brew install pandoc-citeproc
 
       - name: Cache Renv packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: $HOME/.local/share/renv
           key: r-${{ hashFiles('renv.lock') }}
