@@ -10,6 +10,7 @@ This action sets up an R environment for use in actions by:
   - `NOT_CRAN=true`
   - `TZ=UTC`
   - `R_LIBS_USER=tempdir/Library`
+  - `_R_CHECK_SYSTEM_CLOCK_=FALSE`
 - Removing the `-fopenmp` flags from Makeconf on macOS, which are not supported
   with Apple's default Command Line Tools compilers.
 - Appending 'on GitHub Actions' to the default HTTP user agent. This is useful to

@@ -74,7 +74,7 @@ function getR(version) {
 exports.getR = getR;
 function acquireR(version, rtoolsVersion) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (core.getInput("install-r") !== 'true') {
+        if (core.getInput("install-r") !== "true") {
             return;
         }
         try {
@@ -416,6 +416,7 @@ function getDownloadUrlWindows(version) {
 function setREnvironmentVariables() {
     core.exportVariable("R_LIBS_USER", path.join(tempDirectory, "Library"));
     core.exportVariable("TZ", "UTC");
+    core.exportVariable("_R_CHECK_SYSTEM_CLOCK_", "FALSE");
     if (!process.env["NOT_CRAN"])
         core.exportVariable("NOT_CRAN", "true");
 }
