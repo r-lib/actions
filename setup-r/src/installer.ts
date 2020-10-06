@@ -53,6 +53,7 @@ export async function getR(version: string) {
 
   setREnvironmentVariables();
   setupRLibrary();
+  core.setOutput("installed-r-version", version);
 }
 
 async function acquireR(version: string, rtoolsVersion: string) {
