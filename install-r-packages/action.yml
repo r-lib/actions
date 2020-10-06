@@ -14,12 +14,11 @@ runs:
         shell: Rscript {0}
 
       - name: Install system dependencies
-        if: runner.os == 'Linux'
         run: |
           while read -r cmd
           do
             eval sudo $cmd
-          done < <(Rscript -e 'writeLines(pak::local_system_requirements("ubuntu", "${{ inputs.linux-version }}"))')
+            done < <(Rscript -e 'tryCatch(writeLines(pak::local_system_requirements(if ("${{ os.runner }}" == "Linux") "ubuntu", "${{ inputs.linux-version }}")))')
         shell: bash
 
       - name: Install dependencies
