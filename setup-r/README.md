@@ -15,6 +15,7 @@ This action sets up an R environment for use in actions by:
   with Apple's default Command Line Tools compilers.
 - Appending 'on GitHub Actions' to the default HTTP user agent. This is useful to
   distinguish GitHub Actions package requests from other sources.
+- Supplying the installed R version as a `r-version` output.
 
 # Usage
 

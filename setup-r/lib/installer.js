@@ -69,6 +69,7 @@ function getR(version) {
         }
         setREnvironmentVariables();
         setupRLibrary();
+        core.setOutput("r-version", version);
     });
 }
 exports.getR = getR;
