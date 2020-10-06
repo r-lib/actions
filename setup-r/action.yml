@@ -29,7 +29,7 @@ inputs:
     default: true
 outputs:
   r-version:
-    description: "The full R version installed"
+    description: 'The full R version installed'
 runs:
   using: 'node12'
   main: 'lib/setup-r.js'
