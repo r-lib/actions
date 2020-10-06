@@ -28,7 +28,7 @@ inputs:
   install-r:
     default: true
 outputs:
-  r-version:
+  full-r-version:
     description: 'The full R version installed'
 runs:
   using: 'node12'
