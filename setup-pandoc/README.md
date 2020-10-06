@@ -2,9 +2,9 @@
 
 [![RStudio community](https://img.shields.io/badge/community-github--actions-blue?style=social&logo=rstudio&logoColor=75AADB)](https://community.rstudio.com/new-topic?category=Package%20development&tags=github-actions)
 
-This action sets up pandoc by:
+This action sets up pandoc and pandoc-citeproc by:
 
-- downloading and caching a version of pandoc by version and adding to PATH
+- downloading and caching a relased version of pandoc by version and adding it to the PATH
 
 # Usage
 
