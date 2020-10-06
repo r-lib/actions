@@ -8,12 +8,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-      - name: Cache R packages
-        uses: actions/cache@v2
-        with:
-          path: ${{ env.R_LIBS_USER }}
-          key: ${{ runner.os }}-${{ steps.install-r.outputs.full-r-version }}-1-
-
       - name: Install pak
         run: |
           install.packages("pak", repos = "https://r-lib.github.io/p/pak/dev/")
