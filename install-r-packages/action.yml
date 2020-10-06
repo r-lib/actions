@@ -1,7 +1,10 @@
 name: 'Install R package dependencies'
 description: 'Installs and caches the R package dependencies based on a DESCRIPTION file'
 inputs:
-  linux-version:  # id of input
+  os-runner:
+    description: 'os.runner'
+    required: true
+  linux-version:
     description: 'Linux version to target'
     required: true
     default: '16.04'
@@ -18,7 +21,7 @@ runs:
           while read -r cmd
           do
             eval sudo $cmd
-            done < <(Rscript -e 'tryCatch(writeLines(pak::local_system_requirements(if ("${{ os.runner }}" == "Linux") "ubuntu", "${{ inputs.linux-version }}")))')
+            done < <(Rscript -e 'tryCatch(writeLines(pak::local_system_requirements(if ("${{ inputs.os-runner }}" == "Linux") "ubuntu", "${{ inputs.linux-version }}")))')
         shell: bash
 
       - name: Install dependencies
