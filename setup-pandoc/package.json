@@ -25,7 +25,7 @@
   "license": "MIT",
   "homepage": "https://github.com/r-lib/actions/tree/master/setup-pandoc",
   "dependencies": {
-    "@actions/core": "^1.0.0",
+    "@actions/core": "^1.2.6",
     "@actions/exec": "^1.0.0",
     "@actions/tool-cache": "^1.0.0",
     "@actions/io": "^1.0.0",
