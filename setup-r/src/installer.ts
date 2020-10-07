@@ -505,9 +505,11 @@ interface IRRef {
 async function getReleaseVersion(platform: string): Promise<string> {
   let rest: restm.RestClient = new restm.RestClient("setup-r");
   let tags: IRRef[] =
-    (await rest.get<IRRef[]>(
-      util.format("https://rversions.r-pkg.org/r-release-%s", platform)
-    )).result || [];
+    (
+      await rest.get<IRRef[]>(
+        util.format("https://rversions.r-pkg.org/r-release-%s", platform)
+      )
+    ).result || [];
 
   return tags[0].version;
 }
