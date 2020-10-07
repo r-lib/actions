@@ -18,7 +18,7 @@ This action sets up an R environment for use in actions by:
 
 # Usage
 
-See [action.yml](action.yml)
+See [action.yml](action.yml) for details on the available options.
 
 Basic:
 ```yaml
