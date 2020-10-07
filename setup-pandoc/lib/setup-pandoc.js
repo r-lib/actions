@@ -114,12 +114,12 @@ function installPandocWindows(version) {
 }
 function pandocSubdir(version) {
     if (version >= "2.9.2") {
-        return (util.format("pandoc-%s", version));
+        return util.format("pandoc-%s", version);
     }
     if (version == "2.9.1") {
-        return ("");
+        return "";
     }
-    return (util.format("pandoc-%s-windows-x86_64", version));
+    return util.format("pandoc-%s-windows-x86_64", version);
 }
 function installPandocLinux(version) {
     return __awaiter(this, void 0, void 0, function* () {
