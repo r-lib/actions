@@ -75,7 +75,7 @@ function installTinyTeXPosix() {
             }
         }
         const fileName = "install-unx.sh";
-        const downloadUrl = "https://yihui.name/gh/tinytex/tools/install-unx.sh";
+        const downloadUrl = "https://yihui.name/gh/tinytex/tools/install-bin-unix.sh";
         let downloadPath = null;
         try {
             downloadPath = yield tc.downloadTool(downloadUrl);
@@ -106,7 +106,7 @@ function installTinyTeXPosix() {
 function installTinyTeXWindows() {
     return __awaiter(this, void 0, void 0, function* () {
         const fileName = "install-windows.bat";
-        const downloadUrl = "https://yihui.name/gh/tinytex/tools/install-windows.bat";
+        const downloadUrl = "https://yihui.name/gh/tinytex/tools/install-bin-windows.bat";
         let downloadPath = null;
         try {
             downloadPath = yield tc.downloadTool(downloadUrl);
