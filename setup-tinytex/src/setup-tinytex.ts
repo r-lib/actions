@@ -98,7 +98,6 @@ async function installTinyTexWindows() {
 
   await io.mv(downloadPath, path.join(tempDirectory, fileName));
 
-
   const fs = require("fs");
   console.log(path.join(tempDirectory, fileName));
   var text = fs.readFileSync(path.join(tempDirectory, fileName), "utf8");
@@ -113,7 +112,6 @@ async function installTinyTexWindows() {
       if (err) console.log("error", err);
     }
   );
-
 
   try {
     exec.exec(path.join(tempDirectory, fileName));
