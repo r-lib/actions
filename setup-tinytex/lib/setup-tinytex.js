@@ -68,7 +68,7 @@ function installTinyTeXPosix() {
         // We need to install texinfo for texi2dvi, but only on linux
         if (IS_LINUX) {
             try {
-                yield exec.exec("sudo apt", ["install", "-y", "texinfo"]);
+                yield exec.exec("sudo apt-get", ["install", "-y", "texinfo"]);
             }
             catch (error) {
                 throw `Failed to install texinfo package: ${error}`;
