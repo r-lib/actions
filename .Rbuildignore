@@ -9,3 +9,4 @@
 ^.github$
 ^actions\.Rproj$
 ^\.Rproj\.user$
+^Makefile$
