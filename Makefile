@@ -1,6 +1,7 @@
 WORKFLOWS := .github/workflows/check-full.yaml \
 	.github/workflows/check-release.yaml \
 	.github/workflows/check-standard.yaml \
+	.github/workflows/check-pak.yaml \
 	.github/workflows/lint.yaml \
 	.github/workflows/pkgdown.yaml \
 	.github/workflows/test-coverage.yaml
