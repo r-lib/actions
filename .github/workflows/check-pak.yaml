@@ -66,11 +66,7 @@ jobs:
 
       - name: Install system dependencies
         if: runner.os == 'Linux'
-        run: |
-          while read -r cmd
-          do
-            eval sudo $cmd
-          done < <(Rscript -e 'writeLines(pak::local_system_requirements())')
+        run: Rscript -e 'pak::local_system_requirements(execute = TRUE)'
 
       - name: Install dependencies
         run: |
