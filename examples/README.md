@@ -43,9 +43,11 @@ probably what you want to use.
 on:
   push:
     branches:
+      - main
       - master
   pull_request:
     branches:
+      - main
       - master
 
 name: R-CMD-check
@@ -55,7 +57,7 @@ jobs:
     runs-on: macOS-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: r-lib/actions/setup-r@master
+      - uses: r-lib/actions/setup-r@v1
       - name: Install dependencies
         run: |
           install.packages(c("remotes", "rcmdcheck"))
@@ -87,9 +89,11 @@ Bioconductor this is likely the workflow you want to use.
 on:
   push:
     branches:
+      - main
       - master
   pull_request:
     branches:
+      - main
       - master
 
 name: R-CMD-check
@@ -116,11 +120,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: r-lib/actions/setup-r@master
+      - uses: r-lib/actions/setup-r@v1
         with:
           r-version: ${{ matrix.config.r }}
 
-      - uses: r-lib/actions/setup-pandoc@master
+      - uses: r-lib/actions/setup-pandoc@v1
 
       - name: Query dependencies
         run: |
@@ -193,9 +197,11 @@ CI workflow.
 on:
   push:
     branches:
+      - main
       - master
   pull_request:
     branches:
+      - main
       - master
 
 name: R-CMD-check
@@ -228,12 +234,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: r-lib/actions/setup-r@master
+      - uses: r-lib/actions/setup-r@v1
         with:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
 
-      - uses: r-lib/actions/setup-pandoc@master
+      - uses: r-lib/actions/setup-pandoc@v1
 
       - name: Query dependencies
         run: |
@@ -300,9 +306,11 @@ the test coverage of your package and upload the result to
 on:
   push:
     branches:
+      - main
       - master
   pull_request:
     branches:
+      - main
       - master
 
 name: test-coverage
@@ -315,9 +323,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: r-lib/actions/setup-r@master
+      - uses: r-lib/actions/setup-r@v1
 
-      - uses: r-lib/actions/setup-pandoc@master
+      - uses: r-lib/actions/setup-pandoc@v1
 
       - name: Query dependencies
         run: |
@@ -355,9 +363,11 @@ annotations.
 on:
   push:
     branches:
+      - main
       - master
   pull_request:
     branches:
+      - main
       - master
 
 name: lint
@@ -370,7 +380,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: r-lib/actions/setup-r@master
+      - uses: r-lib/actions/setup-r@v1
 
       - name: Query dependencies
         run: |
@@ -428,10 +438,10 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
-      - uses: r-lib/actions/pr-fetch@master
+      - uses: r-lib/actions/pr-fetch@v1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-      - uses: r-lib/actions/setup-r@master
+      - uses: r-lib/actions/setup-r@v1
       - name: Install dependencies
         run: Rscript -e 'install.packages(c("remotes", "roxygen2"))' -e 'remotes::install_deps(dependencies = TRUE)'
       - name: Document
@@ -442,7 +452,7 @@ jobs:
           git config --local user.name "GitHub Actions"
           git add man/\* NAMESPACE
           git commit -m 'Document'
-      - uses: r-lib/actions/pr-push@master
+      - uses: r-lib/actions/pr-push@v1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
   style:
@@ -453,10 +463,10 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
-      - uses: r-lib/actions/pr-fetch@master
+      - uses: r-lib/actions/pr-fetch@v1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-      - uses: r-lib/actions/setup-r@master
+      - uses: r-lib/actions/setup-r@v1
       - name: Install dependencies
         run: Rscript -e 'install.packages("styler")'
       - name: Style
@@ -467,7 +477,7 @@ jobs:
           git config --local user.name "GitHub Actions"
           git add \*.R
           git commit -m 'Style'
-      - uses: r-lib/actions/pr-push@master
+      - uses: r-lib/actions/pr-push@v1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 ```
@@ -519,7 +529,9 @@ Pages](https://pages.github.com/).
 ``` yaml
 on:
   push:
-    branches: master
+    branches:
+      - main
+      - master
 
 name: pkgdown
 
@@ -531,9 +543,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: r-lib/actions/setup-r@master
+      - uses: r-lib/actions/setup-r@v1
 
-      - uses: r-lib/actions/setup-pandoc@master
+      - uses: r-lib/actions/setup-pandoc@v1
 
       - name: Query dependencies
         run: |
@@ -552,7 +564,7 @@ jobs:
       - name: Install dependencies
         run: |
           remotes::install_deps(dependencies = TRUE)
-          install.packages("pkgdown")
+          install.packages("pkgdown", type = "binary")
         shell: Rscript {0}
 
       - name: Install package
@@ -582,7 +594,9 @@ and a `NETLIFY_SITE_ID` secret to your repository for the netlify deploy
 ``` yaml
 on:
   push:
-    branches: master
+    branches:
+      - main
+      - master
 
 name: bookdown
 
@@ -596,7 +610,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Setup R
-        uses: r-lib/actions/setup-r@master
+        uses: r-lib/actions/setup-r@v1
 
       - name: Install pandoc and pandoc citeproc
         run: |
@@ -655,7 +669,9 @@ a `NETLIFY_SITE_ID` secret to your repository for the netlify deploy
 ``` yaml
 on:
   push:
-    branches: master
+    branches:
+      - main
+      - master
 
 name: blogdown
 
@@ -669,7 +685,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Setup R
-        uses: r-lib/actions/setup-r@master
+        uses: r-lib/actions/setup-r@v1
 
       - name: Install pandoc and pandoc citeproc
         run: |
