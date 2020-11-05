@@ -1,15 +1,19 @@
 
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
   - [Quickstart CI](#quickstart-ci-workflow) - A simple CI workflow to
     check with the release version of R.
+  - [Standard CI](#standard-ci-workflow) - A standard CI workflow to
+    check with the release version of R on the three major OSs.
   - [Tidyverse CI](#tidyverse-ci-workflow) - A more complex CI workflow
-  - [Pull Request Commands](#commands-workflow) - Adds `/document` and
+  - [Test coverage](#test-coverage-workflow) - Run `covr::codecov()` on
+    an R package.
+  - [Lint package](#lint-workflow) - Run `lintr::lint_package()` on an R
+    package.
+  - [Pull request commands](#commands-workflow) - Adds `/document` and
     `/style` commands for pull requests.
   - [Render README](#render-readme) - Render README.Rmd when it changes
     and commit the result
-  - [Test coverage](#test-coverage-workflow) - Run `covr::codecov()` on
-    an R package.
-  - [lint](#lint-workflow) - Run `lintr::lint_package()` on an R
-    package.
   - [Build pkgdown site](#build-pkgdown-site) - Build a
     [pkgdown](https://pkgdown.r-lib.org/) site for an R package and
     deploy it to [GitHub Pages](https://pages.github.com/).
@@ -19,6 +23,12 @@
   - [Build blogdown site](#build-blogdown-site) - Build a
     [blogdown](https://bookdown.org/yihui/blogdown/) site and deploy it
     to [netlify](https://www.netlify.com/).
+  - [Docker](#docker-based-workflow) - For custom workflows based on
+    docker containers.
+  - [Bioconductor](#bioconductor-friendly-workflow) - A CI workflow for
+    packages to be released on Bioconductor.
+  - [Forcing binaries](#forcing-binaries) - An environment variable to
+    always use binary packages.
   - [Managing secrets](#managing-secrets) - How to generate auth tokens
     and make them available to actions.
 
@@ -416,7 +426,7 @@ issue comments. `/document` will use
 the package and commit the result to the pull request. `/style` will use
 [styler](https://styler.r-lib.org/) to restyle your package.
 
-## When it can they be used?
+### When should you use it?
 
 1.  You get frequent pull requests, often with documentation only fixes.
 2.  You regularly style your code with styler, and require all additions
