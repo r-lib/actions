@@ -17,6 +17,9 @@ jobs:
 
       - name: Setup R
         uses: r-lib/actions/setup-r@v1
+        with:
+          # To disable crayon coloring in chunk outputs
+          crayon.enabled: 'FALSE'
 
       - name: Install pandoc and pandoc citeproc
         run: |
