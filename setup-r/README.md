@@ -43,7 +43,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: Setup R
-        uses: r-lib/actions/setup-R@v1
+        uses: r-lib/actions/setup-r@v1
         with:
           r-version: ${{ matrix.R }}
       - run: Rscript -e 'print("hello")'
