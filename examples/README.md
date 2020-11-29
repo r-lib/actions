@@ -416,6 +416,9 @@ jobs:
           remotes::install_cran("lintr")
         shell: Rscript {0}
 
+      - name: Install package
+        run: R CMD INSTALL .
+
       - name: Lint
         run: lintr::lint_package()
         shell: Rscript {0}
