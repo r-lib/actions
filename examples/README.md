@@ -602,9 +602,10 @@ repository and then deploys the site via
 [netlify](https://www.netlify.com/). It uses
 [renv](https://rstudio.github.io/renv/) to ensure the package versions
 remain consistent across builds. You will need to run `renv::snapshot()`
-locally and commit the `renv.lock` file before using this workflow, see
-[Using renv with Continous
-Integeration](https://rstudio.github.io/renv/articles/ci.html) for
+locally and commit the `renv.lock` file before using this workflow, and
+after every time you add a new package to `DESCRIPTION`. See [Using renv
+with Continous
+Integration](https://rstudio.github.io/renv/articles/ci.html) for
 additional information. **Note** you need to add a `NETLIFY_AUTH_TOKEN`
 and a `NETLIFY_SITE_ID` secret to your repository for the netlify deploy
 (see [Managing secrets](#managing-secrets) section for details).
