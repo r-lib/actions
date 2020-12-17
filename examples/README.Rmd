@@ -16,7 +16,7 @@ print_yaml <- function(filename) {
 - [Test coverage](#test-coverage-workflow) - Run `covr::codecov()` on an R package.
 - [Lint package](#lint-workflow) - Run `lintr::lint_package()` on an R package.
 - [Pull request commands](#commands-workflow) - Adds `/document` and `/style` commands for pull requests.
-- [Render README](#render-readme) - Render README.Rmd when it changes and commit the result
+- [Render Rmarkdown](#render-rmarkdown) - Render one or more Rmarkdown files when they change and commit the result.
 - [Build pkgdown site](#build-pkgdown-site) - Build a [pkgdown] site for an R package and deploy it to [GitHub Pages].
 - [Build bookdown site](#build-bookdown-site) - Build a [bookdown] site and deploy it to [netlify].
 - [Build blogdown site](#build-blogdown-site) - Build a [blogdown] site and deploy it to [netlify].
@@ -115,13 +115,12 @@ package.
 print_yaml("pr-commands.yaml")
 ```
 
-## Render README
+## Render Rmarkdown
 
-This example automatically re-builds this README.md from README.Rmd whenever it
-or its yaml dependencies change and commits the results to the master branch.
+This example automatically re-builds any Rmarkdown file in the repository whenever it changes and commits the results to the master branch.
 
 ```{r echo = FALSE, results = "asis"}
-print_yaml("render-readme.yaml")
+print_yaml("render-rmarkdown.yaml")
 ```
 
 ## Build pkgdown site
