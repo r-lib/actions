@@ -12,8 +12,8 @@
     package.
   - [Pull request commands](#commands-workflow) - Adds `/document` and
     `/style` commands for pull requests.
-  - [Render README](#render-readme) - Render README.Rmd when it changes
-    and commit the result
+  - [Render Rmarkdown](#render-rmarkdown) - Render one or more Rmarkdown
+    files when they change and commit the result.
   - [Build pkgdown site](#build-pkgdown-site) - Build a
     [pkgdown](https://pkgdown.r-lib.org/) site for an R package and
     deploy it to [GitHub Pages](https://pages.github.com/).
@@ -498,28 +498,30 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-## Render README
+## Render Rmarkdown
 
-This example automatically re-builds this README.md from README.Rmd
-whenever it or its yaml dependencies change and commits the results to
-the master branch.
+This example automatically re-builds any Rmarkdown file in the
+repository whenever it changes and commits the results to the master
+branch.
 
 ``` yaml
 on:
   push:
     paths:
-      - README.Rmd
+      - '**.Rmd'
 
-name: Render README
+name: Render Rmarkdown files
 
 jobs:
   render:
-    name: Render README
+    name: Render Rmarkdown files
     runs-on: macOS-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 2 # This is important to set for `git diff-tree` to work below
       - uses: r-lib/actions/setup-r@v1
       - uses: r-lib/actions/setup-pandoc@v1
       - name: Install rmarkdown, remotes, and the local package
@@ -528,13 +530,15 @@ jobs:
           remotes::install_local(".")
           remotes::install_cran("rmarkdown")
         shell: Rscript {0}
-      - name: Render README
-        run: Rscript -e 'rmarkdown::render("README.Rmd")'
+      - name: Render Rmarkdown files
+        run: |
+          RMD_PATH=($(git diff-tree --no-commit-id --name-only -r HEAD | grep '[.]Rmd$'))
+          Rscript -e 'for (file in commandArgs(TRUE)) rmarkdown::render(file)' ${RMD_PATH[*]}
       - name: Commit results
         run: |
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Actions"
-          git commit README.md -m 'Re-build README.Rmd' || echo "No changes to commit"
+          git commit ${RMD_PATH[*]/.Rmd/.md} -m 'Re-build Rmarkdown files' || echo "No changes to commit"
           git push origin || echo "No changes to commit"
 ```
 
