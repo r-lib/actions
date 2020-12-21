@@ -27,6 +27,8 @@ print_yaml <- function(filename) {
 
 ## Quickstart CI workflow
 
+`usethis::use_github_action("check-release")`
+
 This workflow installs latest release R version on macOS
 and runs R CMD check via the [rcmdcheck](https://github.com/r-lib/rcmdcheck)
 package. If this is the first time you have used CI for a project this is
@@ -44,6 +46,8 @@ print_yaml("check-release.yaml")
 
 ## Standard CI workflow
 
+`usethis::use_github_action("check-standard")`
+
 This workflow runs R CMD check via the
 [rcmdcheck](https://github.com/r-lib/rcmdcheck) package on the three major OSs
 (linux, macOS and Windows) with the current release version of R, and R-devel.
@@ -60,6 +64,8 @@ print_yaml("check-standard.yaml")
 ```
 
 ## Tidyverse CI workflow
+
+`usethis::use_github_action("check-full")`
 
 This workflow installs the last 5 minor R versions
 and runs R CMD check via the [rcmdcheck](https://github.com/r-lib/rcmdcheck)
@@ -81,6 +87,8 @@ print_yaml("check-full.yaml")
 
 ## Test coverage workflow
 
+`usethis::use_github_action("test-coverage")`
+
 This example uses the [covr](https://covr.r-lib.org) package to query the test
 coverage of your package and upload the result to
 [codecov.io](https://codecov.io)
@@ -91,6 +99,8 @@ print_yaml("test-coverage.yaml")
 
 ## Lint workflow
 
+`usethis::use_github_action("lint")`
+
 This example uses the [lintr](https://github.com/jimhester/lintr) package to lint your package and return the results as build annotations.
 
 ```{r echo = FALSE, results = "asis"}
@@ -98,6 +108,8 @@ print_yaml("lint.yaml")
 ```
 
 ## Commands workflow
+
+`usethis::use_github_action("pr-commands")`
 
 This workflow enables the use of 2 R specific commands in pull request issue
 comments. `/document` will use [roxygen2](https://roxygen2.r-lib.org/) to
@@ -117,6 +129,8 @@ print_yaml("pr-commands.yaml")
 
 ## Render Rmarkdown
 
+`usethis::use_github_action("render-rmarkdown")`
+
 This example automatically re-builds any Rmarkdown file in the repository whenever it changes and commits the results to the master branch.
 
 ```{r echo = FALSE, results = "asis"}
@@ -124,6 +138,8 @@ print_yaml("render-rmarkdown.yaml")
 ```
 
 ## Build pkgdown site
+
+`usethis::use_github_action("pkgdown")`
 
 This example builds a [pkgdown] site for a repository and pushes the built package
 to [GitHub Pages].
@@ -133,6 +149,8 @@ print_yaml("pkgdown.yaml")
 ```
 
 ## Build bookdown site
+
+`usethis::use_github_action("bookdown")`
 
 This example builds a [bookdown] site for a repository and then deploys the site via [netlify].
 It uses [renv] to ensure the package versions remain consistent across builds.
@@ -145,6 +163,8 @@ print_yaml("bookdown.yaml")
 
 ## Build blogdown site
 
+`usethis::use_github_action("blogdown")`
+
 This example builds a [blogdown] site for a repository and then deploys the book via [netlify].
 It uses [renv] to ensure the package versions remain consistent across builds.
 You will need to run `renv::snapshot()` locally and commit the `renv.lock` file before using this workflow, see [Using renv with Continous Integeration](https://rstudio.github.io/renv/articles/ci.html) for additional information.
@@ -155,6 +175,8 @@ print_yaml("blogdown.yaml")
 ```
 
 ## Docker based workflow
+
+`usethis::use_github_action("docker")`
 
 If you develop locally with docker or are used to using other docker based CI
 services and already have a docker container with all of your R and system
