@@ -34,6 +34,8 @@
 
 ## Quickstart CI workflow
 
+`usethis::use_github_action("check-release")`
+
 This workflow installs latest release R version on macOS and runs R CMD
 check via the [rcmdcheck](https://github.com/r-lib/rcmdcheck) package.
 If this is the first time you have used CI for a project this is
@@ -81,6 +83,8 @@ jobs:
 ```
 
 ## Standard CI workflow
+
+`usethis::use_github_action("check-standard")`
 
 This workflow runs R CMD check via the
 [rcmdcheck](https://github.com/r-lib/rcmdcheck) package on the three
@@ -183,6 +187,8 @@ jobs:
 ```
 
 ## Tidyverse CI workflow
+
+`usethis::use_github_action("check-full")`
 
 This workflow installs the last 5 minor R versions and runs R CMD check
 via the [rcmdcheck](https://github.com/r-lib/rcmdcheck) package on the
@@ -311,6 +317,8 @@ jobs:
 
 ## Test coverage workflow
 
+`usethis::use_github_action("test-coverage")`
+
 This example uses the [covr](https://covr.r-lib.org) package to query
 the test coverage of your package and upload the result to
 [codecov.io](https://codecov.io)
@@ -367,6 +375,8 @@ jobs:
 ```
 
 ## Lint workflow
+
+`usethis::use_github_action("lint")`
 
 This example uses the [lintr](https://github.com/jimhester/lintr)
 package to lint your package and return the results as build
@@ -425,6 +435,8 @@ jobs:
 ```
 
 ## Commands workflow
+
+`usethis::use_github_action("pr-commands")`
 
 This workflow enables the use of 2 R specific commands in pull request
 issue comments. `/document` will use
@@ -500,6 +512,8 @@ jobs:
 
 ## Render Rmarkdown
 
+`usethis::use_github_action("render-rmarkdown")`
+
 This example automatically re-builds any Rmarkdown file in the
 repository whenever it changes and commits the results to the master
 branch.
@@ -543,6 +557,8 @@ jobs:
 ```
 
 ## Build pkgdown site
+
+`usethis::use_github_action("pkgdown")`
 
 This example builds a [pkgdown](https://pkgdown.r-lib.org/) site for a
 repository and pushes the built package to [GitHub
@@ -600,6 +616,8 @@ jobs:
 ```
 
 ## Build bookdown site
+
+`usethis::use_github_action("bookdown")`
 
 This example builds a [bookdown](https://bookdown.org) site for a
 repository and then deploys the site via
@@ -677,6 +695,8 @@ jobs:
 
 ## Build blogdown site
 
+`usethis::use_github_action("blogdown")`
+
 This example builds a [blogdown](https://bookdown.org/yihui/blogdown/)
 site for a repository and then deploys the book via
 [netlify](https://www.netlify.com/). It uses
@@ -749,6 +769,8 @@ jobs:
 ```
 
 ## Docker based workflow
+
+`usethis::use_github_action("docker")`
 
 If you develop locally with docker or are used to using other docker
 based CI services and already have a docker container with all of your R
