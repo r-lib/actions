@@ -27,6 +27,10 @@ inputs:
     default: 'default'
   install-r:
     default: true
+  windows-path-include-mingw:
+    description: 'If "true" put the 64 bit mingw directory from Rtools on the
+    PATH for Windows builds'
+    default: true
 outputs:
   installed-r-version:
     description: 'The full R version installed'

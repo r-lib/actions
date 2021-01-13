@@ -319,10 +319,14 @@ async function acquireRtools(version: string) {
   }
   if (rtools4) {
     core.addPath(`C:\\rtools40\\usr\\bin`);
-    core.addPath(`C:\\rtools40\\mingw64\\bin`);
+    if (core.getInput("windows-path-include-mingw")) {
+      core.addPath(`C:\\rtools40\\mingw64\\bin`);
+    }
   } else {
     core.addPath(`C:\\Rtools\\bin`);
-    core.addPath(`C:\\Rtools\\mingw_64\\bin`);
+    if (core.getInput("windows-path-include-mingw")) {
+      core.addPath(`C:\\Rtools\\mingw_64\\bin`);
+    }
   }
 }
 
