@@ -74,7 +74,7 @@ async function acquireR(version: string, rtoolsVersion: string) {
         acquireUtilsMacOS(),
         acquireRMacOS(version)
       ]);
-      if (core.getInput("remove-openmp-macos")) {
+      if (core.getInput("remove-openmp-macos") === "true") {
         await removeOpenmpFlags();
       }
     } else {
@@ -319,12 +319,12 @@ async function acquireRtools(version: string) {
   }
   if (rtools4) {
     core.addPath(`C:\\rtools40\\usr\\bin`);
-    if (core.getInput("windows-path-include-mingw")) {
+    if (core.getInput("windows-path-include-mingw") === "true") {
       core.addPath(`C:\\rtools40\\mingw64\\bin`);
     }
   } else {
     core.addPath(`C:\\Rtools\\bin`);
-    if (core.getInput("windows-path-include-mingw")) {
+    if (core.getInput("windows-path-include-mingw") === "true") {
       core.addPath(`C:\\Rtools\\mingw_64\\bin`);
     }
   }
@@ -356,8 +356,8 @@ async function setupRLibrary() {
   let rspm = process.env["RSPM"] ? `'${process.env["RSPM"]}'` : "NULL";
   let cran = `'${process.env["CRAN"] || "https://cloud.r-project.org"}'`;
   let user_agent =
-    core.getInput("http-user-agent") == "default" ||
-    core.getInput("http-user-agent") == ""
+    core.getInput("http-user-agent") === "default" ||
+    core.getInput("http-user-agent") === ""
       ? 'sprintf("R/%s R (%s) on GitHub Actions", getRversion(), paste(getRversion(), R.version$platform, R.version$arch, R.version$os))'
       : `"${core.getInput("http-user-agent")}"`;
 
