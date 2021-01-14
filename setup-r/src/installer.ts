@@ -89,7 +89,7 @@ async function acquireR(version: string, rtoolsVersion: string) {
 
 async function acquireFortranMacOS() {
   try {
-    await exec.exec("brew", ["cask", "install", "gfortran"]);
+    await exec.exec("brew", ["install", "gcc"]);
   } catch (error) {
     core.debug(error);
 
