@@ -123,7 +123,7 @@ function acquireR(version, rtoolsVersion) {
 function acquireFortranMacOS() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            yield exec.exec("brew", ["cask", "install", "gfortran"]);
+            yield exec.exec("brew", ["install", "--cask", "gfortran"]);
         }
         catch (error) {
             core.debug(error);
