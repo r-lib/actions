@@ -142,7 +142,7 @@ async function acquireFortranMacOS(): Promise<string> {
 
     throw `Failed to umount ${mntPath}: ${error}`;
   }
-
+  core.addPath("/usr/local/gfortran/bin");
   return "/";
 }
 

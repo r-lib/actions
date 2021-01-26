@@ -175,7 +175,7 @@ function acquireFortranMacOS() {
 
             throw `Failed to umount ${mntPath}: ${error}`;
           }
-
+        core.addPath("/usr/local/gfortran/bin");
         return "/";
     });
 }
