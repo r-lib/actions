@@ -653,10 +653,9 @@ jobs:
       - name: Setup R
         uses: r-lib/actions/setup-r@v1
 
-      - name: Install pandoc and pandoc citeproc
+      - name: Install pandoc
         run: |
           brew install pandoc
-          brew install pandoc-citeproc
 
       - name: Cache Renv packages
         uses: actions/cache@v2
@@ -730,10 +729,9 @@ jobs:
       - name: Setup R
         uses: r-lib/actions/setup-r@v1
 
-      - name: Install pandoc and pandoc citeproc
+      - name: Install pandoc
         run: |
           brew install pandoc
-          brew install pandoc-citeproc
 
       - name: Cache Renv packages
         uses: actions/cache@v2
