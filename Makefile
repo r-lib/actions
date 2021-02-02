@@ -4,7 +4,9 @@ WORKFLOWS := .github/workflows/check-full.yaml \
 	.github/workflows/check-pak.yaml \
 	.github/workflows/lint.yaml \
 	.github/workflows/pkgdown.yaml \
-	.github/workflows/test-coverage.yaml
+	.github/workflows/pkgdown-pak.yaml \
+	.github/workflows/test-coverage.yaml \
+	.github/workflows/test-coverage-pak.yaml
 
 all : $(WORKFLOWS)
 
