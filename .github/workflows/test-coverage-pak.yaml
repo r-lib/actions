@@ -14,7 +14,9 @@ jobs:
   test-coverage:
     runs-on: ubuntu-18.04
     env:
+      RSPM: https://packagemanager.rstudio.com/cran/__linux__/bionic/latest
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
     steps:
       - uses: actions/checkout@v2
 
@@ -33,6 +35,13 @@ jobs:
           path: ${{ env.R_LIBS_USER }}
           key: ubuntu-18.04-${{ steps.install-r.outputs.installed-r-version }}-1-${{ hashFiles('.github/r-depends.rds') }}
           restore-keys: ubuntu-18.04-${{ steps.install-r.outputs.installed-r-version }}-1-
+
+      - name: Install system dependencies
+        if: runner.os == 'Linux'
+        run: |
+          pak::local_system_requirements(execute = TRUE)
+          pak::pkg_system_requirements("covr", execute = TRUE)
+        shell: Rscript {0}
 
       - name: Install dependencies
         run: |

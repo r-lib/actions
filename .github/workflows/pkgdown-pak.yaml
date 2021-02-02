@@ -10,7 +10,9 @@ jobs:
   pkgdown:
     runs-on: ubuntu-18.04
     env:
+      RSPM: https://packagemanager.rstudio.com/cran/__linux__/bionic/latest
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
     steps:
       - uses: actions/checkout@v2
 
@@ -34,7 +36,10 @@ jobs:
 
       - name: Install system dependencies
         if: runner.os == 'Linux'
-        run: Rscript -e 'pak::local_system_requirements(execute = TRUE)'
+        run: |
+          pak::local_system_requirements(execute = TRUE)
+          pak::pkg_system_requirements("pkgdown", execute = TRUE)
+        shell: Rscript {0}
 
       - name: Install dependencies
         run: |
