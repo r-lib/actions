@@ -13,7 +13,7 @@ inputs:
     default: '1'
   crayon.enabled:
     description: 'Value to set the R option `crayon.enabled` to.'
-    default: NULL
+    default: 'NULL'
   remove-openmp-macos:
     description: 'If true, remove `-fopenmp` from the default compilation
     flags, e.g. `SHLIB_OPENMP_CFLAGS`, as the macOS Command Line Tools do not
