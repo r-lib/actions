@@ -26,7 +26,7 @@ jobs:
       - name: Render Rmarkdown files
         run: |
           RMD_PATH=($(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '[.]Rmd$'))
-          Rscript -e 'files=commandArgs(TRUE); files=files[file.exists(files)]; cat("Attempting to render the following files: ", files, "\n"); for (f in files) rmarkdown::render(f)' ${RMD_PATH[*]} 
+          Rscript -e 'for (f in commandArgs(TRUE)) if (file.exists(f)) rmarkdown::render(f)' ${RMD_PATH[*]} 
       - name: Commit results
         run: |
           git config --local user.email "actions@github.com"
