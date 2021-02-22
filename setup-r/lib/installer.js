@@ -122,13 +122,11 @@ function acquireR(version, rtoolsVersion) {
 }
 function acquireFortranMacOS() {
     return __awaiter(this, void 0, void 0, function* () {
-
-        let gfortran = "gfortran-8.2-Mojave"
-        let mntPath = path.join('/Volumes', gfortran)
-        let fileName = `${gfortran}.dmg`
+        let gfortran = "gfortran-8.2-Mojave";
+        let mntPath = path.join("/Volumes", gfortran);
+        let fileName = `${gfortran}.dmg`;
         let downloadUrl = `https://mac.r-project.org/tools/${fileName}`;
         let downloadPath = null;
-
         try {
             downloadPath = yield tc.downloadTool(downloadUrl);
             yield io.mv(downloadPath, path.join(tempDirectory, fileName));
@@ -137,45 +135,40 @@ function acquireFortranMacOS() {
             core.debug(error);
             throw `Failed to download ${downloadUrl}: ${error}`;
         }
-
         try {
             yield exec.exec("sudo", [
-              "hdiutil",
-              "attach",
-              path.join(tempDirectory, fileName)
+                "hdiutil",
+                "attach",
+                path.join(tempDirectory, fileName)
             ]);
-          } catch (error) {
+        }
+        catch (error) {
             core.debug(error);
-
             throw `Failed to mount ${fileName}: ${error}`;
-          }
-
-          try {
+        }
+        try {
             yield exec.exec("sudo", [
-              "installer",
-              "-package",
-              path.join(mntPath, gfortran, "gfortran.pkg"),
-              "-target",
-              "/"
+                "installer",
+                "-package",
+                path.join(mntPath, gfortran, "gfortran.pkg"),
+                "-target",
+                "/"
             ]);
-          } catch (error) {
+        }
+        catch (error) {
             core.debug(error);
-
             throw `Failed to install gfortran: ${error}`;
-          }
-
-          try {
-            yield exec.exec("sudo", [
-              "hdiutil",
-              "detach",
-              mntPath
-            ]);
-          } catch (error) {
+        }
+        try {
+            yield exec.exec("sudo", ["hdiutil", "detach", mntPath]);
+        }
+        catch (error) {
             core.debug(error);
-
             throw `Failed to umount ${mntPath}: ${error}`;
-          }
+        }
         core.addPath("/usr/local/gfortran/bin");
+        /* we need to put /usr/bin before the  gfortran path, as some tools, e.g. gcov should be used rather than the ones bundled with gfortran */
+        core.addPath("/usr/bin");
         return "/";
     });
 }
