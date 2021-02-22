@@ -123,7 +123,7 @@ function acquireR(version, rtoolsVersion) {
 function acquireFortranMacOS() {
     return __awaiter(this, void 0, void 0, function* () {
         let gfortran = "gfortran-8.2-Mojave";
-        let mntPath = path.join('/Volumes', gfortran);
+        let mntPath = path.join("/Volumes", gfortran);
         let fileName = `${gfortran}.dmg`;
         let downloadUrl = `https://mac.r-project.org/tools/${fileName}`;
         let downloadPath = null;
@@ -160,17 +160,14 @@ function acquireFortranMacOS() {
             throw `Failed to install gfortran: ${error}`;
         }
         try {
-            yield exec.exec("sudo", [
-                "hdiutil",
-                "detach",
-                mntPath
-            ]);
+            yield exec.exec("sudo", ["hdiutil", "detach", mntPath]);
         }
         catch (error) {
             core.debug(error);
             throw `Failed to umount ${mntPath}: ${error}`;
         }
         core.addPath("/usr/local/gfortran/bin");
+        core.addPath("/usr/bin");
         return "/";
     });
 }
