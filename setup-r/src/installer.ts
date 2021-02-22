@@ -88,10 +88,9 @@ async function acquireR(version: string, rtoolsVersion: string) {
 }
 
 async function acquireFortranMacOS(): Promise<string> {
-
-  let gfortran: string = "gfortran-8.2-Mojave"
-  let mntPath: string = path.join('/Volumes', gfortran)
-  let fileName: string = `${gfortran}.dmg`
+  let gfortran: string = "gfortran-8.2-Mojave";
+  let mntPath: string = path.join("/Volumes", gfortran);
+  let fileName: string = `${gfortran}.dmg`;
   let downloadUrl: string = `https://mac.r-project.org/tools/${fileName}`;
   let downloadPath: string | null = null;
 
@@ -103,7 +102,6 @@ async function acquireFortranMacOS(): Promise<string> {
 
     throw `Failed to download ${downloadUrl}: ${error}`;
   }
-
 
   try {
     await exec.exec("sudo", [
@@ -132,11 +130,7 @@ async function acquireFortranMacOS(): Promise<string> {
   }
 
   try {
-    await exec.exec("sudo", [
-      "hdiutil",
-      "detach",
-      mntPath
-    ]);
+    await exec.exec("sudo", ["hdiutil", "detach", mntPath]);
   } catch (error) {
     core.debug(error);
 
