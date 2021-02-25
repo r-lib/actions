@@ -170,7 +170,11 @@ function acquireFortranMacOS() {
         // rename the gcov executable shipped with gfortran, as it conflits with the
         // normal gcov executable in llvm, and we cannot append paths to PATH
         // currently https://github.com/actions/toolkit/issues/270
-        yield io.mv("/usr/local/gfortran/bin/gcov", "/usr/local/gfortran/bin/gcov-fortran");
+        yield exec.exec("sudo", [
+            "mv",
+            "/usr/local/gfortran/bin/gcov",
+            "/usr/local/gfortran/bin/gcov-fortran"
+        ]);
         return "/";
     });
 }

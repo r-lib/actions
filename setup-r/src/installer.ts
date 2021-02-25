@@ -141,10 +141,12 @@ async function acquireFortranMacOS(): Promise<string> {
   // rename the gcov executable shipped with gfortran, as it conflits with the
   // normal gcov executable in llvm, and we cannot append paths to PATH
   // currently https://github.com/actions/toolkit/issues/270
-  await io.mv(
+  await exec.exec("sudo", [
+    "mv",
     "/usr/local/gfortran/bin/gcov",
     "/usr/local/gfortran/bin/gcov-fortran"
-  );
+  ]);
+
   return "/";
 }
 
