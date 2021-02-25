@@ -136,9 +136,15 @@ async function acquireFortranMacOS(): Promise<string> {
 
     throw `Failed to umount ${mntPath}: ${error}`;
   }
+
   core.addPath("/usr/local/gfortran/bin");
-  /* we need to put /usr/bin before the  gfortran path, as some tools, e.g. gcov should be used rather than the ones bundled with gfortran */
-  core.addPath("/usr/bin");
+  // rename the gcov executable shipped with gfortran, as it conflits with the
+  // normal gcov executable in llvm, and we cannot append paths to PATH
+  // currently https://github.com/actions/toolkit/issues/270
+  await io.mv(
+    "/usr/local/gfortran/bin/gcov",
+    "/usr/local/gfortran/bin/gcov-fortran"
+  );
   return "/";
 }
 
