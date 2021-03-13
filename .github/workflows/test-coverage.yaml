@@ -1,9 +1,11 @@
 on:
   push:
     branches:
+      - main
       - master
   pull_request:
     branches:
+      - main
       - master
 
 name: test-coverage
@@ -27,8 +29,8 @@ jobs:
           writeLines(sprintf("R-%i.%i", getRversion()$major, getRversion()$minor), ".github/R-version")
         shell: Rscript {0}
 
-      - name: Cache R packages
-        uses: actions/cache@v1
+      - name: Restore R package cache
+        uses: actions/cache@v2
         with:
           path: ${{ env.R_LIBS_USER }}
           key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-${{ hashFiles('.github/depends.Rds') }}

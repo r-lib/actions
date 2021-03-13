@@ -49,8 +49,6 @@ If your build fails and you are unsure of why here are some useful strategies fo
 1. *Does GitHub Actions support `[ci skip]` or similar syntax to automatically skip a build?*\
   Not by default, however you can enable it in any of your workflows by adding the following [conditional](https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idif), e.g. \
   `if: !contains(github.event.head_commit.message, '[ci skip]')`
-2. *Does the `setup-r` action support R-devel?*\
-  Not currently, as there are not currently any daily R binaries built for R-devel. Though this support is planned in the future.
 
 ## Additional resources
 

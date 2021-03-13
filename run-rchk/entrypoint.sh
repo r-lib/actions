@@ -2,8 +2,8 @@
 
 set -eo pipefail
 
-cd /opt/R-svn/
-. /opt/rchk/scripts/cmpconfig.inc
+cd /home/docker/R-svn/
+. /home/docker/rchk/scripts/cmpconfig.inc
 cd -
 
 APT="$INPUT_APT"
@@ -23,9 +23,9 @@ fi
 
 echo "running rchk tests for $PACKAGE"
 
-cd /opt/R-svn/
-. /opt/rchk/scripts/cmpconfig.inc
-/opt/rchk/scripts/check_package.sh $PACKAGE
+cd /home/docker/R-svn/
+. /home/docker/rchk/scripts/cmpconfig.inc
+/home/docker/rchk/scripts/check_package.sh $PACKAGE
 if [ $(cat packages/lib/$PACKAGE/libs/$PACKAGE.so.bcheck | wc -l) -gt 3 ]; then
   FAIL=1
 fi

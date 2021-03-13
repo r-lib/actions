@@ -2,9 +2,9 @@
 
 [![RStudio community](https://img.shields.io/badge/community-github--actions-blue?style=social&logo=rstudio&logoColor=75AADB)](https://community.rstudio.com/new-topic?category=Package%20development&tags=github-actions)
 
-This action sets up [TinyTex](https://yihui.name/tinytex/) by:
+This action sets up [TinyTeX](https://yihui.name/tinytex/) by:
 
-- downloading TinyTex and adding it to the PATH
+- downloading TinyTeX and adding it to the PATH
 
 # Usage
 

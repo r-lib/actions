@@ -28,38 +28,38 @@ if (!tempDirectory) {
 
 async function run() {
   try {
-    await getTinyTex();
+    await getTinyTeX();
   } catch (error) {
     core.setFailed(error.message);
   }
 }
 
-export async function getTinyTex() {
+export async function getTinyTeX() {
   if (IS_WINDOWS) {
-    installTinyTexWindows();
+    installTinyTeXWindows();
   } else {
-    installTinyTexPosix();
+    installTinyTeXPosix();
   }
 }
 
-async function installTinyTexPosix() {
+async function installTinyTeXPosix() {
   // We need to install texinfo for texi2dvi, but only on linux
   if (IS_LINUX) {
     try {
-      await exec.exec("sudo apt", ["install", "-y", "texinfo"]);
+      await exec.exec("sudo apt-get", ["install", "-y", "texinfo"]);
     } catch (error) {
       throw `Failed to install texinfo package: ${error}`;
     }
   }
 
   const fileName = "install-unx.sh";
-  const downloadUrl = "https://yihui.name/gh/tinytex/tools/install-unx.sh";
+  const downloadUrl = "https://yihui.name/gh/tinytex/tools/install-bin-unix.sh";
   let downloadPath: string | null = null;
 
   try {
     downloadPath = await tc.downloadTool(downloadUrl);
   } catch (error) {
-    throw `Failed to download TinyTex: ${error}`;
+    throw `Failed to download TinyTeX: ${error}`;
   }
 
   await io.mv(downloadPath, path.join(tempDirectory, fileName));
@@ -67,7 +67,7 @@ async function installTinyTexPosix() {
   try {
     await exec.exec("sh", [path.join(tempDirectory, fileName)]);
   } catch (error) {
-    throw `Failed to install TinyTex: ${error}`;
+    throw `Failed to install TinyTeX: ${error}`;
   }
 
   let binPath: string;
@@ -85,19 +85,19 @@ async function installTinyTexPosix() {
   core.addPath(path.join(binPath, arch));
 }
 
-async function installTinyTexWindows() {
+async function installTinyTeXWindows() {
   const fileName = "install-windows.bat";
-  const downloadUrl = "https://yihui.name/gh/tinytex/tools/install-windows.bat";
+  const downloadUrl =
+    "https://yihui.name/gh/tinytex/tools/install-bin-windows.bat";
   let downloadPath: string | null = null;
 
   try {
     downloadPath = await tc.downloadTool(downloadUrl);
   } catch (error) {
-    throw `Failed to download TinyTex: ${error}`;
+    throw `Failed to download TinyTeX: ${error}`;
   }
 
   await io.mv(downloadPath, path.join(tempDirectory, fileName));
-
 
   const fs = require("fs");
   console.log(path.join(tempDirectory, fileName));
@@ -114,11 +114,10 @@ async function installTinyTexWindows() {
     }
   );
 
-
   try {
     exec.exec(path.join(tempDirectory, fileName));
   } catch (error) {
-    throw `Failed to install TinyTex: ${error}`;
+    throw `Failed to install TinyTeX: ${error}`;
   }
 
   core.addPath(

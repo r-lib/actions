@@ -13,18 +13,27 @@ inputs:
     default: '1'
   crayon.enabled:
     description: 'Value to set the R option `crayon.enabled` to.'
-    default: 'TRUE'
+    default: 'NULL'
   remove-openmp-macos:
     description: 'If true, remove `-fopenmp` from the default compilation
     flags, e.g. `SHLIB_OPENMP_CFLAGS`, as the macOS Command Line Tools do not
     support OpenMP'
     default: true
   http-user-agent:
-    descripton: 'If "default", sets the HTTPUserAgent option to e.g. for R
+    description: 'If "default" or "", sets the HTTPUserAgent option to e.g. for R
     3.6.3 running on macOS Catalina, "R/3.6.3 R (3.6.3 x86_64-apple-darwin17.0
     x86_64 darwin17.0) on GitHub Actions". Otherwise uses whatever value is
     set.'
     default: 'default'
+  install-r:
+    default: true
+  windows-path-include-mingw:
+    description: 'If "true" put the 64 bit mingw directory from Rtools on the
+    PATH for Windows builds'
+    default: true
+outputs:
+  installed-r-version:
+    description: 'The full R version installed'
 runs:
   using: 'node12'
   main: 'lib/setup-r.js'

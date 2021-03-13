@@ -1,28 +1,53 @@
 
-  - [Quickstart CI](#quickstart-ci-workflow) - A simple CI workflow to
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+# Example workflows
+
+Package workflows:
+
+  - [`check-release`](#quickstart-ci-workflow) - A simple CI workflow to
     check with the release version of R.
-  - [Tidyverse CI](#tidyverse-ci-workflow) - A more complex CI workflow
-  - [Pull Request Commands](#commands-workflow) - Adds `/document` and
-    `/style` commands for pull requests.
-  - [Render README](#render-readme) - Render README.Rmd when it changes
-    and commit the result
-  - [Test coverage](#test-coverage-workflow) - Run `covr::codecov()` on
-    an R package.
-  - [lint](#lint-workflow) - Run `lintr::lint_package()` on an R
+  - [`check-standard`](#standard-ci-workflow) - A standard CI workflow
+    to check with the release version of R on the three major OSs.
+  - [`check-full`](#tidyverse-ci-workflow) - A more complex CI workflow
+  - [`test-coverage`](#test-coverage-workflow) - Run `covr::codecov()`
+    on an R package.
+  - [`lint`](#lint-workflow) - Run `lintr::lint_package()` on an R
     package.
-  - [Build pkgdown site](#build-pkgdown-site) - Build a
+  - [`pr-commands`](#commands-workflow) - Adds `/document` and `/style`
+    commands for pull requests.
+
+RMarkdown workflows:
+
+  - [`render-rmarkdown`](#render-rmarkdown) - Render one or more
+    Rmarkdown files when they change and commit the result.
+  - [`pkgdown`](#build-pkgdown-site) - Build a
     [pkgdown](https://pkgdown.r-lib.org/) site for an R package and
     deploy it to [GitHub Pages](https://pages.github.com/).
-  - [Build bookdown site](#build-bookdown-site) - Build a
+  - [`bookdown`](#build-bookdown-site) - Build a
     [bookdown](https://bookdown.org) site and deploy it to
     [netlify](https://www.netlify.com/).
-  - [Build blogdown site](#build-blogdown-site) - Build a
+  - [`blogdown`](#build-blogdown-site) - Build a
     [blogdown](https://bookdown.org/yihui/blogdown/) site and deploy it
     to [netlify](https://www.netlify.com/).
+
+Other workflows:
+
+  - [`docker`](#docker-based-workflow) - For custom workflows based on
+    docker containers.
+  - [Bioconductor](#bioconductor-friendly-workflow) - A CI workflow for
+    packages to be released on Bioconductor.
+
+Options and advice:
+
+  - [Forcing binaries](#forcing-binaries) - An environment variable to
+    always use binary packages.
   - [Managing secrets](#managing-secrets) - How to generate auth tokens
     and make them available to actions.
 
 ## Quickstart CI workflow
+
+`usethis::use_github_action("check-release")`
 
 This workflow installs latest release R version on macOS and runs R CMD
 check via the [rcmdcheck](https://github.com/r-lib/rcmdcheck) package.
@@ -38,12 +63,16 @@ probably what you want to use.
 <!-- end list -->
 
 ``` yaml
+# For help debugging build failures open an issue on the RStudio community with the 'github-actions' tag.
+# https://community.rstudio.com/new-topic?category=Package%20development&tags=github-actions
 on:
   push:
     branches:
+      - main
       - master
   pull_request:
     branches:
+      - main
       - master
 
 name: R-CMD-check
@@ -51,20 +80,26 @@ name: R-CMD-check
 jobs:
   R-CMD-check:
     runs-on: macOS-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
-      - uses: r-lib/actions/setup-r@master
+      - uses: r-lib/actions/setup-r@v1
       - name: Install dependencies
         run: |
           install.packages(c("remotes", "rcmdcheck"))
           remotes::install_deps(dependencies = TRUE)
         shell: Rscript {0}
       - name: Check
-        run: rcmdcheck::rcmdcheck(args = "--no-manual", error_on = "error")
+        run: |
+          options(crayon.enabled = TRUE)
+          rcmdcheck::rcmdcheck(args = "--no-manual", error_on = "error")
         shell: Rscript {0}
 ```
 
 ## Standard CI workflow
+
+`usethis::use_github_action("check-standard")`
 
 This workflow runs R CMD check via the
 [rcmdcheck](https://github.com/r-lib/rcmdcheck) package on the three
@@ -80,12 +115,16 @@ Bioconductor this is likely the workflow you want to use.
 <!-- end list -->
 
 ``` yaml
+# For help debugging build failures open an issue on the RStudio community with the 'github-actions' tag.
+# https://community.rstudio.com/new-topic?category=Package%20development&tags=github-actions
 on:
   push:
     branches:
+      - main
       - master
   pull_request:
     branches:
+      - main
       - master
 
 name: R-CMD-check
@@ -102,21 +141,22 @@ jobs:
         config:
           - {os: windows-latest, r: 'release'}
           - {os: macOS-latest, r: 'release'}
-          - {os: macOS-latest, r: 'devel'}
-          - {os: ubuntu-16.04, r: 'release', rspm: "https://packagemanager.rstudio.com/cran/__linux__/xenial/latest"}
+          - {os: ubuntu-20.04, r: 'release', rspm: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest"}
+          - {os: ubuntu-20.04, r: 'devel', rspm: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest"}
 
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
       RSPM: ${{ matrix.config.rspm }}
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       - uses: actions/checkout@v2
 
-      - uses: r-lib/actions/setup-r@master
+      - uses: r-lib/actions/setup-r@v1
         with:
           r-version: ${{ matrix.config.r }}
 
-      - uses: r-lib/actions/setup-pandoc@master
+      - uses: r-lib/actions/setup-pandoc@v1
 
       - name: Query dependencies
         run: |
@@ -125,8 +165,8 @@ jobs:
           writeLines(sprintf("R-%i.%i", getRversion()$major, getRversion()$minor), ".github/R-version")
         shell: Rscript {0}
 
-      - name: Cache R packages
-        uses: actions/cache@v1
+      - name: Restore R package cache
+        uses: actions/cache@v2
         with:
           path: ${{ env.R_LIBS_USER }}
           key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-${{ hashFiles('.github/depends.Rds') }}
@@ -134,12 +174,11 @@ jobs:
 
       - name: Install system dependencies
         if: runner.os == 'Linux'
-        env:
-          RHUB_PLATFORM: linux-x86_64-ubuntu-gcc
         run: |
-          Rscript -e "remotes::install_github('r-hub/sysreqs')"
-          sysreqs=$(Rscript -e "cat(sysreqs::sysreq_commands('DESCRIPTION'))")
-          sudo -s eval "$sysreqs"
+          while read -r cmd
+          do
+            eval sudo $cmd
+          done < <(Rscript -e 'writeLines(remotes::system_requirements("ubuntu", "20.04"))')
 
       - name: Install dependencies
         run: |
@@ -150,7 +189,9 @@ jobs:
       - name: Check
         env:
           _R_CHECK_CRAN_INCOMING_REMOTE_: false
-        run: rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), error_on = "warning", check_dir = "check")
+        run: |
+          options(crayon.enabled = TRUE)
+          rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), error_on = "warning", check_dir = "check")
         shell: Rscript {0}
 
       - name: Upload check results
@@ -162,6 +203,8 @@ jobs:
 ```
 
 ## Tidyverse CI workflow
+
+`usethis::use_github_action("check-full")`
 
 This workflow installs the last 5 minor R versions and runs R CMD check
 via the [rcmdcheck](https://github.com/r-lib/rcmdcheck) package on the
@@ -180,12 +223,20 @@ CI workflow.
 <!-- end list -->
 
 ``` yaml
+# NOTE: This workflow is overkill for most R packages
+# check-standard.yaml is likely a better choice
+# usethis::use_github_action("check-standard") will install it.
+#
+# For help debugging build failures open an issue on the RStudio community with the 'github-actions' tag.
+# https://community.rstudio.com/new-topic?category=Package%20development&tags=github-actions
 on:
   push:
     branches:
+      - main
       - master
   pull_request:
     branches:
+      - main
       - master
 
 name: R-CMD-check
@@ -200,9 +251,11 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {os: macOS-latest,   r: 'devel'}
           - {os: macOS-latest,   r: 'release'}
           - {os: windows-latest, r: 'release'}
+          - {os: windows-latest, r: '3.6'}
+            # We explicitly set the user agent for R devel to the current release version of R so RSPM serves the release binaries.
+          - {os: ubuntu-16.04,   r: 'devel', rspm: "https://packagemanager.rstudio.com/cran/__linux__/xenial/latest", http-user-agent: "R/4.0.0 (ubuntu-16.04) R (4.0.0 x86_64-pc-linux-gnu x86_64 linux-gnu) on GitHub Actions" }
           - {os: ubuntu-16.04,   r: 'release', rspm: "https://packagemanager.rstudio.com/cran/__linux__/xenial/latest"}
           - {os: ubuntu-16.04,   r: 'oldrel',  rspm: "https://packagemanager.rstudio.com/cran/__linux__/xenial/latest"}
           - {os: ubuntu-16.04,   r: '3.5',     rspm: "https://packagemanager.rstudio.com/cran/__linux__/xenial/latest"}
@@ -217,11 +270,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: r-lib/actions/setup-r@master
+      - uses: r-lib/actions/setup-r@v1
         with:
           r-version: ${{ matrix.config.r }}
+          http-user-agent: ${{ matrix.config.http-user-agent }}
 
-      - uses: r-lib/actions/setup-pandoc@master
+      - uses: r-lib/actions/setup-pandoc@v1
 
       - name: Query dependencies
         run: |
@@ -230,8 +284,10 @@ jobs:
           writeLines(sprintf("R-%i.%i", getRversion()$major, getRversion()$minor), ".github/R-version")
         shell: Rscript {0}
 
-      - name: Cache R packages
-        uses: actions/cache@v1
+      - name: Restore R package cache
+        # Cache doesn't work on Windows before R 4.0
+        if: ! (runner.os == 'Windows' && startsWith(matrix.config.r, '3'))
+        uses: actions/cache@v2
         with:
           path: ${{ env.R_LIBS_USER }}
           key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-${{ hashFiles('.github/depends.Rds') }}
@@ -239,12 +295,11 @@ jobs:
 
       - name: Install system dependencies
         if: runner.os == 'Linux'
-        env:
-          RHUB_PLATFORM: linux-x86_64-ubuntu-gcc
         run: |
-          Rscript -e "remotes::install_github('r-hub/sysreqs')"
-          sysreqs=$(Rscript -e "cat(sysreqs::sysreq_commands('DESCRIPTION'))")
-          sudo -s eval "$sysreqs"
+          while read -r cmd
+          do
+            eval sudo $cmd
+          done < <(Rscript -e 'writeLines(remotes::system_requirements("ubuntu", "16.04"))')
 
       - name: Install dependencies
         run: |
@@ -262,7 +317,9 @@ jobs:
       - name: Check
         env:
           _R_CHECK_CRAN_INCOMING_: false
-        run: rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), error_on = "warning", check_dir = "check")
+        run: |
+          options(crayon.enabled = TRUE)
+          rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), error_on = "warning", check_dir = "check")
         shell: Rscript {0}
 
       - name: Show testthat output
@@ -280,6 +337,8 @@ jobs:
 
 ## Test coverage workflow
 
+`usethis::use_github_action("test-coverage")`
+
 This example uses the [covr](https://covr.r-lib.org) package to query
 the test coverage of your package and upload the result to
 [codecov.io](https://codecov.io)
@@ -288,9 +347,11 @@ the test coverage of your package and upload the result to
 on:
   push:
     branches:
+      - main
       - master
   pull_request:
     branches:
+      - main
       - master
 
 name: test-coverage
@@ -303,9 +364,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: r-lib/actions/setup-r@master
+      - uses: r-lib/actions/setup-r@v1
 
-      - uses: r-lib/actions/setup-pandoc@master
+      - uses: r-lib/actions/setup-pandoc@v1
 
       - name: Query dependencies
         run: |
@@ -314,8 +375,8 @@ jobs:
           writeLines(sprintf("R-%i.%i", getRversion()$major, getRversion()$minor), ".github/R-version")
         shell: Rscript {0}
 
-      - name: Cache R packages
-        uses: actions/cache@v1
+      - name: Restore R package cache
+        uses: actions/cache@v2
         with:
           path: ${{ env.R_LIBS_USER }}
           key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-${{ hashFiles('.github/depends.Rds') }}
@@ -335,6 +396,8 @@ jobs:
 
 ## Lint workflow
 
+`usethis::use_github_action("lint")`
+
 This example uses the [lintr](https://github.com/jimhester/lintr)
 package to lint your package and return the results as build
 annotations.
@@ -343,9 +406,11 @@ annotations.
 on:
   push:
     branches:
+      - main
       - master
   pull_request:
     branches:
+      - main
       - master
 
 name: lint
@@ -358,7 +423,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: r-lib/actions/setup-r@master
+      - uses: r-lib/actions/setup-r@v1
 
       - name: Query dependencies
         run: |
@@ -367,8 +432,8 @@ jobs:
           writeLines(sprintf("R-%i.%i", getRversion()$major, getRversion()$minor), ".github/R-version")
         shell: Rscript {0}
 
-      - name: Cache R packages
-        uses: actions/cache@v1
+      - name: Restore R package cache
+        uses: actions/cache@v2
         with:
           path: ${{ env.R_LIBS_USER }}
           key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-${{ hashFiles('.github/depends.Rds') }}
@@ -381,6 +446,9 @@ jobs:
           remotes::install_cran("lintr")
         shell: Rscript {0}
 
+      - name: Install package
+        run: R CMD INSTALL .
+
       - name: Lint
         run: lintr::lint_package()
         shell: Rscript {0}
@@ -388,13 +456,15 @@ jobs:
 
 ## Commands workflow
 
+`usethis::use_github_action("pr-commands")`
+
 This workflow enables the use of 2 R specific commands in pull request
 issue comments. `/document` will use
 [roxygen2](https://roxygen2.r-lib.org/) to rebuild the documentation for
 the package and commit the result to the pull request. `/style` will use
 [styler](https://styler.r-lib.org/) to restyle your package.
 
-## When it can they be used?
+### When should you use it?
 
 1.  You get frequent pull requests, often with documentation only fixes.
 2.  You regularly style your code with styler, and require all additions
@@ -416,19 +486,21 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
-      - uses: r-lib/actions/pr-fetch@master
+      - uses: r-lib/actions/pr-fetch@v1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-      - uses: r-lib/actions/setup-r@master
+      - uses: r-lib/actions/setup-r@v1
       - name: Install dependencies
         run: Rscript -e 'install.packages(c("remotes", "roxygen2"))' -e 'remotes::install_deps(dependencies = TRUE)'
       - name: Document
         run: Rscript -e 'roxygen2::roxygenise()'
       - name: commit
         run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
           git add man/\* NAMESPACE
           git commit -m 'Document'
-      - uses: r-lib/actions/pr-push@master
+      - uses: r-lib/actions/pr-push@v1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
   style:
@@ -439,56 +511,74 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
-      - uses: r-lib/actions/pr-fetch@master
+      - uses: r-lib/actions/pr-fetch@v1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-      - uses: r-lib/actions/setup-r@master
+      - uses: r-lib/actions/setup-r@v1
       - name: Install dependencies
         run: Rscript -e 'install.packages("styler")'
       - name: Style
         run: Rscript -e 'styler::style_pkg()'
       - name: commit
         run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
           git add \*.R
           git commit -m 'Style'
-      - uses: r-lib/actions/pr-push@master
+      - uses: r-lib/actions/pr-push@v1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-## Render README
+## Render Rmarkdown
 
-This example automatically re-builds this README.md from README.Rmd
-whenever it or its yaml dependencies change and commits the results to
-the master branch.
+`usethis::use_github_action("render-rmarkdown")`
+
+This example automatically re-builds any Rmarkdown file in the
+repository whenever it changes and commits the results to the master
+branch.
 
 ``` yaml
 on:
   push:
     paths:
-      - README.Rmd
+      - '**.Rmd'
 
-name: Render README
+name: Render Rmarkdown files
 
 jobs:
   render:
-    name: Render README
+    name: Render Rmarkdown files
     runs-on: macOS-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - uses: r-lib/actions/setup-r@v1
       - uses: r-lib/actions/setup-pandoc@v1
-      - name: Install rmarkdown
-        run: Rscript -e 'install.packages("rmarkdown")'
-      - name: Render README
-        run: Rscript -e 'rmarkdown::render("README.Rmd")'
+      - name: Install rmarkdown, remotes, and the local package
+        run: |
+          install.packages("remotes")
+          remotes::install_local(".")
+          remotes::install_cran("rmarkdown")
+        shell: Rscript {0}
+      - name: Render Rmarkdown files
+        run: |
+          RMD_PATH=($(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '[.]Rmd$'))
+          Rscript -e 'for (f in commandArgs(TRUE)) if (file.exists(f)) rmarkdown::render(f)' ${RMD_PATH[*]} 
       - name: Commit results
         run: |
-          git commit README.md -m 'Re-build README.Rmd' || echo "No changes to commit"
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
+          git commit ${RMD_PATH[*]/.Rmd/.md} -m 'Re-build Rmarkdown files' || echo "No changes to commit"
           git push origin || echo "No changes to commit"
 ```
 
 ## Build pkgdown site
+
+`usethis::use_github_action("pkgdown")`
 
 This example builds a [pkgdown](https://pkgdown.r-lib.org/) site for a
 repository and pushes the built package to [GitHub
@@ -497,7 +587,9 @@ Pages](https://pages.github.com/).
 ``` yaml
 on:
   push:
-    branches: master
+    branches:
+      - main
+      - master
 
 name: pkgdown
 
@@ -509,9 +601,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: r-lib/actions/setup-r@master
+      - uses: r-lib/actions/setup-r@v1
 
-      - uses: r-lib/actions/setup-pandoc@master
+      - uses: r-lib/actions/setup-pandoc@v1
 
       - name: Query dependencies
         run: |
@@ -520,8 +612,8 @@ jobs:
           writeLines(sprintf("R-%i.%i", getRversion()$major, getRversion()$minor), ".github/R-version")
         shell: Rscript {0}
 
-      - name: Cache R packages
-        uses: actions/cache@v1
+      - name: Restore R package cache
+        uses: actions/cache@v2
         with:
           path: ${{ env.R_LIBS_USER }}
           key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-${{ hashFiles('.github/depends.Rds') }}
@@ -529,37 +621,43 @@ jobs:
 
       - name: Install dependencies
         run: |
-          install.packages("remotes")
           remotes::install_deps(dependencies = TRUE)
-          remotes::install_dev("pkgdown")
+          install.packages("pkgdown", type = "binary")
         shell: Rscript {0}
 
       - name: Install package
         run: R CMD INSTALL .
 
       - name: Deploy package
-        run: pkgdown::deploy_to_branch(new_process = FALSE)
-        shell: Rscript {0}
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
+          Rscript -e 'pkgdown::deploy_to_branch(new_process = FALSE)'
 ```
 
 ## Build bookdown site
+
+`usethis::use_github_action("bookdown")`
 
 This example builds a [bookdown](https://bookdown.org) site for a
 repository and then deploys the site via
 [netlify](https://www.netlify.com/). It uses
 [renv](https://rstudio.github.io/renv/) to ensure the package versions
 remain consistent across builds. You will need to run `renv::snapshot()`
-locally and commit the `renv.lock` file before using this workflow, see
-[Using renv with Continous
-Integeration](https://rstudio.github.io/renv/articles/ci.html) for
+locally and commit the `renv.lock` file before using this workflow, and
+after every time you add a new package to `DESCRIPTION`. See [Using renv
+with Continous
+Integration](https://rstudio.github.io/renv/articles/ci.html) for
 additional information. **Note** you need to add a `NETLIFY_AUTH_TOKEN`
-secret to your repository for the netlify deploy (see [Managing
-secrets](#managing-secrets) section for details).
+and a `NETLIFY_SITE_ID` secret to your repository for the netlify deploy
+(see [Managing secrets](#managing-secrets) section for details).
 
 ``` yaml
 on:
   push:
-    branches: master
+    branches:
+      - main
+      - master
 
 name: bookdown
 
@@ -573,22 +671,21 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Setup R
-        uses: r-lib/actions/setup-r@master
+        uses: r-lib/actions/setup-r@v1
 
-      - name: Install pandoc and pandoc citeproc
+      - name: Install pandoc
         run: |
           brew install pandoc
-          brew install pandoc-citeproc
 
       - name: Cache Renv packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: $HOME/.local/share/renv
           key: r-${{ hashFiles('renv.lock') }}
           restore-keys: r-
 
       - name: Cache bookdown results
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: _bookdown_files
           key: bookdown-${{ hashFiles('**/*Rmd') }}
@@ -617,6 +714,8 @@ jobs:
 
 ## Build blogdown site
 
+`usethis::use_github_action("blogdown")`
+
 This example builds a [blogdown](https://bookdown.org/yihui/blogdown/)
 site for a repository and then deploys the book via
 [netlify](https://www.netlify.com/). It uses
@@ -626,13 +725,15 @@ locally and commit the `renv.lock` file before using this workflow, see
 [Using renv with Continous
 Integeration](https://rstudio.github.io/renv/articles/ci.html) for
 additional information. **Note** you need to add a `NETLIFY_AUTH_TOKEN`
-secret to your repository for the netlify deploy (see [Managing
-secrets](#managing-secrets) section for details).
+a `NETLIFY_SITE_ID` secret to your repository for the netlify deploy
+(see [Managing secrets](#managing-secrets) section for details).
 
 ``` yaml
 on:
   push:
-    branches: master
+    branches:
+      - main
+      - master
 
 name: blogdown
 
@@ -646,15 +747,14 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Setup R
-        uses: r-lib/actions/setup-r@master
+        uses: r-lib/actions/setup-r@v1
 
-      - name: Install pandoc and pandoc citeproc
+      - name: Install pandoc
         run: |
           brew install pandoc
-          brew install pandoc-citeproc
 
       - name: Cache Renv packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: $HOME/.local/share/renv
           key: r-${{ hashFiles('renv.lock') }}
@@ -687,6 +787,8 @@ jobs:
 ```
 
 ## Docker based workflow
+
+`usethis::use_github_action("docker")`
 
 If you develop locally with docker or are used to using other docker
 based CI services and already have a docker container with all of your R
@@ -784,7 +886,7 @@ and
 In some cases, your action may need to access an external resource to
 deploy a result of your action. For example, the [bookdown]() and
 [blogdown]() actions require access to your Netlify account. This access
-is managed using a personal access token, commonly called a PAT.
+is managed using a Personal Access Token, commonly called a PAT.
 
 Netlify has a [process for creating a PAT using their
 UI](https://docs.netlify.com/cli/get-started/#obtain-a-token-in-the-netlify-ui),
@@ -816,3 +918,8 @@ which we follow here.
 
 5.  At this point (certainly at some point), you may wish to close your
     **tokens** page to remove the visibility of your token.
+
+The `NETLIFY_SITE_ID` is not quite as personal as the PAT and is visible
+from your Netlify profile. This is the value of the **API ID** variable
+that is listed on your site dashboard under Settings \> General \> Site
+details \> Site information.

@@ -45,50 +45,50 @@ if (!tempDirectory) {
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            yield getTinyTex();
+            yield getTinyTeX();
         }
         catch (error) {
             core.setFailed(error.message);
         }
     });
 }
-function getTinyTex() {
+function getTinyTeX() {
     return __awaiter(this, void 0, void 0, function* () {
         if (IS_WINDOWS) {
-            installTinyTexWindows();
+            installTinyTeXWindows();
         }
         else {
-            installTinyTexPosix();
+            installTinyTeXPosix();
         }
     });
 }
-exports.getTinyTex = getTinyTex;
-function installTinyTexPosix() {
+exports.getTinyTeX = getTinyTeX;
+function installTinyTeXPosix() {
     return __awaiter(this, void 0, void 0, function* () {
         // We need to install texinfo for texi2dvi, but only on linux
         if (IS_LINUX) {
             try {
-                yield exec.exec("sudo apt", ["install", "-y", "texinfo"]);
+                yield exec.exec("sudo apt-get", ["install", "-y", "texinfo"]);
             }
             catch (error) {
                 throw `Failed to install texinfo package: ${error}`;
             }
         }
         const fileName = "install-unx.sh";
-        const downloadUrl = "https://yihui.name/gh/tinytex/tools/install-unx.sh";
+        const downloadUrl = "https://yihui.name/gh/tinytex/tools/install-bin-unix.sh";
         let downloadPath = null;
         try {
             downloadPath = yield tc.downloadTool(downloadUrl);
         }
         catch (error) {
-            throw `Failed to download TinyTex: ${error}`;
+            throw `Failed to download TinyTeX: ${error}`;
         }
         yield io.mv(downloadPath, path.join(tempDirectory, fileName));
         try {
             yield exec.exec("sh", [path.join(tempDirectory, fileName)]);
         }
         catch (error) {
-            throw `Failed to install TinyTex: ${error}`;
+            throw `Failed to install TinyTeX: ${error}`;
         }
         let binPath;
         // The binaries are in TinyTeX/bin/*/, where the wildcard is the
@@ -103,19 +103,18 @@ function installTinyTexPosix() {
         core.addPath(path.join(binPath, arch));
     });
 }
-function installTinyTexWindows() {
+function installTinyTeXWindows() {
     return __awaiter(this, void 0, void 0, function* () {
         const fileName = "install-windows.bat";
-        const downloadUrl = "https://yihui.name/gh/tinytex/tools/install-windows.bat";
+        const downloadUrl = "https://yihui.name/gh/tinytex/tools/install-bin-windows.bat";
         let downloadPath = null;
         try {
             downloadPath = yield tc.downloadTool(downloadUrl);
         }
         catch (error) {
-            throw `Failed to download TinyTex: ${error}`;
+            throw `Failed to download TinyTeX: ${error}`;
         }
         yield io.mv(downloadPath, path.join(tempDirectory, fileName));
-
         const fs = require("fs");
         console.log(path.join(tempDirectory, fileName));
         var text = fs.readFileSync(path.join(tempDirectory, fileName), "utf8");
@@ -127,12 +126,11 @@ function installTinyTexWindows() {
             if (err)
                 console.log("error", err);
         });
-      
         try {
             exec.exec(path.join(tempDirectory, fileName));
         }
         catch (error) {
-            throw `Failed to install TinyTex: ${error}`;
+            throw `Failed to install TinyTeX: ${error}`;
         }
         core.addPath(path.join(process.env["APPDATA"] || "C:\\", "TinyTeX", "bin", "win32"));
     });

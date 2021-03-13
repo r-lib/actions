@@ -6,7 +6,7 @@ import * as tc from "@actions/tool-cache";
 import * as io from "@actions/io";
 import * as util from "util";
 import * as path from "path";
-import { promises as fs } from "fs";
+import * as fs from "fs";
 import * as restm from "typed-rest-client/RestClient";
 import * as semver from "semver";
 import osInfo from "linux-os-info";
@@ -53,9 +53,14 @@ export async function getR(version: string) {
 
   setREnvironmentVariables();
   setupRLibrary();
+  core.setOutput("installed-r-version", version);
 }
 
 async function acquireR(version: string, rtoolsVersion: string) {
+  if (core.getInput("install-r") !== "true") {
+    return;
+  }
+
   try {
     if (IS_WINDOWS) {
       await Promise.all([
@@ -69,25 +74,11 @@ async function acquireR(version: string, rtoolsVersion: string) {
         acquireUtilsMacOS(),
         acquireRMacOS(version)
       ]);
-      if (core.getInput("remove-openmp-macos")) {
+      if (core.getInput("remove-openmp-macos") === "true") {
         await removeOpenmpFlags();
       }
     } else {
-      let returnCode = 1;
-      try {
-        returnCode = await exec.exec("R", ["--version"], {
-          ignoreReturnCode: true,
-          silent: true
-        });
-      } catch (e) {}
-
-      core.debug(`returnCode: ${returnCode}`);
-      if (returnCode != 0) {
-        // We only want to acquire R here if it
-        // doesn't already exist (because you are running in a container that
-        // already includes it)
-        await acquireRUbuntu(version);
-      }
+      await acquireRUbuntu(version);
     }
   } catch (error) {
     core.debug(error);
@@ -96,14 +87,67 @@ async function acquireR(version: string, rtoolsVersion: string) {
   }
 }
 
-async function acquireFortranMacOS() {
+async function acquireFortranMacOS(): Promise<string> {
+  let gfortran: string = "gfortran-8.2-Mojave";
+  let mntPath: string = path.join("/Volumes", gfortran);
+  let fileName: string = `${gfortran}.dmg`;
+  let downloadUrl: string = `https://mac.r-project.org/tools/${fileName}`;
+  let downloadPath: string | null = null;
+
   try {
-    await exec.exec("brew", ["cask", "install", "gfortran"]);
+    downloadPath = await tc.downloadTool(downloadUrl);
+    await io.mv(downloadPath, path.join(tempDirectory, fileName));
   } catch (error) {
     core.debug(error);
 
-    throw `Failed to install gfortan: ${error}`;
+    throw `Failed to download ${downloadUrl}: ${error}`;
   }
+
+  try {
+    await exec.exec("sudo", [
+      "hdiutil",
+      "attach",
+      path.join(tempDirectory, fileName)
+    ]);
+  } catch (error) {
+    core.debug(error);
+
+    throw `Failed to mount ${fileName}: ${error}`;
+  }
+
+  try {
+    await exec.exec("sudo", [
+      "installer",
+      "-package",
+      path.join(mntPath, gfortran, "gfortran.pkg"),
+      "-target",
+      "/"
+    ]);
+  } catch (error) {
+    core.debug(error);
+
+    throw `Failed to install gfortran: ${error}`;
+  }
+
+  try {
+    await exec.exec("sudo", ["hdiutil", "detach", mntPath]);
+  } catch (error) {
+    core.debug(error);
+
+    throw `Failed to umount ${mntPath}: ${error}`;
+  }
+
+  core.addPath("/usr/local/gfortran/bin");
+  // rename the gcov executable shipped with gfortran, as it conflits with the
+  // normal gcov executable in llvm, and we cannot append paths to PATH
+  // currently https://github.com/actions/toolkit/issues/270
+  await exec.exec("sudo", [
+    "mv",
+    "/usr/local/gfortran/bin/gcov",
+    "/usr/local/gfortran/bin/gcov-fortran"
+  ]);
+
+  return "/";
 }
 
 async function acquireUtilsMacOS() {
@@ -163,10 +207,12 @@ async function acquireRUbuntu(version: string): Promise<string> {
       "sudo DEBIAN_FRONTEND=noninteractive add-apt-repository -y ppa:cran/travis"
     );
 
-    await exec.exec("sudo DEBIAN_FRONTEND=noninteractive apt-get update -qq");
+    await exec.exec(
+      "sudo DEBIAN_FRONTEND=noninteractive apt-get update -y -qq"
+    );
     // install gdbi-core and also qpdf, which is used by `--as-cran`
     await exec.exec(
-      "sudo DEBIAN_FRONTEND=noninteractive apt-get install gdebi-core qpdf devscripts"
+      "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y gdebi-core qpdf devscripts"
     );
     await exec.exec("sudo gdebi", [
       "--non-interactive",
@@ -287,37 +333,53 @@ async function acquireRtools(version: string) {
     rtools4 ? "rtools%s-x86_64.exe" : "Rtools%s.exe",
     version
   );
-  let downloadUrl: string = util.format(
-    "http://cloud.r-project.org/bin/windows/Rtools/%s",
-    fileName
-  );
-  console.log(`Downloading ${downloadUrl}...`);
-  let downloadPath: string | null = null;
-  try {
-    downloadPath = await tc.downloadTool(downloadUrl);
-    await io.mv(downloadPath, path.join(tempDirectory, fileName));
-  } catch (error) {
-    core.debug(error);
 
-    throw `Failed to download version ${version}: ${error}`;
-  }
+  // If Rtools is already installed just return, as there is a message box
+  // which hangs the build otherwise.
+  if (
+    (!rtools4 && fs.existsSync("C:\\Rtools")) ||
+    (rtools4 && fs.existsSync("C:\\rtools40"))
+  ) {
+    core.debug(
+      "Skipping Rtools installation as a suitable Rtools is already installed"
+    );
+  } else {
+    let downloadUrl: string = util.format(
+      "http://cloud.r-project.org/bin/windows/Rtools/%s",
+      fileName
+    );
+    console.log(`Downloading ${downloadUrl}...`);
+    let downloadPath: string | null = null;
+    try {
+      downloadPath = await tc.downloadTool(downloadUrl);
+      await io.mv(downloadPath, path.join(tempDirectory, fileName));
+    } catch (error) {
+      core.debug(error);
 
-  try {
-    await exec.exec(path.join(tempDirectory, fileName), [
-      "/VERYSILENT",
-      "/SUPPRESSMSGBOXES"
-    ]);
-  } catch (error) {
-    core.debug(error);
+      throw `Failed to download version ${version}: ${error}`;
+    }
 
-    throw `Failed to install Rtools: ${error}`;
+    try {
+      await exec.exec(path.join(tempDirectory, fileName), [
+        "/VERYSILENT",
+        "/SUPPRESSMSGBOXES"
+      ]);
+    } catch (error) {
+      core.debug(error);
+
+      throw `Failed to install Rtools: ${error}`;
+    }
   }
   if (rtools4) {
     core.addPath(`C:\\rtools40\\usr\\bin`);
-    core.addPath(`C:\\rtools40\\mingw64\\bin`);
+    if (core.getInput("windows-path-include-mingw") === "true") {
+      core.addPath(`C:\\rtools40\\mingw64\\bin`);
+    }
   } else {
     core.addPath(`C:\\Rtools\\bin`);
-    core.addPath(`C:\\Rtools\\mingw_64\\bin`);
+    if (core.getInput("windows-path-include-mingw") === "true") {
+      core.addPath(`C:\\Rtools\\mingw_64\\bin`);
+    }
   }
 }
 
@@ -347,10 +409,12 @@ async function setupRLibrary() {
   let rspm = process.env["RSPM"] ? `'${process.env["RSPM"]}'` : "NULL";
   let cran = `'${process.env["CRAN"] || "https://cloud.r-project.org"}'`;
   let user_agent =
-    core.getInput("http-user-agent") == "default"
+    core.getInput("http-user-agent") === "default" ||
+    core.getInput("http-user-agent") === ""
       ? 'sprintf("R/%s R (%s) on GitHub Actions", getRversion(), paste(getRversion(), R.version$platform, R.version$arch, R.version$os))'
-      : core.getInput("http-user-agent");
-  await fs.writeFile(
+      : `"${core.getInput("http-user-agent")}"`;
+
+  await fs.promises.writeFile(
     profilePath,
     `options(\
        repos = c(\
@@ -399,10 +463,6 @@ function getFileNameUbuntu(version: string): string {
 }
 
 function getDownloadUrlUbuntu(filename: string): string {
-  if (filename == "devel") {
-    throw new Error("R-devel not currently available on ubuntu!");
-  }
-
   try {
     const info = osInfo({ mode: "sync" });
     const versionStr = info.version_id.replace(/[.]/g, "");
@@ -448,8 +508,8 @@ async function getDownloadUrlWindows(version: string): Promise<string> {
 function setREnvironmentVariables() {
   core.exportVariable("R_LIBS_USER", path.join(tempDirectory, "Library"));
   core.exportVariable("TZ", "UTC");
-  if(!process.env["NOT_CRAN"])
-    core.exportVariable("NOT_CRAN", "true");
+  core.exportVariable("_R_CHECK_SYSTEM_CLOCK_", "FALSE");
+  if (!process.env["NOT_CRAN"]) core.exportVariable("NOT_CRAN", "true");
 }
 
 async function determineVersion(version: string): Promise<string> {
@@ -504,9 +564,11 @@ interface IRRef {
 async function getReleaseVersion(platform: string): Promise<string> {
   let rest: restm.RestClient = new restm.RestClient("setup-r");
   let tags: IRRef[] =
-    (await rest.get<IRRef[]>(
-      util.format("https://rversions.r-pkg.org/r-release-%s", platform)
-    )).result || [];
+    (
+      await rest.get<IRRef[]>(
+        util.format("https://rversions.r-pkg.org/r-release-%s", platform)
+      )
+    ).result || [];
 
   return tags[0].version;
 }

@@ -24,12 +24,13 @@
   "license": "MIT",
   "homepage": "https://github.com/r-lib/actions/setup-r",
   "dependencies": {
-    "@actions/core": "^1.0.0",
+    "@actions/core": "^1.2.6",
     "@actions/exec": "^1.0.0",
-    "@actions/tool-cache": "^1.0.0",
     "@actions/io": "^1.0.0",
+    "@actions/tool-cache": "^1.0.0",
     "linux-os-info": "^2.0.0",
-    "semver": "^6.1.1"
+    "semver": "^6.1.1",
+    "typed-rest-client": "^1.7.3"
   },
   "devDependencies": {
     "@types/jest": "^24.0.13",

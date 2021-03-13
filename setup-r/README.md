@@ -10,10 +10,12 @@ This action sets up an R environment for use in actions by:
   - `NOT_CRAN=true`
   - `TZ=UTC`
   - `R_LIBS_USER=tempdir/Library`
+  - `_R_CHECK_SYSTEM_CLOCK_=FALSE`
 - Removing the `-fopenmp` flags from Makeconf on macOS, which are not supported
   with Apple's default Command Line Tools compilers.
 - Appending 'on GitHub Actions' to the default HTTP user agent. This is useful to
   distinguish GitHub Actions package requests from other sources.
+- Supplying the installed R version as a `installed-r-version` output.
 
 # Usage
 
@@ -41,7 +43,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: Setup R
-        uses: r-lib/actions/setup-R@v1
+        uses: r-lib/actions/setup-r@v1
         with:
           r-version: ${{ matrix.R }}
       - run: Rscript -e 'print("hello")'
