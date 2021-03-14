@@ -1,6 +1,12 @@
 on:
   push:
     branches:
+    - master
+    - main
+    tags:
+    - "v*"
+  pull_request:
+    branches:
       - main
       - master
 
@@ -34,6 +40,14 @@ jobs:
           key: ubuntu-18.04-${{ steps.install-r.outputs.installed-r-version }}-1-${{ hashFiles('.github/r-depends.rds') }}
           restore-keys: ubuntu-18.04-${{ steps.install-r.outputs.installed-r-version }}-1-
 
+      - name: Configure Git identity
+        if: github.event_name == 'push'
+        run: |
+          env | sort
+          git config --local user.name "$GITHUB_ACTOR"
+          git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
+        shell: bash
+
       - name: Install system dependencies
         if: runner.os == 'Linux'
         run: |
@@ -51,7 +65,13 @@ jobs:
         run: R CMD INSTALL .
 
       - name: Build and deploy pkgdown site
+        if: github.event_name == 'push'
         run: |
-          git config --local user.name "$GITHUB_ACTOR"
-          git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
-          Rscript -e 'pkgdown::deploy_to_branch(new_process = FALSE)'
+          pkgdown::deploy_to_branch(new_process = FALSE)
+        shell: Rscript {0}
+
+      - name: Build pkgdown site
+        if: github.event_name != 'push'
+        run: |
+          pkgdown::build_site()
+        shell: Rscript {0}
