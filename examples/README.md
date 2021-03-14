@@ -588,6 +588,12 @@ Pages](https://pages.github.com/).
 on:
   push:
     branches:
+    - master
+    - main
+    tags:
+    - "v*"
+  pull_request:
+    branches:
       - main
       - master
 
@@ -619,6 +625,14 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-${{ hashFiles('.github/depends.Rds') }}
           restore-keys: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-
 
+      - name: Configure Git identity
+        if: github.event_name == 'push'
+        run: |
+          env | sort
+          git config --local user.name "$GITHUB_ACTOR"
+          git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
+        shell: bash
+
       - name: Install dependencies
         run: |
           remotes::install_deps(dependencies = TRUE)
@@ -629,10 +643,16 @@ jobs:
         run: R CMD INSTALL .
 
       - name: Deploy package
+        if: github.event_name == 'push'
         run: |
-          git config --local user.email "actions@github.com"
-          git config --local user.name "GitHub Actions"
-          Rscript -e 'pkgdown::deploy_to_branch(new_process = FALSE)'
+          pkgdown::deploy_to_branch(new_process = FALSE)
+        shell: Rscript {0}
+
+      - name: Build site
+        if: github.event_name != 'push'
+        run: |
+          pkgdown::build_site()
+        shell: Rscript {0}
 ```
 
 ## Build bookdown site
