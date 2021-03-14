@@ -626,7 +626,9 @@ jobs:
         shell: Rscript {0}
 
       - name: Install package
-        run: R CMD INSTALL .
+        run: |
+          R CMD INSTALL . --with-keep.source --with-keep.parse.data
+        shell: bash
 
       - name: Deploy package
         run: |
