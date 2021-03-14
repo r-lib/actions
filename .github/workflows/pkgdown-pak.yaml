@@ -50,6 +50,14 @@ jobs:
       - name: Install package
         run: R CMD INSTALL .
 
+      - name: Session info
+        run: |
+          options(width = 100)
+          if (!requireNamespace("sessioninfo", quietly = TRUE)) install.packages("sessioninfo")
+          pkgs <- installed.packages()[, "Package"]
+          sessioninfo::session_info(pkgs, include_base = TRUE)
+        shell: Rscript {0}
+
       - name: Build and deploy pkgdown site
         run: |
           git config --local user.name "$GITHUB_ACTOR"
