@@ -20,11 +20,11 @@ Package workflows:
 - [`test-coverage`](#test-coverage-workflow) - Run `covr::codecov()` on an R package.
 - [`lint`](#lint-workflow) - Run `lintr::lint_package()` on an R package.
 - [`pr-commands`](#commands-workflow) - Adds `/document` and `/style` commands for pull requests.
+- [`pkgdown`](#build-pkgdown-site) - Build a [pkgdown] site for an R package and deploy it to [GitHub Pages].
 
 RMarkdown workflows:
 
 - [`render-rmarkdown`](#render-rmarkdown) - Render one or more Rmarkdown files when they change and commit the result.
-- [`pkgdown`](#build-pkgdown-site) - Build a [pkgdown] site for an R package and deploy it to [GitHub Pages].
 - [`bookdown`](#build-bookdown-site) - Build a [bookdown] site and deploy it to [netlify].
 - [`blogdown`](#build-blogdown-site) - Build a [blogdown] site and deploy it to [netlify].
 
