@@ -16,14 +16,14 @@ Package workflows:
     package.
   - [`pr-commands`](#commands-workflow) - Adds `/document` and `/style`
     commands for pull requests.
+  - [`pkgdown`](#build-pkgdown-site) - Build a
+    [pkgdown](https://pkgdown.r-lib.org/) site for an R package and
+    deploy it to [GitHub Pages](https://pages.github.com/).
 
 RMarkdown workflows:
 
   - [`render-rmarkdown`](#render-rmarkdown) - Render one or more
     Rmarkdown files when they change and commit the result.
-  - [`pkgdown`](#build-pkgdown-site) - Build a
-    [pkgdown](https://pkgdown.r-lib.org/) site for an R package and
-    deploy it to [GitHub Pages](https://pages.github.com/).
   - [`bookdown`](#build-bookdown-site) - Build a
     [bookdown](https://bookdown.org) site and deploy it to
     [netlify](https://www.netlify.com/).
@@ -543,34 +543,45 @@ on:
     paths:
       - '**.Rmd'
 
-name: Render Rmarkdown files
-
 jobs:
-  render:
-    name: Render Rmarkdown files
+  build:
     runs-on: macOS-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout repo
+        uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - uses: r-lib/actions/setup-r@v1
-      - uses: r-lib/actions/setup-pandoc@v1
-      - name: Install rmarkdown, remotes, and the local package
+
+      - name: Setup R
+        uses: r-lib/actions/setup-r@v1
+
+      - name: Install pandoc
         run: |
-          install.packages("remotes")
-          remotes::install_local(".")
-          remotes::install_cran("rmarkdown")
-        shell: Rscript {0}
+          brew install pandoc
+
+      - name: Cache Renv packages
+        uses: actions/cache@v2
+        with:
+          path: $HOME/.local/share/renv
+          key: r-${{ hashFiles('renv.lock') }}
+          restore-keys: r-
+
+      - name: Install packages
+        run: |
+          R -e 'install.packages("renv")'
+          R -e 'renv::restore()'
+
       - name: Render Rmarkdown files
         run: |
           RMD_PATH=($(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '[.]Rmd$'))
           Rscript -e 'for (f in commandArgs(TRUE)) if (file.exists(f)) rmarkdown::render(f)' ${RMD_PATH[*]} 
+
       - name: Commit results
         run: |
-          git config --local user.email "actions@github.com"
-          git config --local user.name "GitHub Actions"
+          git config --local user.name "$GITHUB_ACTOR"
+          git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
           git commit ${RMD_PATH[*]/.Rmd/.md} -m 'Re-build Rmarkdown files' || echo "No changes to commit"
           git push origin || echo "No changes to commit"
 ```
