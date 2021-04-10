@@ -230,12 +230,12 @@ async function acquireRUbuntu(version: string): Promise<string> {
   //
   try {
     await exec.exec("sudo ln", [
-      "-s",
+      "-sf",
       path.join("/opt", "R", version, "bin", "R"),
       "/usr/local/bin/R"
     ]);
     await exec.exec("sudo ln", [
-      "-s",
+      "-sf",
       path.join("/opt", "R", version, "bin", "Rscript"),
       "/usr/local/bin/Rscript"
     ]);
