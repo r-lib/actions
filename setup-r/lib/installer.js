@@ -67,7 +67,7 @@ function getR(version) {
         if (selected) {
             version = selected;
         }
-        let rtoolsVersion = core.getInput("rtools-version") || (version.charAt(0) == "3" ? "35" : "40");
+        let rtoolsVersion = core.getInput("rtools-version") || (version.charAt(0) == "3" ? "35" : "40v2");
         let toolPath = tc.find("R", version);
         if (toolPath) {
             core.debug(`Tool found in cache ${toolPath}`);
