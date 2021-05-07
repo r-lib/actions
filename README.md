@@ -49,6 +49,13 @@ If your build fails and you are unsure of why here are some useful strategies fo
 1. *Does GitHub Actions support `[ci skip]` or similar syntax to automatically skip a build?*\
   Not by default, however you can enable it in any of your workflows by adding the following [conditional](https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idif), e.g. \
   `if: !contains(github.event.head_commit.message, '[ci skip]')`
+1. *Why are my Windows builds failing with an error about `configure.ac` having CRLF line endings?*\
+  On Windows, when your repo is checked out using git the line endings are automatically changed to CRLF. R's check process specifically checks if the `configure.ac` file has these line endings, and will error if it does. To avoid this, add the following step before the `actions/checkout` step to configure git to not alter these line endings:\
+   ```
+   - name: Windows CRLF fix
+     run: git config --global core.autocrlf false
+   ```
+  
 
 ## Additional resources
 
