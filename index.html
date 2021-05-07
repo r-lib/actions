@@ -111,6 +111,11 @@
  Not by default, however you can enable it in any of your workflows by adding the following <a href="https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idif">conditional</a>, e.g. 
  <code>if: !contains(github.event.head_commit.message, '[ci skip]')</code>
 </li>
+<li>
+<em>Why are my Windows builds failing with an error about <code>configure.ac</code> having CRLF line endings?</em>
+ On Windows, when your repo is checked out using git the line endings are automatically changed to CRLF. R’s check process specifically checks if the <code>configure.ac</code> file has these line endings, and will error if it does. To avoid this, add a <code>.gitattributes</code> file to the top level of your package with the following to configure git to always use LF line endings for this file: 
+ <code>configure.ac text eol=lf</code>
+</li>
 </ol>
 </div>
 <div id="additional-resources" class="section level2">
