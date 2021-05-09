@@ -31,6 +31,9 @@ inputs:
     description: 'If "true" put the 64 bit mingw directory from Rtools on the
     PATH for Windows builds'
     default: true
+  update-rtools:
+    description: 'Update rtools40 compilers and libraries to the latest builds'
+    default: false
 outputs:
   installed-r-version:
     description: 'The full R version installed'

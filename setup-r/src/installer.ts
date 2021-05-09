@@ -375,6 +375,14 @@ async function acquireRtools(version: string) {
     if (core.getInput("windows-path-include-mingw") === "true") {
       core.addPath(`C:\\rtools40\\mingw64\\bin`);
     }
+    if (core.getInput("update-rtools") === "true") {
+      try {
+        await exec.exec("c:\\rtools40\\usr\\bin\\bash.exe", ["--login", "-c", "pacman -Syu --noconfirm"]);
+      } catch (error) {
+        core.debug(error);
+        throw `Failed to update rtools40 libraries: ${error}`;
+      }
+    }
   } else {
     core.addPath(`C:\\Rtools\\bin`);
     if (core.getInput("windows-path-include-mingw") === "true") {

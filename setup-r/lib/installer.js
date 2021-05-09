@@ -251,12 +251,12 @@ function acquireRUbuntu(version) {
         //
         try {
             yield exec.exec("sudo ln", [
-                "-s",
+                "-sf",
                 path.join("/opt", "R", version, "bin", "R"),
                 "/usr/local/bin/R"
             ]);
             yield exec.exec("sudo ln", [
-                "-s",
+                "-sf",
                 path.join("/opt", "R", version, "bin", "Rscript"),
                 "/usr/local/bin/Rscript"
             ]);
@@ -379,6 +379,15 @@ function acquireRtools(version) {
             core.addPath(`C:\\rtools40\\usr\\bin`);
             if (core.getInput("windows-path-include-mingw") === "true") {
                 core.addPath(`C:\\rtools40\\mingw64\\bin`);
+            }
+            if (core.getInput("update-rtools") === "true") {
+                try {
+                    yield exec.exec("c:\\rtools40\\usr\\bin\\bash.exe", ["--login", "-c", "pacman -Syu --noconfirm"]);
+                }
+                catch (error) {
+                    core.debug(error);
+                    throw `Failed to update rtools40 libraries: ${error}`;
+                }
             }
         }
         else {
