@@ -32,6 +32,7 @@ Other workflows:
 
 - [`docker`](#docker-based-workflow) - For custom workflows based on docker containers.
 - [Bioconductor](#bioconductor-friendly-workflow) - A CI workflow for packages to be released on Bioconductor.
+- [`lint-project`](#lint-project-workflow) - Run `lintr::lint_dir()` on an R project.
 
 Options and advice: 
 
@@ -180,7 +181,7 @@ print_yaml("bookdown.yaml")
 
 This example builds a [blogdown] site for a repository and then deploys the book via [netlify].
 It uses [renv] to ensure the package versions remain consistent across builds.
-You will need to run `renv::snapshot()` locally and commit the `renv.lock` file before using this workflow, see [Using renv with Continous Integeration](https://rstudio.github.io/renv/articles/ci.html) for additional information.
+You will need to run `renv::snapshot()` locally and commit the `renv.lock` file before using this workflow, see [Using renv with Continous Integration](https://rstudio.github.io/renv/articles/ci.html) for additional information.
 **Note** you need to add a `NETLIFY_AUTH_TOKEN` a `NETLIFY_SITE_ID` secret to your repository for the netlify deploy (see [Managing secrets](#managing-secrets) section for details).
 
 ```{r echo = FALSE, results = "asis"}
@@ -225,6 +226,17 @@ usethis::use_github_action(
     "https://bit.ly/biocthis_gha",
     "check-bioc.yml"
 )
+```
+
+
+## Lint project workflow
+
+`usethis::use_github_action("lint-project")`
+
+This example uses the [lintr](https://github.com/jimhester/lintr) package to lint your project and return the results as annotations.
+
+```{r echo = FALSE, results = "asis"}
+print_yaml("lint-project.yaml")
 ```
 
 
