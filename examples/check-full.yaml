@@ -59,7 +59,6 @@ jobs:
         shell: Rscript {0}
 
       - name: Restore R package cache
-        if: runner.os != 'Windows'
         uses: actions/cache@v2
         with:
           path: ${{ env.R_LIBS_USER }}
@@ -106,3 +105,8 @@ jobs:
         with:
           name: ${{ runner.os }}-r${{ matrix.config.r }}-results
           path: check
+
+      - name: Don't use tar from old Rtools to store the cache
+        if: ${{ runner.os == 'Windows' && startsWith(steps.install-r.outputs.installed-r-version, '3.6' ) }}
+        shell: bash
+        run: echo "C:/Program Files/Git/usr/bin" >> $GITHUB_PATH
