@@ -37,6 +37,8 @@ Other workflows:
     docker containers.
   - [Bioconductor](#bioconductor-friendly-workflow) - A CI workflow for
     packages to be released on Bioconductor.
+  - [`lint-project`](#lint-project-workflow) - Run `lintr::lint_dir()`
+    on an R project.
 
 Options and advice:
 
@@ -733,7 +735,7 @@ site for a repository and then deploys the book via
 remain consistent across builds. You will need to run `renv::snapshot()`
 locally and commit the `renv.lock` file before using this workflow, see
 [Using renv with Continous
-Integeration](https://rstudio.github.io/renv/articles/ci.html) for
+Integration](https://rstudio.github.io/renv/articles/ci.html) for
 additional information. **Note** you need to add a `NETLIFY_AUTH_TOKEN`
 a `NETLIFY_SITE_ID` secret to your repository for the netlify deploy
 (see [Managing secrets](#managing-secrets) section for details).
@@ -848,6 +850,45 @@ usethis::use_github_action(
     "https://bit.ly/biocthis_gha",
     "check-bioc.yml"
 )
+```
+
+## Lint project workflow
+
+`usethis::use_github_action("lint-project")`
+
+This example uses the [lintr](https://github.com/jimhester/lintr)
+package to lint your project and return the results as annotations.
+
+``` yaml
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+name: lint-project
+
+jobs:
+  lint-project:
+    runs-on: macOS-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: r-lib/actions/setup-r@v1
+
+      - name: Install lintr
+        run: install.packages("lintr")
+        shell: Rscript {0}
+
+      - name: Lint root directory
+        run: lintr::lint_dir()
+        shell: Rscript {0}
 ```
 
 ## Forcing binaries
