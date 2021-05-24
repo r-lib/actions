@@ -453,8 +453,19 @@ function getDownloadUrlMacOS(version: string): string {
       filename
     );
   }
+  if (semver.lt(version, "4.0.0")) {
+    // older versions are in el-capitan/base
+    return util.format(
+      "https://cloud.r-project.org/bin/macosx/el-capitan/base/%s",
+      filename
+    );
+  }
 
-  return util.format("https://cloud.r-project.org/bin/macosx/%s", filename);
+  // 4.0.0+ are in base/
+  return util.format(
+    "https://cloud.r-project.org/bin/macosx/base/%s",
+    filename
+  );
 }
 
 function getFileNameUbuntu(version: string): string {
