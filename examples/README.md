@@ -369,6 +369,8 @@ jobs:
       - uses: actions/checkout@v2
 
       - uses: r-lib/actions/setup-r@v1
+        with:
+          install-r: false
 
       - uses: r-lib/actions/setup-pandoc@v1
 
@@ -617,6 +619,8 @@ jobs:
       - uses: actions/checkout@v2
 
       - uses: r-lib/actions/setup-r@v1
+        with:
+          install-r: false
 
       - uses: r-lib/actions/setup-pandoc@v1
 

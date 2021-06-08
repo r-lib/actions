@@ -18,6 +18,8 @@ jobs:
 
       - uses: r-lib/actions/setup-r@v1
         id: install-r
+        with:
+          install-r: false
 
       - uses: r-lib/actions/setup-pandoc@v1
 
