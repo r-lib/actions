@@ -1,8 +1,6 @@
 on:
   push:
-    branches:
-      - main
-      - master
+    branches: [ $default-branch ]
 
 name: bookdown
 
