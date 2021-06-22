@@ -69,13 +69,9 @@ probably what you want to use.
 # https://community.rstudio.com/new-topic?category=Package%20development&tags=github-actions
 on:
   push:
-    branches:
-      - main
-      - master
+    branches:  [ $default-branch ]
   pull_request:
-    branches:
-      - main
-      - master
+    branches:  [ $default-branch ]
 
 name: R-CMD-check
 
@@ -121,13 +117,9 @@ Bioconductor this is likely the workflow you want to use.
 # https://community.rstudio.com/new-topic?category=Package%20development&tags=github-actions
 on:
   push:
-    branches:
-      - main
-      - master
+    branches:  [ $default-branch ]
   pull_request:
-    branches:
-      - main
-      - master
+    branches:  [ $default-branch ]
 
 name: R-CMD-check
 
@@ -233,13 +225,9 @@ CI workflow.
 # https://community.rstudio.com/new-topic?category=Package%20development&tags=github-actions
 on:
   push:
-    branches:
-      - main
-      - master
+    branches:  [ $default-branch ]
   pull_request:
-    branches:
-      - main
-      - master
+    branches:  [ $default-branch ]
 
 name: R-CMD-check
 
@@ -350,13 +338,9 @@ the test coverage of your package and upload the result to
 ``` yaml
 on:
   push:
-    branches:
-      - main
-      - master
+    branches:  [ $default-branch ]
   pull_request:
-    branches:
-      - main
-      - master
+    branches:  [ $default-branch ]
 
 name: test-coverage
 
@@ -409,13 +393,9 @@ annotations.
 ``` yaml
 on:
   push:
-    branches:
-      - main
-      - master
+    branches:  [ $default-branch ]
   pull_request:
-    branches:
-      - main
-      - master
+    branches:  [ $default-branch ]
 
 name: lint
 
@@ -602,9 +582,7 @@ Pages](https://pages.github.com/).
 ``` yaml
 on:
   push:
-    branches:
-      - main
-      - master
+    branches:  [ $default-branch ]
 
 name: pkgdown
 
@@ -670,9 +648,7 @@ and a `NETLIFY_SITE_ID` secret to your repository for the netlify deploy
 ``` yaml
 on:
   push:
-    branches:
-      - main
-      - master
+    branches: [ $default-branch ]
 
 name: bookdown
 
@@ -746,9 +722,7 @@ a `NETLIFY_SITE_ID` secret to your repository for the netlify deploy
 ``` yaml
 on:
   push:
-    branches:
-      - main
-      - master
+    branches: [ $default-branch ]
 
 name: blogdown
 
@@ -865,13 +839,9 @@ package to lint your project and return the results as annotations.
 ``` yaml
 on:
   push:
-    branches:
-      - main
-      - master
+    branches:  [ $default-branch ]
   pull_request:
-    branches:
-      - main
-      - master
+    branches:  [ $default-branch ]
 
 name: lint-project
 
