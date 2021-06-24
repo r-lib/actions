@@ -605,6 +605,8 @@ on:
     branches:
       - main
       - master
+    tags:
+      -'*'
 
 name: pkgdown
 
