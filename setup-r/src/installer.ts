@@ -15,7 +15,7 @@ const IS_WINDOWS = process.platform === "win32";
 const IS_MAC = process.platform === "darwin";
 
 if (!tempDirectory) {
-  let baseLocation;
+  let baseLocation: string;
   if (IS_WINDOWS) {
     // On windows use the USERPROFILE env variable
     baseLocation = process.env["USERPROFILE"] || "C:\\";
@@ -377,7 +377,11 @@ async function acquireRtools(version: string) {
     }
     if (core.getInput("update-rtools") === "true") {
       try {
-        await exec.exec("c:\\rtools40\\usr\\bin\\bash.exe", ["--login", "-c", "pacman -Syu --noconfirm"]);
+        await exec.exec("c:\\rtools40\\usr\\bin\\bash.exe", [
+          "--login",
+          "-c",
+          "pacman -Syu --noconfirm"
+        ]);
       } catch (error) {
         core.debug(error);
         throw `Failed to update rtools40 libraries: ${error}`;
@@ -402,7 +406,7 @@ async function acquireQpdfWindows() {
 }
 
 async function setupRLibrary() {
-  let profilePath;
+  let profilePath: fs.PathLike | fs.promises.FileHandle;
   if (IS_WINDOWS) {
     profilePath = path.join(
       process.env["USERPROFILE"] || "C:\\",
@@ -531,18 +535,61 @@ function setREnvironmentVariables() {
   if (!process.env["NOT_CRAN"]) core.exportVariable("NOT_CRAN", "true");
 }
 
+interface IRRef {
+  version: string;
+}
+
+async function getReleaseVersion(platform: string): Promise<string> {
+  let rest: restm.RestClient = new restm.RestClient("setup-r");
+  let tags: IRRef = (
+    await rest.get<IRRef>(
+      util.format("https://api.r-hub.io/rversions/r-release-%s", platform)
+    )
+  ).result || { version: "" };
+
+  return tags.version;
+}
+
+async function getOldrelVersion(version: string): Promise<string> {
+  let rest: restm.RestClient = new restm.RestClient("setup-r");
+  let tags: IRRef = (
+    await rest.get<IRRef>(
+      util.format("https://api.r-hub.io/rversions/r-oldrel/%s", version)
+    )
+  ).result || { version: "" };
+
+  return tags.version;
+}
+
+async function getAvailableVersions(): Promise<string[]> {
+  let rest: restm.RestClient = new restm.RestClient("setup-r");
+  let tags: IRRef[] =
+    (await rest.get<IRRef[]>("https://api.r-hub.io/rversions/r-versions"))
+      .result || [];
+
+  return tags.map(tag => tag.version);
+}
+
 async function determineVersion(version: string): Promise<string> {
   // There is no linux endpoint, so we just use the tarball one for linux.
 
   version = version.toLowerCase();
   if (version == "latest" || version == "release") {
-    let platform = IS_MAC ? "macos" : IS_WINDOWS ? "win" : "tarball";
-
-    return await getReleaseVersion(platform);
+    if (IS_WINDOWS) {
+      return getReleaseVersion("win");
+    }
+    if (IS_MAC) {
+      return getReleaseVersion("macos");
+    }
+    return getReleaseVersion("tarball");
   }
 
-  if (version == "oldrel") {
-    return await getOldrelVersion();
+  if (version.startsWith("oldrel")) {
+    const [, oldRelVersion] = version.split("/");
+    if (oldRelVersion == null) {
+      return getOldrelVersion("1");
+    }
+    return getOldrelVersion(oldRelVersion);
   }
 
   if (!version.endsWith(".x")) {
@@ -574,40 +621,6 @@ function normalizeVersion(version: string): string {
   }
 
   return version;
-}
-
-interface IRRef {
-  version: string;
-}
-
-async function getReleaseVersion(platform: string): Promise<string> {
-  let rest: restm.RestClient = new restm.RestClient("setup-r");
-  let tags: IRRef[] =
-    (
-      await rest.get<IRRef[]>(
-        util.format("https://rversions.r-pkg.org/r-release-%s", platform)
-      )
-    ).result || [];
-
-  return tags[0].version;
-}
-
-async function getOldrelVersion(): Promise<string> {
-  let rest: restm.RestClient = new restm.RestClient("setup-r");
-  let tags: IRRef[] =
-    (await rest.get<IRRef[]>("https://rversions.r-pkg.org/r-oldrel")).result ||
-    [];
-
-  return tags[0].version;
-}
-
-async function getAvailableVersions(): Promise<string[]> {
-  let rest: restm.RestClient = new restm.RestClient("setup-r");
-  let tags: IRRef[] =
-    (await rest.get<IRRef[]>("https://rversions.r-pkg.org/r-versions"))
-      .result || [];
-
-  return tags.map(tag => tag.version);
 }
 
 async function getPossibleVersions(version: string): Promise<string[]> {

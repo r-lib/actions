@@ -382,7 +382,11 @@ function acquireRtools(version) {
             }
             if (core.getInput("update-rtools") === "true") {
                 try {
-                    yield exec.exec("c:\\rtools40\\usr\\bin\\bash.exe", ["--login", "-c", "pacman -Syu --noconfirm"]);
+                    yield exec.exec("c:\\rtools40\\usr\\bin\\bash.exe", [
+                        "--login",
+                        "-c",
+                        "pacman -Syu --noconfirm"
+                    ]);
                 }
                 catch (error) {
                     core.debug(error);
@@ -500,16 +504,47 @@ function setREnvironmentVariables() {
     if (!process.env["NOT_CRAN"])
         core.exportVariable("NOT_CRAN", "true");
 }
+function getReleaseVersion(platform) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let rest = new restm.RestClient("setup-r");
+        let tags = (yield rest.get(util.format("https://api.r-hub.io/rversions/r-release-%s", platform))).result || { version: "" };
+        return tags.version;
+    });
+}
+function getOldrelVersion(version) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let rest = new restm.RestClient("setup-r");
+        let tags = (yield rest.get(util.format("https://api.r-hub.io/rversions/r-oldrel/%s", version))).result || { version: "" };
+        return tags.version;
+    });
+}
+function getAvailableVersions() {
+    return __awaiter(this, void 0, void 0, function* () {
+        let rest = new restm.RestClient("setup-r");
+        let tags = (yield rest.get("https://api.r-hub.io/rversions/r-versions"))
+            .result || [];
+        return tags.map(tag => tag.version);
+    });
+}
 function determineVersion(version) {
     return __awaiter(this, void 0, void 0, function* () {
         // There is no linux endpoint, so we just use the tarball one for linux.
         version = version.toLowerCase();
         if (version == "latest" || version == "release") {
-            let platform = IS_MAC ? "macos" : IS_WINDOWS ? "win" : "tarball";
-            return yield getReleaseVersion(platform);
+            if (IS_WINDOWS) {
+                return getReleaseVersion("win");
+            }
+            if (IS_MAC) {
+                return getReleaseVersion("macos");
+            }
+            return getReleaseVersion("tarball");
         }
-        if (version == "oldrel") {
-            return yield getOldrelVersion();
+        if (version.startsWith("oldrel")) {
+            const [, oldRelVersion] = version.split("/");
+            if (oldRelVersion == null) {
+                return getOldrelVersion("1");
+            }
+            return getOldrelVersion(oldRelVersion);
         }
         if (!version.endsWith(".x")) {
             const versionPart = version.split(".");
@@ -537,29 +572,6 @@ function normalizeVersion(version) {
         return version.concat(".0");
     }
     return version;
-}
-function getReleaseVersion(platform) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let rest = new restm.RestClient("setup-r");
-        let tags = (yield rest.get(util.format("https://rversions.r-pkg.org/r-release-%s", platform))).result || [];
-        return tags[0].version;
-    });
-}
-function getOldrelVersion() {
-    return __awaiter(this, void 0, void 0, function* () {
-        let rest = new restm.RestClient("setup-r");
-        let tags = (yield rest.get("https://rversions.r-pkg.org/r-oldrel")).result ||
-            [];
-        return tags[0].version;
-    });
-}
-function getAvailableVersions() {
-    return __awaiter(this, void 0, void 0, function* () {
-        let rest = new restm.RestClient("setup-r");
-        let tags = (yield rest.get("https://rversions.r-pkg.org/r-versions"))
-            .result || [];
-        return tags.map(tag => tag.version);
-    });
 }
 function getPossibleVersions(version) {
     return __awaiter(this, void 0, void 0, function* () {
