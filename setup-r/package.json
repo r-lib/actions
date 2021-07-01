@@ -29,7 +29,6 @@
     "@actions/io": "^1.0.0",
     "@actions/tool-cache": "^1.0.0",
     "linux-os-info": "^2.0.0",
-    "rversions": "^1.3.0",
     "semver": "^6.1.1",
     "typed-rest-client": "^1.7.3"
   },
@@ -40,7 +39,7 @@
     "jest": "^24.9.0",
     "jest-circus": "^24.7.1",
     "prettier": "^1.18.2",
-    "ts-jest": "^24.0.2",
+    "ts-jest": "^27.0.3",
     "typescript": "^3.5.1"
   }
 }
