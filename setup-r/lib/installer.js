@@ -428,7 +428,7 @@ function setupRLibrary() {
         let user_agent;
         if (core.getInput("http-user-agent") === "release") {
             let os = IS_WINDOWS ? "win" : IS_MAC ? "macos" : "tarball";
-            let version = getReleaseVersion(os);
+            let version = yield getReleaseVersion(os);
             user_agent = `sprintf("R/${version} R (${version} %s) on GitHub Actions", paste(R.version$platform, R.version$arch, R.version$os))`;
         }
         else {
