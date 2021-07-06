@@ -581,7 +581,7 @@ jobs:
       - name: Render Rmarkdown files
         run: |
           RMD_PATH=($(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '[.]Rmd$'))
-          Rscript -e 'for (f in commandArgs(TRUE)) if (file.exists(f)) rmarkdown::render(f)' ${RMD_PATH[*]}
+          Rscript -e 'for (f in commandArgs(TRUE)) if (file.exists(f)) rmarkdown::render(f)' ${RMD_PATH[*]} 
 
       - name: Commit results
         run: |
@@ -957,7 +957,7 @@ which we follow here.
     `https://github.com/{user}/{repo}/settings/secrets`.
 
 3.  At the **tokens** page:
-
+    
       - Click “New access token”.
       - Provide a description for your benefit, so you will know which
         token this is, perhaps something like `actions-{repo}`.
@@ -965,7 +965,7 @@ which we follow here.
       - Copy the token to your clipboard.
 
 4.  On your repository’s **secrets** page:
-
+    
       - Click “Add a new secret”.
       - In the “Name” field, type `NETLIFY_AUTH_TOKEN` (or the name of
         the secret that the action expects).
