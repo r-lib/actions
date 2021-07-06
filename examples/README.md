@@ -142,9 +142,9 @@ jobs:
       matrix:
         config:
           - {os: windows-latest, r: 'release'}
-          - {os: macOS-latest, r: 'release'}
-          - {os: ubuntu-20.04, r: 'release', rspm: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest"}
-          - {os: ubuntu-20.04,   r: 'devel', rspm: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest", http-user-agent: "R/4.1.0 (ubuntu-20.04) R (4.1.0 x86_64-pc-linux-gnu x86_64 linux-gnu) on GitHub Actions" }
+          - {os: macOS-latest,   r: 'release'}
+          - {os: ubuntu-20.04,   r: 'release', rspm: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest"}
+          - {os: ubuntu-20.04,   r: 'devel',   rspm: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest", http-user-agent: "release"}
 
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
@@ -256,7 +256,7 @@ jobs:
           - {os: macOS-latest,   r: 'release'}
           - {os: windows-latest, r: 'release'}
           - {os: windows-latest, r: 'oldrel/1', rspm: "https://packagemanager.rstudio.com/cran/latest"}
-          - {os: ubuntu-18.04,   r: 'devel',    rspm: "https://packagemanager.rstudio.com/cran/__linux__/bionic/latest", http-user-agent: "R/4.1.0 (ubuntu-18.04) R (4.1.0 x86_64-pc-linux-gnu x86_64 linux-gnu) on GitHub Actions" }
+          - {os: ubuntu-18.04,   r: 'devel',    rspm: "https://packagemanager.rstudio.com/cran/__linux__/bionic/latest", http-user-agent: "release"}
           - {os: ubuntu-18.04,   r: 'release',  rspm: "https://packagemanager.rstudio.com/cran/__linux__/bionic/latest"}
           - {os: ubuntu-18.04,   r: 'oldrel/1', rspm: "https://packagemanager.rstudio.com/cran/__linux__/bionic/latest"}
           - {os: ubuntu-18.04,   r: 'oldrel/2', rspm: "https://packagemanager.rstudio.com/cran/__linux__/bionic/latest"}
@@ -581,7 +581,7 @@ jobs:
       - name: Render Rmarkdown files
         run: |
           RMD_PATH=($(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '[.]Rmd$'))
-          Rscript -e 'for (f in commandArgs(TRUE)) if (file.exists(f)) rmarkdown::render(f)' ${RMD_PATH[*]} 
+          Rscript -e 'for (f in commandArgs(TRUE)) if (file.exists(f)) rmarkdown::render(f)' ${RMD_PATH[*]}
 
       - name: Commit results
         run: |
@@ -957,7 +957,7 @@ which we follow here.
     `https://github.com/{user}/{repo}/settings/secrets`.
 
 3.  At the **tokens** page:
-    
+
       - Click “New access token”.
       - Provide a description for your benefit, so you will know which
         token this is, perhaps something like `actions-{repo}`.
@@ -965,7 +965,7 @@ which we follow here.
       - Copy the token to your clipboard.
 
 4.  On your repository’s **secrets** page:
-    
+
       - Click “Add a new secret”.
       - In the “Name” field, type `NETLIFY_AUTH_TOKEN` (or the name of
         the secret that the action expects).
