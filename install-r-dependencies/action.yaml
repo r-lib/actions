@@ -33,7 +33,7 @@ runs:
 
       - name: Install system dependencies
         run: |
-          if (Sys.info()[["sysname"]] == "linux") {
+          if (Sys.info()[["sysname"]] == "Linux") {
             pak::local_system_requirements(execute = TRUE)
             pak::pkg_system_requirements("rcmdcheck", execute = TRUE)
           }
