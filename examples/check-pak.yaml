@@ -53,6 +53,9 @@ jobs:
 
       - uses: r-lib/actions/install-r-dependencies@master
 
+      - run: pak::pkg_install("rcmdcheck")
+        shell: Rscript {0}
+
       - name: Check
         env:
           _R_CHECK_CRAN_INCOMING_: false
