@@ -1,0 +1,61 @@
+name: 'install-r-dependencies'
+description: 'Action to install R dependencies'
+author: 'Jim Hester'
+inputs:
+  cache-version:
+    description: 'The version of the cache, change this from the default (1) to start over with a fresh cache'
+    required: true
+    default: 1
+runs:
+  using: "composite"
+  steps:
+      - name: Install pak and query dependencies
+        run: |
+          install.packages("pak", repos = "https://r-lib.github.io/p/pak/dev/")
+          saveRDS(pak::pkg_deps("local::.", dependencies = TRUE), ".github/r-depends.rds")
+        shell: Rscript {0}
+
+      - name: Get R and OS version
+        id: get-version
+        run: |
+          cat("##[set-output name=os-version;]", sessionInfo()$running, "\n", sep = "")
+          cat("##[set-output name=r-version;]", R.Version()$version.string, sep = "")
+        shell: Rscript {0}
+
+      - name: Restore R package cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ${{ env.R_LIBS_USER }}/*
+            !${{ env.R_LIBS_USER }}/pak
+          key: ${{ steps.get-version.outputs.os-version }}-${{ steps.get-version.outputs.r-version }}-${{inputs.cache-version }}-${{ hashFiles('.github/r-depends.rds') }}
+          restore-keys: ${{ steps.get-version.outputs.os-version }}-${{ steps.get-version.outputs.r-version }}-${{inputs.cache-version }}-
+
+      - name: Install system dependencies
+        run: |
+          if (Sys.info()[["sysname"]] == "linux") {
+            pak::local_system_requirements(execute = TRUE)
+            pak::pkg_system_requirements("rcmdcheck", execute = TRUE)
+          }
+        shell: Rscript {0}
+
+      - name: Install dependencies
+        run: |
+          options(pak.no_extra_messages = TRUE)
+          pak::local_install_dev_deps(upgrade = TRUE)
+          pak::pkg_install("rcmdcheck")
+        shell: Rscript {0}
+
+      - name: Session info
+        run: |
+          options(width = 100)
+          pkgs <- installed.packages()[, "Package"]
+          sessioninfo::session_info(pkgs, include_base = TRUE)
+        shell: Rscript {0}
+
+      - name: Don't use tar 1.30 from Rtools35 to store the cache
+        shell: bash
+        run: |
+          if command -v /c/Rtools/bin/tar && /c/Rtools/bin/tar --version | grep -q 'tar (GNU tar) 1.30'
+            then echo 'C:/Program Files/Git/usr/bin' >> $GITHUB_PATH
+          fi
