@@ -6,8 +6,8 @@ This action install dependencies for the current R environment based on the DESC
 
 - Installing [pak](https://pak.r-lib.org/)
 - Setting up a dependency cache using [actions/cache](https://github.com/actions/cache).
-- Installing system dependencies if needed using [rstudio/r-system-requirements](https://github.com/rstudio/r-system-requirements)
-- Printing the installed session info using [sessioninfo](https://github.com/r-lib/sessioninfo)
+- Installing system dependencies if needed using [rstudio/r-system-requirements](https://github.com/rstudio/r-system-requirements).
+- Printing the installed session info using [sessioninfo](https://github.com/r-lib/sessioninfo).
 
 # Usage
 

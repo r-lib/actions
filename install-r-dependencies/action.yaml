@@ -43,6 +43,7 @@ runs:
         run: |
           options(pak.no_extra_messages = TRUE)
           pak::local_install_dev_deps(upgrade = TRUE)
+          pak::pkg_install("sessioninfo")
         shell: Rscript {0}
 
       - name: Session info
