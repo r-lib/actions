@@ -30,6 +30,7 @@ jobs:
 
       - name: Install pkgdown
         run: pak::pkg_install("pkgdown")
+        shell: Rscript {0}
 
       - name: Build and deploy pkgdown site
         run: |
