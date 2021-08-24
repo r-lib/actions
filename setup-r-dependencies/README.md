@@ -13,7 +13,8 @@ This action install dependencies for the current R environment based on the DESC
 
 See [action.yml](action.yml)
 
-The only input is `cache-version`, which defaults to 1. If you need to invalidate the existing cache pass any other number and a new cache will be used.
+- `cache-version` - default `1`. If you need to invalidate the existing cache pass any other number and a new cache will be used.
+- `extra-packages` - One or more extra package references to install. Separate each reference by newlines or commas for more than one package.
 
 Basic:
 ```yaml
@@ -23,6 +24,9 @@ steps:
 - uses: r-lib/actions/setup-r-dependencies@v1
   with:
     cache-version: 2
+    extra-packages: |
+      ggplot2
+      rcmdcheck
 ```
 
 # License
