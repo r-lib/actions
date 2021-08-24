@@ -50,7 +50,7 @@ runs:
 
       - name: Install extra dependencies
         run: |
-          x <- ${{ join(inputs.extra_packages, ",") }}
+          x <- ${{ join(inputs.extra_packages, ', ') }}
           print(x)
         shell: Rscript {0}
 
