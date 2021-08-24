@@ -27,8 +27,10 @@ jobs:
       - name: Install package
         run: R CMD INSTALL .
 
-      - name: Install pkgdown
-        run: pak::pkg_install("pkgdown")
+      - name: Install pkgdown and any extra dependencies
+        run: |
+          pak::local_install_dev_deps(upgrade = TRUE, dependencies = c("all", "Config/Needs/website"))
+          pak::pkg_install("pkgdown")
         shell: Rscript {0}
 
       - name: Build and deploy pkgdown site
