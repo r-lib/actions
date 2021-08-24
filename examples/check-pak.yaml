@@ -51,9 +51,8 @@ jobs:
       - uses: r-lib/actions/setup-pandoc@v1
 
       - uses: r-lib/actions/setup-r-dependencies@master
-
-      - run: pak::pkg_install("rcmdcheck")
-        shell: Rscript {0}
+        with:
+          extra-packages: rcmdcheck
 
       - name: Check
         env:
