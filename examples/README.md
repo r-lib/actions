@@ -5,46 +5,46 @@
 
 Package workflows:
 
--   [`check-release`](#quickstart-ci-workflow) - A simple CI workflow to
+  - [`check-release`](#quickstart-ci-workflow) - A simple CI workflow to
     check with the release version of R.
--   [`check-standard`](#standard-ci-workflow) - A standard CI workflow
+  - [`check-standard`](#standard-ci-workflow) - A standard CI workflow
     to check with the release version of R on the three major OSs.
--   [`check-full`](#tidyverse-ci-workflow) - A more complex CI workflow
--   [`test-coverage`](#test-coverage-workflow) - Run `covr::codecov()`
+  - [`check-full`](#tidyverse-ci-workflow) - A more complex CI workflow
+  - [`test-coverage`](#test-coverage-workflow) - Run `covr::codecov()`
     on an R package.
--   [`lint`](#lint-workflow) - Run `lintr::lint_package()` on an R
+  - [`lint`](#lint-workflow) - Run `lintr::lint_package()` on an R
     package.
--   [`pr-commands`](#commands-workflow) - Adds `/document` and `/style`
+  - [`pr-commands`](#commands-workflow) - Adds `/document` and `/style`
     commands for pull requests.
--   [`pkgdown`](#build-pkgdown-site) - Build a
+  - [`pkgdown`](#build-pkgdown-site) - Build a
     [pkgdown](https://pkgdown.r-lib.org/) site for an R package and
     deploy it to [GitHub Pages](https://pages.github.com/).
 
 RMarkdown workflows:
 
--   [`render-rmarkdown`](#render-rmarkdown) - Render one or more
+  - [`render-rmarkdown`](#render-rmarkdown) - Render one or more
     Rmarkdown files when they change and commit the result.
--   [`bookdown`](#build-bookdown-site) - Build a
+  - [`bookdown`](#build-bookdown-site) - Build a
     [bookdown](https://bookdown.org) site and deploy it to
     [netlify](https://www.netlify.com/).
--   [`blogdown`](#build-blogdown-site) - Build a
+  - [`blogdown`](#build-blogdown-site) - Build a
     [blogdown](https://bookdown.org/yihui/blogdown/) site and deploy it
     to [netlify](https://www.netlify.com/).
 
 Other workflows:
 
--   [`docker`](#docker-based-workflow) - For custom workflows based on
+  - [`docker`](#docker-based-workflow) - For custom workflows based on
     docker containers.
--   [Bioconductor](#bioconductor-friendly-workflow) - A CI workflow for
+  - [Bioconductor](#bioconductor-friendly-workflow) - A CI workflow for
     packages to be released on Bioconductor.
--   [`lint-project`](#lint-project-workflow) - Run `lintr::lint_dir()`
+  - [`lint-project`](#lint-project-workflow) - Run `lintr::lint_dir()`
     on an R project.
 
 Options and advice:
 
--   [Forcing binaries](#forcing-binaries) - An environment variable to
+  - [Forcing binaries](#forcing-binaries) - An environment variable to
     always use binary packages.
--   [Managing secrets](#managing-secrets) - How to generate auth tokens
+  - [Managing secrets](#managing-secrets) - How to generate auth tokens
     and make them available to actions.
 
 ## Quickstart CI workflow
@@ -61,6 +61,8 @@ probably what you want to use.
 1.  You have a simple R package
 2.  There is no OS-specific code
 3.  You want a quick start with R CI
+
+<!-- end list -->
 
 ``` yaml
 # For help debugging build failures open an issue on the RStudio community with the 'github-actions' tag.
@@ -111,6 +113,8 @@ Bioconductor this is likely the workflow you want to use.
 
 1.  You plan to submit your package to CRAN or Bioconductor
 2.  Your package has OS-specific code
+
+<!-- end list -->
 
 ``` yaml
 # For help debugging build failures open an issue on the RStudio community with the 'github-actions' tag.
@@ -217,6 +221,8 @@ CI workflow.
 2.  You have a complex R package
 3.  With OS-specific code
 4.  And you want to ensure compatibility with many older R versions
+
+<!-- end list -->
 
 ``` yaml
 # NOTE: This workflow is overkill for most R packages
@@ -467,6 +473,8 @@ the package and commit the result to the pull request. `/style` will use
 1.  You get frequent pull requests, often with documentation only fixes.
 2.  You regularly style your code with styler, and require all additions
     be styled as well.
+
+<!-- end list -->
 
 ``` yaml
 on:
@@ -946,20 +954,20 @@ which we follow here.
     `https://github.com/{user}/{repo}/settings/secrets`.
 
 3.  At the **tokens** page:
-
-    -   Click “New access token”.
-    -   Provide a description for your benefit, so you will know which
+    
+      - Click “New access token”.
+      - Provide a description for your benefit, so you will know which
         token this is, perhaps something like `actions-{repo}`.
-    -   Click “Generate token”.
-    -   Copy the token to your clipboard.
+      - Click “Generate token”.
+      - Copy the token to your clipboard.
 
 4.  On your repository’s **secrets** page:
-
-    -   Click “Add a new secret”.
-    -   In the “Name” field, type `NETLIFY_AUTH_TOKEN` (or the name of
+    
+      - Click “Add a new secret”.
+      - In the “Name” field, type `NETLIFY_AUTH_TOKEN` (or the name of
         the secret that the action expects).
-    -   In the “Value” field, paste the token from your clipboard.
-    -   Click “Add Secret”.
+      - In the “Value” field, paste the token from your clipboard.
+      - Click “Add Secret”.
 
 5.  At this point (certainly at some point), you may wish to close your
     **tokens** page to remove the visibility of your token.
