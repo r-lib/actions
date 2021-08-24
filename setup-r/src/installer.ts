@@ -13,6 +13,7 @@ import osInfo from "linux-os-info";
 
 const IS_WINDOWS = process.platform === "win32";
 const IS_MAC = process.platform === "darwin";
+const IS_LINUX = !(IS_WINDOWS || IS_MAC);
 
 if (!tempDirectory) {
   let baseLocation: string;
@@ -418,7 +419,7 @@ async function setupRLibrary() {
   }
   core.debug("R profile is at " + profilePath);
 
-  let rspm = process.env["RSPM"] ? `'${process.env["RSPM"]}'` : "NULL";
+  let rspm = IS_LINUX && process.env["RSPM"] ? `'${process.env["RSPM"]}'` : "NULL";
   let cran = `'${process.env["CRAN"] || "https://cloud.r-project.org"}'`;
 
   let user_agent;
