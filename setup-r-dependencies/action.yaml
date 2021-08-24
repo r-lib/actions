@@ -50,7 +50,7 @@ runs:
 
       - name: Install extra dependencies
         run: |
-          pkgs <- strsplit("${{ inputs.extra-packages }}, "[[:space:]]+")[[1]]
+          pkgs <- strsplit("${{ inputs.extra-packages }}", "[[:space:],]+")[[1]]
           if (length(pkgs) > 0) {
             pak::pkg_install(pkgs)
           }
