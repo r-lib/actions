@@ -33,29 +33,15 @@ runs:
           key: ${{ steps.get-version.outputs.os-version }}-${{ steps.get-version.outputs.r-version }}-${{inputs.cache-version }}-${{ hashFiles('.github/r-depends.rds') }}
           restore-keys: ${{ steps.get-version.outputs.os-version }}-${{ steps.get-version.outputs.r-version }}-${{inputs.cache-version }}-
 
-      - name: Install system dependencies
-        run: |
-          if (Sys.info()[["sysname"]] == "Linux") {
-            pak::local_system_requirements(execute = TRUE)
-          }
-        shell: Rscript {0}
-
       - name: Install dependencies
         run: |
-          options(pak.no_extra_messages = TRUE)
-          pak::local_install_dev_deps(upgrade = TRUE)
-          pak::pkg_install("sessioninfo")
-        shell: Rscript {0}
-
-      - name: Install extra dependencies
-        run: |
-          pkgs <- strsplit("${{ inputs.extra-packages }}", "[[:space:],]+")[[1]]
-          if (length(pkgs) > 0) {
-            if (Sys.info()[["sysname"]] == "Linux") {
-              pak::pkg_system_requirements(pkgs, execute = TRUE)
-            }
-            pak::pkg_install(pkgs)
+          local_deps <- pak::local_dev_deps(dependencies = TRUE)[["ref"]]
+          extra_deps <- c(strsplit("${{ inputs.extra-packages }}", "[[:space:],]+")[[1]], "sessioninfo")
+          deps <- c(local_deps, extra_deps)
+          if (Sys.info()[["sysname"]] == "Linux") {
+            pak::pkg_system_requirements(deps, execute = TRUE)
           }
+          pak::pkg_install(deps)
         shell: Rscript {0}
 
       - name: Session info
