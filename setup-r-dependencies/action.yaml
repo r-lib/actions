@@ -50,8 +50,10 @@ runs:
 
       - name: Install extra dependencies
         run: |
-          x <- c(${{ inputs.extra-packages }})
-          print(x)
+          pkgs <- c(${{ inputs.extra-packages }})
+          if (length(x) > 0) {
+            pak::pkg_install(pkgs)
+          }
         shell: Rscript {0}
 
       - name: Session info
