@@ -6,6 +6,8 @@ inputs:
     description: 'The version of the cache, change this from the default (1) to start over with a fresh cache'
     required: true
     default: 1
+  extra-packages:
+    description: 'Any extra packages to install outside of the packages listed in the dependencies'
 runs:
   using: "composite"
   steps:
@@ -44,6 +46,12 @@ runs:
           options(pak.no_extra_messages = TRUE)
           pak::local_install_dev_deps(upgrade = TRUE)
           pak::pkg_install("sessioninfo")
+        shell: Rscript {0}
+
+      - name: Install extra dependencies
+        run: |
+          x <- ${{ join(inputs.extra_packages, ",") }}
+          print(x)
         shell: Rscript {0}
 
       - name: Session info
