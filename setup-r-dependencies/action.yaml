@@ -6,6 +6,8 @@ inputs:
     description: 'The version of the cache, change this from the default (1) to start over with a fresh cache'
     required: true
     default: 1
+  extra-packages:
+    description: 'Any extra packages to install outside of the packages listed in the dependencies'
 runs:
   using: "composite"
   steps:
@@ -31,19 +33,17 @@ runs:
           key: ${{ steps.get-version.outputs.os-version }}-${{ steps.get-version.outputs.r-version }}-${{inputs.cache-version }}-${{ hashFiles('.github/r-depends.rds') }}
           restore-keys: ${{ steps.get-version.outputs.os-version }}-${{ steps.get-version.outputs.r-version }}-${{inputs.cache-version }}-
 
-      - name: Install system dependencies
-        run: |
-          if (Sys.info()[["sysname"]] == "Linux") {
-            pak::local_system_requirements(execute = TRUE)
-            pak::pkg_system_requirements("rcmdcheck", execute = TRUE)
-          }
-        shell: Rscript {0}
-
       - name: Install dependencies
         run: |
-          options(pak.no_extra_messages = TRUE)
-          pak::local_install_dev_deps(upgrade = TRUE)
-          pak::pkg_install("sessioninfo")
+          local_deps <- pak::local_dev_deps(dependencies = TRUE)[["ref"]]
+          extra_deps <- strsplit("${{ inputs.extra-packages }}", "[[:space:],]+")[[1]]
+          if (Sys.info()[["sysname"]] == "Linux") {
+            pak::local_system_requirements(execute = TRUE)
+            for (dep in extra_deps) {
+              pak::pkg_system_requirements(dep, execute = TRUE)
+            }
+          }
+          pak::pkg_install(c(local_deps, extra_deps, "sessioninfo"))
         shell: Rscript {0}
 
       - name: Session info
