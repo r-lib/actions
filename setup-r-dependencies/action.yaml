@@ -37,7 +37,6 @@ runs:
         run: |
           if (Sys.info()[["sysname"]] == "Linux") {
             pak::local_system_requirements(execute = TRUE)
-            pak::pkg_system_requirements("rcmdcheck", execute = TRUE)
           }
         shell: Rscript {0}
 
@@ -52,6 +51,9 @@ runs:
         run: |
           pkgs <- strsplit("${{ inputs.extra-packages }}", "[[:space:],]+")[[1]]
           if (length(pkgs) > 0) {
+            if (Sys.info()[["sysname"]] == "Linux") {
+              pak::pkg_system_requirements(pkgs, execute = TRUE)
+            }
             pak::pkg_install(pkgs)
           }
         shell: Rscript {0}
