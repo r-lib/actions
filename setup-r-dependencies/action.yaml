@@ -36,12 +36,14 @@ runs:
       - name: Install dependencies
         run: |
           local_deps <- pak::local_dev_deps(dependencies = TRUE)[["ref"]]
-          extra_deps <- c(strsplit("${{ inputs.extra-packages }}", "[[:space:],]+")[[1]], "sessioninfo")
-          deps <- c(local_deps, extra_deps)
+          extra_deps <- strsplit("${{ inputs.extra-packages }}", "[[:space:],]+")[[1]]
           if (Sys.info()[["sysname"]] == "Linux") {
-            pak::pkg_system_requirements(deps, execute = TRUE)
+            pak::local_system_requirements(execute = TRUE)
+            for (dep in extra_deps) {
+              pak::pkg_system_requirements(dep, execute = TRUE)
+            }
           }
-          pak::pkg_install(deps)
+          pak::pkg_install(c(local_deps, extra_deps, "sessioninfo"))
         shell: Rscript {0}
 
       - name: Session info
