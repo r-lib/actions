@@ -50,8 +50,8 @@ runs:
 
       - name: Install extra dependencies
         run: |
-          pkgs <- c(${{ inputs.extra-packages }})
-          if (length(x) > 0) {
+          pkgs <- gsub(" ", "", alist(${{ inputs.extra-packages }}))
+          if (length(pkgs) > 0) {
             pak::pkg_install(pkgs)
           }
         shell: Rscript {0}
