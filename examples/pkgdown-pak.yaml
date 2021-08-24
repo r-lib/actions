@@ -23,15 +23,9 @@ jobs:
       - uses: r-lib/actions/setup-pandoc@v1
 
       - uses: r-lib/actions/setup-r-dependencies@master
-
-      - name: Install package
-        run: R CMD INSTALL .
-
-      - name: Install pkgdown and any extra dependencies
-        run: |
-          pak::local_install_dev_deps(upgrade = TRUE, dependencies = c("all", "Config/Needs/website"))
-          pak::pkg_install("pkgdown")
-        shell: Rscript {0}
+        with:
+          extra-packages: pkgdown
+          needs: website
 
       - name: Build and deploy pkgdown site
         run: |
