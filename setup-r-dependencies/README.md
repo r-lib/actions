@@ -11,10 +11,11 @@ This action install dependencies for the current R environment based on the DESC
 
 # Usage
 
-See [action.yml](action.yml)
+Inputs available
 
 - `cache-version` - default `1`. If you need to invalidate the existing cache pass any other number and a new cache will be used.
 - `extra-packages` - One or more extra package references to install. Separate each reference by newlines or commas for more than one package.
+- `needs` - `Config/Needs` fields to install from the DESCRIPTION, the `Config/Needs/` prefix will be automatically included.
 
 Basic:
 ```yaml
@@ -27,6 +28,9 @@ steps:
     extra-packages: |
       ggplot2
       rcmdcheck
+    needs: |
+      website
+      coverage
 ```
 
 # License
