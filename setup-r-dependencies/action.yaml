@@ -1,5 +1,5 @@
-name: 'install-r-dependencies'
-description: 'Action to install R dependencies'
+name: 'setup-r-dependencies'
+description: 'Action to setup installation tools and install R dependencies'
 author: 'Jim Hester'
 inputs:
   cache-version:

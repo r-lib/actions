@@ -23,7 +23,7 @@ jobs:
 
       - uses: r-lib/actions/setup-pandoc@v1
 
-      - uses: r-lib/actions/install-r-dependencies@master
+      - uses: r-lib/actions/setup-r-dependencies@master
 
       - name: Install package
         run: R CMD INSTALL .

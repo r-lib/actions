@@ -1,4 +1,4 @@
-# setup-r
+# setup-r-dependencies
 
 [![RStudio community](https://img.shields.io/badge/community-github--actions-blue?style=social&logo=rstudio&logoColor=75AADB)](https://community.rstudio.com/new-topic?category=Package%20development&tags=github-actions)
 
@@ -20,7 +20,7 @@ Basic:
 steps:
 - uses: actions/checkout@master
 - uses: r-lib/actions/setup-r@v1
-- uses: r-lib/actions/install-r-dependencies@v1
+- uses: r-lib/actions/setup-r-dependencies@v1
   with:
     cache-version: 2
 ```

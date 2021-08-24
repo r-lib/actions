@@ -23,7 +23,7 @@ jobs:
       - uses: r-lib/actions/setup-r@master
         id: install-r
 
-      - uses: r-lib/actions/install-r-dependencies@master
+      - uses: r-lib/actions/setup-r-dependencies@master
 
       - name: Test coverage
         run: covr::codecov()
