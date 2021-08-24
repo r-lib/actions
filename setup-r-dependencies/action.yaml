@@ -8,6 +8,8 @@ inputs:
     default: 1
   extra-packages:
     description: 'Any extra packages to install outside of the packages listed in the dependencies'
+  needs:
+    description: 'Any extra Config/Needs fields which need to be included when installing dependencies'
 runs:
   using: "composite"
   steps:
@@ -35,7 +37,8 @@ runs:
 
       - name: Install dependencies
         run: |
-          local_deps <- pak::local_dev_deps(dependencies = TRUE)[["ref"]]
+          needs <- c("all", strsplit("${{ inputs.needs }}", "[[:space:],]+"[[1]]))
+          local_deps <- pak::local_dev_deps(dependencies = needs)[["ref"]]
           extra_deps <- strsplit("${{ inputs.extra-packages }}", "[[:space:],]+")[[1]]
           if (Sys.info()[["sysname"]] == "Linux") {
             pak::local_system_requirements(execute = TRUE)
