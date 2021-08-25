@@ -19,7 +19,7 @@ This action sets up an R environment for use in actions by:
 
 # Usage
 
-See [action.yml](action.yml)
+See [action.yml](action.yml) for details on the available inputs and outputs.
 
 Basic:
 ```yaml
@@ -55,4 +55,4 @@ The scripts and documentation in this project are released under the [MIT Licens
 
 # Contributions
 
-Contributions are welcome! See [Contributor's Guide](docs/contributors.md)
+Contributions are welcome!

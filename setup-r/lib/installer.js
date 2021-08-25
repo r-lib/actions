@@ -45,6 +45,7 @@ const semver = __importStar(require("semver"));
 const linux_os_info_1 = __importDefault(require("linux-os-info"));
 const IS_WINDOWS = process.platform === "win32";
 const IS_MAC = process.platform === "darwin";
+const IS_LINUX = process.platform === "linux";
 if (!tempDirectory) {
     let baseLocation;
     if (IS_WINDOWS) {
@@ -424,6 +425,30 @@ function setupRLibrary() {
         }
         core.debug("R profile is at " + profilePath);
         let rspm = process.env["RSPM"] ? `'${process.env["RSPM"]}'` : "NULL";
+        if (rspm === "NULL" && core.getInput("use-public-rspm") === "true") {
+            if (IS_WINDOWS) {
+                rspm = "'https://packagemanager.rstudio.com/all/latest'";
+            }
+            if (IS_LINUX) {
+                let codename = "";
+                try {
+                    yield exec.exec("lsb_release", ["--short", "--codename"], {
+                        listeners: {
+                            stdout: (data) => (codename += data.toString())
+                        }
+                    });
+                }
+                catch (error) {
+                    core.debug(error.message);
+                    throw `Failed to query the linux version: ${error}`;
+                }
+                codename = codename.trim();
+                rspm = `'https://packagemanager.rstudio.com/all/__linux__/${codename}/latest'`;
+            }
+        }
+        if (rspm !== "NULL") {
+            core.exportVariable("RSPM", rspm.replace(/^'|'$/g, ""));
+        }
         let cran = `'${process.env["CRAN"] || "https://cloud.r-project.org"}'`;
         let user_agent;
         if (core.getInput("http-user-agent") === "release") {
@@ -438,15 +463,15 @@ function setupRLibrary() {
                     ? 'sprintf("R/%s R (%s) on GitHub Actions", getRversion(), paste(getRversion(), R.version$platform, R.version$arch, R.version$os))'
                     : `"${core.getInput("http-user-agent")}"`;
         }
-        yield fs.promises.writeFile(profilePath, `options(\
-       repos = c(\
-         RSPM = ${rspm},\
-         CRAN = ${cran}\
-       ),\
-       crayon.enabled = ${core.getInput("crayon.enabled")},\
-       Ncpus = ${core.getInput("Ncpus")},\
-       HTTPUserAgent = ${user_agent}\
-     )\n`);
+        yield fs.promises.writeFile(profilePath, `options(
+  repos = c(
+    RSPM = ${rspm},
+    CRAN = ${cran}
+  ),
+  crayon.enabled = ${core.getInput("crayon.enabled")},
+  Ncpus = ${core.getInput("Ncpus")},
+  HTTPUserAgent = ${user_agent}
+)\n`);
         // Make R_LIBS_USER
         io.mkdirP(process.env["R_LIBS_USER"] || path.join(tempDirectory, "Library"));
     });
