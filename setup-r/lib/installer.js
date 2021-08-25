@@ -427,7 +427,7 @@ function setupRLibrary() {
         let rspm = process.env["RSPM"] ? `'${process.env["RSPM"]}'` : "NULL";
         if (rspm === "NULL" && core.getInput("use-public-rspm") === "true") {
             if (IS_WINDOWS) {
-                rspm = "NULL"; //"'https://packagemanager.rstudio.com/all/latest'";
+                rspm = "'https://packagemanager.rstudio.com/all/latest'";
             }
             if (IS_LINUX) {
                 let codename = "";
