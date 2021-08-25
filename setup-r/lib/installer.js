@@ -446,6 +446,9 @@ function setupRLibrary() {
                 rspm = `'https://packagemanager.rstudio.com/all/__linux__/${codename}/latest'`;
             }
         }
+        if (rspm !== "NULL") {
+            core.exportVariable("RSPM", rspm.replace(/^'|'$/g, ""));
+        }
         let cran = `'${process.env["CRAN"] || "https://cloud.r-project.org"}'`;
         let user_agent;
         if (core.getInput("http-user-agent") === "release") {

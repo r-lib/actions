@@ -444,6 +444,10 @@ async function setupRLibrary() {
     }
   }
 
+  if (rspm !== "NULL") {
+    core.exportVariable("RSPM", rspm.replace(/^'|'$/g, ""));
+  }
+
   let cran = `'${process.env["CRAN"] || "https://cloud.r-project.org"}'`;
 
   let user_agent;
