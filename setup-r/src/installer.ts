@@ -423,7 +423,7 @@ async function setupRLibrary() {
 
   if (rspm === "NULL" && core.getInput("use-public-rspm") === "true") {
     if (IS_WINDOWS) {
-      rspm = "https://packagemanager.rstudio.com/all/latest";
+      rspm = "'https://packagemanager.rstudio.com/all/latest'";
     }
     if (IS_LINUX) {
       let codename = "";
@@ -439,7 +439,7 @@ async function setupRLibrary() {
         throw `Failed to query the linux version: ${error}`;
       }
 
-      rspm = `https://packagemanager.rstudio.com/all/__linux__/${codename}/latest`;
+      rspm = `'https://packagemanager.rstudio.com/all/__linux__/${codename}/latest'`;
     }
   }
 
