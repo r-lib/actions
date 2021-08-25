@@ -442,7 +442,7 @@ function setupRLibrary() {
                     core.debug(error.message);
                     throw `Failed to query the linux version: ${error}`;
                 }
-                codename.trim();
+                codename = codename.trim();
                 rspm = `'https://packagemanager.rstudio.com/all/__linux__/${codename}/latest'`;
             }
         }
