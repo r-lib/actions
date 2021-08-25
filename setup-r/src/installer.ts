@@ -462,15 +462,15 @@ async function setupRLibrary() {
 
   await fs.promises.writeFile(
     profilePath,
-    `options(\
-       repos = c(\
-         RSPM = ${rspm},\
-         CRAN = ${cran}\
-       ),\
-       crayon.enabled = ${core.getInput("crayon.enabled")},\
-       Ncpus = ${core.getInput("Ncpus")},\
-       HTTPUserAgent = ${user_agent}\
-     )\n`
+    `options(
+  repos = c(
+    RSPM = ${rspm},
+    CRAN = ${cran}
+  ),
+  crayon.enabled = ${core.getInput("crayon.enabled")},
+  Ncpus = ${core.getInput("Ncpus")},
+  HTTPUserAgent = ${user_agent}
+)\n`
   );
 
   // Make R_LIBS_USER

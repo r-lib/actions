@@ -459,15 +459,15 @@ function setupRLibrary() {
                     ? 'sprintf("R/%s R (%s) on GitHub Actions", getRversion(), paste(getRversion(), R.version$platform, R.version$arch, R.version$os))'
                     : `"${core.getInput("http-user-agent")}"`;
         }
-        yield fs.promises.writeFile(profilePath, `options(\
-       repos = c(\
-         RSPM = ${rspm},\
-         CRAN = ${cran}\
-       ),\
-       crayon.enabled = ${core.getInput("crayon.enabled")},\
-       Ncpus = ${core.getInput("Ncpus")},\
-       HTTPUserAgent = ${user_agent}\
-     )\n`);
+        yield fs.promises.writeFile(profilePath, `options(
+  repos = c(
+    RSPM = ${rspm},
+    CRAN = ${cran}
+  ),
+  crayon.enabled = ${core.getInput("crayon.enabled")},
+  Ncpus = ${core.getInput("Ncpus")},
+  HTTPUserAgent = ${user_agent}
+)\n`);
         // Make R_LIBS_USER
         io.mkdirP(process.env["R_LIBS_USER"] || path.join(tempDirectory, "Library"));
     });
