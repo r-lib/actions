@@ -37,12 +37,12 @@ runs:
 
       - name: Install dependencies
         run: |
-          needs <- c("all", sprintf("Config/Needs/%s", strsplit("${{ inputs.needs }}", "[[:space:],]+")[[1]]))
-          local_deps <- pak::local_dev_deps(dependencies = needs)[["ref"]]
+          needs <- sprintf("Config/Needs/%s", strsplit("${{ inputs.needs }}", "[[:space:],]+")[[1]])
+          local_deps <- pak::local_dev_deps(dependencies = c("all", needs))[["ref"]]
           extra_deps <- strsplit("${{ inputs.extra-packages }}", "[[:space:],]+")[[1]]
           if (Sys.info()[["sysname"]] == "Linux") {
             pak::local_system_requirements(execute = TRUE)
-            for (dep in extra_deps) {
+            for (dep in c(needs, extra_deps)) {
               pak::pkg_system_requirements(dep, execute = TRUE)
             }
           }
