@@ -439,7 +439,7 @@ async function setupRLibrary() {
         throw `Failed to query the linux version: ${error}`;
       }
 
-      let rspm = `https://packagemanager.rstudio.com/all/__linux__/${codename}/latest`;
+      rspm = `https://packagemanager.rstudio.com/all/__linux__/${codename}/latest`;
     }
   }
 

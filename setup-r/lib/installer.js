@@ -430,11 +430,11 @@ function setupRLibrary() {
                 rspm = "https://packagemanager.rstudio.com/all/latest";
             }
             if (IS_LINUX) {
-                let codename = '';
+                let codename = "";
                 try {
                     yield exec.exec("lsb_release", ["--short", "--codename"], {
                         listeners: {
-                            stdout: (data) => codename += data.toString()
+                            stdout: (data) => (codename += data.toString())
                         }
                     });
                 }
@@ -442,7 +442,7 @@ function setupRLibrary() {
                     core.debug(error.message);
                     throw `Failed to query the linux version: ${error}`;
                 }
-                let rspm = `https://packagemanager.rstudio.com/all/__linux__/${codename}/latest`;
+                rspm = `https://packagemanager.rstudio.com/all/__linux__/${codename}/latest`;
             }
         }
         let cran = `'${process.env["CRAN"] || "https://cloud.r-project.org"}'`;
