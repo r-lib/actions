@@ -44,7 +44,7 @@ runs:
           extra_deps <- strsplit("${{ inputs.extra-packages }}", "[[:space:],]+")[[1]]
           if (Sys.info()[["sysname"]] == "Linux") {
             pak::local_system_requirements(execute = TRUE)
-            for (dep in c(needs, extra_deps)) {
+            for (dep in c(needs_only_deps, extra_deps)) {
               pak::pkg_system_requirements(dep, execute = TRUE)
             }
           }
