@@ -13,6 +13,7 @@ import osInfo from "linux-os-info";
 
 const IS_WINDOWS = process.platform === "win32";
 const IS_MAC = process.platform === "darwin";
+const IS_LINUX = process.platform === "linux";
 
 if (!tempDirectory) {
   let baseLocation: string;
@@ -419,6 +420,29 @@ async function setupRLibrary() {
   core.debug("R profile is at " + profilePath);
 
   let rspm = process.env["RSPM"] ? `'${process.env["RSPM"]}'` : "NULL";
+
+  if (rspm === "NULL" && core.getInput("use-public-rspm") === "true") {
+    if (IS_WINDOWS) {
+      rspm = "https://packagemanager.rstudio.com/all/latest";
+    }
+    if (IS_LINUX) {
+      let codename = "";
+      try {
+        await exec.exec("lsb_release", ["--short", "--codename"], {
+          listeners: {
+            stdout: (data: Buffer): string => (codename += data.toString())
+          }
+        });
+      } catch (error) {
+        core.debug(error.message);
+
+        throw `Failed to query the linux version: ${error}`;
+      }
+
+      let rspm = `https://packagemanager.rstudio.com/all/__linux__/${codename}/latest`;
+    }
+  }
+
   let cran = `'${process.env["CRAN"] || "https://cloud.r-project.org"}'`;
 
   let user_agent;

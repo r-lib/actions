@@ -45,6 +45,7 @@ const semver = __importStar(require("semver"));
 const linux_os_info_1 = __importDefault(require("linux-os-info"));
 const IS_WINDOWS = process.platform === "win32";
 const IS_MAC = process.platform === "darwin";
+const IS_LINUX = process.platform === "linux";
 if (!tempDirectory) {
     let baseLocation;
     if (IS_WINDOWS) {
@@ -424,6 +425,26 @@ function setupRLibrary() {
         }
         core.debug("R profile is at " + profilePath);
         let rspm = process.env["RSPM"] ? `'${process.env["RSPM"]}'` : "NULL";
+        if (rspm === "NULL" && core.getInput("use-public-rspm") === "true") {
+            if (IS_WINDOWS) {
+                rspm = "https://packagemanager.rstudio.com/all/latest";
+            }
+            if (IS_LINUX) {
+                let codename = '';
+                try {
+                    yield exec.exec("lsb_release", ["--short", "--codename"], {
+                        listeners: {
+                            stdout: (data) => codename += data.toString()
+                        }
+                    });
+                }
+                catch (error) {
+                    core.debug(error.message);
+                    throw `Failed to query the linux version: ${error}`;
+                }
+                let rspm = `https://packagemanager.rstudio.com/all/__linux__/${codename}/latest`;
+            }
+        }
         let cran = `'${process.env["CRAN"] || "https://cloud.r-project.org"}'`;
         let user_agent;
         if (core.getInput("http-user-agent") === "release") {
