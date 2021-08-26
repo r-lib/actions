@@ -10,8 +10,11 @@ jobs:
     container: rocker/verse
     steps:
       - uses: actions/checkout@v1
+
       - run: Rscript fit_model.R
+
       - run: Rscript -e 'rmarkdown::render("report.Rmd")'
+
       - name: Upload results
         uses: actions/upload-artifact@main
         with:
