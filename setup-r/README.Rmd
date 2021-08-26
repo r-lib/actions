@@ -30,7 +30,7 @@ action <- yaml::read_yaml("action.yml")
 action_df <- tibble::tibble(
   name = names(action$inputs),
   description = purrr::map_chr(action$inputs, "description"),
-  default = purrr::map_chr(action$inputs, "default")
+  default = purrr::map_chr(action$inputs, ~ if (is.logical(.x$default)) if (isTRUE(.x$default)) "true" else "false" else glue::single_quote(.x$default))
 )
 cat(glue::glue_data(action_df, "- **{name}** (`{default}`) - {description}"), sep = "\n")
 ```

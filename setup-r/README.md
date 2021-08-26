@@ -26,29 +26,29 @@ This action sets up an R environment for use in actions by:
 
 ## Inputs
 
--   **r-version** (`release`) - Version range or exact version of an R
+-   **r-version** (`'release'`) - Version range or exact version of an R
     version to use.
--   **rtools-version** (\`\`) - Exact version of Rtools to use. Default
+-   **rtools-version** (`''`) - Exact version of Rtools to use. Default
     uses latest suitable rtools for the given version of R.
--   **Ncpus** (`1`) - Value to set the R option `Ncpus` to.
--   **crayon.enabled** (`NULL`) - Value to set the R option
+-   **Ncpus** (`'1'`) - Value to set the R option `Ncpus` to.
+-   **crayon.enabled** (`'NULL'`) - Value to set the R option
     `crayon.enabled` to.
--   **remove-openmp-macos** (`TRUE`) - If true, remove `-fopenmp` from
+-   **remove-openmp-macos** (`true`) - If true, remove `-fopenmp` from
     the default compilation flags, e.g. `SHLIB_OPENMP_CFLAGS`, as the
     macOS Command Line Tools do not support OpenMP.
--   **http-user-agent** (`default`) - If “default” or "“, sets the
-    HTTPUserAgent option to e.g. for R 3.6.3 running on macOS
-    Catalina,”R/3.6.3 R (3.6.3 x86\_64-apple-darwin17.0 x86\_64
-    darwin17.0) on GitHub Actions“. If”release" sets the user agent to
-    the default user agent for the current R release. Otherwise uses
-    whatever value is passed to `http-user-agent`.
--   **install-r** (`TRUE`) - Wether to install R during the setup or use
+-   **http-user-agent** (`'default'`) - If `"default"` or `""`, sets the
+    HTTPUserAgent option to e.g. for R 3.6.3 running on macOS Catalina,
+    `"R/3.6.3 R (3.6.3 x86_64-apple-darwin17.0 x86_64 darwin17.0) on GitHub Actions"`.
+    If `"release"` sets the user agent to the default user agent for the
+    current R release. Otherwise uses whatever value is passed to
+    `http-user-agent`.
+-   **install-r** (`true`) - Wether to install R during the setup or use
     the existing installation in the GitHub Action image.
--   **windows-path-include-mingw** (`TRUE`) - If “true” put the 64 bit
+-   **windows-path-include-mingw** (`true`) - If “true” put the 64 bit
     mingw directory from Rtools on the PATH for Windows builds.
--   **update-rtools** (`FALSE`) - Update rtools40 compilers and
+-   **update-rtools** (`false`) - Update rtools40 compilers and
     libraries to the latest builds.
--   **use-public-rspm** (`FALSE`) - Use the public version of RStudio
+-   **use-public-rspm** (`false`) - Use the public version of RStudio
     package manager available at <https://packagemanager.rstudio.com/>
     to serve binaries for Linux and Windows.
 
