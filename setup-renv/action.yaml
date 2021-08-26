@@ -1,0 +1,42 @@
+name: 'setup-renv'
+description: 'Action to setup renv and install R dependencies in the lockfile'
+author: 'Jim Hester'
+inputs:
+  cache-version:
+    description: 'The version of the cache, change this from the default (1) to start over with a fresh cache'
+    required: true
+    default: 1
+runs:
+  using: "composite"
+  steps:
+      - name: Install renv and query dependencies
+        run: |
+          install.packages("pak", repos = "https://r-lib.github.io/p/pak/dev/")
+          saveRDS(pak::pkg_deps("local::.", dependencies = TRUE), ".github/r-depends.rds")
+        shell: Rscript {0}
+
+      - name: Get R and OS version
+        id: get-version
+        run: |
+          cat("##[set-output name=os-version;]", sessionInfo()$running, "\n", sep = "")
+          cat("##[set-output name=r-version;]", R.Version()$version.string, sep = "")
+        shell: Rscript {0}
+
+      - name: Restore Renv package cache
+        uses: actions/cache@v2
+        with:
+          path: $HOME/.local/share/renv
+          key: ${{ steps.get-version.outputs.os-version }}-${{ steps.get-version.outputs.r-version }}-${{inputs.cache-version }}-${{ hashFiles('renv.lock') }}
+          restore-keys: ${{ steps.get-version.outputs.os-version }}-${{ steps.get-version.outputs.r-version }}-${{inputs.cache-version }}-
+
+      - name: Install renv dependencies
+        run: |
+          R -e 'install.packages("renv")'
+          R -e 'renv::restore()'
+
+      - name: Don't use tar 1.30 from Rtools35 to store the cache
+        shell: bash
+        run: |
+          if command -v /c/Rtools/bin/tar && /c/Rtools/bin/tar --version | grep -q 'tar (GNU tar) 1.30'
+            then echo 'C:/Program Files/Git/usr/bin' >> $GITHUB_PATH
+          fi
