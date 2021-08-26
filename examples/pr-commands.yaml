@@ -1,3 +1,7 @@
+# Workflow derived from https://github.com/r-lib/actions/tree/master/examples
+#
+# For help debugging build failures open an issue on the RStudio community with the 'github-actions' tag.
+# https://community.rstudio.com/new-topic?category=Package%20development&tags=github-actions
 on:
   issue_comment:
     types: [created]
@@ -6,7 +10,7 @@ jobs:
   document:
     if: startsWith(github.event.comment.body, '/document')
     name: document
-    runs-on: macOS-latest
+    runs-on: ubuntu-18.04
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -15,14 +19,17 @@ jobs:
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
       - uses: r-lib/actions/setup-r@v1
-      - name: Install dependencies
-        run: Rscript -e 'install.packages(c("remotes", "roxygen2"))' -e 'remotes::install_deps(dependencies = TRUE)'
+        with:
+          use-public-rspm: true
+      - uses: r-lib/actions/setup-r-dependencies@v1
+        with:
+          extra-packages: roxygen2
       - name: Document
         run: Rscript -e 'roxygen2::roxygenise()'
       - name: commit
         run: |
-          git config --local user.email "actions@github.com"
-          git config --local user.name "GitHub Actions"
+          git config --local user.name "$GITHUB_ACTOR"
+          git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
           git add man/\* NAMESPACE
           git commit -m 'Document'
       - uses: r-lib/actions/pr-push@v1
@@ -31,7 +38,7 @@ jobs:
   style:
     if: startsWith(github.event.comment.body, '/style')
     name: style
-    runs-on: macOS-latest
+    runs-on: ubuntu-18.04
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -46,8 +53,8 @@ jobs:
         run: Rscript -e 'styler::style_pkg()'
       - name: commit
         run: |
-          git config --local user.email "actions@github.com"
-          git config --local user.name "GitHub Actions"
+          git config --local user.name "$GITHUB_ACTOR"
+          git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
           git add \*.R
           git commit -m 'Style'
       - uses: r-lib/actions/pr-push@v1

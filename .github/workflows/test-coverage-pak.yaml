@@ -1,3 +1,7 @@
+# Workflow derived from https://github.com/r-lib/actions/tree/master/examples
+#
+# For help debugging build failures open an issue on the RStudio community with the 'github-actions' tag.
+# https://community.rstudio.com/new-topic?category=Package%20development&tags=github-actions
 on:
   push:
     branches: [main, master]
@@ -17,8 +21,12 @@ jobs:
       - uses: actions/checkout@v2
 
       - uses: r-lib/actions/setup-r@master
+        with:
+          use-public-rspm: true
 
       - uses: r-lib/actions/setup-r-dependencies@master
+        with:
+          extra-packages: covr
 
       - name: Test coverage
         run: covr::codecov()
