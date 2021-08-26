@@ -12,7 +12,6 @@ jobs:
   test-coverage:
     runs-on: ubuntu-18.04
     env:
-      RSPM: https://packagemanager.rstudio.com/cran/__linux__/bionic/latest
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
