@@ -8,6 +8,7 @@ inputs:
   rtools-version:
     description: 'Exact version of Rtools to use. Default uses latest suitable
     rtools for the given version of R.'
+    default: ''
   Ncpus:
     description: 'Value to set the R option `Ncpus` to.'
     default: '1'
@@ -17,7 +18,7 @@ inputs:
   remove-openmp-macos:
     description: 'If true, remove `-fopenmp` from the default compilation
     flags, e.g. `SHLIB_OPENMP_CFLAGS`, as the macOS Command Line Tools do not
-    support OpenMP'
+    support OpenMP.'
     default: true
   http-user-agent:
     description: 'If "default" or "", sets the HTTPUserAgent option to e.g. for
@@ -27,18 +28,19 @@ inputs:
       release. Otherwise uses whatever value is passed to `http-user-agent`.'
     default: 'default'
   install-r:
+    description: 'Wether to install R during the setup or use the existing installation in the GitHub Action image.'
     default: true
   windows-path-include-mingw:
     description: 'If "true" put the 64 bit mingw directory from Rtools on the
-    PATH for Windows builds'
+    PATH for Windows builds.'
     default: true
   update-rtools:
-    description: 'Update rtools40 compilers and libraries to the latest builds'
+    description: 'Update rtools40 compilers and libraries to the latest builds.'
     default: false
   use-public-rspm:
     description: 'Use the public version of RStudio package manager available
       at https://packagemanager.rstudio.com/ to serve binaries for Linux and
-      Windows'
+      Windows.'
     default: false
 outputs:
   installed-r-version:
