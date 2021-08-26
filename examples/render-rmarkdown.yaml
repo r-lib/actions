@@ -2,11 +2,12 @@
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    paths:
-      - '**.Rmd'
+    paths: ['**.Rmd']
+
+name: render-rmarkdown
 
 jobs:
-  build:
+  render-rmarkdown:
     runs-on: macOS-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}

@@ -3,7 +3,9 @@
 on:
   issue_comment:
     types: [created]
+
 name: Commands
+
 jobs:
   document:
     if: startsWith(github.event.comment.body, '/document')

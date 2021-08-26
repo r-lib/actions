@@ -1,8 +1,11 @@
 # Workflow derived from https://github.com/r-lib/actions/tree/master/examples
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on: [push]
+
+name: docker
+
 jobs:
-  job1:
+  docker:
     runs-on: ubuntu-latest
     container: rocker/verse
     steps:
