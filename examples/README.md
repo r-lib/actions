@@ -66,9 +66,7 @@ probably what you want to use.
 
 ``` yaml
 # Workflow derived from https://github.com/r-lib/actions/tree/master/examples
-#
-# For help debugging build failures open an issue on the RStudio community with the 'github-actions' tag.
-# https://community.rstudio.com/new-topic?category=Package%20development&tags=github-actions
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
     branches: [main, master]
@@ -79,15 +77,20 @@ name: R-CMD-check
 
 jobs:
   R-CMD-check:
-    runs-on: macOS-latest
+    runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
+
       - uses: r-lib/actions/setup-r@v1
+        with:
+          use-public-rspm: true
+
       - uses: r-lib/actions/setup-r-dependencies@v1
         with:
           extra-packages: rcmdcheck
+
       - name: Check
         run: |
           options(crayon.enabled = TRUE)
@@ -114,8 +117,7 @@ Bioconductor this is likely the workflow you want to use.
 
 ``` yaml
 # Workflow derived from https://github.com/r-lib/actions/tree/master/examples
-# For help debugging build failures open an issue on the RStudio community with the 'github-actions' tag.
-# https://community.rstudio.com/new-topic?category=Package%20development&tags=github-actions
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
     branches: [main, master]
@@ -136,23 +138,27 @@ jobs:
         config:
           - {os: macOS-latest,   r: 'release'}
           - {os: windows-latest, r: 'release'}
-          - {os: ubuntu-20.04,   r: 'devel', http-user-agent: 'release'}
-          - {os: ubuntu-20.04,   r: 'release'}
+          - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
+          - {os: ubuntu-latest,   r: 'release'}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       - uses: actions/checkout@v2
+
       - uses: r-lib/actions/setup-pandoc@v1
+
       - uses: r-lib/actions/setup-r@v1
-        with:
+          with:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
+
       - uses: r-lib/actions/setup-r-dependencies@v1
         with:
           extra-packages: rcmdcheck
+
       - name: Check
         env:
           _R_CHECK_CRAN_INCOMING_: false
@@ -196,13 +202,11 @@ CI workflow.
 
 ``` yaml
 # Workflow derived from https://github.com/r-lib/actions/tree/master/examples
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 #
-# NOTE: This workflow is overkill for most R packages
-# check-standard.yaml is likely a better choice
+# NOTE: This workflow is overkill for most R packages and
+# check-standard.yaml is likely a better choice.
 # usethis::use_github_action("check-standard") will install it.
-#
-# For help debugging build failures open an issue on the RStudio community with the 'github-actions' tag.
-# https://community.rstudio.com/new-topic?category=Package%20development&tags=github-actions
 on:
   push:
     branches: [main, master]
@@ -224,6 +228,7 @@ jobs:
           - {os: macOS-latest,   r: 'release'}
           - {os: windows-latest, r: 'release'}
           - {os: windows-latest, r: '3.6'}
+          # Deliberately check on older ubuntu to maximise backward compatibility
           - {os: ubuntu-18.04,   r: 'devel', http-user-agent: 'release'}
           - {os: ubuntu-18.04,   r: 'release'}
           - {os: ubuntu-18.04,   r: 'oldrel/1'}
@@ -236,15 +241,19 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+
       - uses: r-lib/actions/setup-pandoc@v1
+
       - uses: r-lib/actions/setup-r@v1
         with:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
+
       - uses: r-lib/actions/setup-r-dependencies@v1
         with:
           extra-packages: rcmdcheck
+
       - name: Check
         env:
           _R_CHECK_CRAN_INCOMING_: false
@@ -276,9 +285,7 @@ the test coverage of your package and upload the result to
 
 ``` yaml
 # Workflow derived from https://github.com/r-lib/actions/tree/master/examples
-#
-# For help debugging build failures open an issue on the RStudio community with the 'github-actions' tag.
-# https://community.rstudio.com/new-topic?category=Package%20development&tags=github-actions
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
     branches: [main, master]
@@ -289,9 +296,8 @@ name: test-coverage
 
 jobs:
   test-coverage:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     env:
-      RSPM: https://packagemanager.rstudio.com/cran/__linux__/bionic/latest
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
@@ -320,9 +326,7 @@ annotations.
 
 ``` yaml
 # Workflow derived from https://github.com/r-lib/actions/tree/master/examples
-#
-# For help debugging build failures open an issue on the RStudio community with the 'github-actions' tag.
-# https://community.rstudio.com/new-topic?category=Package%20development&tags=github-actions
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
     branches: [main, master]
@@ -333,12 +337,16 @@ name: lint
 
 jobs:
   lint:
-    runs-on: macOS-latest
+    runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
+
       - uses: r-lib/actions/setup-r@v1
+        with:
+          use-public-rspm: true
+
       - uses: r-lib/actions/setup-r-dependencies@v1
         with:
           extra-packages: lintr
@@ -368,64 +376,77 @@ the package and commit the result to the pull request. `/style` will use
 
 ``` yaml
 # Workflow derived from https://github.com/r-lib/actions/tree/master/examples
-#
-# For help debugging build failures open an issue on the RStudio community with the 'github-actions' tag.
-# https://community.rstudio.com/new-topic?category=Package%20development&tags=github-actions
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   issue_comment:
     types: [created]
+
 name: Commands
+
 jobs:
   document:
     if: startsWith(github.event.comment.body, '/document')
     name: document
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
+
       - uses: r-lib/actions/pr-fetch@v1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
+
       - uses: r-lib/actions/setup-r@v1
         with:
           use-public-rspm: true
+
       - uses: r-lib/actions/setup-r-dependencies@v1
         with:
           extra-packages: roxygen2
+
       - name: Document
         run: Rscript -e 'roxygen2::roxygenise()'
+
       - name: commit
         run: |
           git config --local user.name "$GITHUB_ACTOR"
           git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
           git add man/\* NAMESPACE
           git commit -m 'Document'
+
       - uses: r-lib/actions/pr-push@v1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
+
   style:
     if: startsWith(github.event.comment.body, '/style')
     name: style
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
+
       - uses: r-lib/actions/pr-fetch@v1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
+
       - uses: r-lib/actions/setup-r@v1
+
       - name: Install dependencies
         run: Rscript -e 'install.packages("styler")'
+
       - name: Style
         run: Rscript -e 'styler::style_pkg()'
+
       - name: commit
         run: |
           git config --local user.name "$GITHUB_ACTOR"
           git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
           git add \*.R
           git commit -m 'Style'
+
       - uses: r-lib/actions/pr-push@v1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
@@ -441,17 +462,16 @@ branch.
 
 ``` yaml
 # Workflow derived from https://github.com/r-lib/actions/tree/master/examples
-#
-# For help debugging build failures open an issue on the RStudio community with the 'github-actions' tag.
-# https://community.rstudio.com/new-topic?category=Package%20development&tags=github-actions
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    paths:
-      - '**.Rmd'
+    paths: ['**.Rmd']
+
+name: render-rmarkdown
 
 jobs:
-  build:
-    runs-on: macOS-latest
+  render-rmarkdown:
+    runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -461,7 +481,9 @@ jobs:
           fetch-depth: 0
 
         uses: r-lib/actions/setup-pandoc@v1
+
         uses: r-lib/actions/setup-r@v1
+
         uses: r-lib/actions/setup-renv@v1
 
       - name: Render Rmarkdown files
@@ -487,28 +509,28 @@ Pages](https://pages.github.com/).
 
 ``` yaml
 # Workflow derived from https://github.com/r-lib/actions/tree/master/examples
-#
-# For help debugging build failures open an issue on the RStudio community with the 'github-actions' tag.
-# https://community.rstudio.com/new-topic?category=Package%20development&tags=github-actions
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
     branches: [main, master]
-    tags:
-      -'*'
+    tags: ['*']
 
 name: pkgdown
 
 jobs:
   pkgdown:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
+
       - uses: r-lib/actions/setup-pandoc@v1
+
       - uses: r-lib/actions/setup-r@v1
         with:
           use-public-rspm: true
+
       - uses: r-lib/actions/setup-r-dependencies@v1
         with:
           extra-packages: pkgdown
@@ -540,9 +562,7 @@ and a `NETLIFY_SITE_ID` secret to your repository for the netlify deploy
 
 ``` yaml
 # Workflow derived from https://github.com/r-lib/actions/tree/master/examples
-#
-# For help debugging build failures open an issue on the RStudio community with the 'github-actions' tag.
-# https://community.rstudio.com/new-topic?category=Package%20development&tags=github-actions
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
     branches: [main, master]
@@ -550,16 +570,20 @@ on:
 name: bookdown
 
 jobs:
-  build:
-    runs-on: macOS-latest
+  bookdown:
+    runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
-        uses: actions/checkout@v2
-        uses: r-lib/actions/setup-pandoc@v1
-        uses: r-lib/actions/setup-r@v1
-        uses: r-lib/actions/setup-renv@v1
-        uses: actions/setup-node@v1
+      - uses: actions/checkout@v2
+
+      - uses: r-lib/actions/setup-pandoc@v1
+
+      - uses: r-lib/actions/setup-r@v1
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-renv@v1
 
       - name: Cache bookdown results
         uses: actions/cache@v2
@@ -571,14 +595,11 @@ jobs:
       - name: Build site
         run: Rscript -e 'bookdown::render_book("index.Rmd", quiet = TRUE)'
 
-      - name: Deploy to Netlify
-        # NETLIFY_AUTH_TOKEN and NETLIFY_SITE_ID added in the repo's secrets
-        env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-        run: |
-          npm install netlify-cli -g
-          netlify deploy --prod --dir _book
+      - name: Deploy to GitHub pages 🚀
+        uses: JamesIves/github-pages-deploy-action@4.1.4
+        with:
+          branch: gh-pages
+          folder: _book
 ```
 
 ## Build blogdown site
@@ -599,9 +620,7 @@ a `NETLIFY_SITE_ID` secret to your repository for the netlify deploy
 
 ``` yaml
 # Workflow derived from https://github.com/r-lib/actions/tree/master/examples
-#
-# For help debugging build failures open an issue on the RStudio community with the 'github-actions' tag.
-# https://community.rstudio.com/new-topic?category=Package%20development&tags=github-actions
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
     branches: [main, master]
@@ -609,16 +628,20 @@ on:
 name: blogdown
 
 jobs:
-  build:
-    runs-on: macOS-latest
+  blogdown:
+    runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
-        uses: actions/checkout@v2
-        uses: r-lib/actions/setup-pandoc@v1
-        uses: r-lib/actions/setup-r@v1
-        uses: r-lib/actions/setup-renv@v1
-        uses: actions/setup-node@v1
+      - uses: actions/checkout@v2
+
+      - uses: r-lib/actions/setup-pandoc@v1
+
+      - uses: r-lib/actions/setup-r@v1
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-renv@v1
 
       - name: Install hugo
         run: |
@@ -628,14 +651,11 @@ jobs:
         run: |
           R -e 'blogdown::build_site(TRUE)'
 
-      - name: Deploy to Netlify
-        # NETLIFY_AUTH_TOKEN and NETLIFY_SITE_ID added in the repo's secrets
-        env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-        run: |
-          npm install netlify-cli -g
-          netlify deploy --prod
+      - name: Deploy to GitHub pages 🚀
+        uses: JamesIves/github-pages-deploy-action@4.1.4
+        with:
+          branch: gh-pages
+          folder: public
 ```
 
 ## Docker based workflow
@@ -651,18 +671,22 @@ uploads the rendered html from the report as a build artifact.
 
 ``` yaml
 # Workflow derived from https://github.com/r-lib/actions/tree/master/examples
-#
-# For help debugging build failures open an issue on the RStudio community with the 'github-actions' tag.
-# https://community.rstudio.com/new-topic?category=Package%20development&tags=github-actions
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on: [push]
+
+name: docker
+
 jobs:
-  job1:
+  docker:
     runs-on: ubuntu-latest
     container: rocker/verse
     steps:
       - uses: actions/checkout@v1
+
       - run: Rscript fit_model.R
+
       - run: Rscript -e 'rmarkdown::render("report.Rmd")'
+
       - name: Upload results
         uses: actions/upload-artifact@main
         with:
@@ -705,9 +729,7 @@ package to lint your project and return the results as annotations.
 
 ``` yaml
 # Workflow derived from https://github.com/r-lib/actions/tree/master/examples
-#
-# For help debugging build failures open an issue on the RStudio community with the 'github-actions' tag.
-# https://community.rstudio.com/new-topic?category=Package%20development&tags=github-actions
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
     branches: [main, master]
@@ -718,13 +740,15 @@ name: lint-project
 
 jobs:
   lint-project:
-    runs-on: macOS-latest
+    runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
 
       - uses: r-lib/actions/setup-r@v1
+        with:
+          use-public-rspm: true
 
       - name: Install lintr
         run: install.packages("lintr")
