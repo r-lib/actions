@@ -77,7 +77,7 @@ name: R-CMD-check
 
 jobs:
   R-CMD-check:
-    runs-on: macOS-latest
+    runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -138,8 +138,8 @@ jobs:
         config:
           - {os: macOS-latest,   r: 'release'}
           - {os: windows-latest, r: 'release'}
-          - {os: ubuntu-20.04,   r: 'devel', http-user-agent: 'release'}
-          - {os: ubuntu-20.04,   r: 'release'}
+          - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
+          - {os: ubuntu-latest,   r: 'release'}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -203,6 +203,10 @@ CI workflow.
 ``` yaml
 # Workflow derived from https://github.com/r-lib/actions/tree/master/examples
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
+#
+# NOTE: This workflow is overkill for most R packages and
+# check-standard.yaml is likely a better choice.
+# usethis::use_github_action("check-standard") will install it.
 on:
   push:
     branches: [main, master]
@@ -224,6 +228,7 @@ jobs:
           - {os: macOS-latest,   r: 'release'}
           - {os: windows-latest, r: 'release'}
           - {os: windows-latest, r: '3.6'}
+          # Deliberately check on older ubuntu to maximise backward compatibility
           - {os: ubuntu-18.04,   r: 'devel', http-user-agent: 'release'}
           - {os: ubuntu-18.04,   r: 'release'}
           - {os: ubuntu-18.04,   r: 'oldrel/1'}
@@ -291,7 +296,7 @@ name: test-coverage
 
 jobs:
   test-coverage:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
@@ -332,7 +337,7 @@ name: lint
 
 jobs:
   lint:
-    runs-on: macOS-latest
+    runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -382,7 +387,7 @@ jobs:
   document:
     if: startsWith(github.event.comment.body, '/document')
     name: document
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -417,7 +422,7 @@ jobs:
   style:
     if: startsWith(github.event.comment.body, '/style')
     name: style
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -466,7 +471,7 @@ name: render-rmarkdown
 
 jobs:
   render-rmarkdown:
-    runs-on: macOS-latest
+    runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -514,7 +519,7 @@ name: pkgdown
 
 jobs:
   pkgdown:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -566,7 +571,7 @@ name: bookdown
 
 jobs:
   bookdown:
-    runs-on: macOS-latest
+    runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -629,7 +634,7 @@ name: blogdown
 
 jobs:
   blogdown:
-    runs-on: macOS-latest
+    runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -745,7 +750,7 @@ name: lint-project
 
 jobs:
   lint-project:
-    runs-on: macOS-latest
+    runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
