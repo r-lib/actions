@@ -30,13 +30,8 @@ jobs:
         run: |
           R -e 'blogdown::build_site(TRUE)'
 
-      - uses: actions/setup-node@v1
-
-      - name: Deploy to Netlify
-        # NETLIFY_AUTH_TOKEN and NETLIFY_SITE_ID added in the repo's secrets
-        env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-        run: |
-          npm install netlify-cli -g
-          netlify deploy --prod
+      - name: Deploy to GitHub pages 🚀
+        uses: JamesIves/github-pages-deploy-action@4.1.4
+        with:
+          branch: gh-pages
+          folder: public
