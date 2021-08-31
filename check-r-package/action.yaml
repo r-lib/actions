@@ -33,5 +33,5 @@ runs:
     - name: Upload check results
       uses: actions/upload-artifact@main
       with:
-        name: ${{ outputs.sanitize-name.name }}
+        name: ${{ steps.sanitize-name.outputs.name }}
         path: check
