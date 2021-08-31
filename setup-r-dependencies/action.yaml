@@ -15,7 +15,7 @@ runs:
   steps:
       - name: Install pak and query dependencies
         run: |
-          cat("::group::Install pak")
+          cat("::group::Install pak\n")
           install.packages("pak", repos = "https://r-lib.github.io/p/pak/dev/")
           saveRDS(pak::pkg_deps("local::.", dependencies = TRUE), ".github/r-depends.rds")
         shell: Rscript {0}
@@ -24,8 +24,8 @@ runs:
         id: get-version
         run: |
           cat("::set-output name=os-version::", sessionInfo()$running, "\n", sep = "")
-          cat("::set-output name=r-version::", R.Version()$version.string, sep = "")
-          cat("::endgroup::")
+          cat("::set-output name=r-version::", R.Version()$version.string, "\n", sep = "")
+          cat("::endgroup::\n")
         shell: Rscript {0}
 
       - name: Restore R package cache
@@ -39,7 +39,7 @@ runs:
 
       - name: Install dependencies
         run: |
-          cat("::group::Install dependencies")
+          cat("::group::Install dependencies\n")
           local_deps <- pak::local_dev_deps(dependencies = "all")[["ref"]]
           needs <- sprintf("Config/Needs/%s", strsplit("${{ inputs.needs }}", "[[:space:],]+")[[1]])
           needs_deps <- pak::local_dev_deps(dependencies = needs)[["ref"]]
@@ -52,16 +52,16 @@ runs:
             }
           }
           pak::pkg_install(c(local_deps, needs_only_deps, extra_deps, "sessioninfo"))
-          cat("::endgroup::")
+          cat("::endgroup::\n")
         shell: Rscript {0}
 
       - name: Session info
         run: |
-          cat("::group::Session info")
+          cat("::group::Session info\n")
           options(width = 100)
           pkgs <- installed.packages()[, "Package"]
           sessioninfo::session_info(pkgs, include_base = TRUE)
-          cat("::endgroup::")
+          cat("::endgroup::\n")
         shell: Rscript {0}
 
       - name: Don't use tar 1.30 from Rtools35 to store the cache
