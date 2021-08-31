@@ -22,18 +22,15 @@ runs:
       shell: Rscript {0}
 
     - name: Show testthat output
-      if: always()
       run: find check -name 'testthat.Rout*' -exec cat '{}' \; || true
       shell: bash
 
     - name: Sanitize output filename
       id: sanitize-name
-      if: failure()
       run: echo "::set-output name=name::$(echo '${{ inputs.artifact-name }}' | sed 's{[/\\":<>|*?]+{-{')"
       shell: bash
 
     - name: Upload check results
-      if: failure()
       uses: actions/upload-artifact@main
       with:
         name: ${{ outputs.sanitize-name.name }}
