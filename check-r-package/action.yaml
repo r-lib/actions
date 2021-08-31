@@ -1,0 +1,40 @@
+name: 'check-r-package'
+description: 'Action to check R package with the rcmdcheck package'
+author: 'Jim Hester'
+inputs:
+  artifact-name:
+    description: 'The name used for the output artifact if the check fails'
+runs:
+  using: "composite"
+  steps:
+    - name: Install rcmdcheck
+      run: |
+        pak::pkg_system_requirements("rcmdcheck", execute = TRUE)
+        pak::pkg_install("rcmdcheck")
+      shell: Rscript {0}
+
+    - name: Check
+      env:
+        _R_CHECK_CRAN_INCOMING_: false
+      run: |
+        options(crayon.enabled = TRUE)
+        rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), error_on = "warning", check_dir = "check")
+      shell: Rscript {0}
+
+    - name: Show testthat output
+      if: always()
+      run: find check -name 'testthat.Rout*' -exec cat '{}' \; || true
+      shell: bash
+
+    - name: Sanitize output filename
+      id: sanitize-name
+      if: failure()
+      run: echo "::set-output name=name::$(echo '${{ inputs.artifact-name }}' | sed 's{[/\\":<>|*?]+{-{')"
+      shell: bash
+
+    - name: Upload check results
+      if: failure()
+      uses: actions/upload-artifact@main
+      with:
+        name: ${{ outputs.sanitize-name.name }}
+        path: check
