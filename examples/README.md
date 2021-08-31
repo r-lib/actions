@@ -104,9 +104,9 @@ jobs:
 
 This workflow runs R CMD check via the
 [rcmdcheck](https://github.com/r-lib/rcmdcheck) package on the three
-major OSs (linux, macOS and Windows) with the current release version of
-R, and R-devel. If you plan to someday submit your package to CRAN or
-Bioconductor this is likely the workflow you want to use.
+major OSs (linux, macOS and Windows) with the current, development, and
+previous versions of R. If you plan to someday submit your package to
+CRAN or Bioconductor this is likely the workflow you want to use.
 
 ### When should you use it?
 
@@ -140,6 +140,7 @@ jobs:
           - {os: windows-latest, r: 'release'}
           - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
           - {os: ubuntu-latest,   r: 'release'}
+          - {os: ubuntu-latest,   r: 'oldrel/1'}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
