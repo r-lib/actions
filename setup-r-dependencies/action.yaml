@@ -16,7 +16,6 @@ runs:
       - name: Install pak and query dependencies
         run: |
           cat("::group::Install pak\n")
-          options(pak.no_extra_messages = TRUE)
           install.packages("pak", repos = "https://r-lib.github.io/p/pak/dev/")
           saveRDS(pak::pkg_deps("local::.", dependencies = TRUE), ".github/r-depends.rds")
         shell: Rscript {0}
@@ -41,6 +40,7 @@ runs:
       - name: Install dependencies
         run: |
           cat("::group::Install dependencies\n")
+          options(pak.no_extra_messages = TRUE)
           local_deps <- pak::local_dev_deps(dependencies = "all")[["ref"]]
           needs <- sprintf("Config/Needs/%s", strsplit("${{ inputs.needs }}", "[[:space:],]+")[[1]])
           needs_deps <- pak::local_dev_deps(dependencies = needs)[["ref"]]
