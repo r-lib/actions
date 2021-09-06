@@ -10,7 +10,7 @@ these actions.
 
 1. [r-lib/actions/setup-r](https://github.com/r-lib/actions/tree/master/setup-r) - Sets up [R](https://r-project.org)
 1. [r-lib/actions/setup-r-dependencies](https://github.com/r-lib/actions/tree/master/setup-r-dependencies) - Installs packages declared in `DESCRIPTION`
-1. [r-lib/actions/setup-r-renv](https://github.com/r-lib/actions/tree/master/setup-r-renv) - Installs packages from renv lockfile.
+1. [r-lib/actions/setup-renv](https://github.com/r-lib/actions/tree/master/setup-renv) - Installs packages from renv lockfile.
 1. [r-lib/actions/setup-pandoc](https://github.com/r-lib/actions/tree/master/setup-pandoc) - Sets up [pandoc](https://pandoc.org/)
 1. [r-lib/actions/setup-tinytex](https://github.com/r-lib/actions/tree/master/setup-tinytex) - Sets up LaTeX with [tinytex](https://yihui.name/tinytex)
 1. [r-lib/actions/pr-fetch](https://github.com/r-lib/actions/tree/master/pr-fetch) - Fetches changes of a PR associated with an event
