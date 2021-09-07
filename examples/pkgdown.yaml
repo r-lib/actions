@@ -4,6 +4,8 @@ on:
   push:
     branches: [main, master]
     tags: ['*']
+  pull_request:
+    branches: [main, master]
 
 name: pkgdown
 
@@ -26,7 +28,18 @@ jobs:
           extra-packages: pkgdown
           needs: website
 
-      - name: Deploy package
+      - name: Build Site (PR)
+        if: github.event_name != 'push'
+        shell: Rscript {0}
+        run: |
+          pkgdown::build_site(new_process = FALSE)
+          # Must validate after building site
+          testthat::expect_warning({
+            pkgdown::build_reference_index()
+          }, NA)
+
+      - name: Deploy site (push)
+        if: github.event_name == 'push'
         run: |
           git config --local user.name "$GITHUB_ACTOR"
           git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
