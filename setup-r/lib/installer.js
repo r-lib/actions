@@ -378,7 +378,10 @@ function acquireRtools(version) {
         }
         if (rtools4) {
             core.addPath(`C:\\rtools40\\usr\\bin`);
-            if (core.getInput("windows-path-include-mingw") === "true") {
+            if (core.getInput("r-version").match("ucrt")) {
+                core.addPath(`C:\\rtools40\\ucrt64\\bin`);
+            }
+            else if (core.getInput("windows-path-include-mingw") === "true") {
                 core.addPath(`C:\\rtools40\\mingw64\\bin`);
             }
             if (core.getInput("update-rtools") === "true") {
@@ -522,6 +525,9 @@ function getDownloadUrlWindows(version) {
     return __awaiter(this, void 0, void 0, function* () {
         if (version == "devel") {
             return "https://cloud.r-project.org/bin/windows/base/R-devel-win.exe";
+        }
+        if (version == "devel-ucrt") {
+            return "https://cloud.r-project.org/bin/windows/testing/R-devel-ucrt.exe";
         }
         const filename = getFileNameWindows(version);
         const releaseVersion = yield getReleaseVersion("win");
