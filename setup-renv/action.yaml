@@ -30,6 +30,7 @@ runs:
           restore-keys: ${{ steps.get-version.outputs.os-version }}-${{ steps.get-version.outputs.r-version }}-${{inputs.cache-version }}-
 
       - name: Install renv dependencies
+        shell: bash
         run: |
           R -e 'install.packages("renv")'
           R -e 'renv::restore()'
