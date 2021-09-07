@@ -373,7 +373,9 @@ async function acquireRtools(version: string) {
   }
   if (rtools4) {
     core.addPath(`C:\\rtools40\\usr\\bin`);
-    if (core.getInput("windows-path-include-mingw") === "true") {
+    if (core.getInput("r-version").match("ucrt")) {
+      core.addPath(`C:\\rtools40\\ucrt64\\bin`);
+    } else if (core.getInput("windows-path-include-mingw") === "true") {
       core.addPath(`C:\\rtools40\\mingw64\\bin`);
     }
     if (core.getInput("update-rtools") === "true") {
@@ -547,6 +549,9 @@ function getFileNameWindows(version: string): string {
 async function getDownloadUrlWindows(version: string): Promise<string> {
   if (version == "devel") {
     return "https://cloud.r-project.org/bin/windows/base/R-devel-win.exe";
+  }
+  if (version == "devel-ucrt") {
+    return "https://cloud.r-project.org/bin/windows/testing/R-devel-ucrt.exe";
   }
 
   const filename: string = getFileNameWindows(version);
