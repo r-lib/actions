@@ -375,6 +375,7 @@ async function acquireRtools(version: string) {
     core.addPath(`C:\\rtools40\\usr\\bin`);
     if (core.getInput("r-version").match("ucrt")) {
       core.addPath(`C:\\rtools40\\ucrt64\\bin`);
+      core.exportVariable("_R_INSTALL_TIME_PATCHES_", "no");
     } else if (core.getInput("windows-path-include-mingw") === "true") {
       core.addPath(`C:\\rtools40\\mingw64\\bin`);
     }
@@ -471,6 +472,7 @@ async function setupRLibrary() {
     profilePath,
     `options(
   repos = c(
+    ${core.getInput("r-version").match("ucrt") ? `CRAN_UCRT = "https://www.r-project.org/nosvn/winutf8/ucrt3/CRAN",` : '' }
     RSPM = ${rspm},
     CRAN = ${cran}
   ),
