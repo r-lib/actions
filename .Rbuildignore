@@ -10,3 +10,4 @@
 ^actions\.Rproj$
 ^\.Rproj\.user$
 ^Makefile$
+^CITATION\.cff$
