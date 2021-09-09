@@ -243,8 +243,10 @@ jobs:
       matrix:
         config:
           - {os: macOS-latest,   r: 'release'}
+
           - {os: windows-latest, r: 'release'}
-          - {os: windows-latest, r: '3.6'}
+          - {os: windows-latest, r: 'oldrel/1'}
+
           # Deliberately check on older ubuntu to maximise backward compatibility
           - {os: ubuntu-18.04,   r: 'devel', http-user-agent: 'release'}
           - {os: ubuntu-18.04,   r: 'release'}
