@@ -111,6 +111,8 @@
 <h2 class="hasAnchor">
 <a href="#common-questions" class="anchor"></a>Common questions</h2>
 <ol>
+<li>Why are my builds with plots failing on macOS? You need to install XQuartz to do plotting with the default quartz device on macOS. This can be done by adding the following to your workflow. <code>yaml  - if: runner.os == 'macOS'    run: brew install --cask xquartz</code>
+</li>
 <li>
 <em>Does GitHub Actions support <code>[ci skip]</code> or similar syntax to automatically skip a build?</em>
  Not by default, however you can enable it in any of your workflows by adding the following <a href="https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idif">conditional</a>, e.g. 
