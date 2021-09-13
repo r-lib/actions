@@ -42,6 +42,8 @@ inputs:
       at https://packagemanager.rstudio.com/ to serve binaries for Linux and
       Windows.'
     default: false
+  extra-repositories:
+    description: 'One or more extra repositories to include'
 outputs:
   installed-r-version:
     description: 'The full R version installed'

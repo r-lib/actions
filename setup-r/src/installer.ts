@@ -448,7 +448,9 @@ async function setupRLibrary() {
     core.exportVariable("RSPM", rspm.replace(/^'|'$/g, ""));
   }
 
-  let cran = `'${process.env["CRAN"] || "https://cloud.r-project.org"}'`;
+  let cran = `'${core.getInput("cran") ||
+    process.env["CRAN"] ||
+    "https://cloud.r-project.org"}'`;
 
   let user_agent;
 
@@ -465,12 +467,24 @@ async function setupRLibrary() {
         : `"${core.getInput("http-user-agent")}"`;
   }
 
+  // Split the repositories by whitespace and then quote each entry joining with commas
+  let extra_repositories = core
+    .getInput("extra-repositories")
+    .split(/\s+/)
+    .map(x => `"${x}"`)
+    .join(",");
+
+  // Prepend a , if there are extra repositories
+  if (extra_repositories) {
+    extra_repositories = "\n,    " + extra_repositories;
+  }
+
   await fs.promises.writeFile(
     profilePath,
     `options(
   repos = c(
     RSPM = ${rspm},
-    CRAN = ${cran}
+    CRAN = ${cran}${extra_repositories}
   ),
   crayon.enabled = ${core.getInput("crayon.enabled")},
   Ncpus = ${core.getInput("Ncpus")},

@@ -449,7 +449,9 @@ function setupRLibrary() {
         if (rspm !== "NULL") {
             core.exportVariable("RSPM", rspm.replace(/^'|'$/g, ""));
         }
-        let cran = `'${process.env["CRAN"] || "https://cloud.r-project.org"}'`;
+        let cran = `'${core.getInput("cran") ||
+            process.env["CRAN"] ||
+            "https://cloud.r-project.org"}'`;
         let user_agent;
         if (core.getInput("http-user-agent") === "release") {
             let os = IS_WINDOWS ? "win" : IS_MAC ? "macos" : "tarball";
@@ -463,10 +465,20 @@ function setupRLibrary() {
                     ? 'sprintf("R/%s R (%s) on GitHub Actions", getRversion(), paste(getRversion(), R.version$platform, R.version$arch, R.version$os))'
                     : `"${core.getInput("http-user-agent")}"`;
         }
+        // Split the repositories by whitespace and then quote each entry joining with commas
+        let extra_repositories = core
+            .getInput("extra-repositories")
+            .split(/\s+/)
+            .map(x => `"${x}"`)
+            .join(",");
+        // Prepend a , if there are extra repositories
+        if (extra_repositories) {
+            extra_repositories = "\n,    " + extra_repositories;
+        }
         yield fs.promises.writeFile(profilePath, `options(
   repos = c(
     RSPM = ${rspm},
-    CRAN = ${cran}
+    CRAN = ${cran}${extra_repositories}
   ),
   crayon.enabled = ${core.getInput("crayon.enabled")},
   Ncpus = ${core.getInput("Ncpus")},
