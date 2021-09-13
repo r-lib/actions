@@ -48,6 +48,12 @@ If your build fails and you are unsure of why here are some useful strategies fo
 
 ## Common questions
 
+1. Why are my builds with plots failing on macOS?
+  You need to install XQuartz to do plotting with the default quartz device on macOS. This can be done by adding the following to your workflow.
+    ```yaml
+    - if: runner.os == 'macOS'
+      run: brew install --cask xquartz
+    ```
 1. *Does GitHub Actions support `[ci skip]` or similar syntax to automatically skip a build?*\
   Not by default, however you can enable it in any of your workflows by adding the following [conditional](https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idif), e.g. \
   `if: !contains(github.event.head_commit.message, '[ci skip]')`
