@@ -18,6 +18,8 @@ steps:
 - run: tlmgr --version
 ```
 
+If you want to select the CTAN mirror you can set the `CTAN_REPO` tinytex environment variable.
+
 # License
 
 The scripts and documentation in this project are released under the [MIT License](LICENSE)
