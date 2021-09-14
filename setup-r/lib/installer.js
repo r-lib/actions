@@ -481,7 +481,9 @@ function setupRLibrary() {
         }
         yield fs.promises.writeFile(profilePath, `options(
   repos = c(
-    ${core.getInput("r-version").match("ucrt") ? `CRAN_UCRT = "https://www.r-project.org/nosvn/winutf8/ucrt3/CRAN",` : ''}
+    ${core.getInput("r-version").match("ucrt")
+            ? `CRAN_UCRT = "https://www.r-project.org/nosvn/winutf8/ucrt3/CRAN",`
+            : ""}
     RSPM = ${rspm},
     CRAN = ${cran}${extra_repositories}
   ),
@@ -594,7 +596,7 @@ function determineVersion(version) {
             return getReleaseVersion("tarball");
         }
         if (version.startsWith("oldrel")) {
-            const [, oldRelVersion] = version.split("/");
+            const [, oldRelVersion] = version.split(/[-\/]/);
             if (oldRelVersion == null) {
                 return getOldrelVersion("1");
             }
