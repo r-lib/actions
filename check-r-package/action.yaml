@@ -1,0 +1,13 @@
+name: 'check-r-package'
+description: 'Action to check R package with rcmdcheck'
+author: 'Jim Hester'
+runs:
+  using: "composite"
+  steps:
+    - name: Check
+      env:
+        _R_CHECK_CRAN_INCOMING_: false
+      run: |
+        options(crayon.enabled = TRUE)
+        rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), error_on = "warning", check_dir = "check")
+      shell: Rscript {0}
