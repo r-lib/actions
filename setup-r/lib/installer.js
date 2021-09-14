@@ -473,7 +473,7 @@ function setupRLibrary() {
             .join(",");
         // Prepend a , if there are extra repositories
         if (extra_repositories) {
-            extra_repositories = "\n,    " + extra_repositories;
+            extra_repositories = ",\n    " + extra_repositories;
         }
         yield fs.promises.writeFile(profilePath, `options(
   repos = c(
