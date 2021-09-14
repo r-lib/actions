@@ -1,6 +1,16 @@
 name: 'check-r-package'
 description: 'Action to check R package with rcmdcheck'
 author: 'Jim Hester'
+inputs:
+  args:
+    description: 'Arguments to pass to the `args` parameter of rcmdcheck'
+    default: '"--no-manual", "--as-cran"'
+  error-on:
+    description: 'What type of result should cause a build error?'
+    default: '"warning"'
+  check-dir:
+    description: 'Where should the check output go?'
+    default: '"check"'
 runs:
   using: "composite"
   steps:
@@ -9,5 +19,5 @@ runs:
         _R_CHECK_CRAN_INCOMING_: false
       run: |
         options(crayon.enabled = TRUE)
-        rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), error_on = "warning", check_dir = "check")
+        rcmdcheck::rcmdcheck(args = c(${{ inputs.args }}), error_on = ${{ inputs.error-on }}, check_dir = ${{ inputs.check-dir }})
       shell: Rscript {0}
