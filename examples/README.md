@@ -690,7 +690,7 @@ on:
 name: shiny-deploy
 
 jobs:
-  pkgdown:
+  shiny-deploy:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
