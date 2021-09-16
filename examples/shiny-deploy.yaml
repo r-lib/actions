@@ -1,0 +1,34 @@
+# Workflow derived from https://github.com/r-lib/actions/tree/master/examples
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
+on:
+  push:
+    branches: [main, master]
+
+name: shiny-deploy
+
+jobs:
+  pkgdown:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      RSCONNECT_USER: ${{ secrets.RSCONNECT_USER }}
+      RSCONNECT_TOKEN: ${{ secrets.RSCONNECT_TOKEN }}
+      RSCONNECT_SECRET: ${{ secrets.RSCONNECT_SECRET }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: r-lib/actions/setup-pandoc@v1
+
+      - uses: r-lib/actions/setup-r@v1
+        with:
+          use-public-rspm: true
+
+      - name: Install rsconnect
+        run: install.packages("rsconnect")
+        shell: Rscript {0}
+
+      - name: Authorize and deploy app
+        run: |
+          rsconnect::setAccountInfo($RSCONNECT_USER, $RSCONNECT_TOKEN, $RSCONNECT_SECRET)
+          rsconnect::deployApp()
+        shell: Rscript {0}
