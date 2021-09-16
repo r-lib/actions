@@ -668,6 +668,10 @@ user name (`RSCONNECT_USER`), token (`RSCONNECT_TOKEN`), and secret
 (`RSCONNECT_SECRET`), which are securely accessed as GitHub Secrets.
 **Your token and secret are private and should be kept confidential**.
 
+This action assumes you have an `renv` lockfile in your repository that
+describes the `R` packages and versions required for your Shiny
+application.
+
 -   See here for information on how to obtain the token and secret for
     configuring `rsconnect`:
     <https://shiny.rstudio.com/articles/shinyapps.html>
@@ -701,6 +705,8 @@ jobs:
       - uses: r-lib/actions/setup-r@v1
         with:
           use-public-rspm: true
+
+      - uses: r-lib/actions/setup-renv@v1
 
       - name: Install rsconnect
         run: install.packages("rsconnect")
