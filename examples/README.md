@@ -694,9 +694,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-      RSCONNECT_USER: ${{ secrets.RSCONNECT_USER }}
-      RSCONNECT_TOKEN: ${{ secrets.RSCONNECT_TOKEN }}
-      RSCONNECT_SECRET: ${{ secrets.RSCONNECT_SECRET }}
     steps:
       - uses: actions/checkout@v2
 
@@ -714,7 +711,7 @@ jobs:
 
       - name: Authorize and deploy app
         run: |
-          rsconnect::setAccountInfo($RSCONNECT_USER, $RSCONNECT_TOKEN, $RSCONNECT_SECRET)
+          rsconnect::setAccountInfo(${{ secrets.RSCONNECT_USER }}, ${{ secrets.RSCONNECT_TOKEN }}, ${{ secrets.RSCONNECT_SECRET }})
           rsconnect::deployApp()
         shell: Rscript {0}
 ```
