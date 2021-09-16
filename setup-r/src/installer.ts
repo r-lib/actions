@@ -471,14 +471,14 @@ async function setupRLibrary() {
   }
 
   // Split the repositories by whitespace and then quote each entry joining with commas
-  let extra_repositories = core
-    .getInput("extra-repositories")
-    .split(/\s+/)
-    .map(x => `"${x}"`)
-    .join(",");
+  let extra_repositories = core.getInput("extra-repositories");
 
   // Prepend a , if there are extra repositories
   if (extra_repositories) {
+    extra_repositories = extra_repositories
+      .split(/\s+/)
+      .map(x => `"${x}"`)
+      .join(",");
     extra_repositories = ",\n    " + extra_repositories;
   }
 
