@@ -5,46 +5,48 @@
 
 Package workflows:
 
-  - [`check-release`](#quickstart-ci-workflow) - A simple CI workflow to
+-   [`check-release`](#quickstart-ci-workflow) - A simple CI workflow to
     check with the release version of R.
-  - [`check-standard`](#standard-ci-workflow) - A standard CI workflow
+-   [`check-standard`](#standard-ci-workflow) - A standard CI workflow
     to check with the release version of R on the three major OSs.
-  - [`check-full`](#tidyverse-ci-workflow) - A more complex CI workflow
-  - [`test-coverage`](#test-coverage-workflow) - Run `covr::codecov()`
+-   [`check-full`](#tidyverse-ci-workflow) - A more complex CI workflow
+-   [`test-coverage`](#test-coverage-workflow) - Run `covr::codecov()`
     on an R package.
-  - [`lint`](#lint-workflow) - Run `lintr::lint_package()` on an R
+-   [`lint`](#lint-workflow) - Run `lintr::lint_package()` on an R
     package.
-  - [`pr-commands`](#commands-workflow) - Adds `/document` and `/style`
+-   [`pr-commands`](#commands-workflow) - Adds `/document` and `/style`
     commands for pull requests.
-  - [`pkgdown`](#build-pkgdown-site) - Build a
+-   [`pkgdown`](#build-pkgdown-site) - Build a
     [pkgdown](https://pkgdown.r-lib.org/) site for an R package and
     deploy it to [GitHub Pages](https://pages.github.com/).
 
 RMarkdown workflows:
 
-  - [`render-rmarkdown`](#render-rmarkdown) - Render one or more
+-   [`render-rmarkdown`](#render-rmarkdown) - Render one or more
     Rmarkdown files when they change and commit the result.
-  - [`bookdown`](#build-bookdown-site) - Build a
+-   [`bookdown`](#build-bookdown-site) - Build a
     [bookdown](https://bookdown.org) site and deploy it to
     [netlify](https://www.netlify.com/).
-  - [`blogdown`](#build-blogdown-site) - Build a
+-   [`blogdown`](#build-blogdown-site) - Build a
     [blogdown](https://bookdown.org/yihui/blogdown/) site and deploy it
     to [netlify](https://www.netlify.com/).
 
 Other workflows:
 
-  - [`docker`](#docker-based-workflow) - For custom workflows based on
+-   [`docker`](#docker-based-workflow) - For custom workflows based on
     docker containers.
-  - [Bioconductor](#bioconductor-friendly-workflow) - A CI workflow for
+-   [Bioconductor](#bioconductor-friendly-workflow) - A CI workflow for
     packages to be released on Bioconductor.
-  - [`lint-project`](#lint-project-workflow) - Run `lintr::lint_dir()`
+-   [`lint-project`](#lint-project-workflow) - Run `lintr::lint_dir()`
     on an R project.
+-   [`shiny-deploy`](#shiny-app-deployment) - Deploy a Shiny app to
+    shinyapps.io or RStudio Connect.
 
 Options and advice:
 
-  - [Forcing binaries](#forcing-binaries) - An environment variable to
+-   [Forcing binaries](#forcing-binaries) - An environment variable to
     always use binary packages.
-  - [Managing secrets](#managing-secrets) - How to generate auth tokens
+-   [Managing secrets](#managing-secrets) - How to generate auth tokens
     and make them available to actions.
 
 ## Quickstart CI workflow
@@ -61,8 +63,6 @@ probably what you want to use.
 1.  You have a simple R package
 2.  There is no OS-specific code
 3.  You want a quick start with R CI
-
-<!-- end list -->
 
 ``` yaml
 # Workflow derived from https://github.com/r-lib/actions/tree/master/examples
@@ -121,8 +121,6 @@ CRAN or Bioconductor this is likely the workflow you want to use.
 
 1.  You plan to submit your package to CRAN or Bioconductor
 2.  Your package has OS-specific code
-
-<!-- end list -->
 
 ``` yaml
 # Workflow derived from https://github.com/r-lib/actions/tree/master/examples
@@ -202,8 +200,6 @@ CI workflow.
 2.  You have a complex R package
 3.  With OS-specific code
 4.  And you want to ensure compatibility with many older R versions
-
-<!-- end list -->
 
 ``` yaml
 # Workflow derived from https://github.com/r-lib/actions/tree/master/examples
@@ -374,8 +370,6 @@ the package and commit the result to the pull request. `/style` will use
 1.  You get frequent pull requests, often with documentation only fixes.
 2.  You regularly style your code with styler, and require all additions
     be styled as well.
-
-<!-- end list -->
 
 ``` yaml
 # Workflow derived from https://github.com/r-lib/actions/tree/master/examples
@@ -661,6 +655,67 @@ jobs:
           folder: public
 ```
 
+## Shiny App Deployment
+
+`usethis::use_github_action("shiny-deploy")`
+
+This example will deploy your Shiny application to either
+[shinyapps.io](https://www.shinyapps.io/) or [RStudio
+Connect](https://www.rstudio.com/products/connect/) using the
+`rsconnect` package. The `rsconnect` package requires authorization to
+deploy an app using your account. This action does this by using your
+user name (`RSCONNECT_USER`), token (`RSCONNECT_TOKEN`), and secret
+(`RSCONNECT_SECRET`), which are securely accessed as GitHub Secrets.
+**Your token and secret are private and should be kept confidential**.
+
+This action assumes you have an `renv` lockfile in your repository that
+describes the `R` packages and versions required for your Shiny
+application.
+
+-   See here for information on how to obtain the token and secret for
+    configuring `rsconnect`:
+    <https://shiny.rstudio.com/articles/shinyapps.html>
+
+-   See here for information on how to store private tokens in a
+    repository as GitHub Secrets:
+    <https://docs.github.com/en/actions/reference/encrypted-secrets#creating-encrypted-secrets-for-a-repository>
+
+``` yaml
+# Workflow derived from https://github.com/r-lib/actions/tree/master/examples
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
+on:
+  push:
+    branches: [main, master]
+
+name: shiny-deploy
+
+jobs:
+  shiny-deploy:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: r-lib/actions/setup-pandoc@v1
+
+      - uses: r-lib/actions/setup-r@v1
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-renv@v1
+
+      - name: Install rsconnect
+        run: install.packages("rsconnect")
+        shell: Rscript {0}
+
+      - name: Authorize and deploy app
+        run: |
+          rsconnect::setAccountInfo(${{ secrets.RSCONNECT_USER }}, ${{ secrets.RSCONNECT_TOKEN }}, ${{ secrets.RSCONNECT_SECRET }})
+          rsconnect::deployApp()
+        shell: Rscript {0}
+```
+
 ## Docker based workflow
 
 `usethis::use_github_action("docker")`
@@ -823,25 +878,25 @@ which we follow here.
     `https://github.com/{user}/{repo}/settings/secrets`.
 
 3.  At the **tokens** page:
-    
-      - Click “New access token”.
-      - Provide a description for your benefit, so you will know which
+
+    -   Click “New access token”.
+    -   Provide a description for your benefit, so you will know which
         token this is, perhaps something like `actions-{repo}`.
-      - Click “Generate token”.
-      - Copy the token to your clipboard.
+    -   Click “Generate token”.
+    -   Copy the token to your clipboard.
 
 4.  On your repository’s **secrets** page:
-    
-      - Click “Add a new secret”.
-      - In the “Name” field, type `NETLIFY_AUTH_TOKEN` (or the name of
+
+    -   Click “Add a new secret”.
+    -   In the “Name” field, type `NETLIFY_AUTH_TOKEN` (or the name of
         the secret that the action expects).
-      - In the “Value” field, paste the token from your clipboard.
-      - Click “Add Secret”.
+    -   In the “Value” field, paste the token from your clipboard.
+    -   Click “Add Secret”.
 
 5.  At this point (certainly at some point), you may wish to close your
     **tokens** page to remove the visibility of your token.
 
 The `NETLIFY_SITE_ID` is not quite as personal as the PAT and is visible
 from your Netlify profile. This is the value of the **API ID** variable
-that is listed on your site dashboard under Settings \> General \> Site
-details \> Site information.
+that is listed on your site dashboard under Settings &gt; General &gt;
+Site details &gt; Site information.
