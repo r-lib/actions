@@ -1,5 +1,5 @@
 name: 'check-r-package'
-description: 'Action to check R package with rcmdcheck'
+description: 'Action to check R package with rcmdcheck. Assumes that rcmdcheck has already been installed.'
 author: 'Jim Hester'
 inputs:
   args:

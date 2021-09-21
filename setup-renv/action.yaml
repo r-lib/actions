@@ -11,8 +11,7 @@ runs:
   steps:
       - name: Install renv and query dependencies
         run: |
-          install.packages("pak", repos = "https://r-lib.github.io/p/pak/dev/")
-          saveRDS(pak::pkg_deps("local::.", dependencies = TRUE), ".github/r-depends.rds")
+          install.packages("renv")
         shell: Rscript {0}
 
       - name: Get R and OS version
@@ -34,7 +33,7 @@ runs:
           R -e 'install.packages("renv")'
           R -e 'renv::restore()'
         shell: bash
-        
+
       - name: Don't use tar 1.30 from Rtools35 to store the cache
         run: |
           if command -v /c/Rtools/bin/tar && /c/Rtools/bin/tar --version | grep -q 'tar (GNU tar) 1.30'
