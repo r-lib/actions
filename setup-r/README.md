@@ -51,6 +51,8 @@ This action sets up an R environment for use in actions by:
 -   **use-public-rspm** (`false`) - Use the public version of RStudio
     package manager available at <https://packagemanager.rstudio.com/>
     to serve binaries for Linux and Windows.
+-   **extra-repositories** (`''`) - One or more extra CRAN-like
+    repositories to include in the `repos` global option
 
 ## Outputs
 

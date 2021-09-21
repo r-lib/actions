@@ -43,7 +43,8 @@ inputs:
       Windows.'
     default: false
   extra-repositories:
-    description: 'One or more extra repositories to include'
+    description: 'One or more extra CRAN-like repositories to include in the `repos` global option'
+    default: ''
 outputs:
   installed-r-version:
     description: 'The full R version installed'
