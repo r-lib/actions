@@ -42,8 +42,9 @@ This action sets up an R environment for use in actions by:
     If `"release"` sets the user agent to the default user agent for the
     current R release. Otherwise uses whatever value is passed to
     `http-user-agent`.
--   **install-r** (`true`) - If “true”, install R during the setup; if
-    “false”, use the existing installation in the GitHub Action image.
+-   **install-r** (`true`) - If “true” download and install R during the
+    setup. If “false” use the existing installation in the GitHub Action
+    image.
 -   **windows-path-include-mingw** (`true`) - If “true” put the 64 bit
     mingw directory from Rtools on the PATH for Windows builds.
 -   **update-rtools** (`false`) - Update rtools40 compilers and

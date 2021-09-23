@@ -28,7 +28,8 @@ inputs:
       release. Otherwise uses whatever value is passed to `http-user-agent`.'
     default: 'default'
   install-r:
-    description: 'Wether to install R during the setup or use the existing installation in the GitHub Action image.'
+    description: 'If "true" download and install R during the setup. If "false"
+      use the existing installation in the GitHub Action image.'
     default: true
   windows-path-include-mingw:
     description: 'If "true" put the 64 bit mingw directory from Rtools on the
