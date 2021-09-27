@@ -485,12 +485,12 @@ jobs:
         with:
           fetch-depth: 0
 
-        uses: r-lib/actions/setup-pandoc@v1
+      - uses: r-lib/actions/setup-pandoc@v1
 
-        uses: r-lib/actions/setup-r@v1
+      - uses: r-lib/actions/setup-r@v1
 
-        uses: r-lib/actions/setup-renv@v1
-
+      - uses: r-lib/actions/setup-renv@v1
+      
       - name: Render Rmarkdown files
         run: |
           RMD_PATH=($(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '[.]Rmd$'))
