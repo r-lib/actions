@@ -5,6 +5,9 @@ inputs:
   args:
     description: 'Arguments to pass to the `args` parameter of rcmdcheck'
     default: '"--no-manual", "--as-cran"'
+  build_args:
+    description: 'Arguments to pass to the `build_args` parameter of rcmdcheck'
+    default: ''
   error-on:
     description: 'What type of result should cause a build error?'
     default: '"warning"'
@@ -19,5 +22,5 @@ runs:
         _R_CHECK_CRAN_INCOMING_: false
       run: |
         options(crayon.enabled = TRUE)
-        rcmdcheck::rcmdcheck(args = c(${{ inputs.args }}), error_on = ${{ inputs.error-on }}, check_dir = ${{ inputs.check-dir }})
+        rcmdcheck::rcmdcheck(args = c(${{ inputs.args }}), build_args = c(${{ inputs.build_args }}), error_on = ${{ inputs.error-on }}, check_dir = ${{ inputs.check-dir }})
       shell: Rscript {0}
