@@ -9,7 +9,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-      - name: Install renv and query dependencies
+      - name: Install renv
         run: |
           install.packages("renv")
         shell: Rscript {0}
