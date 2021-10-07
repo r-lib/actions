@@ -29,14 +29,12 @@ runs:
           restore-keys: ${{ steps.get-version.outputs.os-version }}-${{ steps.get-version.outputs.r-version }}-${{inputs.cache-version }}-
 
       - name: Install renv dependencies
-        run: |
-          R -e 'install.packages("renv")'
-          R -e 'renv::restore()'
-        shell: bash
+        run: renv::restore()
+        shell: Rscript {0}
 
       - name: Don't use tar 1.30 from Rtools35 to store the cache
+        shell: bash
         run: |
           if command -v /c/Rtools/bin/tar && /c/Rtools/bin/tar --version | grep -q 'tar (GNU tar) 1.30'
             then echo 'C:/Program Files/Git/usr/bin' >> $GITHUB_PATH
           fi
-        shell: bash
