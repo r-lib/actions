@@ -21,10 +21,16 @@ runs:
           cat("##[set-output name=r-version;]", R.Version()$version.string, sep = "")
         shell: Rscript {0}
 
+      - name: Get renv cache path
+        id: get-renv-cache-path
+        run: |
+          cat("##[set-output name=renv-cache-path;]", renv:::paths$cache(), sep = "")
+        shell: Rscript {0}
+
       - name: Restore Renv package cache
         uses: actions/cache@v2
         with:
-          path: $HOME/.cache/R/renv
+          path: ${{ steps.get-renv-cache-path.renv-cache-path }}
           key: ${{ steps.get-version.outputs.os-version }}-${{ steps.get-version.outputs.r-version }}-${{inputs.cache-version }}-${{ hashFiles('renv.lock') }}
           restore-keys: ${{ steps.get-version.outputs.os-version }}-${{ steps.get-version.outputs.r-version }}-${{inputs.cache-version }}-
 
