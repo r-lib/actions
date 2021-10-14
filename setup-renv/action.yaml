@@ -24,7 +24,7 @@ runs:
       - name: Restore Renv package cache
         uses: actions/cache@v2
         with:
-          path: $HOME/.local/share/renv
+          path: $HOME/.cache/R/renv
           key: ${{ steps.get-version.outputs.os-version }}-${{ steps.get-version.outputs.r-version }}-${{inputs.cache-version }}-${{ hashFiles('renv.lock') }}
           restore-keys: ${{ steps.get-version.outputs.os-version }}-${{ steps.get-version.outputs.r-version }}-${{inputs.cache-version }}-
 
