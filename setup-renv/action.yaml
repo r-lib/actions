@@ -9,9 +9,10 @@ inputs:
 runs:
   using: "composite"
   steps:
-      - name: Install renv
+      - name: Install and activate renv
         run: |
           install.packages("renv")
+          renv::activate()
         shell: Rscript {0}
 
       - name: Get R and OS version
@@ -24,13 +25,13 @@ runs:
       - name: Get renv cache path
         id: get-renv-cache-path
         run: |
-          cat("##[set-output name=renv-cache-path;]", renv:::paths$cache(), sep = "")
+          cat("##[set-output name=renv-cache-path;]", renv::paths$cache(), sep = "")
         shell: Rscript {0}
 
       - name: Restore Renv package cache
         uses: actions/cache@v2
         with:
-          path: ${{ steps.get-renv-cache-path.renv-cache-path }}
+          path: ${{ steps.get-renv-cache-path.outputs.renv-cache-path }}
           key: ${{ steps.get-version.outputs.os-version }}-${{ steps.get-version.outputs.r-version }}-${{inputs.cache-version }}-${{ hashFiles('renv.lock') }}
           restore-keys: ${{ steps.get-version.outputs.os-version }}-${{ steps.get-version.outputs.r-version }}-${{inputs.cache-version }}-
 
