@@ -9,9 +9,15 @@ inputs:
 runs:
   using: "composite"
   steps:
-      - name: Install renv
+      - name: Set RENV_PATHS_ROOT
+        shell: bash
+        run: |
+          echo "RENV_PATHS_ROOT=${{ runner.temp }}/renv" >> $GITHUB_ENV
+
+      - name: Install and activate renv
         run: |
           install.packages("renv")
+          renv::activate()
         shell: Rscript {0}
 
       - name: Get R and OS version
@@ -24,7 +30,7 @@ runs:
       - name: Restore Renv package cache
         uses: actions/cache@v2
         with:
-          path: $HOME/.local/share/renv
+          path: ${{ env.RENV_PATHS_ROOT }}
           key: ${{ steps.get-version.outputs.os-version }}-${{ steps.get-version.outputs.r-version }}-${{inputs.cache-version }}-${{ hashFiles('renv.lock') }}
           restore-keys: ${{ steps.get-version.outputs.os-version }}-${{ steps.get-version.outputs.r-version }}-${{inputs.cache-version }}-
 
