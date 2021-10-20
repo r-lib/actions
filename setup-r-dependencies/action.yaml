@@ -10,9 +10,6 @@ inputs:
     description: 'Any extra packages to install outside of the packages listed in the dependencies'
   needs:
     description: 'Any extra Config/Needs fields which need to be included when installing dependencies'
-  pak-version:
-    description: 'Which pak version to use. Possible values are "stable", "rc" and "devel".'
-    default: 'stable'
 runs:
   using: "composite"
   steps:
@@ -20,7 +17,7 @@ runs:
         run: |
           cat("::group::Install pak\n")
           options(pak.no_extra_messages = TRUE)
-          install.packages("pak", repos = "https://r-lib.github.io/p/pak/{{ inputs.pak-version }}/")
+          install.packages("pak", repos = "https://r-lib.github.io/p/pak/dev/")
           saveRDS(pak::pkg_deps("local::.", dependencies = TRUE), ".github/r-depends.rds")
         shell: Rscript {0}
 
