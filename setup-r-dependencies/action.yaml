@@ -6,8 +6,6 @@ inputs:
     description: 'The version of the cache, change this from the default (1) to start over with a fresh cache'
     required: true
     default: 1
-  extra-packages:
-    description: 'Any extra packages to install outside of the packages listed in the dependencies'
   needs:
     description: 'Any extra Config/Needs fields which need to be included when installing dependencies'
   pak-version:
@@ -21,7 +19,8 @@ runs:
           cat("::group::Install pak\n")
           options(pak.no_extra_messages = TRUE)
           install.packages("pak", repos = "https://r-lib.github.io/p/pak/${{ inputs.pak-version }}/")
-          saveRDS(pak::pkg_deps("local::.", dependencies = TRUE), ".github/r-depends.rds")
+          needs <- sprintf("Config/Needs/%s", strsplit("${{ inputs.needs }}", "[[:space:],]+")[[1]])
+          saveRDS(pak::pkg_deps("deps::.", dependencies = c(needs, "all"), upgrade = TRUE), ".github/r-depends.rds")
         shell: Rscript {0}
 
       - name: Get R and OS version
@@ -45,18 +44,16 @@ runs:
         run: |
           cat("::group::Install dependencies\n")
           options(pak.no_extra_messages = TRUE)
-          local_deps <- pak::local_dev_deps(dependencies = "all")[["ref"]]
-          needs <- sprintf("Config/Needs/%s", strsplit("${{ inputs.needs }}", "[[:space:],]+")[[1]])
-          needs_deps <- pak::local_dev_deps(dependencies = needs)[["ref"]]
-          needs_only_deps <- setdiff(needs_deps, local_deps)
-          extra_deps <- strsplit("${{ inputs.extra-packages }}", "[[:space:],]+")[[1]]
+          pak::pkg_install("sessioninfo")
           if (Sys.info()[["sysname"]] == "Linux") {
             pak::local_system_requirements(execute = TRUE)
-            for (dep in c(needs_only_deps, extra_deps)) {
+            deps <- readRDS(".github/r-depends.rds")[["package"]][-1]
+            for (dep in deps) {
               pak::pkg_system_requirements(dep, execute = TRUE)
             }
           }
-          pak::pkg_install(c(local_deps, needs_only_deps, extra_deps, "sessioninfo"))
+          needs <- sprintf("Config/Needs/%s", strsplit("${{ inputs.needs }}", "[[:space:],]+")[[1]])
+          pak::pkg_install("deps::.", dependencies = c(needs, "all"), upgrade = TRUE)
           cat("::endgroup::\n")
         shell: Rscript {0}
 
