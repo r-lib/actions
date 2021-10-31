@@ -114,10 +114,10 @@ function installPandocWindows(version) {
     });
 }
 function pandocSubdir(version) {
-    if (semver.gt(version, "2.9.2")) {
+    if (semver.gte(version, "2.9.2")) {
         return util.format("pandoc-%s", version);
     }
-    if (semver.eq(version,"2.9.1")) {
+    if (semver.eq(version, "2.9.1")) {
         return "";
     }
     return util.format("pandoc-%s-windows-x86_64", version);
