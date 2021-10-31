@@ -25,6 +25,7 @@ const path = __importStar(require("path"));
 const util = __importStar(require("util"));
 const IS_WINDOWS = process.platform === "win32";
 const IS_MAC = process.platform === "darwin";
+const semver = __importStar(require("semver"));
 if (!tempDirectory) {
     let baseLocation;
     if (IS_WINDOWS) {
@@ -113,10 +114,10 @@ function installPandocWindows(version) {
     });
 }
 function pandocSubdir(version) {
-    if (version >= "2.9.2") {
+    if (semver.gt(version, "2.9.2")) {
         return util.format("pandoc-%s", version);
     }
-    if (version == "2.9.1") {
+    if (semver.eq(version,"2.9.1")) {
         return "";
     }
     return util.format("pandoc-%s-windows-x86_64", version);
