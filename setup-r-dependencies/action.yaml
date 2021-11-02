@@ -44,7 +44,7 @@ runs:
         run: |
           cat("::group::Install dependencies\n")
           options(pak.no_extra_messages = TRUE)
-          pak::pkg_install("sessioninfo")
+          pak::pkg_install("r-lib/sessioninfo@a68df12")
           if (Sys.info()[["sysname"]] == "Linux") {
             pak::local_system_requirements(execute = TRUE)
             deps <- readRDS(".github/r-depends.rds")[["package"]][-1]
