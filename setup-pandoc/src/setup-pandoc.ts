@@ -7,6 +7,7 @@ import * as tc from "@actions/tool-cache";
 import * as path from "path";
 import * as util from "util";
 import * as fs from "fs";
+import { compare } from 'compare-versions';
 
 const IS_WINDOWS = process.platform === "win32";
 const IS_MAC = process.platform === "darwin";
@@ -105,11 +106,11 @@ async function installPandocWindows(version: string) {
 }
 
 function pandocSubdir(version: string) {
-  if (version >= "2.9.2") {
+  if (compare(version, "2.9.2", ">=")) {
     return util.format("pandoc-%s", version);
   }
 
-  if (version == "2.9.1") {
+  if (compare(version, "2.9.1", "=")) {
     return "";
   }
 
