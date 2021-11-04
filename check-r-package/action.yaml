@@ -17,6 +17,13 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Get R and OS version
+      id: get-version
+      run: |
+        cat("::set-output name=os-version::", sessionInfo()$running, "\n", sep = "")
+        cat("::set-output name=r-version::", R.Version()$version.string, "\n", sep = "")
+      shell: Rscript {0}
+
     - name: Check
       env:
         _R_CHECK_CRAN_INCOMING_: false
@@ -24,3 +31,15 @@ runs:
         options(crayon.enabled = TRUE)
         rcmdcheck::rcmdcheck(args = c(${{ inputs.args }}), build_args = c(${{ inputs.build_args }}), error_on = ${{ inputs.error-on }}, check_dir = ${{ inputs.check-dir }})
       shell: Rscript {0}
+
+    - name: Show testthat output
+      if: always()
+      run: find check -name 'testthat.Rout*' -exec cat '{}' \; || true
+      shell: bash
+
+    - name: Upload check results
+      if: failure()
+      uses: actions/upload-artifact@main
+      with:
+        name: ${{ steps.get-version.outputs.os-version }}-r-${{ steps.get-version.outputs.r-version }}-results
+        path: check
