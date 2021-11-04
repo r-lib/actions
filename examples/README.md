@@ -390,7 +390,7 @@ name: Commands
 
 jobs:
   document:
-    if: startsWith(github.event.comment.body, '/document')
+    if: ${{ github.event.issue.pull_request && (github.event.comment.author_association == 'MEMBER' || github.event.comment.author_association == 'OWNER') && startsWith(github.event.comment.body, '/document') }}
     name: document
     runs-on: ubuntu-latest
     env:
@@ -425,7 +425,7 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
   style:
-    if: startsWith(github.event.comment.body, '/style')
+    if: ${{ github.event.issue.pull_request && (github.event.comment.author_association == 'MEMBER' || github.event.comment.author_association == 'OWNER') && startsWith(github.event.comment.body, '/style') }}
     name: style
     runs-on: ubuntu-latest
     env:
