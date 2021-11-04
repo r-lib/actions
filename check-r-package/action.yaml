@@ -41,5 +41,5 @@ runs:
       if: failure()
       uses: actions/upload-artifact@main
       with:
-        name: ${{ steps.get-version.outputs.os-version }}-r-${{ steps.get-version.outputs.r-version }}-results
+        name: ${{ steps.get-version.outputs.os-version }}-${{ steps.get-version.outputs.r-version }}-results
         path: check
