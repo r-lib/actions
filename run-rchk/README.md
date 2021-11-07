@@ -13,18 +13,33 @@ Basic:
 ```yml
   rchk:
     runs-on: ubuntu-latest
+    container:
+      image: rhub/ubuntu-rchk
+      options: --user=root
+    steps:
+    - uses: actions/checkout@v1
+    - uses: r-lib/actions/run-rchk@master
+```
+
+If you want to have more control
+```yml
+  rchk:
+    runs-on: ubuntu-latest
+    container:
+      image: rhub/ubuntu-rchk
+      options: --user=root
     steps:
     - uses: actions/checkout@v1
     - uses: r-lib/actions/run-rchk@master
       with:
-        apt: <any apt dependencies, optional>
-        package: <R package name, optional>
+        setup-only: true
+    - uses: r-lib/actions/setup-r-dependencies@v1
+      with:
+        cache-version: rchk-1
+    - uses: r-lib/actions/run-rchk@master
+      with:
+        run-only: true
 ```
-
-Any `apt` dependencies could be installed by providing the `apt` argument. For example, `apt: libxml2-dev libssl-dev` etc.
-
-The `package` is the optional package name. If left empty, it will be determined from the repo name.
-
 
 # License
 
