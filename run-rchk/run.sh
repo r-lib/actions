@@ -2,29 +2,9 @@
 
 set -eo pipefail
 
-cd /home/docker/R-svn/
-. /home/docker/rchk/scripts/cmpconfig.inc
-cd -
-
-APT="$INPUT_APT"
-if [ -n "$APT" ]; then
-    sudo apt-get install $APT -y
-fi
-
-R --slave -e "install.packages('remotes', repos = 'https://cloud.r-project.org')"
-
-R --slave -e "remotes::install_local(repos = 'https://cloud.r-project.org')"
-
-PACKAGE="$INPUT_PACKAGE"
-
-if [ -z "$PACKAGE" ]; then
-    PACKAGE=$(echo ${GITHUB_REPOSITORY#*/})
-fi
-
-echo "running rchk tests for $PACKAGE"
+PACKAGE=$(Rscript -e "d=read.dcf('DESCRIPTION');cat(d[,colnames(d)=='Package',drop=TRUE])")
 
 cd /home/docker/R-svn/
-. /home/docker/rchk/scripts/cmpconfig.inc
 /home/docker/rchk/scripts/check_package.sh $PACKAGE
 if [ $(cat packages/lib/$PACKAGE/libs/$PACKAGE.so.bcheck | wc -l) -gt 3 ]; then
   FAIL=1
