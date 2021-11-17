@@ -462,8 +462,7 @@ jobs:
 `usethis::use_github_action("render-rmarkdown")`
 
 This example automatically re-builds any Rmarkdown file in the
-repository whenever it changes and commits the results to the master
-branch.
+repository whenever it changes and commits the results.
 
 ``` yaml
 # Workflow derived from https://github.com/r-lib/actions/tree/master/examples
