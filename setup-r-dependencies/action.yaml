@@ -13,6 +13,9 @@ inputs:
   pak-version:
     description: 'Which pak version to use. Possible values are "stable", "rc" and "devel".'
     default: 'stable'
+  working-directory:
+    description: 'Using the working-directory keyword, you can specify the working directory of where to run the command.'
+    default: null
 runs:
   using: "composite"
   steps:
@@ -21,6 +24,10 @@ runs:
           cat("::group::Install pak\n")
           options(pak.no_extra_messages = TRUE)
           install.packages("pak", repos = "https://r-lib.github.io/p/pak/${{ inputs.pak-version }}/")
+          if [[ -n ${{ inputs.working-directory }} ]]
+          then
+            cd {{ inputs.working-directory }}
+          fi
           saveRDS(pak::pkg_deps("local::.", dependencies = TRUE), ".github/r-depends.rds")
         shell: Rscript {0}
 
