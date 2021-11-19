@@ -20,16 +20,21 @@ runs:
   using: "composite"
   steps:
       - name: Install pak and query dependencies
-        working-directory: ${{ inputs.working-directory }}
         run: |
           cat("::group::Install pak\n")
           options(pak.no_extra_messages = TRUE)
           install.packages("pak", repos = "https://r-lib.github.io/p/pak/${{ inputs.pak-version }}/")
-          pkg_deps_path <- "local::."
+          pkg_deps <- NULL
+          
           if (nchar("${{ inputs.working-directory }}") > 0){
-            pkg_deps_path <- "${{ inputs.working-directory }}"
+            wd <- getwd()
+            setwd("${{ inputs.working-directory }}")
+            pkg_deps <- pak::pkg_deps("local::.", dependencies = TRUE)
+            setwd(wd)
+          } else {
+            pkg_deps <- pak::pkg_deps("local::.", dependencies = TRUE)
           }
-          saveRDS(pak::pkg_deps(pkg_deps_path, dependencies = TRUE), ".github/r-depends.rds")
+          saveRDS(pkg_deps, ".github/r-depends.rds")
         shell: Rscript {0}
 
       - name: Get R and OS version
