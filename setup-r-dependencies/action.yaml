@@ -15,7 +15,7 @@ inputs:
     default: 'stable'
   working-directory:
     description: 'Using the working-directory keyword, you can specify the working directory of where "pkg_deps" command searches for dependencies in the "DESCRIPTION" file.'
-    default: ""
+    default: '.'
 runs:
   using: "composite"
   steps:
@@ -25,15 +25,7 @@ runs:
           options(pak.no_extra_messages = TRUE)
           install.packages("pak", repos = "https://r-lib.github.io/p/pak/${{ inputs.pak-version }}/")
           pkg_deps <- NULL
-          
-          if (nchar("${{ inputs.working-directory }}") > 0){
-            wd <- getwd()
-            setwd("${{ inputs.working-directory }}")
-            pkg_deps <- pak::pkg_deps("local::.", dependencies = TRUE)
-            setwd(wd)
-          } else {
-            pkg_deps <- pak::pkg_deps("local::.", dependencies = TRUE)
-          }
+          pkg_deps <- pak::pkg_deps("local::${{ inputs.working-directory }}", dependencies = TRUE)
           saveRDS(pkg_deps, ".github/r-depends.rds")
         shell: Rscript {0}
 
@@ -73,6 +65,7 @@ runs:
           pak::pkg_install(c(local_deps, needs_only_deps, extra_deps, "sessioninfo"))
           cat("::endgroup::\n")
         shell: Rscript {0}
+        working-directory: ${{ inputs.working-directory }}
 
       - name: Session info
         run: |
