@@ -25,7 +25,11 @@ runs:
           cat("::group::Install pak\n")
           options(pak.no_extra_messages = TRUE)
           install.packages("pak", repos = "https://r-lib.github.io/p/pak/${{ inputs.pak-version }}/")
-          saveRDS(pak::pkg_deps("local::.", dependencies = TRUE), ".github/r-depends.rds")
+          pkg_deps_path <- "local::."
+          if (nchar("${{ inputs.working-directory }}") > 0){
+            pkg_deps_path <- "${{ inputs.working-directory }}"
+          }
+          saveRDS(pak::pkg_deps(pkg_deps_path, dependencies = TRUE), ".github/r-depends.rds")
         shell: Rscript {0}
 
       - name: Get R and OS version
