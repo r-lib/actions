@@ -24,7 +24,6 @@ runs:
           cat("::group::Install pak\n")
           options(pak.no_extra_messages = TRUE)
           install.packages("pak", repos = "https://r-lib.github.io/p/pak/${{ inputs.pak-version }}/")
-          pkg_deps <- NULL
           pkg_deps <- pak::pkg_deps("local::${{ inputs.working-directory }}", dependencies = TRUE)
           saveRDS(pkg_deps, ".github/r-depends.rds")
         shell: Rscript {0}
