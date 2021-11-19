@@ -55,8 +55,7 @@ runs:
           restore-keys: ${{ steps.get-version.outputs.os-version }}-${{ steps.get-version.outputs.r-version }}-${{inputs.cache-version }}-
 
       - name: Install dependencies
-        with:
-          working-directory: ${{ inputs.working-directory }}
+        working-directory: ${{ inputs.working-directory }}
         run: |
           cat("::group::Install dependencies\n")
           options(pak.no_extra_messages = TRUE)
