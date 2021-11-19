@@ -16,7 +16,7 @@ Inputs available
 - `cache-version` - default `1`. If you need to invalidate the existing cache pass any other number and a new cache will be used.
 - `extra-packages` - One or more extra package references to install. Separate each reference by newlines or commas for more than one package.
 - `needs` - `Config/Needs` fields to install from the DESCRIPTION, the `Config/Needs/` prefix will be automatically included.
-- `working-directory` - default `""`. If you need to change directory to find the DESCRIPTION file
+- `working-directory` - default `'.'`. If the DESCRIPTION file is not in the root directory of your repository.
 
 Basic:
 ```yaml
