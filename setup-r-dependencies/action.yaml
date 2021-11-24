@@ -23,6 +23,9 @@ runs:
           needs <- sprintf("Config/Needs/%s", strsplit("${{ inputs.needs }}", "[[:space:],]+")[[1]])
           # TODO: extra packages, sessioninfo should be here as well
           pak::lockfile_create(lockfile = ".github/pkg.lock", dependencies = c(needs, "all"))
+          cat("::group::Show lockfile\n")
+          writeLines(readLines(".github/pkg.lock"))
+          cat("::endgroup::\n")
         shell: Rscript --verbose {0}
 
       - name: Get R and OS version
