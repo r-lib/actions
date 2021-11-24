@@ -48,6 +48,7 @@ runs:
       - name: Install dependencies
         run: |
           cat("::group::Install dependencies\n")
+          pak::lockfile_install(".github/pkg.lock")
           extra_deps <- strsplit("${{ inputs.extra-packages }}", "[[:space:],]+")[[1]]
           pak::pkg_install("sessioninfo")
           if (length(extra_deps) > 0) pak::pkg_install(extra_deps)
