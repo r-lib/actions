@@ -12,7 +12,7 @@ inputs:
     description: 'Any extra Config/Needs fields which need to be included when installing dependencies'
   pak-version:
     description: 'Which pak version to use. Possible values are "stable", "rc" and "devel".'
-    default: 'stable'
+    default: 'devel'
 runs:
   using: "composite"
   steps:
