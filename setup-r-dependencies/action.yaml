@@ -48,18 +48,10 @@ runs:
       - name: Install dependencies
         run: |
           cat("::group::Install dependencies\n")
-          pak::lockfile_install(".github/pkg.lock")
           extra_deps <- strsplit("${{ inputs.extra-packages }}", "[[:space:],]+")[[1]]
           pak::pkg_install("sessioninfo")
           if (length(extra_deps) > 0) pak::pkg_install(extra_deps)
           pak::lockfile_install(".github/pkg.lock")
-          if (Sys.info()[["sysname"]] == "Linux") {
-            pkgs <- pak::lib_status()$package
-            pak::local_system_requirements(execute = TRUE)
-            for (pkg in pkgs) {
-              pak::pkg_system_requirements(pkg, execute = TRUE)
-            }
-          }
           cat("::endgroup::\n")
         shell: Rscript --verbose {0}
 
