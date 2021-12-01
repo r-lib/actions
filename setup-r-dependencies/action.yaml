@@ -16,10 +16,13 @@ inputs:
 runs:
   using: "composite"
   steps:
-      - name: Install pak and query dependencies
+      - name: Install pak
         run: |
-          cat("::group::Install pak\n")
           install.packages("pak", repos = "https://r-lib.github.io/p/pak/${{ inputs.pak-version }}/")
+        shell: Rscript --verbose {0}
+
+      - name: Query dependencies
+        run: |
           needs <- sprintf("Config/Needs/%s", strsplit("${{ inputs.needs }}", "[[:space:],]+")[[1]])
           extra_deps <- strsplit("${{ inputs.extra-packages }}", "[[:space:],]+")[[1]]
           pak::lockfile_create(
@@ -27,9 +30,11 @@ runs:
             lockfile = ".github/pkg.lock",
             dependencies = c(needs, "all")
           )
-          cat("::group::Show lockfile\n")
+        shell: Rscript --verbose {0}
+
+      - name: Show lockfile
+        run: |
           writeLines(readLines(".github/pkg.lock"))
-          cat("::endgroup::\n")
         shell: Rscript --verbose {0}
 
       - name: Get R and OS version
@@ -51,16 +56,12 @@ runs:
 
       - name: Install dependencies
         run: |
-          cat("::group::Install dependencies\n")
           pak::lockfile_install(".github/pkg.lock")
-          cat("::endgroup::\n")
         shell: Rscript --verbose {0}
 
       - name: Session info
         run: |
-          cat("::group::Session info\n")
           sessioninfo::session_info(pkgs = "installed", include_base = TRUE)
-          cat("::endgroup::\n")
         shell: Rscript --verbose {0}
 
       - name: Don't use tar 1.30 from Rtools35 to store the cache
