@@ -107,9 +107,16 @@
 <h2 id="common-questions">Common questions<a class="anchor" aria-label="anchor" href="#common-questions"></a>
 </h2>
 <ol style="list-style-type: decimal">
-<li><p>Why are my builds with plots failing on macOS? You need to install XQuartz to do plotting with the default quartz device on macOS. This can be done by adding the following to your workflow. <code>yaml  - if: runner.os == 'macOS'    run: brew install --cask xquartz</code></p></li>
-<li><p><em>Why are my Windows builds failing with an error about <code>configure.ac</code> having CRLF line endings?</em><br>
-On Windows, when your repo is checked out using git the line endings are automatically changed to CRLF. R’s check process specifically checks if the <code>configure.ac</code> file has these line endings, and will error if it does. To avoid this, add a <code>.gitattributes</code> file to the top level of your package with the following to configure git to always use LF line endings for this file:<br><code>configure.ac text eol=lf</code></p></li>
+<li>Why are my builds with plots failing on macOS? You need to install XQuartz to do plotting with the default quartz device on macOS. This can be done by adding the following to your workflow. <code>yaml  - if: runner.os == 'macOS'    run: brew install --cask xquartz</code>
+</li>
+<li>
+<em>Does GitHub Actions support <code>[ci skip]</code> or similar syntax to automatically skip a build?</em><br>
+Not by default, however you can enable it in any of your workflows by adding the following <a href="https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idif" class="external-link">conditional</a>, e.g. <br><code>if: !contains(github.event.head_commit.message, '[ci skip]')</code>
+</li>
+<li>
+<em>Why are my Windows builds failing with an error about <code>configure.ac</code> having CRLF line endings?</em><br>
+On Windows, when your repo is checked out using git the line endings are automatically changed to CRLF. R’s check process specifically checks if the <code>configure.ac</code> file has these line endings, and will error if it does. To avoid this, add a <code>.gitattributes</code> file to the top level of your package with the following to configure git to always use LF line endings for this file:<br><code>configure.ac text eol=lf</code>
+</li>
 </ol>
 </div>
 <div class="section level2">
