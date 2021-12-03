@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,18 +33,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">testpackage</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.0</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="reference/index.html">Reference</a>
 </li>
@@ -59,81 +55,79 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-<div id="github-actions-for-the-r-language" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#github-actions-for-the-r-language" class="anchor"></a>GitHub Actions for the R language</h1></div>
+<div class="section level1">
+<div class="page-header"><h1 id="github-actions-for-the-r-language">GitHub Actions for the R language<a class="anchor" aria-label="anchor" href="#github-actions-for-the-r-language"></a>
+</h1></div>
 
-<p>This repository stores <a href="https://github.com/features/actions">GitHub Actions</a> for R projects, which can be used to do a variety of CI tasks. It also has a number of <a href="https://github.com/r-lib/actions/tree/master/examples">example workflows</a> which use these actions.</p>
-<ol>
+<p>This repository stores <a href="https://github.com/features/actions" class="external-link">GitHub Actions</a> for R projects, which can be used to do a variety of CI tasks. It also has a number of <a href="https://github.com/r-lib/actions/tree/master/examples" class="external-link">example workflows</a> which use these actions.</p>
+<ol style="list-style-type: decimal">
 <li>
-<a href="https://github.com/r-lib/actions/tree/master/setup-r">r-lib/actions/setup-r</a> - Sets up <a href="https://r-project.org">R</a>
+<a href="https://github.com/r-lib/actions/tree/master/setup-r" class="external-link">r-lib/actions/setup-r</a> - Sets up <a href="https://r-project.org" class="external-link">R</a>
 </li>
 <li>
-<a href="https://github.com/r-lib/actions/tree/master/setup-r-dependencies">r-lib/actions/setup-r-dependencies</a> - Installs packages declared in <code>DESCRIPTION</code>
+<a href="https://github.com/r-lib/actions/tree/master/setup-r-dependencies" class="external-link">r-lib/actions/setup-r-dependencies</a> - Installs packages declared in <code>DESCRIPTION</code>
 </li>
 <li>
-<a href="https://github.com/r-lib/actions/tree/master/setup-renv">r-lib/actions/setup-renv</a> - Installs packages from renv lockfile.</li>
+<a href="https://github.com/r-lib/actions/tree/master/setup-renv" class="external-link">r-lib/actions/setup-renv</a> - Installs packages from renv lockfile.</li>
 <li>
-<a href="https://github.com/r-lib/actions/tree/master/setup-pandoc">r-lib/actions/setup-pandoc</a> - Sets up <a href="https://pandoc.org/">pandoc</a>
+<a href="https://github.com/r-lib/actions/tree/master/setup-pandoc" class="external-link">r-lib/actions/setup-pandoc</a> - Sets up <a href="https://pandoc.org/" class="external-link">pandoc</a>
 </li>
 <li>
-<a href="https://github.com/r-lib/actions/tree/master/setup-tinytex">r-lib/actions/setup-tinytex</a> - Sets up LaTeX with <a href="https://yihui.name/tinytex">tinytex</a>
+<a href="https://github.com/r-lib/actions/tree/master/setup-tinytex" class="external-link">r-lib/actions/setup-tinytex</a> - Sets up LaTeX with <a href="https://yihui.name/tinytex" class="external-link">tinytex</a>
 </li>
 <li>
-<a href="https://github.com/r-lib/actions/tree/master/pr-fetch">r-lib/actions/pr-fetch</a> - Fetches changes of a PR associated with an event</li>
+<a href="https://github.com/r-lib/actions/tree/master/pr-fetch" class="external-link">r-lib/actions/pr-fetch</a> - Fetches changes of a PR associated with an event</li>
 <li>
-<a href="https://github.com/r-lib/actions/tree/master/pr-push">r-lib/actions/pr-push</a> - Pushes changes to a PR associated with an event</li>
+<a href="https://github.com/r-lib/actions/tree/master/pr-push" class="external-link">r-lib/actions/pr-push</a> - Pushes changes to a PR associated with an event</li>
 <li>
-<a href="https://github.com/r-lib/actions/tree/master/run-rchk">r-lib/actions/run-rchk</a> - Runs <a href="https://github.com/kalibera/rchk">rchk</a> tests to detect memory protection errors in C source code.</li>
+<a href="https://github.com/r-lib/actions/tree/master/run-rchk" class="external-link">r-lib/actions/run-rchk</a> - Runs <a href="https://github.com/kalibera/rchk" class="external-link">rchk</a> tests to detect memory protection errors in C source code.</li>
 </ol>
-<div id="examples" class="section level2">
-<h2 class="hasAnchor">
-<a href="#examples" class="anchor"></a>Examples</h2>
-<p>See the <a href="https://github.com/r-lib/actions/tree/master/examples">r-lib/actions/examples</a> directory for a variety of example workflows using these actions.</p>
+<div class="section level2">
+<h2 id="examples">Examples<a class="anchor" aria-label="anchor" href="#examples"></a>
+</h2>
+<p>See the <a href="https://github.com/r-lib/actions/tree/master/examples" class="external-link">r-lib/actions/examples</a> directory for a variety of example workflows using these actions.</p>
 </div>
-<div id="where-to-find-help" class="section level2">
-<h2 class="hasAnchor">
-<a href="#where-to-find-help" class="anchor"></a>Where to find help</h2>
+<div class="section level2">
+<h2 id="where-to-find-help">Where to find help<a class="anchor" aria-label="anchor" href="#where-to-find-help"></a>
+</h2>
 <p>If your build fails and you are unsure of why here are some useful strategies for getting help.</p>
-<ol>
+<ol style="list-style-type: decimal">
 <li>Figure out what caused the error. Look for the <em>first</em> time the word ‘error’ appears in the build log. Quite often errors at the end of the log are caused by an earlier issue, so it is best to look for the root cause.</li>
-<li>Take advantage of <a href="https://github.com/search?q=path%3A.github%2Fworkflows">GitHub’s code search</a> to find similar yaml files. Use ‘path:.github/workflows’ to restrict your search to GitHub Action workflow files and also include additional terms specific to your problem. e.g. If you need to figure out how to install geospatial libraries such as <a href="https://gdal.org/">gdal</a> use a search like <a href="https://github.com/search?q=gdal+path%3A.github%2Fworkflows">‘gdal path:.github/workflows’</a>. If you want to restrict results only to GitHub Actions workflows that use R you can add search for <a href="https://github.com/search?q=%22setup-r%22+path%3A.github%2Fworkflows">’“setup-r” path:.github/workflows</a>
+<li>Take advantage of <a href="https://github.com/search?q=path%3A.github%2Fworkflows" class="external-link">GitHub’s code search</a> to find similar yaml files. Use ‘path:.github/workflows’ to restrict your search to GitHub Action workflow files and also include additional terms specific to your problem. e.g. If you need to figure out how to install geospatial libraries such as <a href="https://gdal.org/" class="external-link">gdal</a> use a search like <a href="https://github.com/search?q=gdal+path%3A.github%2Fworkflows" class="external-link">‘gdal path:.github/workflows’</a>. If you want to restrict results only to GitHub Actions workflows that use R you can add search for <a href="https://github.com/search?q=%22setup-r%22+path%3A.github%2Fworkflows" class="external-link">’“setup-r” path:.github/workflows</a>
 </li>
-<li>Open an issue on <a href="https://community.rstudio.com/new-topic?category=Package%20development&amp;tags=github-actions"><img src="https://img.shields.io/badge/community-github--actions-blue?style=social&amp;logo=rstudio&amp;logoColor=75AADB" alt="RStudio community"></a> about your problem. Be sure to link to the workflow file you are using and a failing build to help others help you.</li>
-<li>If your issue seems related to GitHub Actions, but is not R specific open an issue at the <a href="https://github.community/t5/GitHub-Actions/bd-p/actions">GitHub Actions Community</a> page.</li>
-<li>If you have done all of the above and are <strong>absolutely</strong> sure there is a bug in one of the R specifc actions listed above, open an <a href="https://github.com/r-lib/actions/issues/new/choose">issue here</a>.</li>
+<li>Open an issue on <a href="https://community.rstudio.com/new-topic?category=Package%20development&amp;tags=github-actions" class="external-link"><img src="https://img.shields.io/badge/community-github--actions-blue?style=social&amp;logo=rstudio&amp;logoColor=75AADB" alt="RStudio community"></a> about your problem. Be sure to link to the workflow file you are using and a failing build to help others help you.</li>
+<li>If your issue seems related to GitHub Actions, but is not R specific open an issue at the <a href="https://github.community/t5/GitHub-Actions/bd-p/actions" class="external-link">GitHub Actions Community</a> page.</li>
+<li>If you have done all of the above and are <strong>absolutely</strong> sure there is a bug in one of the R specifc actions listed above, open an <a href="https://github.com/r-lib/actions/issues/new/choose" class="external-link">issue here</a>.</li>
 </ol>
 <blockquote>
-<p>If using a general search engine or GitHub search about your problem/idea, please note that content published prior to the Fall 2019 is probably outdated because the beta version of GitHub Actions was different. More recent posts or answers could be outdated too since GitHub Actions evolve, so refer to <a href="https://help.github.com/en/actions">GitHub Actions official docs</a> in case of doubt (and to existing working workflows) and <a href="https://github.blog/changelog/">GitHub changelog</a>.</p>
+<p>If using a general search engine or GitHub search about your problem/idea, please note that content published prior to the Fall 2019 is probably outdated because the beta version of GitHub Actions was different. More recent posts or answers could be outdated too since GitHub Actions evolve, so refer to <a href="https://help.github.com/en/actions" class="external-link">GitHub Actions official docs</a> in case of doubt (and to existing working workflows) and <a href="https://github.blog/changelog/" class="external-link">GitHub changelog</a>.</p>
 </blockquote>
 </div>
-<div id="common-questions" class="section level2">
-<h2 class="hasAnchor">
-<a href="#common-questions" class="anchor"></a>Common questions</h2>
-<ol>
+<div class="section level2">
+<h2 id="common-questions">Common questions<a class="anchor" aria-label="anchor" href="#common-questions"></a>
+</h2>
+<ol style="list-style-type: decimal">
 <li><p>Why are my builds with plots failing on macOS? You need to install XQuartz to do plotting with the default quartz device on macOS. This can be done by adding the following to your workflow. <code>yaml  - if: runner.os == 'macOS'    run: brew install --cask xquartz</code></p></li>
-<li><p><em>Why are my Windows builds failing with an error about <code>configure.ac</code> having CRLF line endings?</em>
- On Windows, when your repo is checked out using git the line endings are automatically changed to CRLF. R’s check process specifically checks if the <code>configure.ac</code> file has these line endings, and will error if it does. To avoid this, add a <code>.gitattributes</code> file to the top level of your package with the following to configure git to always use LF line endings for this file: 
- <code>configure.ac text eol=lf</code></p></li>
+<li><p><em>Why are my Windows builds failing with an error about <code>configure.ac</code> having CRLF line endings?</em><br>
+On Windows, when your repo is checked out using git the line endings are automatically changed to CRLF. R’s check process specifically checks if the <code>configure.ac</code> file has these line endings, and will error if it does. To avoid this, add a <code>.gitattributes</code> file to the top level of your package with the following to configure git to always use LF line endings for this file:<br><code>configure.ac text eol=lf</code></p></li>
 </ol>
 </div>
-<div id="additional-resources" class="section level2">
-<h2 class="hasAnchor">
-<a href="#additional-resources" class="anchor"></a>Additional resources</h2>
+<div class="section level2">
+<h2 id="additional-resources">Additional resources<a class="anchor" aria-label="anchor" href="#additional-resources"></a>
+</h2>
 <ul>
 <li>
-<a href="https://www.jimhester.com/talk/2020-rsc-github-actions/">GitHub Actions for R</a>, Jim Hester’s talk at rstudio::conf 2020. <a href="https://resources.rstudio.com/rstudio-conf-2020/azure-pipelines-and-github-actions-jim-hester">Recording</a>, <a href="https://speakerdeck.com/jimhester/github-actions-for-r">slidedeck</a>.</li>
+<a href="https://www.jimhester.com/talk/2020-rsc-github-actions/" class="external-link">GitHub Actions for R</a>, Jim Hester’s talk at rstudio::conf 2020. <a href="https://resources.rstudio.com/rstudio-conf-2020/azure-pipelines-and-github-actions-jim-hester" class="external-link">Recording</a>, <a href="https://speakerdeck.com/jimhester/github-actions-for-r" class="external-link">slidedeck</a>.</li>
 <li>
-<a href="https://www.edwardthomson.com/blog/github_actions_advent_calendar.html">GitHub Actions advent calendar</a> a series of blogposts by Edward Thomson, one of the GitHub Actions product managers highlighting features of GitHub Actions.</li>
+<a href="https://www.edwardthomson.com/blog/github_actions_advent_calendar.html" class="external-link">GitHub Actions advent calendar</a> a series of blogposts by Edward Thomson, one of the GitHub Actions product managers highlighting features of GitHub Actions.</li>
 <li>
-<a href="https://ropenscilabs.github.io/actions_sandbox/">GitHub Actions with R</a> - a short online book about using GitHub Actions with R, produced as part of the <a href="https://ozunconf19.ropensci.org/">rOpenSci OzUnconf</a>.</li>
+<a href="https://ropenscilabs.github.io/actions_sandbox/" class="external-link">GitHub Actions with R</a> - a short online book about using GitHub Actions with R, produced as part of the <a href="https://ozunconf19.ropensci.org/" class="external-link">rOpenSci OzUnconf</a>.</li>
 <li>
-<a href="https://github.com/sdras/awesome-actions#awesome-actions---">Awesome Actions</a> - a curated list of custom actions. <strong>Note</strong> many of these are from early in the GitHub Actions beta and may no longer work.</li>
+<a href="https://github.com/sdras/awesome-actions#awesome-actions---" class="external-link">Awesome Actions</a> - a curated list of custom actions. <strong>Note</strong> many of these are from early in the GitHub Actions beta and may no longer work.</li>
 </ul>
 </div>
-<div id="license-cc0-licensed" class="section level2">
-<h2 class="hasAnchor">
-<a href="#license-cc0-licensed" class="anchor"></a>License <img src="https://img.shields.io/github/license/r-lib/actions" alt="CC0 licensed">
+<div class="section level2">
+<h2 id="license-cc0-licensed">License <img src="https://img.shields.io/github/license/r-lib/actions" alt="CC0 licensed"><a class="anchor" aria-label="anchor" href="#license-cc0-licensed"></a>
 </h2>
 <p>All examples in this repository are published with the <a href="./LICENSE">CC0</a> license.</p>
 </div>
@@ -142,35 +136,47 @@
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="license">
-<h2>License</h2>
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li>GPL (&gt;= 2)</li>
 </ul>
 </div>
+
+
+<div class="citation">
+<h2 data-toc-skip>Citation</h2>
+<ul class="list-unstyled">
+<li><a href="authors.html#citation">Citing testpackage</a></li>
+</ul>
+</div>
+
 <div class="developers">
-<h2>Developers</h2>
+<h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
 <li>Jim Hester <br><small class="roles"> Author, maintainer </small>  </li>
 </ul>
 </div>
 
-  <div class="dev-status">
-<h2>Dev status</h2>
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://github.com/r-lib/actions/actions?workflow=R-CMD-check"><img src="https://github.com/r-lib/actions/workflows/R-CMD-check/badge.svg" alt="R build status"></a></li>
-<li><a href="https://community.rstudio.com/new-topic?category=Package%20development&amp;tags=github-actions"><img src="https://img.shields.io/badge/community-github--actions-blue?style=social&amp;logo=rstudio&amp;logoColor=75AADB" alt="RStudio community"></a></li>
+<li><a href="https://github.com/r-lib/actions/actions?workflow=R-CMD-check" class="external-link"><img src="https://github.com/r-lib/actions/workflows/R-CMD-check/badge.svg" alt="R build status"></a></li>
+<li><a href="https://community.rstudio.com/new-topic?category=Package%20development&amp;tags=github-actions" class="external-link"><img src="https://img.shields.io/badge/community-github--actions-blue?style=social&amp;logo=rstudio&amp;logoColor=75AADB" alt="RStudio community"></a></li>
 </ul>
 </div>
-</div>
+
+  </div>
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by Jim Hester.</p>
+  <p></p>
+<p>Developed by Jim Hester.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.0.</p>
 </div>
 
       </footer>
@@ -178,6 +184,8 @@
 
   
 
+
+  
 
   </body>
 </html>
