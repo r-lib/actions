@@ -7,7 +7,7 @@ inputs:
     default: '"--no-manual", "--as-cran"'
   build_args:
     description: 'Arguments to pass to the `build_args` parameter of rcmdcheck'
-    default: ''
+    default: '"--no-manual"'
   error-on:
     description: 'What type of result should cause a build error?'
     default: '"warning"'
