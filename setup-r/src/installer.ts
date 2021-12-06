@@ -70,11 +70,9 @@ async function acquireR(version: string, rtoolsVersion: string) {
         acquireQpdfWindows()
       ]);
     } else if (IS_MAC) {
-      await Promise.all([
-        acquireFortranMacOS(),
-        acquireUtilsMacOS(),
-        acquireRMacOS(version)
-      ]);
+      await acquireFortranMacOS();
+      await acquireUtilsMacOS();
+      await acquireRMacOS(version);
       if (core.getInput("remove-openmp-macos") === "true") {
         await removeOpenmpFlags();
       }
