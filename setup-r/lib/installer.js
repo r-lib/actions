@@ -102,11 +102,9 @@ function acquireR(version, rtoolsVersion) {
                 ]);
             }
             else if (IS_MAC) {
-                yield Promise.all([
-                    acquireFortranMacOS(),
-                    acquireUtilsMacOS(),
-                    acquireRMacOS(version)
-                ]);
+                yield acquireFortranMacOS();
+                yield acquireUtilsMacOS();
+                yield acquireRMacOS(version);
                 if (core.getInput("remove-openmp-macos") === "true") {
                     yield removeOpenmpFlags();
                 }
