@@ -64,6 +64,8 @@ async function installPandocMac(version: string) {
   await io.mv(downloadPath, path.join(tempDirectory, fileName));
 
   exec.exec("sudo installer", [
+    "-allowUntrusted",
+    "-dumplog",
     "-pkg",
     path.join(tempDirectory, fileName),
     "-target",
