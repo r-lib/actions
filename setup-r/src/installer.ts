@@ -119,6 +119,8 @@ async function acquireFortranMacOS(): Promise<string> {
   try {
     await exec.exec("sudo", [
       "installer",
+      "-allowUntrusted",
+      "-dumplog",
       "-package",
       path.join(mntPath, gfortran, "gfortran.pkg"),
       "-target",

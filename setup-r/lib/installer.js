@@ -150,6 +150,8 @@ function acquireFortranMacOS() {
         try {
             yield exec.exec("sudo", [
                 "installer",
+                "-allowUntrusted",
+                "-dumplog",
                 "-package",
                 path.join(mntPath, gfortran, "gfortran.pkg"),
                 "-target",
