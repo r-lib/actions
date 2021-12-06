@@ -278,6 +278,8 @@ async function acquireRMacOS(version: string): Promise<string> {
   try {
     await exec.exec("sudo", [
       "installer",
+      "-allowUntrusted",
+      "-dumplog",
       "-pkg",
       path.join(tempDirectory, fileName),
       "-target",

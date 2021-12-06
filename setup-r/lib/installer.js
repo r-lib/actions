@@ -297,6 +297,8 @@ function acquireRMacOS(version) {
         try {
             yield exec.exec("sudo", [
                 "installer",
+                "-allowUntrusted",
+                "-dumplog",
                 "-pkg",
                 path.join(tempDirectory, fileName),
                 "-target",
