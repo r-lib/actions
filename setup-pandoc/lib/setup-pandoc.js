@@ -81,6 +81,8 @@ function installPandocMac(version) {
         }
         yield io.mv(downloadPath, path.join(tempDirectory, fileName));
         exec.exec("sudo installer", [
+            "-allowUntrusted",
+            "-dumplog",
             "-pkg",
             path.join(tempDirectory, fileName),
             "-target",
