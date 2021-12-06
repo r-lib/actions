@@ -16,10 +16,22 @@ inputs:
 runs:
   using: "composite"
   steps:
+      - name: Get R and OS version
+        id: get-version
+        run: |
+          cat("::set-output name=os-version::", sessionInfo()$running, "\n", sep = "")
+          cat("::set-output name=r-version::", R.Version()$version.string, "\n", sep = "")
+          cat("::endgroup::\n")
+        shell: Rscript --verbose {0}
+
       - name: Install pak and query dependencies
         run: |
           cat("::group::Install pak\n")
-          install.packages("pak", repos = "https://r-lib.github.io/p/pak/${{ inputs.pak-version }}/")
+          if (grepl(" ucrt", "${{ steps.get-version.outputs.r-version }}")) {
+            install.packages("pak", repos = "https://r-lib.github.io/p/pak/devel/ucrt/", type = "win.binary")
+          } else {
+            install.packages("pak", repos = "https://r-lib.github.io/p/pak/${{ inputs.pak-version }}/")
+          }
           needs <- sprintf("Config/Needs/%s", strsplit("${{ inputs.needs }}", "[[:space:],]+")[[1]])
           extra_deps <- strsplit("${{ inputs.extra-packages }}", "[[:space:],]+")[[1]]
           pak::lockfile_create(
@@ -29,14 +41,6 @@ runs:
           )
           cat("::group::Show lockfile\n")
           writeLines(readLines(".github/pkg.lock"))
-          cat("::endgroup::\n")
-        shell: Rscript --verbose {0}
-
-      - name: Get R and OS version
-        id: get-version
-        run: |
-          cat("::set-output name=os-version::", sessionInfo()$running, "\n", sep = "")
-          cat("::set-output name=r-version::", R.Version()$version.string, "\n", sep = "")
           cat("::endgroup::\n")
         shell: Rscript --verbose {0}
 
