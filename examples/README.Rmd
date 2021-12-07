@@ -158,6 +158,7 @@ print_yaml("render-rmarkdown.yaml")
 
 This example builds a [pkgdown] site for a repository and pushes the built package
 to [GitHub Pages].
+The inclusion of [`workflow_dispatch`](https://docs.github.com/en/actions/learn-github-actions/events-that-trigger-workflows#workflow_dispatch) means the workflow can be [run manually, from the browser](https://docs.github.com/en/actions/managing-workflow-runs/manually-running-a-workflow), or [triggered via the GitHub REST API](https://docs.github.com/en/rest/reference/actions/#create-a-workflow-dispatch-event).
 
 ```{r echo = FALSE, results = "asis"}
 print_yaml("pkgdown.yaml")
