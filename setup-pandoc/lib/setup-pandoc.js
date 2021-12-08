@@ -23,6 +23,7 @@ const io = __importStar(require("@actions/io"));
 const tc = __importStar(require("@actions/tool-cache"));
 const path = __importStar(require("path"));
 const util = __importStar(require("util"));
+const compare_versions_1 = require("compare-versions");
 const IS_WINDOWS = process.platform === "win32";
 const IS_MAC = process.platform === "darwin";
 if (!tempDirectory) {
@@ -115,10 +116,10 @@ function installPandocWindows(version) {
     });
 }
 function pandocSubdir(version) {
-    if (version >= "2.9.2") {
+    if (compare_versions_1.compare(version, "2.9.2", ">=")) {
         return util.format("pandoc-%s", version);
     }
-    if (version == "2.9.1") {
+    if (compare_versions_1.compare(version, "2.9.1", "=")) {
         return "";
     }
     return util.format("pandoc-%s-windows-x86_64", version);

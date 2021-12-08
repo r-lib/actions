@@ -390,7 +390,7 @@ name: Commands
 
 jobs:
   document:
-    if: startsWith(github.event.comment.body, '/document')
+    if: ${{ github.event.issue.pull_request && (github.event.comment.author_association == 'MEMBER' || github.event.comment.author_association == 'OWNER') && startsWith(github.event.comment.body, '/document') }}
     name: document
     runs-on: ubuntu-latest
     env:
@@ -425,7 +425,7 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
   style:
-    if: startsWith(github.event.comment.body, '/style')
+    if: ${{ github.event.issue.pull_request && (github.event.comment.author_association == 'MEMBER' || github.event.comment.author_association == 'OWNER') && startsWith(github.event.comment.body, '/style') }}
     name: style
     runs-on: ubuntu-latest
     env:
@@ -510,7 +510,12 @@ jobs:
 
 This example builds a [pkgdown](https://pkgdown.r-lib.org/) site for a
 repository and pushes the built package to [GitHub
-Pages](https://pages.github.com/).
+Pages](https://pages.github.com/). The inclusion of
+[`workflow_dispatch`](https://docs.github.com/en/actions/learn-github-actions/events-that-trigger-workflows#workflow_dispatch)
+means the workflow can be [run manually, from the
+browser](https://docs.github.com/en/actions/managing-workflow-runs/manually-running-a-workflow),
+or [triggered via the GitHub REST
+API](https://docs.github.com/en/rest/reference/actions/#create-a-workflow-dispatch-event).
 
 ``` yaml
 # Workflow derived from https://github.com/r-lib/actions/tree/master/examples
@@ -518,7 +523,9 @@ Pages](https://pages.github.com/).
 on:
   push:
     branches: [main, master]
-    tags: ['*']
+  release:
+    types: [published]
+  workflow_dispatch:
 
 name: pkgdown
 
