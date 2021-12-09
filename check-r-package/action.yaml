@@ -27,5 +27,5 @@ runs:
       run: |
         options(crayon.enabled = TRUE)
         rcmdcheck::rcmdcheck(args = c(${{ inputs.args }}), build_args = c(${{ inputs.build_args }}), error_on = ${{ inputs.error-on }}, check_dir = ${{ inputs.check-dir }})
-        shell: Rscript {0}
-        working-directory: ${{ inputs.working-directory }}
+      shell: Rscript {0}
+      working-directory: ${{ inputs.working-directory }}
