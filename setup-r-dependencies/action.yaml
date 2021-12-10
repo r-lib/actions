@@ -23,7 +23,7 @@ runs:
         id: get-version
         run: |
           cat("::set-output name=os-version::", sessionInfo()$running, "\n", sep = "")
-          cat("::set-output name=r-version::", R.Version()$version.string, "\n", sep = "")
+          cat("::set-output name=r-version::", if (grepl("development", rv <- R.Version()$version.string)) getRversion() else rv, "\n", sep = "")
           cat("::endgroup::\n")
         shell: Rscript --verbose {0}
 
