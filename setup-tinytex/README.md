@@ -22,15 +22,11 @@ If you want to select the CTAN mirror you can set the `CTAN_REPO` tinytex enviro
 
 ## CTAN packages
 
-For your workflow you might need to install CTAN packages manually.
 The tinytex R package (which is not the same as the TinyTeX TeX distribution) supports automatic CTAN package installation when using the rmarkdown package.
-In other words for automatic CTAN package installation you need:
-* The tinytex R package.
-* PDF building via the rmarkdown R package.
+If you are using TinyTeX without rmarkdown (including using it without R!), then you will need to install CTAN packages manually.
+For example this is the case if your R package builds its PDF reference manual at `R CMD build` or while being checked.
 
-In particular, for building the PDF manual of R packages, R does not use rmarkdown, and there is no automatic CRAN package installation.
-
-To install CRAN packages manually, you can call `tlmgr` from your workflow, here is an example:
+To install CTAN packages manually, you can call `tlmgr` from your workflow, here is a complete example:
 ```yaml
 steps:
   - uses: actions/checkout@v2
