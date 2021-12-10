@@ -5,48 +5,48 @@
 
 Package workflows:
 
-  - [`check-release`](#quickstart-ci-workflow) - A simple CI workflow to
+-   [`check-release`](#quickstart-ci-workflow) - A simple CI workflow to
     check with the release version of R.
-  - [`check-standard`](#standard-ci-workflow) - A standard CI workflow
+-   [`check-standard`](#standard-ci-workflow) - A standard CI workflow
     to check with the release version of R on the three major OSs.
-  - [`check-full`](#tidyverse-ci-workflow) - A more complex CI workflow
-  - [`test-coverage`](#test-coverage-workflow) - Run `covr::codecov()`
+-   [`check-full`](#tidyverse-ci-workflow) - A more complex CI workflow
+-   [`test-coverage`](#test-coverage-workflow) - Run `covr::codecov()`
     on an R package.
-  - [`lint`](#lint-workflow) - Run `lintr::lint_package()` on an R
+-   [`lint`](#lint-workflow) - Run `lintr::lint_package()` on an R
     package.
-  - [`pr-commands`](#commands-workflow) - Adds `/document` and `/style`
+-   [`pr-commands`](#commands-workflow) - Adds `/document` and `/style`
     commands for pull requests.
-  - [`pkgdown`](#build-pkgdown-site) - Build a
+-   [`pkgdown`](#build-pkgdown-site) - Build a
     [pkgdown](https://pkgdown.r-lib.org/) site for an R package and
     deploy it to [GitHub Pages](https://pages.github.com/).
 
 RMarkdown workflows:
 
-  - [`render-rmarkdown`](#render-rmarkdown) - Render one or more
+-   [`render-rmarkdown`](#render-rmarkdown) - Render one or more
     Rmarkdown files when they change and commit the result.
-  - [`bookdown`](#build-bookdown-site) - Build a
+-   [`bookdown`](#build-bookdown-site) - Build a
     [bookdown](https://bookdown.org) site and deploy it to
     [netlify](https://www.netlify.com/).
-  - [`blogdown`](#build-blogdown-site) - Build a
+-   [`blogdown`](#build-blogdown-site) - Build a
     [blogdown](https://bookdown.org/yihui/blogdown/) site and deploy it
     to [netlify](https://www.netlify.com/).
 
 Other workflows:
 
-  - [`docker`](#docker-based-workflow) - For custom workflows based on
+-   [`docker`](#docker-based-workflow) - For custom workflows based on
     docker containers.
-  - [Bioconductor](#bioconductor-friendly-workflow) - A CI workflow for
+-   [Bioconductor](#bioconductor-friendly-workflow) - A CI workflow for
     packages to be released on Bioconductor.
-  - [`lint-project`](#lint-project-workflow) - Run `lintr::lint_dir()`
+-   [`lint-project`](#lint-project-workflow) - Run `lintr::lint_dir()`
     on an R project.
-  - [`shiny-deploy`](#shiny-app-deployment) - Deploy a Shiny app to
+-   [`shiny-deploy`](#shiny-app-deployment) - Deploy a Shiny app to
     shinyapps.io or RStudio Connect.
 
 Options and advice:
 
-  - [Forcing binaries](#forcing-binaries) - An environment variable to
+-   [Forcing binaries](#forcing-binaries) - An environment variable to
     always use binary packages.
-  - [Managing secrets](#managing-secrets) - How to generate auth tokens
+-   [Managing secrets](#managing-secrets) - How to generate auth tokens
     and make them available to actions.
 
 ## Quickstart CI workflow
@@ -64,10 +64,8 @@ probably what you want to use.
 2.  There is no OS-specific code
 3.  You want a quick start with R CI
 
-<!-- end list -->
-
 ``` yaml
-# Workflow derived from https://github.com/r-lib/actions/tree/master/examples
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
@@ -86,15 +84,16 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: r-lib/actions/setup-r@v1
+      - uses: r-lib/actions/setup-r@v2
         with:
           use-public-rspm: true
 
-      - uses: r-lib/actions/setup-r-dependencies@v1
+      - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: rcmdcheck
+          extra-packages: any::rcmdcheck
+          needs: check
 
-      - uses: r-lib/actions/check-r-package@v1
+      - uses: r-lib/actions/check-r-package@v2
 
       - name: Show testthat output
         if: always()
@@ -124,10 +123,8 @@ CRAN or Bioconductor this is likely the workflow you want to use.
 1.  You plan to submit your package to CRAN or Bioconductor
 2.  Your package has OS-specific code
 
-<!-- end list -->
-
 ``` yaml
-# Workflow derived from https://github.com/r-lib/actions/tree/master/examples
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
@@ -160,19 +157,20 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: r-lib/actions/setup-pandoc@v1
+      - uses: r-lib/actions/setup-pandoc@v2
 
-      - uses: r-lib/actions/setup-r@v1
+      - uses: r-lib/actions/setup-r@v2
         with:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
 
-      - uses: r-lib/actions/setup-r-dependencies@v1
+      - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: rcmdcheck
+          extra-packages: any::rcmdcheck
+          needs: check
 
-      - uses: r-lib/actions/check-r-package@v1
+      - uses: r-lib/actions/check-r-package@v2
 
       - name: Show testthat output
         if: always()
@@ -205,10 +203,8 @@ CI workflow.
 3.  With OS-specific code
 4.  And you want to ensure compatibility with many older R versions
 
-<!-- end list -->
-
 ``` yaml
-# Workflow derived from https://github.com/r-lib/actions/tree/master/examples
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 #
 # NOTE: This workflow is overkill for most R packages and
@@ -253,19 +249,20 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: r-lib/actions/setup-pandoc@v1
+      - uses: r-lib/actions/setup-pandoc@v2
 
-      - uses: r-lib/actions/setup-r@v1
+      - uses: r-lib/actions/setup-r@v2
         with:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
 
-      - uses: r-lib/actions/setup-r-dependencies@v1
+      - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: rcmdcheck
+          extra-packages: any::rcmdcheck
+          needs: check
 
-      - uses: r-lib/actions/check-r-package@v1
+      - uses: r-lib/actions/check-r-package@v2
 
       - name: Show testthat output
         if: always()
@@ -289,7 +286,7 @@ the test coverage of your package and upload the result to
 [codecov.io](https://codecov.io)
 
 ``` yaml
-# Workflow derived from https://github.com/r-lib/actions/tree/master/examples
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
@@ -308,13 +305,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: r-lib/actions/setup-r@v1
+      - uses: r-lib/actions/setup-r@v2
         with:
           use-public-rspm: true
 
-      - uses: r-lib/actions/setup-r-dependencies@v1
+      - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: covr
+          extra-packages: any::covr
+          needs: coverage
 
       - name: Test coverage
         run: covr::codecov()
@@ -330,7 +328,7 @@ package to lint your package and return the results as build
 annotations.
 
 ``` yaml
-# Workflow derived from https://github.com/r-lib/actions/tree/master/examples
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
@@ -348,13 +346,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: r-lib/actions/setup-r@v1
+      - uses: r-lib/actions/setup-r@v2
         with:
           use-public-rspm: true
 
-      - uses: r-lib/actions/setup-r-dependencies@v1
+      - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: lintr
+          extra-packages: any::lintr
+          needs: lint
 
       - name: Lint
         run: lintr::lint_package()
@@ -377,10 +376,8 @@ the package and commit the result to the pull request. `/style` will use
 2.  You regularly style your code with styler, and require all additions
     be styled as well.
 
-<!-- end list -->
-
 ``` yaml
-# Workflow derived from https://github.com/r-lib/actions/tree/master/examples
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   issue_comment:
@@ -398,17 +395,18 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: r-lib/actions/pr-fetch@v1
+      - uses: r-lib/actions/pr-fetch@v2
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: r-lib/actions/setup-r@v1
+      - uses: r-lib/actions/setup-r@v2
         with:
           use-public-rspm: true
 
-      - uses: r-lib/actions/setup-r-dependencies@v1
+      - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: roxygen2
+          extra-packages: any::roxygen2
+          needs: pr-document
 
       - name: Document
         run: Rscript -e 'roxygen2::roxygenise()'
@@ -420,7 +418,7 @@ jobs:
           git add man/\* NAMESPACE
           git commit -m 'Document'
 
-      - uses: r-lib/actions/pr-push@v1
+      - uses: r-lib/actions/pr-push@v2
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -433,11 +431,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: r-lib/actions/pr-fetch@v1
+      - uses: r-lib/actions/pr-fetch@v2
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: r-lib/actions/setup-r@v1
+      - uses: r-lib/actions/setup-r@v2
 
       - name: Install dependencies
         run: Rscript -e 'install.packages("styler")'
@@ -452,7 +450,7 @@ jobs:
           git add \*.R
           git commit -m 'Style'
 
-      - uses: r-lib/actions/pr-push@v1
+      - uses: r-lib/actions/pr-push@v2
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 ```
@@ -466,7 +464,7 @@ repository whenever it changes and commits the results to the master
 branch.
 
 ``` yaml
-# Workflow derived from https://github.com/r-lib/actions/tree/master/examples
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
@@ -485,11 +483,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: r-lib/actions/setup-pandoc@v1
+      - uses: r-lib/actions/setup-pandoc@v2
 
-      - uses: r-lib/actions/setup-r@v1
+      - uses: r-lib/actions/setup-r@v2
 
-      - uses: r-lib/actions/setup-renv@v1
+      - uses: r-lib/actions/setup-renv@v2
       
       - name: Render Rmarkdown files
         run: |
@@ -518,7 +516,7 @@ or [triggered via the GitHub REST
 API](https://docs.github.com/en/rest/reference/actions/#create-a-workflow-dispatch-event).
 
 ``` yaml
-# Workflow derived from https://github.com/r-lib/actions/tree/master/examples
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
@@ -537,15 +535,15 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: r-lib/actions/setup-pandoc@v1
+      - uses: r-lib/actions/setup-pandoc@v2
 
-      - uses: r-lib/actions/setup-r@v1
+      - uses: r-lib/actions/setup-r@v2
         with:
           use-public-rspm: true
 
-      - uses: r-lib/actions/setup-r-dependencies@v1
+      - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: pkgdown
+          extra-packages: any::pkgdown
           needs: website
 
       - name: Deploy package
@@ -573,7 +571,7 @@ and a `NETLIFY_SITE_ID` secret to your repository for the netlify deploy
 (see [Managing secrets](#managing-secrets) section for details).
 
 ``` yaml
-# Workflow derived from https://github.com/r-lib/actions/tree/master/examples
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
@@ -589,13 +587,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: r-lib/actions/setup-pandoc@v1
+      - uses: r-lib/actions/setup-pandoc@v2
 
-      - uses: r-lib/actions/setup-r@v1
+      - uses: r-lib/actions/setup-r@v2
         with:
           use-public-rspm: true
 
-      - uses: r-lib/actions/setup-renv@v1
+      - uses: r-lib/actions/setup-renv@v2
 
       - name: Cache bookdown results
         uses: actions/cache@v2
@@ -631,7 +629,7 @@ a `NETLIFY_SITE_ID` secret to your repository for the netlify deploy
 (see [Managing secrets](#managing-secrets) section for details).
 
 ``` yaml
-# Workflow derived from https://github.com/r-lib/actions/tree/master/examples
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
@@ -647,13 +645,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: r-lib/actions/setup-pandoc@v1
+      - uses: r-lib/actions/setup-pandoc@v2
 
-      - uses: r-lib/actions/setup-r@v1
+      - uses: r-lib/actions/setup-r@v2
         with:
           use-public-rspm: true
 
-      - uses: r-lib/actions/setup-renv@v1
+      - uses: r-lib/actions/setup-renv@v2
 
       - name: Install hugo
         run: |
@@ -687,18 +685,16 @@ This action assumes you have an `renv` lockfile in your repository that
 describes the `R` packages and versions required for your Shiny
 application.
 
-  - See here for information on how to obtain the token and secret for
+-   See here for information on how to obtain the token and secret for
     configuring `rsconnect`:
     <https://shiny.rstudio.com/articles/shinyapps.html>
 
-  - See here for information on how to store private tokens in a
+-   See here for information on how to store private tokens in a
     repository as GitHub Secrets:
     <https://docs.github.com/en/actions/reference/encrypted-secrets#creating-encrypted-secrets-for-a-repository>
 
-<!-- end list -->
-
 ``` yaml
-# Workflow derived from https://github.com/r-lib/actions/tree/master/examples
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
@@ -714,13 +710,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: r-lib/actions/setup-pandoc@v1
+      - uses: r-lib/actions/setup-pandoc@v2
 
-      - uses: r-lib/actions/setup-r@v1
+      - uses: r-lib/actions/setup-r@v2
         with:
           use-public-rspm: true
 
-      - uses: r-lib/actions/setup-renv@v1
+      - uses: r-lib/actions/setup-renv@v2
 
       - name: Install rsconnect
         run: install.packages("rsconnect")
@@ -745,7 +741,7 @@ model in `fit_model.R` and then have a report in `report.Rmd`. It then
 uploads the rendered html from the report as a build artifact.
 
 ``` yaml
-# Workflow derived from https://github.com/r-lib/actions/tree/master/examples
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on: [push]
 
@@ -803,7 +799,7 @@ This example uses the [lintr](https://github.com/jimhester/lintr)
 package to lint your project and return the results as annotations.
 
 ``` yaml
-# Workflow derived from https://github.com/r-lib/actions/tree/master/examples
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
@@ -821,7 +817,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: r-lib/actions/setup-r@v1
+      - uses: r-lib/actions/setup-r@v2
         with:
           use-public-rspm: true
 
@@ -841,8 +837,8 @@ Code repositories such as [CRAN](http://cran.r-project.org) or
 pre-compiled) form for some platforms, but these binaries can sometimes
 be missing our lag behind the package sources published on the
 repository. The
-[setup-r](https://github.com/r-lib/actions/tree/master/setup-r) action,
-and all example workflows utilizing it follow the
+[setup-r](https://github.com/r-lib/actions/tree/v2/setup-r) action, and
+all example workflows utilizing it follow the
 `install.packages.compile.from.source` `options()` default and will
 install from source when a binary is out of date. Installing from source
 can be slow and require additional system dependencies, but ensures that
@@ -895,20 +891,20 @@ which we follow here.
     `https://github.com/{user}/{repo}/settings/secrets`.
 
 3.  At the **tokens** page:
-    
-      - Click “New access token”.
-      - Provide a description for your benefit, so you will know which
+
+    -   Click “New access token”.
+    -   Provide a description for your benefit, so you will know which
         token this is, perhaps something like `actions-{repo}`.
-      - Click “Generate token”.
-      - Copy the token to your clipboard.
+    -   Click “Generate token”.
+    -   Copy the token to your clipboard.
 
 4.  On your repository’s **secrets** page:
-    
-      - Click “Add a new secret”.
-      - In the “Name” field, type `NETLIFY_AUTH_TOKEN` (or the name of
+
+    -   Click “Add a new secret”.
+    -   In the “Name” field, type `NETLIFY_AUTH_TOKEN` (or the name of
         the secret that the action expects).
-      - In the “Value” field, paste the token from your clipboard.
-      - Click “Add Secret”.
+    -   In the “Value” field, paste the token from your clipboard.
+    -   Click “Add Secret”.
 
 5.  At this point (certainly at some point), you may wish to close your
     **tokens** page to remove the visibility of your token.
