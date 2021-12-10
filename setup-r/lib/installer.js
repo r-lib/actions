@@ -301,6 +301,24 @@ function acquireRMacOS(version) {
             core.debug(error);
             throw `Failed to install R: ${error}`;
         }
+        // Older R versions on newer macOS cannot create a symlink to R and
+        // Rscript, we'll need to do it manually.
+        try {
+            yield exec.exec("sudo ln", [
+                "-sf",
+                "/Library/Frameworks/R.framework/Resources/bin/R",
+                "/usr/local/bin/R"
+            ]);
+            yield exec.exec("sudo ln", [
+                "-sf",
+                "/Library/Frameworks/R.framework/Resources/bin/Rscript",
+                "/usr/local/bin/Rscript"
+            ]);
+        }
+        catch (error) {
+            core.debug(error);
+            core.debug("Marching on despite failed symlink creation.");
+        }
         return "/";
     });
 }
