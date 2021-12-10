@@ -130,13 +130,7 @@ async function acquireFortranMacOS(): Promise<string> {
     throw `Failed to install gfortran: ${error}`;
   }
 
-  try {
-    await exec.exec("sudo", ["hdiutil", "detach", mntPath]);
-  } catch (error) {
-    core.debug(error);
-
-    throw `Failed to umount ${mntPath}: ${error}`;
-  }
+  // We do not detach the volume here, because it might lead to hangs
 
   core.addPath("/usr/local/gfortran/bin");
   // rename the gcov executable shipped with gfortran, as it conflits with the

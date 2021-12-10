@@ -160,13 +160,7 @@ function acquireFortranMacOS() {
             core.debug(error);
             throw `Failed to install gfortran: ${error}`;
         }
-        try {
-            yield exec.exec("sudo", ["hdiutil", "detach", mntPath]);
-        }
-        catch (error) {
-            core.debug(error);
-            throw `Failed to umount ${mntPath}: ${error}`;
-        }
+        // We do not detach the volume here, because it might lead to hangs
         core.addPath("/usr/local/gfortran/bin");
         // rename the gcov executable shipped with gfortran, as it conflits with the
         // normal gcov executable in llvm, and we cannot append paths to PATH
