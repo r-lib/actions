@@ -69,6 +69,19 @@ jobs:
       - run: Rscript -e 'print("hello")'
 ```
 
+## FAQ
+
+### How do I use a custom R profile that sets an option?
+
+You can add an extra step to your workflow, after R was installed,
+and create the R profile. Here is an example:
+```yaml
+      - name: Add some R options for later steps
+        run: |
+          cat("\noptions(tinytex.verbose = TRUE)\n", file = "~/.Rprofile", append = TRUE)
+        shell: Rscript {0}
+```
+
 ## License
 
 The scripts and documentation in this project are released under the [MIT License](LICENSE)
