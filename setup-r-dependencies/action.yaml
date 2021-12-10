@@ -37,6 +37,7 @@ runs:
           }
           needs <- sprintf("Config/Needs/%s", strsplit("${{ inputs.needs }}", "[[:space:],]+")[[1]])
           extra_deps <- strsplit("${{ inputs.extra-packages }}", "[[:space:],]+")[[1]]
+          dir.create(".github", showWarnings=FALSE)
           pak::lockfile_create(
             c("deps::.", "any::sessioninfo", extra_deps),
             lockfile = ".github/pkg.lock",
@@ -54,9 +55,8 @@ runs:
           path: |
             ${{ env.R_LIBS_USER }}/*
             !${{ env.R_LIBS_USER }}/pak
-          key: ${{ steps.get-version.outputs.os-version }}-${{ steps.get-version.outputs.r-version }}-${{inputs.cache-version }}-${{ hashFiles('.github/pkg.lock') }}
+          key: ${{ steps.get-version.outputs.os-version }}-${{ steps.get-version.outputs.r-version }}-${{inputs.cache-version }}-${{ hashFiles('${{ inputsworking-directory }}/.github/pkg.lock') }}
           restore-keys: ${{ steps.get-version.outputs.os-version }}-${{ steps.get-version.outputs.r-version }}-${{inputs.cache-version }}-
-        working-directory: ${{ inputs.working-directory }}
 
       - name: Install dependencies
         run: |
