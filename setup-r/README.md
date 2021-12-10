@@ -31,8 +31,6 @@ This action sets up an R environment for use in actions by:
 -   **rtools-version** (`''`) - Exact version of Rtools to use. Default
     uses latest suitable rtools for the given version of R.
 -   **Ncpus** (`'1'`) - Value to set the R option `Ncpus` to.
--   **crayon.enabled** (`'NULL'`) - Value to set the R option
-    `crayon.enabled` to.
 -   **remove-openmp-macos** (`true`) - If true, remove `-fopenmp` from
     the default compilation flags, e.g. `SHLIB_OPENMP_CFLAGS`, as the
     macOS Command Line Tools do not support OpenMP.

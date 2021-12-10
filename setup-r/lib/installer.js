@@ -489,7 +489,6 @@ function setupRLibrary() {
     RSPM = ${rspm},
     CRAN = ${cran}${extra_repositories}
   ),
-  crayon.enabled = ${core.getInput("crayon.enabled")},
   Ncpus = ${core.getInput("Ncpus")},
   HTTPUserAgent = ${user_agent}
 )\n`);
