@@ -94,18 +94,6 @@ jobs:
           needs: check
 
       - uses: r-lib/actions/check-r-package@v2
-
-      - name: Show testthat output
-        if: always()
-        run: find check -name 'testthat.Rout*' -exec cat '{}' \; || true
-        shell: bash
-
-      - name: Upload check results
-        if: failure()
-        uses: actions/upload-artifact@main
-        with:
-          name: ${{ runner.os }}-r${{ matrix.config.r }}-results
-          path: check
 ```
 
 ## Standard CI workflow
@@ -171,18 +159,6 @@ jobs:
           needs: check
 
       - uses: r-lib/actions/check-r-package@v2
-
-      - name: Show testthat output
-        if: always()
-        run: find check -name 'testthat.Rout*' -exec cat '{}' \; || true
-        shell: bash
-
-      - name: Upload check results
-        if: failure()
-        uses: actions/upload-artifact@main
-        with:
-          name: ${{ runner.os }}-r${{ matrix.config.r }}-results
-          path: check
 ```
 
 ## Tidyverse CI workflow
@@ -263,18 +239,6 @@ jobs:
           needs: check
 
       - uses: r-lib/actions/check-r-package@v2
-
-      - name: Show testthat output
-        if: always()
-        run: find check -name 'testthat.Rout*' -exec cat '{}' \; || true
-        shell: bash
-
-      - name: Upload check results
-        if: failure()
-        uses: actions/upload-artifact@main
-        with:
-          name: ${{ runner.os }}-r${{ matrix.config.r }}-results
-          path: check
 ```
 
 ## Test coverage workflow

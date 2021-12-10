@@ -29,3 +29,16 @@ runs:
         rcmdcheck::rcmdcheck(args = c(${{ inputs.args }}), build_args = c(${{ inputs.build_args }}), error_on = ${{ inputs.error-on }}, check_dir = ${{ inputs.check-dir }})
       shell: Rscript {0}
       working-directory: ${{ inputs.working-directory }}
+
+    - name: Show testthat output
+      if: always()
+      run: find check -name 'testthat.Rout*' -exec cat '{}' \; || true
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+
+    - name: Upload check results
+      if: failure()
+      uses: actions/upload-artifact@main
+      with:
+        name: ${{ runner.os }}-r${{ matrix.config.r }}-results
+        path: ${{ inputs.working-directory }}/check
