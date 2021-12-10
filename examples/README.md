@@ -521,6 +521,8 @@ API](https://docs.github.com/en/rest/reference/actions/#create-a-workflow-dispat
 on:
   push:
     branches: [main, master]
+  pull_request:
+    branches: [main, master]
   release:
     types: [published]
   workflow_dispatch:
@@ -547,10 +549,16 @@ jobs:
           needs: website
 
       - name: Deploy package
+        if: github.event_name != 'pull_request'
         run: |
           git config --local user.name "$GITHUB_ACTOR"
           git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
           Rscript -e 'pkgdown::deploy_to_branch(new_process = FALSE)'
+
+      - name: Build site without deploying
+        if: github.event_name == 'pull_request'
+        run: |
+          Rscript -e 'pkgdown::build_site(preview = FALSE, install = FALSE)'
 ```
 
 ## Build bookdown site
@@ -576,6 +584,9 @@ and a `NETLIFY_SITE_ID` secret to your repository for the netlify deploy
 on:
   push:
     branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
 
 name: bookdown
 
@@ -606,6 +617,7 @@ jobs:
         run: Rscript -e 'bookdown::render_book("index.Rmd", quiet = TRUE)'
 
       - name: Deploy to GitHub pages 🚀
+        if: github.event_name != 'pull_request'
         uses: JamesIves/github-pages-deploy-action@4.1.4
         with:
           branch: gh-pages
@@ -634,6 +646,9 @@ a `NETLIFY_SITE_ID` secret to your repository for the netlify deploy
 on:
   push:
     branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
 
 name: blogdown
 
@@ -662,6 +677,7 @@ jobs:
           R -e 'blogdown::build_site(TRUE)'
 
       - name: Deploy to GitHub pages 🚀
+        if: github.event_name != 'pull_request'
         uses: JamesIves/github-pages-deploy-action@4.1.4
         with:
           branch: gh-pages

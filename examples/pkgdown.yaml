@@ -3,6 +3,8 @@
 on:
   push:
     branches: [main, master]
+  pull_request:
+    branches: [main, master]
   release:
     types: [published]
   workflow_dispatch:
@@ -29,7 +31,13 @@ jobs:
           needs: website
 
       - name: Deploy package
+        if: github.event_name != 'pull_request'
         run: |
           git config --local user.name "$GITHUB_ACTOR"
           git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
           Rscript -e 'pkgdown::deploy_to_branch(new_process = FALSE)'
+
+      - name: Build site without deploying
+        if: github.event_name == 'pull_request'
+        run: |
+          Rscript -e 'pkgdown::build_site(preview = FALSE, install = FALSE)'
