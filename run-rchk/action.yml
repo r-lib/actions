@@ -21,7 +21,7 @@ runs:
       run: bash $GITHUB_ACTION_PATH/setup.sh
       shell: bash
     - if: inputs.setup-only != 'true' && inputs.run-only != 'true'
-      uses: r-lib/actions/setup-r-dependencies@v1
+      uses: r-lib/actions/setup-r-dependencies@v2
       with:
         cache-version: ${{ inputs.cache-version }}
     - if: inputs.setup-only != 'true'
