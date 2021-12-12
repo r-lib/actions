@@ -13,10 +13,20 @@ This action install dependencies for the current R environment based on the DESC
 
 Inputs available
 
-- `cache-version` - default `1`. If you need to invalidate the existing cache pass any other number and a new cache will be used.
-- `extra-packages` - One or more extra package references to install. Separate each reference by newlines or commas for more than one package.
-- `needs` - `Config/Needs` fields to install from the DESCRIPTION, the `Config/Needs/` prefix will be automatically included.
-- `working-directory` - default `'.'`. If the DESCRIPTION file is not in the root directory of your repository.
+- `cache-version` - default `1`. If you need to invalidate the existing
+  cache pass any other number and a new cache will be used.
+- `dependencies` - default `'"all"'`. Types of dependencies to install. By
+  default all direct dependencies of the current package are installed, and
+  hard dependencies of these direct dependencies. See also the `needs` and
+  `extra-packages` parameters. This parameter must be a valid R expression
+  in single quotes and it is passed to the `dependencies` argument of
+  `pak::lockfile_create().`
+- `extra-packages` - One or more extra package references to install.
+  Separate each reference by newlines or commas for more than one package.
+- `needs` - `Config/Needs` fields to install from the DESCRIPTION, the
+  `Config/Needs/` prefix will be automatically included.
+- `working-directory` - default `'.'`. If the DESCRIPTION file is not in the
+  root directory of your repository.
 
 Basic:
 ```yaml
