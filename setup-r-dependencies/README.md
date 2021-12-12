@@ -27,11 +27,46 @@ steps:
   with:
     cache-version: 2
     extra-packages: |
-      ggplot2
-      rcmdcheck
+      any::ggplot2
+      any::rcmdcheck
     needs: |
       website
       coverage
+```
+
+## Extra packages and the `any::` prefix
+
+In the example above the `any::` prefix for ggplot2 and rcmdcheck tells pak
+to install these packages from CRAN, unless the local package or one of
+its dependencies request it from somewhere else. E.g. if the checked package
+required the development version of ggplot2 from
+https://github.com/tidyverse/ggplot2 then pak will install it from there.
+
+## Installing the local package
+
+Sometimes you need to install the R package in the repository, e.g.
+the `pkgdown.yaml` example workflow does this. You can specify the local
+package as `local::.` to pak:
+
+```yaml
+steps:
+- uses: actions/checkout@v2
+- uses: r-lib/actions/setup-r@v2
+- uses: r-lib/actions/setup-r-dependencies@v2
+  with:
+    extra-packages: any::pkgdown, local::.
+    needs: website
+```
+
+Other packages from the repository can be installed similarly, e.g.
+to install an embedded test package you can write:
+
+```yaml
+...
+- uses: r-lib/actions/setup-r-dependencies@v2
+  with:
+    extra-packages: any::pkgdown, local::., local::./tests/testthat/testpkg
+...
 ```
 
 # License
