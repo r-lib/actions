@@ -7,11 +7,17 @@ This action checks an R package using the [rcmdcheck](https://r-lib.github.io/rc
 # Usage
 
 Inputs available:
-- description - default `"--no-manual", "--as-cran"`. Arguments to pass to the `args` parameter of `rcmdcheck`
-- build_args - default `""`. Arguments to pass to the `build_args` parameter of `rcmdcheck`
-- error-on - default `"warning"`. Arguments to pass to the `error-on` parameter of `rcmdcheck`
-- check-dir - default `"check"`. Arguments to pass to the `check-dir` parameter of `rcmdcheck`
-- working-directory - default `"."`. If the R package to check is not in the root directory of your repository.
+- args - default `c("--no-manual", "--as-cran")`. Arguments to pass to the
+  `args` parameter of `rcmdcheck`. It must be an R expression in single
+  quotes.
+- build_args - default `"--no-manual"`. Arguments to pass to the `build_args`
+  parameter of `rcmdcheck`. it must be an R expression in single quotes.
+- error-on - default `"warning"`. Arguments to pass to the `error-on`
+  parameter of `rcmdcheck`. It must be an R expression in single quotes.
+- check-dir - default `"check"`. Arguments to pass to the `check-dir` 
+  parameter of `rcmdcheck`. It must be an R expression in single quotes.
+- working-directory - default `"."`. If the R package to check is not in
+  the root directory of your repository.
 
 Basic: 
 ```yaml
