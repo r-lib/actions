@@ -30,7 +30,7 @@ runs:
       - name: Install pak and query dependencies
         run: |
           cat("::group::Install pak\n")
-          if (grepl(" ucrt", "${{ steps.get-version.outputs.r-version }}")) {
+          if (identical(R.Version()$crt, "ucrt")) {
             install.packages("pak", repos = "https://r-lib.github.io/p/pak/devel/ucrt/", type = "win.binary")
           } else {
             install.packages("pak", repos = "https://r-lib.github.io/p/pak/${{ inputs.pak-version }}/")
