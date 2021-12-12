@@ -14,7 +14,7 @@ Basic:
 ```yaml
 steps:
 - uses: actions/checkout@master
-- uses: r-lib/actions/setup-pandoc@v1
+- uses: r-lib/actions/setup-pandoc@v2
   with:
     pandoc-version: '2.7.3' # The pandoc version to download (if necessary) and use.
 - run: echo "# Test" | pandoc -t html

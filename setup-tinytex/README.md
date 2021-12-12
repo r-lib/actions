@@ -14,7 +14,7 @@ Basic:
 ```yaml
 steps:
 - uses: actions/checkout@master
-- uses: r-lib/actions/setup-tinytex@v1
+- uses: r-lib/actions/setup-tinytex@v2
 - run: tlmgr --version
 ```
 
@@ -30,7 +30,7 @@ To install CTAN packages manually, you can call `tlmgr` from your workflow, here
 ```yaml
 steps:
   - uses: actions/checkout@v2
-  - uses: r-lib/actions/setup-tinytex@v1
+  - uses: r-lib/actions/setup-tinytex@v2
   - run: tlmgr --version
 
   - name: Install additional LaTeX packages
@@ -52,7 +52,7 @@ To change the bundle to install you can change the environment variable
 `TINYTEX_INSTALLER`
 
 ````yaml
-      - uses: r-lib/actions/setup-tinytex@v1
+      - uses: r-lib/actions/setup-tinytex@v2
         env:
           # install full prebuilt version
           TINYTEX_INSTALLER: TinyTeX
@@ -65,7 +65,7 @@ https://github.com/yihui/tinytex-releases/releases
 To install a specific version, you can set the `TINYTEX_VERSION` environment variable
 
 ````yaml
-      - uses: r-lib/actions/setup-tinytex@v1
+      - uses: r-lib/actions/setup-tinytex@v2
         env:
           # always install the bundled version from Nov. 2021
           TINYTEX_VERSION: 2021-11

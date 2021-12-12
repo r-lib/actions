@@ -64,7 +64,7 @@ Basic:
 ``` yaml
 steps:
 - uses: actions/checkout@master
-- uses: r-lib/actions/setup-r@v1
+- uses: r-lib/actions/setup-r@v2
   with:
     r-version: '3.5.3' # The R version to download (if necessary) and use.
 - run: Rscript -e 'print("hello")'
@@ -83,7 +83,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: Setup R
-        uses: r-lib/actions/setup-r@v1
+        uses: r-lib/actions/setup-r@v2
         with:
           r-version: ${{ matrix.R }}
       - run: Rscript -e 'print("hello")'

@@ -33,7 +33,7 @@ If you want to have more control
     - uses: r-lib/actions/run-rchk@master
       with:
         setup-only: true
-    - uses: r-lib/actions/setup-r-dependencies@v1
+    - uses: r-lib/actions/setup-r-dependencies@v2
       with:
         cache-version: rchk-1
     - uses: r-lib/actions/run-rchk@master

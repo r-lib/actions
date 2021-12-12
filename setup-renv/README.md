@@ -17,8 +17,8 @@ Basic:
 ```yaml
 steps:
 - uses: actions/checkout@master
-- uses: r-lib/actions/setup-r@v1
-- uses: r-lib/actions/setup-renv@v1
+- uses: r-lib/actions/setup-r@v2
+- uses: r-lib/actions/setup-renv@v2
   with:
     cache-version: 2
 ```
