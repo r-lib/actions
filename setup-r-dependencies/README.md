@@ -26,7 +26,7 @@ steps:
 - uses: r-lib/actions/setup-r-dependencies@v2
   with:
     cache-version: 2
-    extra-packages: |
+    extra-packages: |<
       any::ggplot2
       any::rcmdcheck
     needs: |
@@ -67,6 +67,49 @@ to install an embedded test package you can write:
   with:
     extra-packages: any::pkgdown, local::., local::./tests/testthat/testpkg
 ...
+```
+
+## System dependencies
+
+pak automatically install the system dependencies of all installed R
+packages on the following Linux Distributions:
+
+* CentOS,
+* OpenSUSE,
+* RedHat,
+* SLE and
+* Ubuntu.
+
+System dependencies are **not** installed on other operating systems and
+other Linux distributions currently, and you need to install them manually,
+_before_ using the `r-lib/setup-r-dependencies` action.
+
+On macOS you can usually use `brew`, here is an example step in a workflow:
+
+```yaml
+      - name: Install macOS system dependencies
+        if: runner.os == 'macOS'
+        run: |
+          brew install imagemagick@6
+          brew install libgit2
+```
+
+On Windows you can usually use `pacman` that is included in Rtools4, or
+`choco` to install external software:
+
+```yaml
+      - name: Install most Windows system dependencies
+        if: runner.os == 'Windows'
+        run: |
+          pacman -Syu mingw-w64-x86_64-make --noconfirm
+```
+
+```yaml
+      - name: Install databases (windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          choco install mariadb
 ```
 
 # License
