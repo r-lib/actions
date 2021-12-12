@@ -146,7 +146,7 @@ print_yaml("pr-commands.yaml")
 
 `usethis::use_github_action("render-rmarkdown")`
 
-This example automatically re-builds any Rmarkdown file in the repository whenever it changes and commits the results to the master branch.
+This example automatically re-builds any Rmarkdown file in the repository whenever it changes and commits the results to the same branch.
 
 ```{r echo = FALSE, results = "asis"}
 print_yaml("render-rmarkdown.yaml")

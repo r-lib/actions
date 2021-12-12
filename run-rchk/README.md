@@ -17,8 +17,8 @@ Basic:
       image: rhub/ubuntu-rchk
       options: --user=root
     steps:
-    - uses: actions/checkout@v1
-    - uses: r-lib/actions/run-rchk@master
+    - uses: actions/checkout@v2
+    - uses: r-lib/actions/run-rchk@v2
 ```
 
 If you want to have more control
@@ -29,14 +29,14 @@ If you want to have more control
       image: rhub/ubuntu-rchk
       options: --user=root
     steps:
-    - uses: actions/checkout@v1
-    - uses: r-lib/actions/run-rchk@master
+    - uses: actions/checkout@v2
+    - uses: r-lib/actions/run-rchk@v2
       with:
         setup-only: true
     - uses: r-lib/actions/setup-r-dependencies@v2
       with:
         cache-version: rchk-1
-    - uses: r-lib/actions/run-rchk@master
+    - uses: r-lib/actions/run-rchk@v2
       with:
         run-only: true
 ```

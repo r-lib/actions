@@ -13,7 +13,7 @@ See [action.yml](action.yml)
 Basic:
 ```yaml
 steps:
-- uses: actions/checkout@master
+- uses: actions/checkout@v2
 - uses: r-lib/actions/setup-tinytex@v2
 - run: tlmgr --version
 ```

@@ -7,7 +7,7 @@
 This GitHub Action fetches and checks out the current head of a pull request,
 it is intended to be used by actions which trigger based on comment creation.
 It is often paired with the
-[pr-push](https://github.com/r-lib/actions/tree/master/pr-push) action.
+[pr-push](https://github.com/r-lib/actions/tree/v2/pr-push) action.
 
 ## Usage
 
@@ -28,7 +28,7 @@ jobs:
     runs-on: macOS-latest
     steps:
       - uses: actions/checkout@v1
-      - uses: r-lib/actions/pr-fetch@master
+      - uses: r-lib/actions/pr-fetch@v2
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 ```

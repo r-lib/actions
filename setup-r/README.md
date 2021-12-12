@@ -10,7 +10,7 @@ This action sets up an R environment for use in actions by:
 
 -   Downloading and caching a version of R by version and adding to PATH
 -   Registering [problem
-    matchers](https://github.com/r-lib/actions/tree/master/setup-r/.github)
+    matchers](https://github.com/r-lib/actions/tree/v2/setup-r/.github)
     for error output
 -   Setting the following environment variables
     -   `NOT_CRAN=true`
@@ -63,7 +63,7 @@ Basic:
 
 ``` yaml
 steps:
-- uses: actions/checkout@master
+- uses: actions/checkout@v2
 - uses: r-lib/actions/setup-r@v2
   with:
     r-version: '3.5.3' # The R version to download (if necessary) and use.
@@ -81,7 +81,7 @@ jobs:
         R: [ '3.5.3', '3.6.1' ]
     name: R ${{ matrix.R }} sample
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2
       - name: Setup R
         uses: r-lib/actions/setup-r@v2
         with:

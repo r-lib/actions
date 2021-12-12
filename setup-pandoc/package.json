@@ -23,7 +23,7 @@
   ],
   "author": "jimhester",
   "license": "MIT",
-  "homepage": "https://github.com/r-lib/actions/tree/master/setup-pandoc",
+  "homepage": "https://github.com/r-lib/actions/tree/v2/setup-pandoc",
   "dependencies": {
     "@actions/core": "^1.2.6",
     "@actions/exec": "^1.0.0",

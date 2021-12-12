@@ -5,21 +5,21 @@
 
 This repository stores [GitHub Actions](https://github.com/features/actions)
 for R projects, which can be used to do a variety of CI tasks. It also has a
-number of [example workflows](https://github.com/r-lib/actions/tree/master/examples) which use
+number of [example workflows](https://github.com/r-lib/actions/tree/v2/examples) which use
 these actions.
 
-1. [r-lib/actions/setup-r](https://github.com/r-lib/actions/tree/master/setup-r) - Sets up [R](https://r-project.org)
-1. [r-lib/actions/setup-r-dependencies](https://github.com/r-lib/actions/tree/master/setup-r-dependencies) - Installs packages declared in `DESCRIPTION`
-1. [r-lib/actions/setup-renv](https://github.com/r-lib/actions/tree/master/setup-renv) - Installs packages from renv lockfile.
-1. [r-lib/actions/setup-pandoc](https://github.com/r-lib/actions/tree/master/setup-pandoc) - Sets up [pandoc](https://pandoc.org/)
-1. [r-lib/actions/setup-tinytex](https://github.com/r-lib/actions/tree/master/setup-tinytex) - Sets up LaTeX with [tinytex](https://yihui.name/tinytex)
-1. [r-lib/actions/pr-fetch](https://github.com/r-lib/actions/tree/master/pr-fetch) - Fetches changes of a PR associated with an event
-1. [r-lib/actions/pr-push](https://github.com/r-lib/actions/tree/master/pr-push) - Pushes changes to a PR associated with an event
-1. [r-lib/actions/run-rchk](https://github.com/r-lib/actions/tree/master/run-rchk) - Runs [rchk](https://github.com/kalibera/rchk) tests to detect memory protection errors in C source code.
+1. [r-lib/actions/setup-r](https://github.com/r-lib/actions/tree/v2/setup-r) - Sets up [R](https://r-project.org)
+1. [r-lib/actions/setup-r-dependencies](https://github.com/r-lib/actions/tree/v2/setup-r-dependencies) - Installs packages declared in `DESCRIPTION`
+1. [r-lib/actions/setup-renv](https://github.com/r-lib/actions/tree/v2/setup-renv) - Installs packages from renv lockfile.
+1. [r-lib/actions/setup-pandoc](https://github.com/r-lib/actions/tree/v2/setup-pandoc) - Sets up [pandoc](https://pandoc.org/)
+1. [r-lib/actions/setup-tinytex](https://github.com/r-lib/actions/tree/v2/setup-tinytex) - Sets up LaTeX with [tinytex](https://yihui.name/tinytex)
+1. [r-lib/actions/pr-fetch](https://github.com/r-lib/actions/tree/v2/pr-fetch) - Fetches changes of a PR associated with an event
+1. [r-lib/actions/pr-push](https://github.com/r-lib/actions/tree/v2/pr-push) - Pushes changes to a PR associated with an event
+1. [r-lib/actions/run-rchk](https://github.com/r-lib/actions/tree/v2/run-rchk) - Runs [rchk](https://github.com/kalibera/rchk) tests to detect memory protection errors in C source code.
 
 ## Examples
 
-See the [r-lib/actions/examples](https://github.com/r-lib/actions/tree/master/examples) directory
+See the [r-lib/actions/examples](https://github.com/r-lib/actions/tree/v2/examples) directory
 for a variety of example workflows using these actions.
 
 ## Where to find help

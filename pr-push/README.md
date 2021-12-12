@@ -8,7 +8,7 @@ This GitHub Action pushes changes to the head of the pull request branch. It
 assumes you have already commited any results prior to running. It is intended
 to be used by actions which trigger based on comment creation. It is often
 paired with the
-[pr-fetch](https://github.com/r-lib/actions/tree/master/pr-fetch) action.
+[pr-fetch](https://github.com/r-lib/actions/tree/v2/pr-fetch) action.
 
 ## Usage
 
@@ -29,13 +29,13 @@ jobs:
     runs-on: macOS-latest
     steps:
       - uses: actions/checkout@v1
-      - uses: r-lib/actions/pr-fetch@master
+      - uses: r-lib/actions/pr-fetch@v2
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
       - run: |
         echo "hi" > foo
         git commit -m 'foo added' --author 'GitHub Actions <actions@github.com>'
-      - uses: r-lib/actions/pr-push@master
+      - uses: r-lib/actions/pr-push@v2
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 ```

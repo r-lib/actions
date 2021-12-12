@@ -13,7 +13,7 @@ See [action.yml](action.yml)
 Basic:
 ```yaml
 steps:
-- uses: actions/checkout@master
+- uses: actions/checkout@v2
 - uses: r-lib/actions/setup-pandoc@v2
   with:
     pandoc-version: '2.7.3' # The pandoc version to download (if necessary) and use.

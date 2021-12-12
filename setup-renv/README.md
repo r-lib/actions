@@ -16,7 +16,7 @@ Inputs available
 Basic:
 ```yaml
 steps:
-- uses: actions/checkout@master
+- uses: actions/checkout@v2
 - uses: r-lib/actions/setup-r@v2
 - uses: r-lib/actions/setup-renv@v2
   with:
