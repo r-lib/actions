@@ -25,6 +25,11 @@ Inputs available
   Separate each reference by newlines or commas for more than one package.
 - `needs` - `Config/Needs` fields to install from the DESCRIPTION, the
   `Config/Needs/` prefix will be automatically included.
+- `pak-version`: Which pak version to use. Possible values are
+  `stable`, `rc` and `devel`. Currently it defaults to `devel`, because some
+  of the new features of the `v2` release depend on that, but the default
+  will change to `stable` soon. You can override the default with this
+  parameter.
 - `working-directory` - default `'.'`. If the DESCRIPTION file is not in the
   root directory of your repository.
 
@@ -44,6 +49,28 @@ steps:
       coverage
 ```
 
+## Supported R versions and operating systems
+
+`setup-r-dependencies` uses static builds of [pak](https://pak.r-lib.org/)
+to resolve, download and install the dependencies. There are typically
+recent static pak builds available for:
+
+- x86_64 Linux, for the last 5 R releases and R-devel (currently this is
+  R 3.4.x through R 4.1.x and R-devel).
+- x86_64 macOS, for the last 5 R releases and R-devel.
+- Windows (x86_64 and i386), for the last 5 R releases and R-devel.
+
+There are typically less recent builds for
+
+- R-devel on Windows x86_64 UCRT,
+- arm64 macOS, from R 4.1.x, but at most the last 5 R releases, and R devel.
+
+See https://github.com/r-lib/pak#installation for the most accurate
+information.
+
+If your platform does not have a static pak build, e.g. you are on
+s390x Linux, then you cannot use the `setup-r-dependencies` action currently.
+
 ## Extra packages and the `any::` prefix
 
 In the example above the `any::` prefix for ggplot2 and rcmdcheck tells pak
@@ -51,6 +78,49 @@ to install these packages from CRAN, unless the local package or one of
 its dependencies request it from somewhere else. E.g. if the checked package
 required the development version of ggplot2 from
 https://github.com/tidyverse/ggplot2 then pak will install it from there.
+
+## Ignoring optional dependencies that need a newer R version
+
+When you check a package on an earlier R version, it is not uncommon that
+some optional (soft) dependencies of your package are not available on that
+R version because they need a newer one.
+
+You can use the `extra-packages` parameter and pak's `package=?ignore-before-r`
+syntax to express this.
+
+Here is an example. The butcher package depends on survival, which needs
+R 3.5.0 now, and pak's dependency resolution fails on R 3.4.x:
+
+```
+Error: Cannot install packages:
+* local::.: Can't install dependency survival
+* survival: Needs R 3.5.0
+```
+
+To tell pak to ignore survival on R versions older than R 3.5.0, you can
+write this in the butcher workflow file:
+
+```yaml
+steps:
+- uses: actions/checkout@v2
+- uses: r-lib/actions/setup-r@v2
+- uses: r-lib/actions/setup-r-dependencies@v2
+  with:
+    extra-packages: any::rcmdcheck, survival=?ignore-before-r=3.5.0
+    needs: check
+```
+
+Of course you'll also have to make sure that the test cases and examples
+in butcher are prepared for survival not being available. For running
+`R CMD check` you'll probably also need to set the `_R_CHECK_FORCE_SUGGESTS_`
+environment variable to `false`, otherwise the check fails if suggested
+packages are not available:
+
+```yaml
+- uses: r-lib/actions/check-r-package@v2
+  env:
+    _R_CHECK_FORCE_SUGGESTS_: false
+```
 
 ## Installing the local package
 
