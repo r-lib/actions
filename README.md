@@ -13,6 +13,7 @@ these actions.
 1. [r-lib/actions/setup-renv](https://github.com/r-lib/actions/tree/v2/setup-renv) - Installs packages from renv lockfile.
 1. [r-lib/actions/setup-pandoc](https://github.com/r-lib/actions/tree/v2/setup-pandoc) - Sets up [pandoc](https://pandoc.org/)
 1. [r-lib/actions/setup-tinytex](https://github.com/r-lib/actions/tree/v2/setup-tinytex) - Sets up LaTeX with [tinytex](https://yihui.name/tinytex)
+1. [r-lib/actions/check-r-package](https://github.com/r-lib/actions/tree/v2/check-r-package) - Runs `R CMD check` on an R package.
 1. [r-lib/actions/pr-fetch](https://github.com/r-lib/actions/tree/v2/pr-fetch) - Fetches changes of a PR associated with an event
 1. [r-lib/actions/pr-push](https://github.com/r-lib/actions/tree/v2/pr-push) - Pushes changes to a PR associated with an event
 1. [r-lib/actions/run-rchk](https://github.com/r-lib/actions/tree/v2/run-rchk) - Runs [rchk](https://github.com/kalibera/rchk) tests to detect memory protection errors in C source code.
