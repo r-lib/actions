@@ -373,7 +373,7 @@ async function acquireRtools(version: string) {
   }
   if (rtools4) {
     core.addPath(`C:\\rtools40\\usr\\bin`);
-    if (core.getInput("r-version").match("ucrt")) {
+    if (core.getInput("r-version").match("devel")) {
       core.addPath(`C:\\rtools40\\ucrt64\\bin`);
       core.exportVariable("_R_INSTALL_TIME_PATCHES_", "no");
     } else if (core.getInput("windows-path-include-mingw") === "true") {
@@ -486,11 +486,6 @@ async function setupRLibrary() {
     profilePath,
     `options(
   repos = c(
-    ${
-      core.getInput("r-version").match("ucrt")
-        ? `CRAN_UCRT = "https://www.r-project.org/nosvn/winutf8/ucrt3/CRAN",`
-        : ""
-    }
     RSPM = ${rspm},
     CRAN = ${cran}${extra_repositories}
   ),
@@ -570,9 +565,6 @@ async function getDownloadUrlWindows(version: string): Promise<string> {
   if (version == "devel") {
     return "https://cloud.r-project.org/bin/windows/base/R-devel-win.exe";
   }
-  if (version == "devel-ucrt") {
-    return "https://cloud.r-project.org/bin/windows/testing/R-devel-ucrt.exe";
-  }
 
   const filename: string = getFileNameWindows(version);
 
@@ -638,6 +630,11 @@ async function determineVersion(version: string): Promise<string> {
   // There is no linux endpoint, so we just use the tarball one for linux.
 
   version = version.toLowerCase();
+
+  // Formerly called 'devel-ucrt' is now just 'devel'
+  if (version == "devel-ucrt") {
+    return "devel";
+  }
   if (version == "latest" || version == "release") {
     if (IS_WINDOWS) {
       return getReleaseVersion("win");
