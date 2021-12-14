@@ -424,53 +424,6 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-## Render Rmarkdown
-
-`usethis::use_github_action("render-rmarkdown")`
-
-This example automatically re-builds any Rmarkdown file in the
-repository whenever it changes and commits the results to the same
-branch.
-
-``` yaml
-# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
-# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
-on:
-  push:
-    paths: ['**.Rmd']
-
-name: render-rmarkdown
-
-jobs:
-  render-rmarkdown:
-    runs-on: ubuntu-latest
-    env:
-      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - uses: r-lib/actions/setup-pandoc@v2
-
-      - uses: r-lib/actions/setup-r@v2
-
-      - uses: r-lib/actions/setup-renv@v2
-      
-      - name: Render Rmarkdown files
-        run: |
-          RMD_PATH=($(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '[.]Rmd$'))
-          Rscript -e 'for (f in commandArgs(TRUE)) if (file.exists(f)) rmarkdown::render(f)' ${RMD_PATH[*]}
-
-      - name: Commit results
-        run: |
-          git config --local user.name "$GITHUB_ACTOR"
-          git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
-          git commit ${RMD_PATH[*]/.Rmd/.md} -m 'Re-build Rmarkdown files' || echo "No changes to commit"
-          git push origin || echo "No changes to commit"
-```
-
 ## Build pkgdown site
 
 `usethis::use_github_action("pkgdown")`
@@ -637,6 +590,53 @@ jobs:
           git push origin || echo "No changes to commit"
 ```
 
+## Render Rmarkdown
+
+`usethis::use_github_action("render-rmarkdown")`
+
+This example automatically re-builds any Rmarkdown file in the
+repository whenever it changes and commits the results to the same
+branch.
+
+``` yaml
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
+on:
+  push:
+    paths: ['**.Rmd']
+
+name: render-rmarkdown
+
+jobs:
+  render-rmarkdown:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - uses: r-lib/actions/setup-pandoc@v2
+
+      - uses: r-lib/actions/setup-r@v2
+
+      - uses: r-lib/actions/setup-renv@v2
+      
+      - name: Render Rmarkdown files
+        run: |
+          RMD_PATH=($(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '[.]Rmd$'))
+          Rscript -e 'for (f in commandArgs(TRUE)) if (file.exists(f)) rmarkdown::render(f)' ${RMD_PATH[*]}
+
+      - name: Commit results
+        run: |
+          git config --local user.name "$GITHUB_ACTOR"
+          git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
+          git commit ${RMD_PATH[*]/.Rmd/.md} -m 'Re-build Rmarkdown files' || echo "No changes to commit"
+          git push origin || echo "No changes to commit"
+```
+
 ## Build bookdown site
 
 `usethis::use_github_action("bookdown")`
@@ -757,67 +757,6 @@ jobs:
           folder: public
 ```
 
-## Shiny App Deployment
-
-`usethis::use_github_action("shiny-deploy")`
-
-This example will deploy your Shiny application to either
-[shinyapps.io](https://www.shinyapps.io/) or [RStudio
-Connect](https://www.rstudio.com/products/connect/) using the
-`rsconnect` package. The `rsconnect` package requires authorization to
-deploy an app using your account. This action does this by using your
-user name (`RSCONNECT_USER`), token (`RSCONNECT_TOKEN`), and secret
-(`RSCONNECT_SECRET`), which are securely accessed as GitHub Secrets.
-**Your token and secret are private and should be kept confidential**.
-
-This action assumes you have an `renv` lockfile in your repository that
-describes the `R` packages and versions required for your Shiny
-application.
-
--   See here for information on how to obtain the token and secret for
-    configuring `rsconnect`:
-    <https://shiny.rstudio.com/articles/shinyapps.html>
-
--   See here for information on how to store private tokens in a
-    repository as GitHub Secrets:
-    <https://docs.github.com/en/actions/reference/encrypted-secrets#creating-encrypted-secrets-for-a-repository>
-
-``` yaml
-# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
-# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
-on:
-  push:
-    branches: [main, master]
-
-name: shiny-deploy
-
-jobs:
-  shiny-deploy:
-    runs-on: ubuntu-latest
-    env:
-      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-    steps:
-      - uses: actions/checkout@v2
-
-      - uses: r-lib/actions/setup-pandoc@v2
-
-      - uses: r-lib/actions/setup-r@v2
-        with:
-          use-public-rspm: true
-
-      - uses: r-lib/actions/setup-renv@v2
-
-      - name: Install rsconnect
-        run: install.packages("rsconnect")
-        shell: Rscript {0}
-
-      - name: Authorize and deploy app
-        run: |
-          rsconnect::setAccountInfo(${{ secrets.RSCONNECT_USER }}, ${{ secrets.RSCONNECT_TOKEN }}, ${{ secrets.RSCONNECT_SECRET }})
-          rsconnect::deployApp()
-        shell: Rscript {0}
-```
-
 ## Docker based workflow
 
 `usethis::use_github_action("docker")`
@@ -917,6 +856,67 @@ jobs:
 
       - name: Lint root directory
         run: lintr::lint_dir()
+        shell: Rscript {0}
+```
+
+## Shiny App Deployment
+
+`usethis::use_github_action("shiny-deploy")`
+
+This example will deploy your Shiny application to either
+[shinyapps.io](https://www.shinyapps.io/) or [RStudio
+Connect](https://www.rstudio.com/products/connect/) using the
+`rsconnect` package. The `rsconnect` package requires authorization to
+deploy an app using your account. This action does this by using your
+user name (`RSCONNECT_USER`), token (`RSCONNECT_TOKEN`), and secret
+(`RSCONNECT_SECRET`), which are securely accessed as GitHub Secrets.
+**Your token and secret are private and should be kept confidential**.
+
+This action assumes you have an `renv` lockfile in your repository that
+describes the `R` packages and versions required for your Shiny
+application.
+
+-   See here for information on how to obtain the token and secret for
+    configuring `rsconnect`:
+    <https://shiny.rstudio.com/articles/shinyapps.html>
+
+-   See here for information on how to store private tokens in a
+    repository as GitHub Secrets:
+    <https://docs.github.com/en/actions/reference/encrypted-secrets#creating-encrypted-secrets-for-a-repository>
+
+``` yaml
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
+on:
+  push:
+    branches: [main, master]
+
+name: shiny-deploy
+
+jobs:
+  shiny-deploy:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: r-lib/actions/setup-pandoc@v2
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-renv@v2
+
+      - name: Install rsconnect
+        run: install.packages("rsconnect")
+        shell: Rscript {0}
+
+      - name: Authorize and deploy app
+        run: |
+          rsconnect::setAccountInfo(${{ secrets.RSCONNECT_USER }}, ${{ secrets.RSCONNECT_TOKEN }}, ${{ secrets.RSCONNECT_SECRET }})
+          rsconnect::deployApp()
         shell: Rscript {0}
 ```
 
