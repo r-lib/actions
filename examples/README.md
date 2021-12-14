@@ -19,6 +19,10 @@ Package workflows:
 -   [`pkgdown`](#build-pkgdown-site) - Build a
     [pkgdown](https://pkgdown.r-lib.org/) site for an R package and
     deploy it to [GitHub Pages](https://pages.github.com/).
+-   [`document`](#document-package) - Run `roxygen2::roxygenise()` on an
+    R package.
+-   [`style`](#style-package) - Run `styler::style_pkg()` on an R
+    package.
 
 RMarkdown workflows:
 
@@ -523,6 +527,113 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           Rscript -e 'pkgdown::build_site(preview = FALSE, install = FALSE)'
+```
+
+## Document package
+
+`usethis::use_github_action("document")`
+
+This example documents an R package whenever a file in the `R/`
+directory changes, then commits and pushes the changes to the same
+branch.
+
+``` yaml
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
+on:
+  push:
+    paths: ["R/**"]
+  pull_request:
+    paths: ["R/**"]
+
+name: Document
+
+jobs:
+  document:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - name: Install dependencies
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::roxygen2
+
+      - name: Document
+        run: roxygen2::roxygenise()
+        shell: Rscript {0}
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.name "$GITHUB_ACTOR"
+          git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
+          git add man/\* NAMESPACE
+          git commit -m "Update documentation" || echo "No changes to commit"
+          git pull --ff-only || echo "No remote changes"
+          git push origin || echo "No changes to commit"
+```
+
+## Style package
+
+`usethis::use_github_action("document")`
+
+This example styles the R code in a package, then commits and pushes the
+changes to the same branch.
+
+``` yaml
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
+on:
+  push:
+    paths: ["R/**"]
+  pull_request:
+    paths: ["R/**"]
+
+name: Style
+
+jobs:
+  style:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - name: Install dependencies
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::styler
+
+      - name: Style
+        run: styler::style_pkg()
+        shell: Rscript {0}
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.name "$GITHUB_ACTOR"
+          git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
+          git add R/\*
+          git commit -m "Style code" || echo "No changes to commit"
+          git pull --ff-only || echo "No remote changes"
+          git push origin || echo "No changes to commit"
 ```
 
 ## Build bookdown site

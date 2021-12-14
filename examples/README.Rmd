@@ -21,6 +21,8 @@ Package workflows:
 - [`lint`](#lint-workflow) - Run `lintr::lint_package()` on an R package.
 - [`pr-commands`](#commands-workflow) - Adds `/document` and `/style` commands for pull requests.
 - [`pkgdown`](#build-pkgdown-site) - Build a [pkgdown] site for an R package and deploy it to [GitHub Pages].
+- [`document`](#document-package) - Run `roxygen2::roxygenise()` on an R package.
+- [`style`](#style-package) - Run `styler::style_pkg()` on an R package.
 
 RMarkdown workflows:
 
@@ -162,6 +164,28 @@ The inclusion of [`workflow_dispatch`](https://docs.github.com/en/actions/learn-
 
 ```{r echo = FALSE, results = "asis"}
 print_yaml("pkgdown.yaml")
+```
+
+## Document package
+
+`usethis::use_github_action("document")`
+
+This example documents an R package whenever a file in the `R/` directory changes, then commits and pushes the changes
+to the same branch.
+
+```{r echo = FALSE, results = "asis"}
+print_yaml("document.yaml")
+```
+
+## Style package
+
+`usethis::use_github_action("document")`
+
+This example styles the R code in a package, then commits and pushes the changes
+to the same branch.
+
+```{r echo = FALSE, results = "asis"}
+print_yaml("style.yaml")
 ```
 
 ## Build bookdown site
