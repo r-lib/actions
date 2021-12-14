@@ -17,6 +17,24 @@ these actions.
 1. [r-lib/actions/pr-push](https://github.com/r-lib/actions/tree/v2/pr-push) - Pushes changes to a PR associated with an event
 1. [r-lib/actions/run-rchk](https://github.com/r-lib/actions/tree/v2/run-rchk) - Runs [rchk](https://github.com/kalibera/rchk) tests to detect memory protection errors in C source code.
 
+## Releases and tags
+
+We use major version tags to mark breaking changes in these actions.
+For the current version, please use the `v2` tag, e.g.:
+
+```yaml
+- uses: r-lib/actions/setup-r@v2
+```
+
+The `v2` tag occasionally changes, to introduce non-breaking fixes and
+improvements. These changes introduce more fine grained tags, e.g. `v2.0.1`.
+You can refer to these as well in your workflow files, if you need to.
+
+## What's new?
+
+See the [`v2` release notes](https://github.com/r-lib/actions/releases/tag/v2).
+These notes are kept current with the changes in `v2`.
+
 ## Examples
 
 See the [r-lib/actions/examples](https://github.com/r-lib/actions/tree/v2/examples) directory
