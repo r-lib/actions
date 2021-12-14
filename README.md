@@ -27,7 +27,7 @@ For the current version, please use the `v2` tag, e.g.:
 ```
 
 The `v2` tag occasionally changes, to introduce non-breaking fixes and
-improvements. These changes introduce more fine grained tags, e.g. `v2.0.1`.
+improvements. These changes use more fine grained tags, e.g. `v2.0.1`.
 You can refer to these as well in your workflow files, if you need to.
 
 ## What's new?
