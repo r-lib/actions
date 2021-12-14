@@ -144,6 +144,16 @@ package.
 print_yaml("pr-commands.yaml")
 ```
 
+## Render Rmarkdown
+
+`usethis::use_github_action("render-rmarkdown")`
+
+This example automatically re-builds any Rmarkdown file in the repository whenever it changes and commits the results to the same branch.
+
+```{r echo = FALSE, results = "asis"}
+print_yaml("render-rmarkdown.yaml")
+```
+
 ## Build pkgdown site
 
 `usethis::use_github_action("pkgdown")`
@@ -178,16 +188,6 @@ to the same branch.
 print_yaml("style.yaml")
 ```
 
-## Render Rmarkdown
-
-`usethis::use_github_action("render-rmarkdown")`
-
-This example automatically re-builds any Rmarkdown file in the repository whenever it changes and commits the results to the same branch.
-
-```{r echo = FALSE, results = "asis"}
-print_yaml("render-rmarkdown.yaml")
-```
-
 ## Build bookdown site
 
 `usethis::use_github_action("bookdown")`
@@ -212,6 +212,22 @@ You will need to run `renv::snapshot()` locally and commit the `renv.lock` file 
 
 ```{r echo = FALSE, results = "asis"}
 print_yaml("blogdown.yaml")
+```
+
+## Shiny App Deployment
+
+`usethis::use_github_action("shiny-deploy")`
+
+This example will deploy your Shiny application to either [shinyapps.io](https://www.shinyapps.io/) or [RStudio Connect](https://www.rstudio.com/products/connect/) using the `rsconnect` package. The `rsconnect` package requires authorization to deploy an app using your account. This action does this by using your user name (`RSCONNECT_USER`), token (`RSCONNECT_TOKEN`), and secret (`RSCONNECT_SECRET`), which are securely accessed as GitHub Secrets. **Your token and secret are private and should be kept confidential**.
+
+This action assumes you have an `renv` lockfile in your repository that describes the `R` packages and versions required for your Shiny application.
+
+- See here for information on how to obtain the token and secret for configuring `rsconnect`: https://shiny.rstudio.com/articles/shinyapps.html
+
+- See here for information on how to store private tokens in a repository as GitHub Secrets: https://docs.github.com/en/actions/reference/encrypted-secrets#creating-encrypted-secrets-for-a-repository
+
+```{r echo = FALSE, results = "asis"}
+print_yaml("shiny-deploy.yaml")
 ```
 
 ## Docker based workflow
@@ -263,22 +279,6 @@ This example uses the [lintr](https://github.com/jimhester/lintr) package to lin
 
 ```{r echo = FALSE, results = "asis"}
 print_yaml("lint-project.yaml")
-```
-
-## Shiny App Deployment
-
-`usethis::use_github_action("shiny-deploy")`
-
-This example will deploy your Shiny application to either [shinyapps.io](https://www.shinyapps.io/) or [RStudio Connect](https://www.rstudio.com/products/connect/) using the `rsconnect` package. The `rsconnect` package requires authorization to deploy an app using your account. This action does this by using your user name (`RSCONNECT_USER`), token (`RSCONNECT_TOKEN`), and secret (`RSCONNECT_SECRET`), which are securely accessed as GitHub Secrets. **Your token and secret are private and should be kept confidential**.
-
-This action assumes you have an `renv` lockfile in your repository that describes the `R` packages and versions required for your Shiny application.
-
-- See here for information on how to obtain the token and secret for configuring `rsconnect`: https://shiny.rstudio.com/articles/shinyapps.html
-
-- See here for information on how to store private tokens in a repository as GitHub Secrets: https://docs.github.com/en/actions/reference/encrypted-secrets#creating-encrypted-secrets-for-a-repository
-
-```{r echo = FALSE, results = "asis"}
-print_yaml("shiny-deploy.yaml")
 ```
 
 
