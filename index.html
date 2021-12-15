@@ -59,47 +59,33 @@
 <div class="page-header"><h1 id="github-actions-for-the-r-language">GitHub Actions for the R language<a class="anchor" aria-label="anchor" href="#github-actions-for-the-r-language"></a>
 </h1></div>
 
-<p>This repository stores <a href="https://github.com/features/actions" class="external-link">GitHub Actions</a> for R projects, which can be used to do a variety of CI tasks. It also has a number of <a href="https://github.com/r-lib/actions/tree/v2/examples" class="external-link">example workflows</a> which use these actions.</p>
+<p>This repository stores <a href="https://github.com/features/actions" class="external-link">GitHub Actions</a> for R projects, which can be used to do a variety of CI tasks. It also has a number of <a href="https://github.com/r-lib/actions/tree/master/examples" class="external-link">example workflows</a> which use these actions.</p>
 <ol style="list-style-type: decimal">
 <li>
-<a href="https://github.com/r-lib/actions/tree/v2/setup-r" class="external-link">r-lib/actions/setup-r</a> - Sets up <a href="https://r-project.org" class="external-link">R</a>
+<a href="https://github.com/r-lib/actions/tree/master/setup-r" class="external-link">r-lib/actions/setup-r</a> - Sets up <a href="https://r-project.org" class="external-link">R</a>
 </li>
 <li>
-<a href="https://github.com/r-lib/actions/tree/v2/setup-r-dependencies" class="external-link">r-lib/actions/setup-r-dependencies</a> - Installs packages declared in <code>DESCRIPTION</code>
+<a href="https://github.com/r-lib/actions/tree/master/setup-r-dependencies" class="external-link">r-lib/actions/setup-r-dependencies</a> - Installs packages declared in <code>DESCRIPTION</code>
 </li>
 <li>
-<a href="https://github.com/r-lib/actions/tree/v2/setup-renv" class="external-link">r-lib/actions/setup-renv</a> - Installs packages from renv lockfile.</li>
+<a href="https://github.com/r-lib/actions/tree/master/setup-renv" class="external-link">r-lib/actions/setup-renv</a> - Installs packages from renv lockfile.</li>
 <li>
-<a href="https://github.com/r-lib/actions/tree/v2/setup-pandoc" class="external-link">r-lib/actions/setup-pandoc</a> - Sets up <a href="https://pandoc.org/" class="external-link">pandoc</a>
+<a href="https://github.com/r-lib/actions/tree/master/setup-pandoc" class="external-link">r-lib/actions/setup-pandoc</a> - Sets up <a href="https://pandoc.org/" class="external-link">pandoc</a>
 </li>
 <li>
-<a href="https://github.com/r-lib/actions/tree/v2/setup-tinytex" class="external-link">r-lib/actions/setup-tinytex</a> - Sets up LaTeX with <a href="https://yihui.name/tinytex" class="external-link">tinytex</a>
+<a href="https://github.com/r-lib/actions/tree/master/setup-tinytex" class="external-link">r-lib/actions/setup-tinytex</a> - Sets up LaTeX with <a href="https://yihui.name/tinytex" class="external-link">tinytex</a>
 </li>
 <li>
-<a href="https://github.com/r-lib/actions/tree/v2/check-r-package" class="external-link">r-lib/actions/check-r-package</a> - Runs <code>R CMD check</code> on an R package.</li>
+<a href="https://github.com/r-lib/actions/tree/master/pr-fetch" class="external-link">r-lib/actions/pr-fetch</a> - Fetches changes of a PR associated with an event</li>
 <li>
-<a href="https://github.com/r-lib/actions/tree/v2/pr-fetch" class="external-link">r-lib/actions/pr-fetch</a> - Fetches changes of a PR associated with an event</li>
+<a href="https://github.com/r-lib/actions/tree/master/pr-push" class="external-link">r-lib/actions/pr-push</a> - Pushes changes to a PR associated with an event</li>
 <li>
-<a href="https://github.com/r-lib/actions/tree/v2/pr-push" class="external-link">r-lib/actions/pr-push</a> - Pushes changes to a PR associated with an event</li>
-<li>
-<a href="https://github.com/r-lib/actions/tree/v2/run-rchk" class="external-link">r-lib/actions/run-rchk</a> - Runs <a href="https://github.com/kalibera/rchk" class="external-link">rchk</a> tests to detect memory protection errors in C source code.</li>
+<a href="https://github.com/r-lib/actions/tree/master/run-rchk" class="external-link">r-lib/actions/run-rchk</a> - Runs <a href="https://github.com/kalibera/rchk" class="external-link">rchk</a> tests to detect memory protection errors in C source code.</li>
 </ol>
-<div class="section level2">
-<h2 id="releases-and-tags">Releases and tags<a class="anchor" aria-label="anchor" href="#releases-and-tags"></a>
-</h2>
-<p>We use major version tags to mark breaking changes in these actions. For the current version, please use the <code>v2</code> tag, e.g.:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> r-lib/actions/setup-r@v2</span></span></code></pre></div>
-<p>The <code>v2</code> tag occasionally changes, to introduce non-breaking fixes and improvements. These changes use more fine grained tags, e.g. <code>v2.0.1</code>. You can refer to these as well in your workflow files, if you need to.</p>
-</div>
-<div class="section level2">
-<h2 id="whats-new">What’s new?<a class="anchor" aria-label="anchor" href="#whats-new"></a>
-</h2>
-<p>See the <a href="https://github.com/r-lib/actions/releases/tag/v2" class="external-link"><code>v2</code> release notes</a>. These notes are kept current with the changes in <code>v2</code>.</p>
-</div>
 <div class="section level2">
 <h2 id="examples">Examples<a class="anchor" aria-label="anchor" href="#examples"></a>
 </h2>
-<p>See the <a href="https://github.com/r-lib/actions/tree/v2/examples" class="external-link">r-lib/actions/examples</a> directory for a variety of example workflows using these actions.</p>
+<p>See the <a href="https://github.com/r-lib/actions/tree/master/examples" class="external-link">r-lib/actions/examples</a> directory for a variety of example workflows using these actions.</p>
 </div>
 <div class="section level2">
 <h2 id="where-to-find-help">Where to find help<a class="anchor" aria-label="anchor" href="#where-to-find-help"></a>
@@ -121,9 +107,16 @@
 <h2 id="common-questions">Common questions<a class="anchor" aria-label="anchor" href="#common-questions"></a>
 </h2>
 <ol style="list-style-type: decimal">
-<li><p>Why are my builds with plots failing on macOS? You need to install XQuartz to do plotting with the default quartz device on macOS. This can be done by adding the following to your workflow. <code>yaml     - if: runner.os == 'macOS'       run: brew install --cask xquartz</code></p></li>
-<li><p><em>Why are my Windows builds failing with an error about <code>configure.ac</code> having CRLF line endings?</em><br>
-On Windows, when your repo is checked out using git the line endings are automatically changed to CRLF. R’s check process specifically checks if the <code>configure.ac</code> file has these line endings, and will error if it does. To avoid this, add a <code>.gitattributes</code> file to the top level of your package with the following to configure git to always use LF line endings for this file:<br><code>configure.ac text eol=lf</code></p></li>
+<li>Why are my builds with plots failing on macOS? You need to install XQuartz to do plotting with the default quartz device on macOS. This can be done by adding the following to your workflow. <code>yaml  - if: runner.os == 'macOS'    run: brew install --cask xquartz</code>
+</li>
+<li>
+<em>Does GitHub Actions support <code>[ci skip]</code> or similar syntax to automatically skip a build?</em><br>
+Not by default, however you can enable it in any of your workflows by adding the following <a href="https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idif" class="external-link">conditional</a>, e.g. <br><code>if: !contains(github.event.head_commit.message, '[ci skip]')</code>
+</li>
+<li>
+<em>Why are my Windows builds failing with an error about <code>configure.ac</code> having CRLF line endings?</em><br>
+On Windows, when your repo is checked out using git the line endings are automatically changed to CRLF. R’s check process specifically checks if the <code>configure.ac</code> file has these line endings, and will error if it does. To avoid this, add a <code>.gitattributes</code> file to the top level of your package with the following to configure git to always use LF line endings for this file:<br><code>configure.ac text eol=lf</code>
+</li>
 </ol>
 </div>
 <div class="section level2">
