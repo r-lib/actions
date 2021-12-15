@@ -62,7 +62,6 @@ recent static pak builds available for:
 
 There are typically less recent builds for
 
-- R-devel on Windows x86_64 UCRT,
 - arm64 macOS, from R 4.1.x, but at most the last 5 R releases, and R devel.
 
 See https://github.com/r-lib/pak#installation for the most accurate

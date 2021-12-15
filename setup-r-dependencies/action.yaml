@@ -33,11 +33,7 @@ runs:
       - name: Install pak and query dependencies
         run: |
           cat("::group::Install pak\n")
-          if (identical(R.Version()$crt, "ucrt")) {
-            install.packages("pak", repos = "https://r-lib.github.io/p/pak/devel/ucrt/", type = "win.binary")
-          } else {
-            install.packages("pak", repos = "https://r-lib.github.io/p/pak/${{ inputs.pak-version }}/")
-          }
+          install.packages("pak", repos = "https://r-lib.github.io/p/pak/${{ inputs.pak-version }}/")
           needs <- sprintf("Config/Needs/%s", strsplit("${{ inputs.needs }}", "[[:space:],]+")[[1]])
           extra_deps <- strsplit("${{ inputs.extra-packages }}", "[[:space:],]+")[[1]]
           dir.create(".github", showWarnings=FALSE)
