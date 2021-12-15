@@ -28,6 +28,7 @@ jobs:
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::roxygen2
+          needs: roxygen2
 
       - name: Document
         run: roxygen2::roxygenise()
