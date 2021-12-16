@@ -44,7 +44,7 @@ runs:
           cat("::group::Show Lockfile\n")
           writeLines(readLines(".github/pkg.lock"))
           cat("::endgroup::\n")
-        shell: Rscript --verbose {0}
+        shell: Rscript {0}
         working-directory: ${{ inputs.working-directory }}
 
       - name: Restore R package cache
