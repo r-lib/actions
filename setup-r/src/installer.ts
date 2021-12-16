@@ -65,14 +65,14 @@ async function acquireR(version: string, rtoolsVersion: string) {
   try {
     if (IS_WINDOWS) {
       await Promise.all([
-        acquireRWindows(version),
-        acquireRtools(rtoolsVersion),
-        acquireQpdfWindows()
+        core.group('Downloading R', async () => { acquireRWindows(version) }),
+        core.group('Downloading Rtools', async () => { acquireRtools(rtoolsVersion) }),
+        core.group('Downloading qpdf', async () => { acquireQpdfWindows() })
       ]);
     } else if (IS_MAC) {
-      await acquireFortranMacOS();
-      await acquireUtilsMacOS();
-      await acquireRMacOS(version);
+      await core.group('Downloading gfortran', async() => { acquireFortranMacOS() });
+      await core.group('Downloading macOS utils', async() => { acquireUtilsMacOS() });
+      await core.group('Downloading R', async() => { acquireRMacOS(version) });
       if (core.getInput("remove-openmp-macos") === "true") {
         await removeOpenmpFlags();
       }
@@ -180,7 +180,7 @@ async function acquireRUbuntu(version: string): Promise<string> {
   let downloadUrl: string = getDownloadUrlUbuntu(fileName);
   let downloadPath: string | null = null;
   try {
-    downloadPath = await tc.downloadTool(downloadUrl);
+    downloadPath = await core.group('Downloading R', async () => { return tc.downloadTool(downloadUrl) });
     await io.mv(downloadPath, path.join(tempDirectory, fileName));
   } catch (error) {
     core.debug(error);
@@ -202,17 +202,23 @@ async function acquireRUbuntu(version: string): Promise<string> {
       "sudo DEBIAN_FRONTEND=noninteractive add-apt-repository -y ppa:cran/travis"
     );
 
-    await exec.exec(
-      "sudo DEBIAN_FRONTEND=noninteractive apt-get update -y -qq"
-    );
+    await core.group('Updating system package data', async() => {
+      exec.exec(
+        "sudo DEBIAN_FRONTEND=noninteractive apt-get update -y -qq"
+      );
+    });
     // install gdbi-core and also qpdf, which is used by `--as-cran`
-    await exec.exec(
-      "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y gdebi-core qpdf devscripts"
-    );
-    await exec.exec("sudo gdebi", [
-      "--non-interactive",
-      path.join(tempDirectory, fileName)
-    ]);
+    await core.group('Installing R system requirements', async() => {
+      exec.exec(
+        "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y gdebi-core qpdf devscripts"
+      );
+    });
+    await core.group("Installing R", async() => {
+      exec.exec("sudo gdebi", [
+        "--non-interactive",
+        path.join(tempDirectory, fileName)
+      ]);
+    });
   } catch (error) {
     core.debug(error);
 
