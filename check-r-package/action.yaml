@@ -25,6 +25,7 @@ runs:
       env:
         _R_CHECK_CRAN_INCOMING_: false
       run: |
+        ## --------------------------------------------------------------------
         options(crayon.enabled = TRUE)
         if (Sys.getenv("_R_CHECK_FORCE_SUGGESTS_", "") == "") Sys.setenv("_R_CHECK_FORCE_SUGGESTS_" = "false")
         rcmdcheck::rcmdcheck(args = (${{ inputs.args }}), build_args = (${{ inputs.build_args }}), error_on = (${{ inputs.error-on }}), check_dir = (${{ inputs.check-dir }}))
@@ -33,7 +34,11 @@ runs:
 
     - name: Show testthat output
       if: always()
-      run: find check -name 'testthat.Rout*' -exec cat '{}' \; || true
+      run: |
+        ## --------------------------------------------------------------------
+        echo ::group::Show testthat output
+        find check -name 'testthat.Rout*' -exec cat '{}' \; || true
+        echo ::endgroup::
       shell: bash
       working-directory: ${{ inputs.working-directory }}
 
