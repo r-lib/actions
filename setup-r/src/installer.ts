@@ -65,16 +65,16 @@ async function acquireR(version: string, rtoolsVersion: string) {
   try {
     if (IS_WINDOWS) {
       await Promise.all([
-        core.group('Downloading R', async () => { await acquireRWindows(version) }),
-        core.group('Downloading Rtools', async () => { await acquireRtools(rtoolsVersion) }),
-        core.group('Downloading qpdf', async () => { await acquireQpdfWindows() })
+        await acquireRWindows(version),
+        await acquireRtools(rtoolsVersion),
+        await acquireQpdfWindows()
       ]);
     } else if (IS_MAC) {
       await core.group('Downloading gfortran', async() => { await acquireFortranMacOS() });
       await core.group('Downloading macOS utils', async() => { await acquireUtilsMacOS() });
       await core.group('Downloading R', async() => { await acquireRMacOS(version) });
       if (core.getInput("remove-openmp-macos") === "true") {
-        await removeOpenmpFlags();
+        await core.group('Patching -fopenmp', async() => { await removeOpenmpFlags() });
       }
     } else {
       await acquireRUbuntu(version);
@@ -198,9 +198,11 @@ async function acquireRUbuntu(version: string): Promise<string> {
 
   try {
     // Important backports needed for CRAN packages, including libgit2
-    await exec.exec(
-      "sudo DEBIAN_FRONTEND=noninteractive add-apt-repository -y ppa:cran/travis"
-    );
+    await core.group('Adding ppa:cran/travis repository', async() => {
+      exec.exec(
+        "sudo DEBIAN_FRONTEND=noninteractive add-apt-repository -y ppa:cran/travis"
+      );
+    });
 
     await core.group('Updating system package data', async() => {
       await exec.exec(

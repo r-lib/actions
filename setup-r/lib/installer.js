@@ -96,9 +96,9 @@ function acquireR(version, rtoolsVersion) {
         try {
             if (IS_WINDOWS) {
                 yield Promise.all([
-                    core.group('Downloading R', () => __awaiter(this, void 0, void 0, function* () { yield acquireRWindows(version); })),
-                    core.group('Downloading Rtools', () => __awaiter(this, void 0, void 0, function* () { yield acquireRtools(rtoolsVersion); })),
-                    core.group('Downloading qpdf', () => __awaiter(this, void 0, void 0, function* () { yield acquireQpdfWindows(); }))
+                    yield acquireRWindows(version),
+                    yield acquireRtools(rtoolsVersion),
+                    yield acquireQpdfWindows()
                 ]);
             }
             else if (IS_MAC) {
@@ -106,7 +106,7 @@ function acquireR(version, rtoolsVersion) {
                 yield core.group('Downloading macOS utils', () => __awaiter(this, void 0, void 0, function* () { yield acquireUtilsMacOS(); }));
                 yield core.group('Downloading R', () => __awaiter(this, void 0, void 0, function* () { yield acquireRMacOS(version); }));
                 if (core.getInput("remove-openmp-macos") === "true") {
-                    yield removeOpenmpFlags();
+                    yield core.group('Patching -fopenmp', () => __awaiter(this, void 0, void 0, function* () { yield removeOpenmpFlags(); }));
                 }
             }
             else {
@@ -227,7 +227,9 @@ function acquireRUbuntu(version) {
         }
         try {
             // Important backports needed for CRAN packages, including libgit2
-            yield exec.exec("sudo DEBIAN_FRONTEND=noninteractive add-apt-repository -y ppa:cran/travis");
+            yield core.group('Adding ppa:cran/travis repository', () => __awaiter(this, void 0, void 0, function* () {
+                exec.exec("sudo DEBIAN_FRONTEND=noninteractive add-apt-repository -y ppa:cran/travis");
+            }));
             yield core.group('Updating system package data', () => __awaiter(this, void 0, void 0, function* () {
                 yield exec.exec("sudo DEBIAN_FRONTEND=noninteractive apt-get update -y -qq");
             }));
