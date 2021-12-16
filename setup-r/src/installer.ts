@@ -179,14 +179,17 @@ async function acquireRUbuntu(version: string): Promise<string> {
   let fileName: string = getFileNameUbuntu(version);
   let downloadUrl: string = getDownloadUrlUbuntu(fileName);
   let downloadPath: string | null = null;
+  core.startGroup('Downloading R');
+
   try {
-    downloadPath = await core.group('Downloading R', async () => { return await tc.downloadTool(downloadUrl) });
+    downloadPath = await tc.downloadTool(downloadUrl);
     await io.mv(downloadPath, path.join(tempDirectory, fileName));
   } catch (error) {
     core.debug(error);
 
     throw `Failed to download version ${version}: ${error}`;
   }
+  core.endGroup()
 
   //
   // Install

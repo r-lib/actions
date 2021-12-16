@@ -210,14 +210,16 @@ function acquireRUbuntu(version) {
         let fileName = getFileNameUbuntu(version);
         let downloadUrl = getDownloadUrlUbuntu(fileName);
         let downloadPath = null;
+        core.startGroup('Downloading R');
         try {
-            downloadPath = yield core.group('Downloading R', () => __awaiter(this, void 0, void 0, function* () { return yield tc.downloadTool(downloadUrl); }));
+            downloadPath = yield tc.downloadTool(downloadUrl);
             yield io.mv(downloadPath, path.join(tempDirectory, fileName));
         }
         catch (error) {
             core.debug(error);
             throw `Failed to download version ${version}: ${error}`;
         }
+        core.endGroup();
         //
         // Install
         //
