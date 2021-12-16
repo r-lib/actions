@@ -96,15 +96,15 @@ function acquireR(version, rtoolsVersion) {
         try {
             if (IS_WINDOWS) {
                 yield Promise.all([
-                    core.group('Downloading R', () => __awaiter(this, void 0, void 0, function* () { acquireRWindows(version); })),
-                    core.group('Downloading Rtools', () => __awaiter(this, void 0, void 0, function* () { acquireRtools(rtoolsVersion); })),
-                    core.group('Downloading qpdf', () => __awaiter(this, void 0, void 0, function* () { acquireQpdfWindows(); }))
+                    core.group('Downloading R', () => __awaiter(this, void 0, void 0, function* () { yield acquireRWindows(version); })),
+                    core.group('Downloading Rtools', () => __awaiter(this, void 0, void 0, function* () { yield acquireRtools(rtoolsVersion); })),
+                    core.group('Downloading qpdf', () => __awaiter(this, void 0, void 0, function* () { yield acquireQpdfWindows(); }))
                 ]);
             }
             else if (IS_MAC) {
-                yield core.group('Downloading gfortran', () => __awaiter(this, void 0, void 0, function* () { acquireFortranMacOS(); }));
-                yield core.group('Downloading macOS utils', () => __awaiter(this, void 0, void 0, function* () { acquireUtilsMacOS(); }));
-                yield core.group('Downloading R', () => __awaiter(this, void 0, void 0, function* () { acquireRMacOS(version); }));
+                yield core.group('Downloading gfortran', () => __awaiter(this, void 0, void 0, function* () { yield acquireFortranMacOS(); }));
+                yield core.group('Downloading macOS utils', () => __awaiter(this, void 0, void 0, function* () { yield acquireUtilsMacOS(); }));
+                yield core.group('Downloading R', () => __awaiter(this, void 0, void 0, function* () { yield acquireRMacOS(version); }));
                 if (core.getInput("remove-openmp-macos") === "true") {
                     yield removeOpenmpFlags();
                 }
@@ -211,7 +211,7 @@ function acquireRUbuntu(version) {
         let downloadUrl = getDownloadUrlUbuntu(fileName);
         let downloadPath = null;
         try {
-            downloadPath = yield core.group('Downloading R', () => __awaiter(this, void 0, void 0, function* () { return tc.downloadTool(downloadUrl); }));
+            downloadPath = yield core.group('Downloading R', () => __awaiter(this, void 0, void 0, function* () { return yield tc.downloadTool(downloadUrl); }));
             yield io.mv(downloadPath, path.join(tempDirectory, fileName));
         }
         catch (error) {
@@ -229,14 +229,14 @@ function acquireRUbuntu(version) {
             // Important backports needed for CRAN packages, including libgit2
             yield exec.exec("sudo DEBIAN_FRONTEND=noninteractive add-apt-repository -y ppa:cran/travis");
             yield core.group('Updating system package data', () => __awaiter(this, void 0, void 0, function* () {
-                exec.exec("sudo DEBIAN_FRONTEND=noninteractive apt-get update -y -qq");
+                yield exec.exec("sudo DEBIAN_FRONTEND=noninteractive apt-get update -y -qq");
             }));
             // install gdbi-core and also qpdf, which is used by `--as-cran`
             yield core.group('Installing R system requirements', () => __awaiter(this, void 0, void 0, function* () {
-                exec.exec("sudo DEBIAN_FRONTEND=noninteractive apt-get install -y gdebi-core qpdf devscripts");
+                yield exec.exec("sudo DEBIAN_FRONTEND=noninteractive apt-get install -y gdebi-core qpdf devscripts");
             }));
             yield core.group("Installing R", () => __awaiter(this, void 0, void 0, function* () {
-                exec.exec("sudo gdebi", [
+                yield exec.exec("sudo gdebi", [
                     "--non-interactive",
                     path.join(tempDirectory, fileName)
                 ]);
