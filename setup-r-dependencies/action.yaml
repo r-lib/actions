@@ -63,7 +63,12 @@ runs:
           pak::lockfile_install(".github/pkg.lock")
           cat("::endgroup::\n")
           cat("::group::Session info\n")
-          sessioninfo::session_info(pkgs = "installed", include_base = TRUE)
+          if (packageVersion("sessioninfo") >= "1.2.1") {
+            sessioninfo::session_info(pkgs = "installed", include_base = TRUE)
+          } else {
+            options(width = 200)
+            sessioninfo::session_info(rownames(installed.packages()), include_base=TRUE)
+          }
           cat("::endgroup::\n")
         shell: Rscript {0}
         working-directory: ${{ inputs.working-directory }}
