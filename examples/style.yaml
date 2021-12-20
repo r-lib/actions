@@ -30,6 +30,27 @@ jobs:
           extra-packages: any::styler
           needs: styler
 
+      - name: Enable styler cache
+        run: styler::cache_activate()
+        shell: Rscript {0}
+
+      - name: Determine cache location
+        id: styler-loc
+        run: |
+          cat(
+            "##[set-output name=loc;]",
+            styler::cache_info(format = "tabular")$location,
+            "\n",
+            sep = ""
+          )
+        shell: Rscript {0}
+
+      - name: Cache styler
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.styler-loc.outputs.loc }}
+          key: ${{ runner.os }}-styler
+
       - name: Style
         run: styler::style_pkg()
         shell: Rscript {0}
