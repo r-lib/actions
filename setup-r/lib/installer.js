@@ -228,10 +228,6 @@ function acquireRUbuntu(version) {
             throw new Error("Temp directory not set");
         }
         try {
-            // Important backports needed for CRAN packages, including libgit2
-            yield core.group('Adding ppa:cran/travis repository', () => __awaiter(this, void 0, void 0, function* () {
-                yield exec.exec("sudo DEBIAN_FRONTEND=noninteractive add-apt-repository -y ppa:cran/travis");
-            }));
             yield core.group('Updating system package data', () => __awaiter(this, void 0, void 0, function* () {
                 yield exec.exec("sudo DEBIAN_FRONTEND=noninteractive apt-get update -y -qq");
             }));

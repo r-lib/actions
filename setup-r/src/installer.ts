@@ -200,13 +200,6 @@ async function acquireRUbuntu(version: string): Promise<string> {
   }
 
   try {
-    // Important backports needed for CRAN packages, including libgit2
-    await core.group('Adding ppa:cran/travis repository', async() => {
-      await exec.exec(
-        "sudo DEBIAN_FRONTEND=noninteractive add-apt-repository -y ppa:cran/travis"
-      );
-    });
-
     await core.group('Updating system package data', async() => {
       await exec.exec(
         "sudo DEBIAN_FRONTEND=noninteractive apt-get update -y -qq"
