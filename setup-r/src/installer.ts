@@ -523,7 +523,7 @@ function getFileNameMacOS(version: string): string {
 
 function getDownloadUrlMacOS(version: string): string {
   if (version == "devel") {
-    return "https://mac.r-project.org/high-sierra/R-devel/R-devel.pkg";
+    return "https://mac.R-project.org/high-sierra/last-success/R-devel-x86_64.pkg";
   }
   const filename: string = getFileNameMacOS(version);
 
