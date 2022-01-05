@@ -25,11 +25,11 @@ RMarkdown workflows:
 -   [`render-rmarkdown`](#render-rmarkdown) - Render one or more
     Rmarkdown files when they change and commit the result.
 -   [`bookdown`](#build-bookdown-site) - Build a
-    [bookdown](https://bookdown.org) site and deploy it to
-    [netlify](https://www.netlify.com/).
+    [bookdown](https://bookdown.org) site and deploy it to [GitHub
+    Pages](https://pages.github.com/).
 -   [`blogdown`](#build-blogdown-site) - Build a
     [blogdown](https://bookdown.org/yihui/blogdown/) site and deploy it
-    to [netlify](https://www.netlify.com/).
+    to [GitHub Pages](https://pages.github.com/).
 
 Other workflows:
 
@@ -530,17 +530,15 @@ jobs:
 `usethis::use_github_action("bookdown")`
 
 This example builds a [bookdown](https://bookdown.org) site for a
-repository and then deploys the site via
-[netlify](https://www.netlify.com/). It uses
+repository and then deploys the site via [GitHub
+Pages](https://pages.github.com/). It uses
 [renv](https://rstudio.github.io/renv/) to ensure the package versions
 remain consistent across builds. You will need to run `renv::snapshot()`
 locally and commit the `renv.lock` file before using this workflow, and
 after every time you add a new package to `DESCRIPTION`. See [Using renv
 with Continous
 Integration](https://rstudio.github.io/renv/articles/ci.html) for
-additional information. **Note** you need to add a `NETLIFY_AUTH_TOKEN`
-and a `NETLIFY_SITE_ID` secret to your repository for the netlify deploy
-(see [Managing secrets](#managing-secrets) section for details).
+additional information.
 
 ``` yaml
 # Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
@@ -593,16 +591,14 @@ jobs:
 `usethis::use_github_action("blogdown")`
 
 This example builds a [blogdown](https://bookdown.org/yihui/blogdown/)
-site for a repository and then deploys the book via
-[netlify](https://www.netlify.com/). It uses
+site for a repository and then deploys the book via [GitHub
+Pages](https://pages.github.com/). It uses
 [renv](https://rstudio.github.io/renv/) to ensure the package versions
 remain consistent across builds. You will need to run `renv::snapshot()`
 locally and commit the `renv.lock` file before using this workflow, see
 [Using renv with Continous
 Integration](https://rstudio.github.io/renv/articles/ci.html) for
-additional information. **Note** you need to add a `NETLIFY_AUTH_TOKEN`
-a `NETLIFY_SITE_ID` secret to your repository for the netlify deploy
-(see [Managing secrets](#managing-secrets) section for details).
+additional information.
 
 ``` yaml
 # Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
@@ -850,46 +846,3 @@ You can learn more about packages in source and binary form
 [here](https://r-pkgs.org/package-structure-state.html#binary-package)
 and
 [here](https://www.jumpingrivers.com/blog/faster-r-package-installation-rstudio/).
-
-## Managing secrets
-
-In some cases, your action may need to access an external resource to
-deploy a result of your action. For example, the [bookdown]() and
-[blogdown]() actions require access to your Netlify account. This access
-is managed using a Personal Access Token, commonly called a PAT.
-
-Netlify has a [process for creating a PAT using their
-UI](https://docs.netlify.com/cli/get-started/#obtain-a-token-in-the-netlify-ui),
-which we follow here.
-
-1.  In a web browser, open [your Netlify **tokens**
-    page](https://app.netlify.com/user/applications#personal-access-tokens).
-
-2.  In another tab in your web browser, open your GitHub repository’s
-    **secrets** page. The URL depends on your repository; it will look
-    something like this:
-    `https://github.com/{user}/{repo}/settings/secrets`.
-
-3.  At the **tokens** page:
-
-    -   Click “New access token”.
-    -   Provide a description for your benefit, so you will know which
-        token this is, perhaps something like `actions-{repo}`.
-    -   Click “Generate token”.
-    -   Copy the token to your clipboard.
-
-4.  On your repository’s **secrets** page:
-
-    -   Click “Add a new secret”.
-    -   In the “Name” field, type `NETLIFY_AUTH_TOKEN` (or the name of
-        the secret that the action expects).
-    -   In the “Value” field, paste the token from your clipboard.
-    -   Click “Add Secret”.
-
-5.  At this point (certainly at some point), you may wish to close your
-    **tokens** page to remove the visibility of your token.
-
-The `NETLIFY_SITE_ID` is not quite as personal as the PAT and is visible
-from your Netlify profile. This is the value of the **API ID** variable
-that is listed on your site dashboard under Settings \> General \> Site
-details \> Site information.
