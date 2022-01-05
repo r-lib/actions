@@ -53,7 +53,7 @@ runs:
           path: |
             ${{ env.R_LIBS_USER }}/*
             !${{ env.R_LIBS_USER }}/pak
-          key: ${{ steps.install.outputs.os-version }}-${{ steps.install.outputs.r-version }}-${{inputs.cache-version }}-${{ hashFiles('${{ inputsworking-directory }}/.github/pkg.lock') }}
+          key: ${{ steps.install.outputs.os-version }}-${{ steps.install.outputs.r-version }}-${{inputs.cache-version }}-${{ hashFiles('${{ inputs.working-directory }}/.github/pkg.lock') }}
           restore-keys: ${{ steps.install.outputs.os-version }}-${{ steps.install.outputs.r-version }}-${{inputs.cache-version }}-
 
       - name: Install dependencies
