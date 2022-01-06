@@ -30,14 +30,12 @@ jobs:
           extra-packages: any::pkgdown, local::.
           needs: website
 
-      - name: Deploy package
-        if: github.event_name != 'pull_request'
-        run: |
-          git config --local user.name "$GITHUB_ACTOR"
-          git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
-          Rscript -e 'pkgdown::deploy_to_branch(new_process = FALSE)'
+      - name: Build site
+        run: Rscript -e 'pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)'
 
-      - name: Build site without deploying
-        if: github.event_name == 'pull_request'
-        run: |
-          Rscript -e 'pkgdown::build_site(preview = FALSE, install = FALSE)'
+      - name: Deploy to GitHub pages 🚀
+        if: github.event_name != 'pull_request'
+        uses: JamesIves/github-pages-deploy-action@4.1.4
+        with:
+          branch: gh-pages
+          folder: docs
