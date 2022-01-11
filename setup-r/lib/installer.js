@@ -97,7 +97,7 @@ function acquireR(version, rtoolsVersion) {
             if (IS_WINDOWS) {
                 yield Promise.all([
                     yield acquireRWindows(version),
-                    yield acquireRtools(rtoolsVersion)
+                    yield acquireRtools(rtoolsVersion),
                 ]);
             }
             else if (IS_MAC) {
@@ -401,7 +401,7 @@ function acquireRtools(version) {
                 core.addPath(`C:\\rtools40\\ucrt64\\bin`);
                 core.exportVariable("_R_INSTALL_TIME_PATCHES_", "no");
             }
-            else if (core.getInput("windows-path-include-mingw") === "true") {
+            if (core.getInput("windows-path-include-mingw") === "true") {
                 core.addPath(`C:\\rtools40\\mingw64\\bin`);
             }
             if (core.getInput("update-rtools") === "true") {
