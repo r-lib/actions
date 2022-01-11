@@ -67,7 +67,6 @@ async function acquireR(version: string, rtoolsVersion: string) {
       await Promise.all([
         await acquireRWindows(version),
         await acquireRtools(rtoolsVersion),
-        await acquireQpdfWindows()
       ]);
     } else if (IS_MAC) {
       await core.group('Downloading gfortran', async() => { await acquireFortranMacOS() });

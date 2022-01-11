@@ -1,0 +1,22 @@
+---
+title: "Test vignette for GH Actions"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Test vignette for GH Actopns}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Irure ad excepteur aliqua esse id sint ex aliquip laborum. Officia laborum ex cupidatat exercitation velit. Nisi elit incididunt nisi ullamco. Ut Lorem eiusmod anim ipsum dolore cupidatat officia non. Culpa voluptate consectetur in ullamco minim sit sunt. Ad aute laborum laborum cillum qui consequat proident sit ad incididunt. Enim nisi nulla aliquip anim fugiat deserunt aliqua aliqua sunt nisi commodo magna reprehenderit. Reprehenderit dolor sunt nulla mollit est magna exercitation dolore magna. Mollit qui labore tempor commodo veniam cupidatat esse irure nisi eiusmod qui dolore nisi.
+
+```{r}
+summary(mtcars)
+```
+
