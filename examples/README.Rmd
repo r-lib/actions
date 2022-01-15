@@ -38,7 +38,6 @@ Other workflows:
 Options and advice: 
 
 - [Forcing binaries](#forcing-binaries) - An environment variable to always use binary packages. 
-- [Managing secrets](#managing-secrets) - How to generate auth tokens and make them available to actions.
 
 ## Quickstart CI workflow
 
