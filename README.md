@@ -82,7 +82,7 @@ If your build fails and you are unsure of why here are some useful strategies fo
   
 1. *How can I customize an action to run R code?*\
 \
-The safest way is to add a `step` to your action, specifying `Rscript {0}` as the `shell` for that step. Here's an example from the [bookdown action](https://github.com/r-lib/actions/tree/v2-branch/examples#build-bookdown-site)
+The safest way is to add a `step` to your action, specifying `Rscript {0}` as the `shell` for that step. Here's an example from the [bookdown action](https://github.com/r-lib/actions/tree/v2-branch/examples#build-bookdown-site):
     ```yaml
     - name: Build site
       run: bookdown::render_book("index.Rmd", quiet = TRUE)
