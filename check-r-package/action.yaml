@@ -28,9 +28,6 @@ runs:
         ## --------------------------------------------------------------------
         options(crayon.enabled = TRUE)
         if (Sys.getenv("_R_CHECK_FORCE_SUGGESTS_", "") == "") Sys.setenv("_R_CHECK_FORCE_SUGGESTS_" = "false")
-        cat("::group::Environment\n")
-        print(Sys.getenv())
-        cat("::endgroup::\n")
         rcmdcheck::rcmdcheck(args = (${{ inputs.args }}), build_args = (${{ inputs.build_args }}), error_on = (${{ inputs.error-on }}), check_dir = (${{ inputs.check-dir }}))
       shell: Rscript {0}
       working-directory: ${{ inputs.working-directory }}

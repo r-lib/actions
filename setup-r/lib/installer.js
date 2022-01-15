@@ -98,7 +98,6 @@ function acquireR(version, rtoolsVersion) {
                 yield Promise.all([
                     yield acquireRWindows(version),
                     yield acquireRtools(rtoolsVersion),
-                    yield acquireQpdfWindows()
                 ]);
             }
             else if (IS_MAC) {
@@ -397,13 +396,13 @@ function acquireRtools(version) {
             }
         }
         if (rtools4) {
+            if (core.getInput("windows-path-include-mingw") === "true") {
+                core.addPath(`C:\\rtools40\\mingw64\\bin`);
+            }
             core.addPath(`C:\\rtools40\\usr\\bin`);
             if (core.getInput("r-version").match("devel")) {
                 core.addPath(`C:\\rtools40\\ucrt64\\bin`);
                 core.exportVariable("_R_INSTALL_TIME_PATCHES_", "no");
-            }
-            else if (core.getInput("windows-path-include-mingw") === "true") {
-                core.addPath(`C:\\rtools40\\mingw64\\bin`);
             }
             if (core.getInput("update-rtools") === "true") {
                 try {

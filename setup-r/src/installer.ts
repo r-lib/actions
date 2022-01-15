@@ -67,7 +67,6 @@ async function acquireR(version: string, rtoolsVersion: string) {
       await Promise.all([
         await acquireRWindows(version),
         await acquireRtools(rtoolsVersion),
-        await acquireQpdfWindows()
       ]);
     } else if (IS_MAC) {
       await core.group('Downloading gfortran', async() => { await acquireFortranMacOS() });
@@ -390,12 +389,13 @@ async function acquireRtools(version: string) {
     }
   }
   if (rtools4) {
+    if (core.getInput("windows-path-include-mingw") === "true") {
+      core.addPath(`C:\\rtools40\\mingw64\\bin`);
+    }
     core.addPath(`C:\\rtools40\\usr\\bin`);
     if (core.getInput("r-version").match("devel")) {
       core.addPath(`C:\\rtools40\\ucrt64\\bin`);
       core.exportVariable("_R_INSTALL_TIME_PATCHES_", "no");
-    } else if (core.getInput("windows-path-include-mingw") === "true") {
-      core.addPath(`C:\\rtools40\\mingw64\\bin`);
     }
     if (core.getInput("update-rtools") === "true") {
       try {

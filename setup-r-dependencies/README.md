@@ -41,7 +41,7 @@ steps:
 - uses: r-lib/actions/setup-r-dependencies@v2
   with:
     cache-version: 2
-    extra-packages: |<
+    extra-packages: |
       any::ggplot2
       any::rcmdcheck
     needs: |

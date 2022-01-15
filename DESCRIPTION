@@ -8,5 +8,6 @@ Authors@R:
              email = "james.hester@rstudio.com"))
 Description: This is a simple package used to test the workflow files.
 Imports: xml2, curl
-Suggests: covr
+Suggests: covr, knitr, rmarkdown
 License: GPL (>= 2)
+VignetteBuilder: knitr, rmarkdown
