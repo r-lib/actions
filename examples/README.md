@@ -731,10 +731,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - run: source("fit_model.R")
-        shell: Rscript {0}
-
-      - run: rmarkdown::render("report.Rmd")
+      - run: |
+          source("fit_model.R")
+          rmarkdown::render("report.Rmd")
         shell: Rscript {0}
 
       - name: Upload results
