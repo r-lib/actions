@@ -67,7 +67,8 @@ If your build fails and you are unsure of why here are some useful strategies fo
 
 ## Common questions
 
-1. Why are my builds with plots failing on macOS?
+1. *Why are my builds with plots failing on macOS?*\
+\
   You need to install XQuartz to do plotting with the default quartz device on macOS. This can be done by adding the following to your workflow.
     ```yaml
     - if: runner.os == 'macOS'
@@ -75,6 +76,7 @@ If your build fails and you are unsure of why here are some useful strategies fo
     ```
 
 1. *Why are my Windows builds failing with an error about `configure.ac` having CRLF line endings?*\
+\
   On Windows, when your repo is checked out using git the line endings are automatically changed to CRLF. R's check process specifically checks if the `configure.ac` file has these line endings, and will error if it does. To avoid this, add a `.gitattributes` file to the top level of your package with the following to configure git to always use LF line endings for this file: \
   `configure.ac text eol=lf`
   
