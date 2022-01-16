@@ -24,6 +24,8 @@ jobs:
         with:
           extra-packages: any::lintr
           needs: lint
+        env:
+          CLI_NO_THREAD: 1
 
       - name: Lint
         run: lintr::lint_package()

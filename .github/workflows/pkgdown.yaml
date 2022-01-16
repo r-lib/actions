@@ -29,6 +29,8 @@ jobs:
         with:
           extra-packages: any::pkgdown, local::.
           needs: website
+        env:
+          CLI_NO_THREAD: 1
 
       - name: Build site
         run: Rscript -e 'pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)'
