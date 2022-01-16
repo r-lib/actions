@@ -498,7 +498,8 @@ function setupRLibrary() {
                 .join(",");
             extra_repositories = ",\n    " + extra_repositories;
         }
-        yield fs.promises.writeFile(profilePath, `options(
+        yield fs.promises.writeFile(profilePath, `Sys.setenv("PKGCACHE_HTTP_VERSION" = "2")
+options(
   repos = c(
     RSPM = ${rspm},
     CRAN = ${cran}${extra_repositories}

@@ -502,7 +502,8 @@ async function setupRLibrary() {
 
   await fs.promises.writeFile(
     profilePath,
-    `options(
+    `Sys.setenv("PKGCACHE_HTTP_VERSION" = "2")
+options(
   repos = c(
     RSPM = ${rspm},
     CRAN = ${cran}${extra_repositories}
