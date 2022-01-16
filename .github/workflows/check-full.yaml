@@ -39,7 +39,6 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
-      PKGCACHE_HTTP_VERSION: 2
 
     steps:
       - uses: actions/checkout@v2
@@ -52,25 +51,9 @@ jobs:
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
 
-      - name: Set up debugging
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y gdb
-          rm -rf /tmp/core.*
-          echo '/tmp/core.%h.%e.%t' | sudo tee /proc/sys/kernel/core_pattern
-          cat /proc/sys/kernel/core_pattern
-
       - uses: r-lib/actions/setup-r-dependencies@v2-branch
         with:
           extra-packages: any::rcmdcheck
           needs: check
 
       - uses: r-lib/actions/check-r-package@v2-branch
-
-      - name: Crash debug
-        if: always() && runner.os == 'Linux'
-        run: |
-          for c in $(ls core* /tmp/core* || true); do
-              gdb -c "$c" -ex bt -ex "set pagination 0" -batch;
-          done;
