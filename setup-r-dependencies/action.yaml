@@ -35,6 +35,7 @@ runs:
           needs <- sprintf("Config/Needs/%s", strsplit("${{ inputs.needs }}", "[[:space:],]+")[[1]])
           extra_deps <- strsplit("${{ inputs.extra-packages }}", "[[:space:],]+")[[1]]
           dir.create(".github", showWarnings=FALSE)
+          Sys.setenv("PKGCACHE_HTTP_VERSION" = "2")
           pak::lockfile_create(
             c("deps::.", "any::sessioninfo", extra_deps),
             lockfile = ".github/pkg.lock",
@@ -60,6 +61,7 @@ runs:
         run: |
           ## Installing/Updating packages
           cat("::group::Installing/updating packages\n")
+          Sys.setenv("PKGCACHE_HTTP_VERSION" = "2")
           pak::lockfile_install(".github/pkg.lock")
           cat("::endgroup::\n")
           cat("::group::Session info\n")
