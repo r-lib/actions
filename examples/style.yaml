@@ -35,10 +35,10 @@ jobs:
         shell: Rscript {0}
 
       - name: Determine cache location
-        id: styler-loc
+        id: styler-location
         run: |
           cat(
-            "##[set-output name=loc;]",
+            "##[set-output name=location;]",
             styler::cache_info(format = "tabular")$location,
             "\n",
             sep = ""
@@ -48,7 +48,7 @@ jobs:
       - name: Cache styler
         uses: actions/cache@v2
         with:
-          path: ${{ steps.styler-loc.outputs.loc }}
+          path: ${{ steps.styler-location.outputs.location }}
           key: ${{ runner.os }}-styler-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-styler-
