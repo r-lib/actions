@@ -26,7 +26,6 @@ jobs:
           needs: lint
         env:
           CLI_NO_THREAD: 1
-          PKG_SYSREQS: false
 
       - name: Lint
         run: lintr::lint_package()

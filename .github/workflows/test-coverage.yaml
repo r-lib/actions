@@ -27,7 +27,6 @@ jobs:
           needs: coverage
         env:
           CLI_NO_THREAD: 1
-          PKG_SYSREQS: false
 
       - name: Test coverage
         run: covr::codecov()
