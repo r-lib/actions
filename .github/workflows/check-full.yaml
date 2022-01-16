@@ -39,6 +39,7 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
+      PKGCACHE_HTTP_VERSION: 2
 
     steps:
       - uses: actions/checkout@v2
@@ -49,14 +50,13 @@ jobs:
         with:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
-          use-public-rspm: false
+          use-public-rspm: true
 
       - name: Set up debugging
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y gdb
-          ulimit -c unlimited -S       # enable core dumps
           rm -rf /tmp/core.*
           echo '/tmp/core.%h.%e.%t' | sudo tee /proc/sys/kernel/core_pattern
           cat /proc/sys/kernel/core_pattern
@@ -71,7 +71,6 @@ jobs:
       - name: Crash debug
         if: always() && runner.os == 'Linux'
         run: |
-          ulimit -a
           for c in $(ls core* /tmp/core* || true); do
               gdb -c "$c" -ex bt -ex "set pagination 0" -batch;
           done;
