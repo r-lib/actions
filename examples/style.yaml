@@ -49,7 +49,10 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ steps.styler-loc.outputs.loc }}
-          key: ${{ runner.os }}-styler
+          key: ${{ runner.os }}-styler-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-styler-
+            ${{ runner.os }}-
 
       - name: Style
         run: styler::style_pkg()
