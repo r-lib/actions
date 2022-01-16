@@ -25,7 +25,5 @@ jobs:
         with:
           extra-packages: any::rcmdcheck
           needs: check
-        env:
-          CLI_NO_THREAD: 1
 
       - uses: r-lib/actions/check-r-package@v2-branch

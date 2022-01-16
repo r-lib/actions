@@ -25,8 +25,6 @@ jobs:
         with:
           extra-packages: any::covr
           needs: coverage
-        env:
-          CLI_NO_THREAD: 1
 
       - name: Test coverage
         run: covr::codecov()
