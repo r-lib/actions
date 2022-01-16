@@ -27,5 +27,6 @@ jobs:
           needs: check
         env:
           CLI_NO_THREAD: 1
+          PKG_SYSREQS: false
 
       - uses: r-lib/actions/check-r-package@v2-branch
