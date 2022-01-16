@@ -71,6 +71,7 @@ jobs:
       - name: Crash debug
         if: always() && runner.os == 'Linux'
         run: |
+          ulimit -a
           for c in $(ls core* /tmp/core* || true); do
               gdb -c "$c" -ex bt -ex "set pagination 0" -batch;
           done;
