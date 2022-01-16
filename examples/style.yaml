@@ -2,9 +2,9 @@
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    paths: ["R/**"]
+    paths: ["R/**", "tests/**", "vignettes/**"]
   pull_request:
-    paths: ["R/**"]
+    paths: ["R/**", "tests/**", "vignettes/**"]
 
 name: Style
 
@@ -55,7 +55,7 @@ jobs:
             ${{ runner.os }}-
 
       - name: Style
-        run: styler::style_pkg()
+        run: styler::style_pkg(filetype = c(".R", ".Rmd", ".Rmarkdown", ".Rnw"))
         shell: Rscript {0}
 
       - name: Commit and push changes
