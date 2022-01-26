@@ -67,7 +67,8 @@ If your build fails and you are unsure of why here are some useful strategies fo
 
 ## Common questions
 
-1. Why are my builds with plots failing on macOS?
+1. *Why are my builds with plots failing on macOS?*\
+\
   You need to install XQuartz to do plotting with the default quartz device on macOS. This can be done by adding the following to your workflow.
     ```yaml
     - if: runner.os == 'macOS'
@@ -75,10 +76,19 @@ If your build fails and you are unsure of why here are some useful strategies fo
     ```
 
 1. *Why are my Windows builds failing with an error about `configure.ac` having CRLF line endings?*\
+\
   On Windows, when your repo is checked out using git the line endings are automatically changed to CRLF. R's check process specifically checks if the `configure.ac` file has these line endings, and will error if it does. To avoid this, add a `.gitattributes` file to the top level of your package with the following to configure git to always use LF line endings for this file: \
   `configure.ac text eol=lf`
   
-
+1. *How can I customize an action to run R code?*\
+\
+The safest way is to add a `step` to your action, specifying `Rscript {0}` as the `shell` for that step. Here's an example from the [bookdown action](https://github.com/r-lib/actions/tree/v2-branch/examples#build-bookdown-site):
+    ```yaml
+    - name: Build site
+      run: bookdown::render_book("index.Rmd", quiet = TRUE)
+      shell: Rscript {0}
+   ```
+  
 ## Additional resources
 
 - [GitHub Actions for R](https://www.jimhester.com/talk/2020-rsc-github-actions/), Jim Hester's talk at rstudio::conf 2020. [Recording](https://resources.rstudio.com/rstudio-conf-2020/azure-pipelines-and-github-actions-jim-hester), [slidedeck](https://speakerdeck.com/jimhester/github-actions-for-r).

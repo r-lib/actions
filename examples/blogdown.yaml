@@ -26,12 +26,12 @@ jobs:
       - uses: r-lib/actions/setup-renv@v2
 
       - name: Install hugo
-        run: |
-          R -e 'blogdown::install_hugo()'
+        run: blogdown::install_hugo()
+        shell: Rscript {0}
 
       - name: Build site
-        run: |
-          R -e 'blogdown::build_site(TRUE)'
+        run: blogdown::build_site(TRUE)
+        shell: Rscript {0}
 
       - name: Deploy to GitHub pages 🚀
         if: github.event_name != 'pull_request'

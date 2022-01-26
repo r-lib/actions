@@ -46,8 +46,6 @@ Options and advice:
 
 -   [Forcing binaries](#forcing-binaries) - An environment variable to
     always use binary packages.
--   [Managing secrets](#managing-secrets) - How to generate auth tokens
-    and make them available to actions.
 
 ## Quickstart CI workflow
 
@@ -373,7 +371,8 @@ jobs:
           needs: pr-document
 
       - name: Document
-        run: Rscript -e 'roxygen2::roxygenise()'
+        run: roxygen2::roxygenise()
+        shell: Rscript {0}
 
       - name: commit
         run: |
@@ -402,10 +401,12 @@ jobs:
       - uses: r-lib/actions/setup-r@v2
 
       - name: Install dependencies
-        run: Rscript -e 'install.packages("styler")'
+        run: install.packages("styler")
+        shell: Rscript {0}
 
       - name: Style
-        run: Rscript -e 'styler::style_pkg()'
+        run: styler::style_pkg()
+        shell: Rscript {0}
 
       - name: commit
         run: |
@@ -512,17 +513,17 @@ jobs:
           extra-packages: any::pkgdown, local::.
           needs: website
 
-      - name: Deploy package
-        if: github.event_name != 'pull_request'
-        run: |
-          git config --local user.name "$GITHUB_ACTOR"
-          git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
-          Rscript -e 'pkgdown::deploy_to_branch(new_process = FALSE)'
+      - name: Build site
+        run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
+        shell: Rscript {0}
 
-      - name: Build site without deploying
-        if: github.event_name == 'pull_request'
-        run: |
-          Rscript -e 'pkgdown::build_site(preview = FALSE, install = FALSE)'
+      - name: Deploy to GitHub pages 🚀
+        if: github.event_name != 'pull_request'
+        uses: JamesIves/github-pages-deploy-action@4.1.4
+        with:
+          clean: false
+          branch: gh-pages
+          folder: docs
 ```
 
 ## Build bookdown site
@@ -576,7 +577,8 @@ jobs:
           restore-keys: bookdown-
 
       - name: Build site
-        run: Rscript -e 'bookdown::render_book("index.Rmd", quiet = TRUE)'
+        run: bookdown::render_book("index.Rmd", quiet = TRUE)
+        shell: Rscript {0}
 
       - name: Deploy to GitHub pages 🚀
         if: github.event_name != 'pull_request'
@@ -629,12 +631,12 @@ jobs:
       - uses: r-lib/actions/setup-renv@v2
 
       - name: Install hugo
-        run: |
-          R -e 'blogdown::install_hugo()'
+        run: blogdown::install_hugo()
+        shell: Rscript {0}
 
       - name: Build site
-        run: |
-          R -e 'blogdown::build_site(TRUE)'
+        run: blogdown::build_site(TRUE)
+        shell: Rscript {0}
 
       - name: Deploy to GitHub pages 🚀
         if: github.event_name != 'pull_request'
@@ -730,9 +732,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - run: Rscript fit_model.R
-
-      - run: Rscript -e 'rmarkdown::render("report.Rmd")'
+      - run: |
+          source("fit_model.R")
+          rmarkdown::render("report.Rmd")
+        shell: Rscript {0}
 
       - name: Upload results
         uses: actions/upload-artifact@main
