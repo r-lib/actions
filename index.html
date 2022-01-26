@@ -133,9 +133,12 @@
 <h2 id="common-questions">Common questions<a class="anchor" aria-label="anchor" href="#common-questions"></a>
 </h2>
 <ol style="list-style-type: decimal">
-<li><p>Why are my builds with plots failing on macOS? You need to install XQuartz to do plotting with the default quartz device on macOS. This can be done by adding the following to your workflow. <code>yaml     - if: runner.os == 'macOS'       run: brew install --cask xquartz</code></p></li>
-<li><p><em>Why are my Windows builds failing with an error about <code>configure.ac</code> having CRLF line endings?</em><br>
+<li><p><em>Why are my builds with plots failing on macOS?</em><br><br>
+You need to install XQuartz to do plotting with the default quartz device on macOS. This can be done by adding the following to your workflow. <code>yaml     - if: runner.os == 'macOS'       run: brew install --cask xquartz</code></p></li>
+<li><p><em>Why are my Windows builds failing with an error about <code>configure.ac</code> having CRLF line endings?</em><br><br>
 On Windows, when your repo is checked out using git the line endings are automatically changed to CRLF. R’s check process specifically checks if the <code>configure.ac</code> file has these line endings, and will error if it does. To avoid this, add a <code>.gitattributes</code> file to the top level of your package with the following to configure git to always use LF line endings for this file:<br><code>configure.ac text eol=lf</code></p></li>
+<li><p><em>How can I customize an action to run R code?</em><br><br>
+The safest way is to add a <code>step</code> to your action, specifying <code>Rscript {0}</code> as the <code>shell</code> for that step. Here’s an example from the <a href="https://github.com/r-lib/actions/tree/v2-branch/examples#build-bookdown-site" class="external-link">bookdown action</a>: <code>yaml     - name: Build site       run: bookdown::render_book("index.Rmd", quiet = TRUE)       shell: Rscript {0}</code></p></li>
 </ol>
 </div>
 <div class="section level2">
@@ -202,7 +205,7 @@ On Windows, when your repo is checked out using git the line endings are automat
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
 </div>
 
       </footer>
