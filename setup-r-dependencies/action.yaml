@@ -10,6 +10,9 @@ inputs:
     description: 'Any extra packages to install outside of the packages listed in the dependencies'
   needs:
     description: 'Any extra Config/Needs fields which need to be included when installing dependencies'
+  packages:
+    description: 'Which package(s) to install.'
+    default: 'deps::., any::sessioninfo'
   pak-version:
     description: 'Which pak version to use. Possible values are "stable", "rc" and "devel".'
     default: 'devel'
@@ -33,11 +36,12 @@ runs:
           cat("::endgroup::\n")
           cat("::group::Dependency resolution\n")
           needs <- sprintf("Config/Needs/%s", strsplit("${{ inputs.needs }}", "[[:space:],]+")[[1]])
+          deps <- strsplit("${{ inputs.packages }}", "[[:space:],]+")[[1]]
           extra_deps <- strsplit("${{ inputs.extra-packages }}", "[[:space:],]+")[[1]]
           dir.create(".github", showWarnings=FALSE)
           Sys.setenv("PKGCACHE_HTTP_VERSION" = "2")
           pak::lockfile_create(
-            c("deps::.", "any::sessioninfo", extra_deps),
+            c(deps, extra_deps),
             lockfile = ".github/pkg.lock",
             dependencies = c(needs, (${{ inputs.dependencies }}))
           )
@@ -65,11 +69,15 @@ runs:
           pak::lockfile_install(".github/pkg.lock")
           cat("::endgroup::\n")
           cat("::group::Session info\n")
-          if (packageVersion("sessioninfo") >= "1.2.1") {
-            sessioninfo::session_info(pkgs = "installed", include_base = TRUE)
+          if (requireNamespace("sessioninfo", quietly = TRUE)) {
+            if (packageVersion("sessioninfo") >= "1.2.1") {
+              sessioninfo::session_info(pkgs = "installed", include_base = TRUE)
+            } else {
+              options(width = 200)
+              sessioninfo::session_info(rownames(installed.packages()), include_base=TRUE)
+            }
           } else {
-            options(width = 200)
-            sessioninfo::session_info(rownames(installed.packages()), include_base=TRUE)
+            sessionInfo()
           }
           cat("::endgroup::\n")
         shell: Rscript {0}

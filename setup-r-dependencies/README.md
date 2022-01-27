@@ -25,6 +25,10 @@ Inputs available
   Separate each reference by newlines or commas for more than one package.
 - `needs` - `Config/Needs` fields to install from the DESCRIPTION, the
   `Config/Needs/` prefix will be automatically included.
+- `packages`: - default `deps::., any::sessioninfo`. Which package(s) to
+  install. The default installs the dependencies of the package in the
+  working directory and the sessioninfo package. Separate multiple packages
+  by newlines or commas.
 - `pak-version`: Which pak version to use. Possible values are
   `stable`, `rc` and `devel`. Currently it defaults to `devel`, because some
   of the new features of the `v2` release depend on that, but the default
