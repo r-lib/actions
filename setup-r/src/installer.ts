@@ -424,11 +424,6 @@ async function acquireRtools(version: string) {
       core.addPath(`C:\\rtools42\\x86_64-w64-mingw32.static.posix\\bin`);
 
   } else if (rtools40) {
-    if (core.getInput("windows-path-include-mingw") === "true") {
-      core.warning(
-        "windows-path-include-mingw is now defunct for Rtools40"
-      );
-    }
     if (core.getInput("r-version").match("devel")) {
       core.addPath(`C:\\rtools40\\ucrt64\\bin`);
       core.exportVariable("_R_INSTALL_TIME_PATCHES_", "no");

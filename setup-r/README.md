@@ -46,7 +46,8 @@ This action sets up an R environment for use in actions by:
     image.
 -   **windows-path-include-mingw** (`true`) - If “true” put the 64 bit
     mingw directory from Rtools on the PATH for Windows builds. This
-    argument is now defunct on Rtools40 and later.
+    argument is now defunct on Rtools40 and later, which never add the
+    mingw directory to the path.
 -   **update-rtools** (`false`) - Update rtools40 compilers and
     libraries to the latest builds.
 -   **use-public-rspm** (`false`) - Use the public version of RStudio
