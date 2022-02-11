@@ -57,5 +57,5 @@ runs:
       uses: actions/upload-artifact@main
       with:
         name: ${{ runner.os }}-r${{ matrix.config.r }}-testthat-snapshots
-        path: ${{ inputs.working-directory }}/check/tests*/testthat/_snaps
+        path: ${{ inputs.working-directory }}/check/**/tests*/testthat/_snaps
         if-no-files-found: ignore
