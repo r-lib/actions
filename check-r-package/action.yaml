@@ -52,11 +52,6 @@ runs:
         name: ${{ runner.os }}-r${{ matrix.config.r }}-results
         path: ${{ inputs.working-directory }}/check
 
-    - name: test
-      run: |
-        print("---${{ inputs.upload-snapshots }}--")
-      shell: Rscript {0}
-
     - name: Upload snapshots
       if: inputs.upload-snapshots != 'false'
       uses: actions/upload-artifact@main
