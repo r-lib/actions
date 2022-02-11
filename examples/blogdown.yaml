@@ -12,9 +12,9 @@ name: blogdown
 jobs:
   blogdown:
     runs-on: ubuntu-latest
-    # Allow concurrent PR runs, but not concurrent runs that deploy
+    # Only restrict concurrency for non-PR jobs
     concurrency:
-      group: ${{ github.head_ref || github.workflow }}
+      group: pkgdown-${{ github.event_name != 'pull_request' || github.run_id }}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
