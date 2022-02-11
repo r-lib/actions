@@ -12,10 +12,12 @@ Inputs available:
   quotes.
 - build_args - default `"--no-manual"`. Arguments to pass to the `build_args`
   parameter of `rcmdcheck`. it must be an R expression in single quotes.
-- error-on - default `"warning"`. Arguments to pass to the `error-on`
-  parameter of `rcmdcheck`. It must be an R expression in single quotes.
 - check-dir - default `"check"`. Arguments to pass to the `check-dir` 
   parameter of `rcmdcheck`. It must be an R expression in single quotes.
+- error-on - default `"warning"`. Arguments to pass to the `error-on`
+  parameter of `rcmdcheck`. It must be an R expression in single quotes.
+- upload-artifacts - default `false`. Whether to upload all testthat
+  snapshots as an artifact.
 - working-directory - default `"."`. If the R package to check is not in
   the root directory of your repository.
 

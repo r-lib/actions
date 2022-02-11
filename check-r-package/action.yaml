@@ -17,6 +17,9 @@ inputs:
   working-directory:
     description: 'Using the working-directory keyword, you can specify the working directory of where "rcmdcheck::rcmdcheck" is run.'
     default: '.'
+  upload-snapshots:
+    description: 'Whether to upload all testthat snapshots as an artifact.'
+    default: false
     
 runs:
   using: "composite"
@@ -48,3 +51,11 @@ runs:
       with:
         name: ${{ runner.os }}-r${{ matrix.config.r }}-results
         path: ${{ inputs.working-directory }}/check
+
+    - name: Upload snapshots
+      if: ${{ inputs.upload-snapshots }}
+      uses: actions/upload-artifacts@main
+      with:
+        name: ${{ runner.os }}-r${{ matrix.config.r }}-testthat-snapshots
+        path: ${{ inputs.working-directory }}/check/tests*/testthat/_snaps
+        if-no-files-found: ignore
