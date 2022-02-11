@@ -351,18 +351,18 @@ async function acquireRtools(version: string) {
   const rtools40 = !rtools42 && versionNumber >= 40;
   const rtools3x = !rtools42 && !rtools40;
   var downloadUrl, fileName;
-  if (rtools42) {
-    fileName = util.format("rtools%s-x86_64.exe", version);
+  if (rtools3x) {
+    fileName = util.format("Rtools%s.exe", version);
     downloadUrl = util.format(
       "http://cloud.r-project.org/bin/windows/Rtools/%s",
       fileName)
   } else if (rtools40) {
-    fileName = "rtools42-5038-4926.exe";
+    fileName = util.format("rtools%s-x86_64.exe", version);
     downloadUrl = util.format(
       "http://cloud.r-project.org/bin/windows/Rtools/%s",
       fileName)
-  } else {
-    fileName = util.format("Rtools%s.exe", version);
+  } else { // rtools42
+    fileName = "rtools42-5038-4926.exe";
     downloadUrl = "https://github.com/gaborcsardi/Rtools42/releases/download/5038-4926/rtools42-5038-4926.exe";
   }
 
