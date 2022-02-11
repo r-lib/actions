@@ -1,5 +1,5 @@
 
 library(testthat)
-library(testthatpackage)
+library(testpackage)
 
 test_check("testpackage")
