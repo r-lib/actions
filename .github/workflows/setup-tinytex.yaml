@@ -1,0 +1,16 @@
+on:
+  push:
+    branches: [main, master, v2-branch]
+  pull_request:
+    branches: [main, master, v2-branch]
+
+name: "setup-tinytex test"
+
+jobs:
+  tinytex:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: r-lib/actions/setup-tinytex@v2
+      - run: tlmgr --version
