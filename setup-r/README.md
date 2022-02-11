@@ -29,7 +29,8 @@ This action sets up an R environment for use in actions by:
 -   **r-version** (`'release'`) - Version range or exact version of an R
     version to use.
 -   **rtools-version** (`''`) - Exact version of Rtools to use. Default
-    uses latest suitable rtools for the given version of R.
+    uses latest suitable rtools for the given version of R. Set it to
+    “42” for Rtools42.
 -   **Ncpus** (`'1'`) - Value to set the R option `Ncpus` to.
 -   **remove-openmp-macos** (`true`) - If true, remove `-fopenmp` from
     the default compilation flags, e.g. `SHLIB_OPENMP_CFLAGS`, as the
@@ -44,7 +45,8 @@ This action sets up an R environment for use in actions by:
     setup. If “false” use the existing installation in the GitHub Action
     image.
 -   **windows-path-include-mingw** (`true`) - If “true” put the 64 bit
-    mingw directory from Rtools on the PATH for Windows builds.
+    mingw directory from Rtools on the PATH for Windows builds. This
+    argument is now defunct on Rtools40 and later.
 -   **update-rtools** (`false`) - Update rtools40 compilers and
     libraries to the latest builds.
 -   **use-public-rspm** (`false`) - Use the public version of RStudio

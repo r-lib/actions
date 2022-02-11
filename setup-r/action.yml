@@ -7,7 +7,7 @@ inputs:
     default: 'release'
   rtools-version:
     description: 'Exact version of Rtools to use. Default uses latest suitable
-    rtools for the given version of R.'
+    rtools for the given version of R. Set it to "42" for Rtools42.'
     default: ''
   Ncpus:
     description: 'Value to set the R option `Ncpus` to.'
@@ -30,7 +30,7 @@ inputs:
     default: true
   windows-path-include-mingw:
     description: 'If "true" put the 64 bit mingw directory from Rtools on the
-    PATH for Windows builds.'
+    PATH for Windows builds. This argument is now defunct on Rtools40 and later.'
     default: true
   update-rtools:
     description: 'Update rtools40 compilers and libraries to the latest builds.'

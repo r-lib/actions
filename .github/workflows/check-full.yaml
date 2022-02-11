@@ -24,6 +24,8 @@ jobs:
         config:
           - {os: macOS-latest,   r: 'release'}
 
+          - {os: windows-latest, r: 'devel', rtools-version: '42'}
+          - {os: windows-latest, r: 'devel'  }
           - {os: windows-latest, r: 'release'}
           # Use 3.6 to trigger usage of RTools35
           - {os: windows-latest, r: '3.6'}
@@ -48,6 +50,7 @@ jobs:
       - uses: r-lib/actions/setup-r@v2-branch
         with:
           r-version: ${{ matrix.config.r }}
+          rtools-version: ${{ matrix.config.rtools-version }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
 

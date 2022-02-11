@@ -364,16 +364,31 @@ function acquireRWindows(version) {
 }
 function acquireRtools(version) {
     return __awaiter(this, void 0, void 0, function* () {
-        const rtools4 = version.charAt(0) == "4";
-        let fileName = util.format(rtools4 ? "rtools%s-x86_64.exe" : "Rtools%s.exe", version);
+        const versionNumber = parseInt(version.substring(0, 2));
+        const rtools42 = versionNumber >= 41;
+        const rtools40 = !rtools42 && versionNumber >= 40;
+        const rtools3x = !rtools42 && !rtools40;
+        var downloadUrl, fileName;
+        if (rtools42) {
+            fileName = util.format("rtools%s-x86_64.exe", version);
+            downloadUrl = util.format("http://cloud.r-project.org/bin/windows/Rtools/%s", fileName);
+        }
+        else if (rtools40) {
+            fileName = "rtools42-5038-4926.exe";
+            downloadUrl = util.format("http://cloud.r-project.org/bin/windows/Rtools/%s", fileName);
+        }
+        else {
+            fileName = util.format("Rtools%s.exe", version);
+            downloadUrl = "https://github.com/gaborcsardi/Rtools42/releases/download/5038-4926/rtools42-5038-4926.exe";
+        }
         // If Rtools is already installed just return, as there is a message box
         // which hangs the build otherwise.
-        if ((!rtools4 && fs.existsSync("C:\\Rtools")) ||
-            (rtools4 && fs.existsSync("C:\\rtools40"))) {
+        if ((rtools42 && fs.existsSync("C:\\Rtools42")) ||
+            (rtools40 && fs.existsSync("C:\\rtools40")) ||
+            (rtools3x && fs.existsSync("C:\\Rtools"))) {
             core.debug("Skipping Rtools installation as a suitable Rtools is already installed");
         }
         else {
-            let downloadUrl = util.format("http://cloud.r-project.org/bin/windows/Rtools/%s", fileName);
             console.log(`Downloading ${downloadUrl}...`);
             let downloadPath = null;
             try {
@@ -395,11 +410,14 @@ function acquireRtools(version) {
                 throw `Failed to install Rtools: ${error}`;
             }
         }
-        if (rtools4) {
+        if (rtools42) {
+            core.addPath(`C:\\rtools42\\usr\\bin`);
+            core.addPath(`C:\\rtools42\\x86_64-w64-mingw32.static.posix\\bin`);
+        }
+        else if (rtools40) {
             if (core.getInput("windows-path-include-mingw") === "true") {
-                core.addPath(`C:\\rtools40\\mingw64\\bin`);
+                core.warning("windows-path-include-mingw is now defunct for Rtools40");
             }
-            core.addPath(`C:\\rtools40\\usr\\bin`);
             if (core.getInput("r-version").match("devel")) {
                 core.addPath(`C:\\rtools40\\ucrt64\\bin`);
                 core.exportVariable("_R_INSTALL_TIME_PATCHES_", "no");
@@ -418,7 +436,7 @@ function acquireRtools(version) {
                 }
             }
         }
-        else {
+        else { // rtools3x
             core.addPath(`C:\\Rtools\\bin`);
             if (core.getInput("windows-path-include-mingw") === "true") {
                 core.addPath(`C:\\Rtools\\mingw_64\\bin`);
