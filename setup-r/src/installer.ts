@@ -85,7 +85,7 @@ async function acquireR(version: string, rtoolsVersion: string) {
   }
 
   if (IS_WINDOWS) {
-    const rtoolsVersionNumber = parseInt(version.substring(0, 2));
+    const rtoolsVersionNumber = parseInt(rtoolsVersion.substring(0, 2));
     const rtools42 = rtoolsVersionNumber >= 41;
     if (rtools42) {
       var tries_left = 10;

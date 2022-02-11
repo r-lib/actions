@@ -117,7 +117,7 @@ function acquireR(version, rtoolsVersion) {
             throw `Failed to get R ${version}: ${error}`;
         }
         if (IS_WINDOWS) {
-            const rtoolsVersionNumber = parseInt(version.substring(0, 2));
+            const rtoolsVersionNumber = parseInt(rtoolsVersion.substring(0, 2));
             const rtools42 = rtoolsVersionNumber >= 41;
             if (rtools42) {
                 var tries_left = 10;
