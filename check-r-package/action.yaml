@@ -54,7 +54,7 @@ runs:
 
     - name: Upload snapshots
       if: ${{ inputs.upload-snapshots }}
-      uses: actions/upload-artifacts@main
+      uses: actions/upload-artifact@main
       with:
         name: ${{ runner.os }}-r${{ matrix.config.r }}-testthat-snapshots
         path: ${{ inputs.working-directory }}/check/tests*/testthat/_snaps
