@@ -167,6 +167,18 @@ System dependencies are **not** installed on other operating systems and
 other Linux distributions currently, and you need to install them manually,
 _before_ using the `r-lib/setup-r-dependencies` action.
 
+Also note that the system depedencies of Bioconductor packages are typically
+not installed automatically, so you might need to do this, even on the
+supported Linux distributions.
+
+On Ubuntu Linux you can use `apt-get` to install system depedencies:
+
+```yaml
+      - name: Install libcurl on Linux
+        if: runner.os == 'Linux'
+        run: sudo apt-get update -y && sudo apt-get install -y libcurl4-openssl-dev
+```
+
 On macOS you can usually use `brew`, here is an example step in a workflow:
 
 ```yaml
@@ -194,6 +206,24 @@ On Windows you can usually use `pacman` that is included in Rtools4, or
         run: |
           choco install mariadb
 ```
+
+# Installing the latest dependencies
+
+Note that `setup-r-dependencies` does _not_ necessarily install the latest
+versions of the dependent R packages. Typically, if there is a binary build
+of an older package version available, and that satisfies all version
+requirements, then it will be preferred over a later source R package.
+
+This makes the jobs more robust, because installing source packages fails
+more often, especially on platforms without automatic system dependency
+installation (e.g. Windows and macOS).
+
+If your package does need a later version of a dependency, then you need
+to explicitly require a newer version in the `DESCRIPTION` file.
+Alternatively, if you only want to run the CI jobs with a later version,
+without a formal version requirement, then add the package to the
+`extra-packages` parameter. `setup-r-dependencies` installs the latest versions
+of these packages.
 
 # License
 
