@@ -586,7 +586,7 @@ jobs:
 
 ## Style package
 
-`usethis::use_github_action("document")`
+`usethis::use_github_action("style")`
 
 This example styles the R code in a package, then commits and pushes the
 changes to the same branch.
