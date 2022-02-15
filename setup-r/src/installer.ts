@@ -382,8 +382,8 @@ async function acquireRtools(version: string) {
       "http://cloud.r-project.org/bin/windows/Rtools/%s",
       fileName)
   } else { // rtools42
-    fileName = "rtools42-5038-4926.exe";
-    downloadUrl = "https://github.com/gaborcsardi/Rtools42/releases/download/5038-4926/rtools42-5038-4926.exe";
+    fileName = "rtools42-5038-5046.exe";
+    downloadUrl = "https://github.com/gaborcsardi/Rtools42/releases/download/5038-5046/rtools42-5038-5046.exe";
   }
 
   // If Rtools is already installed just return, as there is a message box
