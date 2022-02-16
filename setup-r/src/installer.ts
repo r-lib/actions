@@ -420,10 +420,10 @@ async function acquireRtools(version: string) {
     }
   }
   if (rtools42) {
-      core.addPath(`C:\\rtools42\\usr\\bin`);
-      core.addPath(`C:\\rtools42\\x86_64-w64-mingw32.static.posix\\bin`);
-
+    core.addPath(`C:\\rtools42\\usr\\bin`);
+    core.addPath(`C:\\rtools42\\x86_64-w64-mingw32.static.posix\\bin`);
   } else if (rtools40) {
+    core.addPath(`C:\\rtools40\\usr\\bin`);
     if (core.getInput("r-version").match("devel")) {
       core.addPath(`C:\\rtools40\\ucrt64\\bin`);
       core.exportVariable("_R_INSTALL_TIME_PATCHES_", "no");
