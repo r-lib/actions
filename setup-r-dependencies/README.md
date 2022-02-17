@@ -30,10 +30,7 @@ Inputs available
   working directory and the sessioninfo package. Separate multiple packages
   by newlines or commas.
 - `pak-version`: Which pak version to use. Possible values are
-  `stable`, `rc` and `devel`. Currently it defaults to `devel`, because some
-  of the new features of the `v2` release depend on that, but the default
-  will change to `stable` soon. You can override the default with this
-  parameter.
+  `stable`, `rc` and `devel`. Defaults to `stable`.
 - `working-directory` - default `'.'`. If the DESCRIPTION file is not in the
   root directory of your repository.
 
