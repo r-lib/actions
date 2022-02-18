@@ -30,7 +30,6 @@ async function run() {
   try {
     await getTinyTeX();
   } catch (error) {
-    console.error("RUN FAILED");
     core.setFailed(error.message);
     process.exit(1);
   }
@@ -66,10 +65,8 @@ async function installTinyTeXPosix() {
 
   try {
     await io.mv(downloadPath, path.join(tempDirectory, fileName));
-    console.error("EXEC");
     await exec.exec("sh", [path.join(tempDirectory, fileName)]);
   } catch (error) {
-    console.error("EXEC ERROR");
     throw `Failed to install TinyTeX: ${error}`;
   }
 
