@@ -130,6 +130,7 @@ function installPandocLinux(version) {
         const downloadUrl = util.format("https://github.com/jgm/pandoc/releases/download/%s/%s", version, fileName);
         let downloadPath = null;
         try {
+            console.log("::group::Download pandoc")
             downloadPath = yield tc.downloadTool(downloadUrl);
         }
         catch (error) {
@@ -137,7 +138,9 @@ function installPandocLinux(version) {
         }
         yield io.mv(downloadPath, path.join(tempDirectory, fileName));
         try {
+            console.log("::group::Install gdebi-core")
             yield exec.exec("sudo apt-get", ["install", "-y", "gdebi-core"]);
+            console.log("::group::Install pandoc")
             yield exec.exec("sudo gdebi", [
                 "--non-interactive",
                 path.join(tempDirectory, fileName)
@@ -147,6 +150,7 @@ function installPandocLinux(version) {
             core.debug(error);
             throw `Failed to install pandoc: ${error}`;
         }
+        console.log("::endgroup::")
     });
 }
 run();
