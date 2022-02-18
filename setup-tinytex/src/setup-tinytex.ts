@@ -31,6 +31,7 @@ async function run() {
     await getTinyTeX();
   } catch (error) {
     core.setFailed(error.message);
+    process.exit(1);
   }
 }
 
@@ -62,9 +63,8 @@ async function installTinyTeXPosix() {
     throw `Failed to download TinyTeX: ${error}`;
   }
 
-  await io.mv(downloadPath, path.join(tempDirectory, fileName));
-
   try {
+    await io.mv(downloadPath, path.join(tempDirectory, fileName));
     await exec.exec("sh", [path.join(tempDirectory, fileName)]);
   } catch (error) {
     throw `Failed to install TinyTeX: ${error}`;

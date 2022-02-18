@@ -62,6 +62,7 @@ function run() {
         }
         catch (error) {
             core.setFailed(error.message);
+            process.exit(1);
         }
     });
 }
@@ -96,8 +97,8 @@ function installTinyTeXPosix() {
         catch (error) {
             throw `Failed to download TinyTeX: ${error}`;
         }
-        yield io.mv(downloadPath, path.join(tempDirectory, fileName));
         try {
+            yield io.mv(downloadPath, path.join(tempDirectory, fileName));
             yield exec.exec("sh", [path.join(tempDirectory, fileName)]);
         }
         catch (error) {

@@ -13,4 +13,12 @@ jobs:
       - uses: actions/checkout@v2
 
       - uses: r-lib/actions/setup-tinytex@v2
+        env:
+          # always install the bundled version from Nov. 2021
+          TINYTEX_VERSION: 2021-11
+
       - run: tlmgr --version
+
+      - run: |
+          echo This does not run any more
+        shell: bash
