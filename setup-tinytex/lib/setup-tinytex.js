@@ -61,6 +61,7 @@ function run() {
             yield getTinyTeX();
         }
         catch (error) {
+            console.error("RUN FAILED");
             core.setFailed(error.message);
             process.exit(1);
         }
@@ -99,9 +100,11 @@ function installTinyTeXPosix() {
         }
         try {
             yield io.mv(downloadPath, path.join(tempDirectory, fileName));
+            console.error("EXEC");
             yield exec.exec("sh", [path.join(tempDirectory, fileName)]);
         }
         catch (error) {
+            console.error("EXEC ERROR");
             throw `Failed to install TinyTeX: ${error}`;
         }
         let binPath;

@@ -3,7 +3,8 @@ on:
     branches: [main, master, v2-branch]
   pull_request:
     branches: [main, master, v2-branch]
-
+  workflow_dispatch:
+    
 name: "setup-tinytex test"
 
 jobs:
@@ -18,7 +19,3 @@ jobs:
           TINYTEX_VERSION: 2021-11
 
       - run: tlmgr --version
-
-      - run: |
-          echo This does not run any more
-        shell: bash
