@@ -16,6 +16,6 @@ jobs:
       - uses: r-lib/actions/setup-tinytex@v2-branch
         env:
           # always install the bundled version from Nov. 2021
-          TINYTEX_VERSION: 2021-11
+          TINYTEX_VERSION: 2021.11
 
       - run: tlmgr --version

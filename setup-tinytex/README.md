@@ -68,7 +68,7 @@ To install a specific version, you can set the `TINYTEX_VERSION` environment var
       - uses: r-lib/actions/setup-tinytex@v2
         env:
           # always install the bundled version from Nov. 2021
-          TINYTEX_VERSION: 2021-11
+          TINYTEX_VERSION: 2021.11
 ````
 
 See more on those bundles in [`yihui/tinytex-releases`
