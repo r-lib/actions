@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: r-lib/actions/setup-tinytex@v2
+      - uses: r-lib/actions/setup-tinytex@v2-branch
         env:
           # always install the bundled version from Nov. 2021
           TINYTEX_VERSION: 2021-11
