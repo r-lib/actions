@@ -161,6 +161,8 @@ jobs:
           needs: check
 
       - uses: r-lib/actions/check-r-package@v2
+        with:
+          upload-snapshots: true
 ```
 
 ## Tidyverse CI workflow
@@ -241,6 +243,8 @@ jobs:
           needs: check
 
       - uses: r-lib/actions/check-r-package@v2
+        with:
+          upload-snapshots: true
 ```
 
 ## Test coverage workflow
@@ -281,7 +285,7 @@ jobs:
           needs: coverage
 
       - name: Test coverage
-        run: covr::codecov()
+        run: covr::codecov(quiet = FALSE)
         shell: Rscript {0}
 ```
 
@@ -458,13 +462,10 @@ jobs:
 
       - uses: r-lib/actions/setup-renv@v2
       
-      - name: Render Rmarkdown files
+      - name: Render Rmarkdown files and Commit Results
         run: |
           RMD_PATH=($(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '[.]Rmd$'))
           Rscript -e 'for (f in commandArgs(TRUE)) if (file.exists(f)) rmarkdown::render(f)' ${RMD_PATH[*]}
-
-      - name: Commit results
-        run: |
           git config --local user.name "$GITHUB_ACTOR"
           git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
           git commit ${RMD_PATH[*]/.Rmd/.md} -m 'Re-build Rmarkdown files' || echo "No changes to commit"
@@ -501,6 +502,9 @@ name: pkgdown
 jobs:
   pkgdown:
     runs-on: ubuntu-latest
+    # Only restrict concurrency for non-PR jobs
+    concurrency:
+      group: pkgdown-${{ github.event_name != 'pull_request' || github.run_id }}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -569,6 +573,7 @@ jobs:
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::roxygen2
+          needs: roxygen2
 
       - name: Document
         run: roxygen2::roxygenise()
@@ -580,8 +585,8 @@ jobs:
           git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
           git add man/\* NAMESPACE
           git commit -m "Update documentation" || echo "No changes to commit"
-          git pull --ff-only || echo "No remote changes"
-          git push origin || echo "No changes to commit"
+          git pull --ff-only
+          git push origin
 ```
 
 ## Style package
@@ -596,9 +601,9 @@ changes to the same branch.
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    paths: ["R/**"]
+    paths: ["**.[rR]", "**.[rR]md", "**.[rR]markdown", "**.[rR]nw"]
   pull_request:
-    paths: ["R/**"]
+    paths: ["**.[rR]", "**.[rR]md", "**.[rR]markdown", "**.[rR]nw"]
 
 name: Style
 
@@ -622,9 +627,34 @@ jobs:
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::styler
+          needs: styler
+
+      - name: Enable styler cache
+        run: styler::cache_activate()
+        shell: Rscript {0}
+
+      - name: Determine cache location
+        id: styler-location
+        run: |
+          cat(
+            "##[set-output name=location;]",
+            styler::cache_info(format = "tabular")$location,
+            "\n",
+            sep = ""
+          )
+        shell: Rscript {0}
+
+      - name: Cache styler
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.styler-location.outputs.location }}
+          key: ${{ runner.os }}-styler-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-styler-
+            ${{ runner.os }}-
 
       - name: Style
-        run: styler::style_pkg()
+        run: styler::style_pkg(filetype = c(".R", ".Rmd", ".Rmarkdown", ".Rnw"))
         shell: Rscript {0}
 
       - name: Commit and push changes
@@ -633,8 +663,8 @@ jobs:
           git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
           git add R/\*
           git commit -m "Style code" || echo "No changes to commit"
-          git pull --ff-only || echo "No remote changes"
-          git push origin || echo "No changes to commit"
+          git pull --ff-only
+          git push origin
 ```
 
 ## Build bookdown site
@@ -667,6 +697,9 @@ name: bookdown
 jobs:
   bookdown:
     runs-on: ubuntu-latest
+    # Only restrict concurrency for non-PR jobs
+    concurrency:
+      group: pkgdown-${{ github.event_name != 'pull_request' || github.run_id }}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -728,6 +761,9 @@ name: blogdown
 jobs:
   blogdown:
     runs-on: ubuntu-latest
+    # Only restrict concurrency for non-PR jobs
+    concurrency:
+      group: pkgdown-${{ github.event_name != 'pull_request' || github.run_id }}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
