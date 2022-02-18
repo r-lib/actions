@@ -70,10 +70,10 @@ function run() {
 function getTinyTeX() {
     return __awaiter(this, void 0, void 0, function* () {
         if (IS_WINDOWS) {
-            installTinyTeXWindows();
+            yield installTinyTeXWindows();
         }
         else {
-            installTinyTeXPosix();
+            yield installTinyTeXPosix();
         }
     });
 }

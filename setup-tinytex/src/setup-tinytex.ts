@@ -38,9 +38,9 @@ async function run() {
 
 export async function getTinyTeX() {
   if (IS_WINDOWS) {
-    installTinyTeXWindows();
+    await installTinyTeXWindows();
   } else {
-    installTinyTeXPosix();
+    await installTinyTeXPosix();
   }
 }
 
