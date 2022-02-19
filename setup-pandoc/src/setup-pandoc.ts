@@ -129,6 +129,7 @@ async function installPandocLinux(version: string) {
   let downloadPath: string | null = null;
 
   try {
+    console.log("::group::Download pandoc");
     downloadPath = await tc.downloadTool(downloadUrl);
   } catch (error) {
     throw `Failed to download Pandoc ${version}: ${error}`;
@@ -137,7 +138,9 @@ async function installPandocLinux(version: string) {
   await io.mv(downloadPath, path.join(tempDirectory, fileName));
 
   try {
+    console.log("::group::Install gdebi-core");
     await exec.exec("sudo apt-get", ["install", "-y", "gdebi-core"]);
+    console.log("::group::Install pandoc");
     await exec.exec("sudo gdebi", [
       "--non-interactive",
       path.join(tempDirectory, fileName)
@@ -147,6 +150,7 @@ async function installPandocLinux(version: string) {
 
     throw `Failed to install pandoc: ${error}`;
   }
+  console.log("::endgroup::");
 }
 
 run();
