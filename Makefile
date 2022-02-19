@@ -8,7 +8,7 @@ WORKFLOWS := .github/workflows/check-full.yaml \
 all : $(WORKFLOWS)
 
 $(WORKFLOWS) : .github/workflows/%.yaml: examples/%.yaml
-	perl -pe 's{(r-lib/actions/[\w-]+@)v2}{$$1v2-branch}g' $^ | \
+	perl -pe 's{r-lib/actions/([\w-]+)\@v2}{./$$1}g' $^ | \
 	perl -pe 's{main, master}{main, master, v2-branch}g' > $@
 
 .PHONY: clean
