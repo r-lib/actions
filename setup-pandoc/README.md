@@ -4,26 +4,27 @@
 
 This action sets up pandoc and pandoc-citeproc by:
 
-- downloading and caching a relased version of pandoc by version and adding it to the PATH
+- downloading and caching a released version of pandoc by version and adding it to the PATH
 
 # Usage
 
 See [action.yml](action.yml)
 
 Basic:
+
 ```yaml
 steps:
 - uses: actions/checkout@v2
 - uses: r-lib/actions/setup-pandoc@v2
   with:
-    pandoc-version: '2.7.3' # The pandoc version to download (if necessary) and use.
+    pandoc-version: '2.17.1' # The pandoc version to download (if necessary) and use.
 - run: echo "# Test" | pandoc -t html
 ```
 
 # License
 
-The scripts and documentation in this project are released under the [MIT License](LICENSE)
+The scripts and documentation in this project are released under the [MIT License](LICENSE).
 
 # Contributions
 
-Contributions are welcome!  See [Contributor's Guide](docs/contributors.md)
+Contributions are welcome! See [Contributor's Guide](docs/contributors.md)
