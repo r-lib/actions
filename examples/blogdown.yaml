@@ -9,13 +9,14 @@ on:
 
 name: blogdown
 
+# Cancel workflow for the same PR, avoid concurrent deploys
+concurrency:
+  group: blogdown-${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   blogdown:
     runs-on: ubuntu-latest
-    # Cancel workflow for the same PR, avoid concurrent deploys
-    concurrency:
-      group: pkgdown-${{ github.event.pull_request.number }}
-      cancel-in-progress: ${{ github.event_name == 'pull_request' }}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
