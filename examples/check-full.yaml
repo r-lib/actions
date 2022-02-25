@@ -12,16 +12,16 @@ on:
 
 name: R-CMD-check
 
+# Cancel earlier workflow for the same PR
+concurrency:
+  group: check-full-${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
 jobs:
   R-CMD-check:
     runs-on: ${{ matrix.config.os }}
 
     name: ${{ matrix.config.os }} (${{ matrix.config.r }})
-
-    # Cancel earlier workflow for the same PR
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.job }}-${{ github.event.pull_request.number || github.run_id }}
-      cancel-in-progress: true
 
     strategy:
       fail-fast: false
