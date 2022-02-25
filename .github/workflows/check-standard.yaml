@@ -14,6 +14,11 @@ jobs:
 
     name: ${{ matrix.config.os }} (${{ matrix.config.r }})
 
+    # Cancel earlier workflow for the same PR
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+      cancel-in-progress: true
+
     strategy:
       fail-fast: false
       matrix:

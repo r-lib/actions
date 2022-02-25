@@ -12,9 +12,10 @@ name: bookdown
 jobs:
   bookdown:
     runs-on: ubuntu-latest
-    # Only restrict concurrency for non-PR jobs
+    # Cancel workflow for the same PR, avoid concurrent deploys
     concurrency:
-      group: pkgdown-${{ github.event_name != 'pull_request' || github.run_id }}
+      group: pkgdown-${{ github.event.pull_request.number }}
+      cancel-in-progress: ${{ github.event_name == 'pull_request' }}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
