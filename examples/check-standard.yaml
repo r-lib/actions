@@ -16,7 +16,7 @@ jobs:
 
     # Cancel earlier workflow for the same PR
     concurrency:
-      group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+      group: ${{ github.workflow }}-${{ github.job }}-${{ github.event.pull_request.number || github.run_id }}
       cancel-in-progress: true
 
     strategy:

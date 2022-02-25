@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     # Cancel workflow for the same PR, avoid concurrent deploys
     concurrency:
-      group: pkgdown-${{ github.event.pull_request.number }}
+      group: ${{ github.workflow }}-${{ github.job }}-${{ github.event.pull_request.number }}
       cancel-in-progress: ${{ github.event_name == 'pull_request' }}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
