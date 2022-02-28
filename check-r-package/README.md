@@ -18,6 +18,8 @@ Inputs available:
   parameter of `rcmdcheck`. It must be an R expression in single quotes.
 - upload-artifacts - default `false`. Whether to upload all testthat
   snapshots as an artifact.
+- upload-results - default `false`. Whether to upload check results for
+  successful runs too.
 - working-directory - default `"."`. If the R package to check is not in
   the root directory of your repository.
 
