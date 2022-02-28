@@ -20,7 +20,10 @@ inputs:
   upload-snapshots:
     description: 'Whether to upload all testthat snapshots as an artifact.'
     default: false
-    
+  upload-results:
+    description: 'Whether to upload check results for successful runs too.'
+    default: false
+
 runs:
   using: "composite"
   steps:
@@ -46,7 +49,7 @@ runs:
       working-directory: ${{ inputs.working-directory }}
 
     - name: Upload check results
-      if: failure()
+      if: failure() || inputs.upload-results != 'false'
       uses: actions/upload-artifact@main
       with:
         name: ${{ runner.os }}-r${{ matrix.config.r }}-results
