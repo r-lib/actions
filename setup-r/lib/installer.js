@@ -615,6 +615,9 @@ function getReleaseVersion(platform) {
     return __awaiter(this, void 0, void 0, function* () {
         let rest = new restm.RestClient("setup-r");
         let tags = (yield rest.get(util.format("https://api.r-hub.io/rversions/r-release-%s", platform))).result || { version: "" };
+        if (platform == 'tarball') {
+            return "4.1.2";
+        }
         return tags.version;
     });
 }
