@@ -16,9 +16,9 @@ Inputs available:
   parameter of `rcmdcheck`. It must be an R expression in single quotes.
 - error-on - default `"warning"`. Arguments to pass to the `error-on`
   parameter of `rcmdcheck`. It must be an R expression in single quotes.
-- upload-artifacts - default `false`. Whether to upload all testthat
+- upload-snapshots - default `false`. Whether to upload all testthat
   snapshots as an artifact.
-- upload-snapshots - default `false`. Whether to upload check results for
+- upload-results - default `false`. Whether to upload check results for
   successful runs too.
 - working-directory - default `"."`. If the R package to check is not in
   the root directory of your repository.
