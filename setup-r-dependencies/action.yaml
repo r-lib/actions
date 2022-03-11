@@ -79,6 +79,8 @@ runs:
           } else {
             sessionInfo()
           }
+          ## Clean up lock file
+          unlink(".github/pkg.lock")
           cat("::endgroup::\n")
         shell: Rscript {0}
         working-directory: ${{ inputs.working-directory }}
