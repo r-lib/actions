@@ -139,7 +139,7 @@ async function installPandocLinux(version: string): Promise<void> {
 
   try {
     console.log("::group::Install gdebi-core");
-    await exec.exec("sudo apt-get", ["install", "-y", "gdebi-core"]);
+    await exec.exec("sudo apt-get", ["install", "-yqq", "gdebi-core"]);
     console.log("::group::Install pandoc");
     await exec.exec("sudo gdebi", [
       "--non-interactive",
