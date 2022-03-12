@@ -54,8 +54,8 @@ async function installPandocMac(version: string): Promise<void> {
     version,
     fileName
   );
-  let downloadPath: string | null = null;
 
+  let downloadPath: string;
   try {
     downloadPath = await tc.downloadTool(downloadUrl);
   } catch (error) {
@@ -81,8 +81,8 @@ async function installPandocWindows(version: string): Promise<void> {
     version,
     fileName
   );
-  let downloadPath: string | null = null;
 
+  let downloadPath: string;
   try {
     downloadPath = await tc.downloadTool(downloadUrl);
   } catch (error) {
@@ -126,8 +126,8 @@ async function installPandocLinux(version: string): Promise<void> {
     version,
     fileName
   );
-  let downloadPath: string | null = null;
 
+  let downloadPath: string;
   try {
     console.log("::group::Download pandoc");
     downloadPath = await tc.downloadTool(downloadUrl);
