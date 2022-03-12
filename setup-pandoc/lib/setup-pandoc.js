@@ -60,6 +60,7 @@ if (!tempDirectory) {
     tempDirectory = path.join(baseLocation, "actions", "temp");
 }
 function run() {
+    var _a, _b;
     return __awaiter(this, void 0, void 0, function* () {
         try {
             let pandocVersion = core.getInput("pandoc-version");
@@ -67,7 +68,7 @@ function run() {
             yield getPandoc(pandocVersion);
         }
         catch (error) {
-            core.setFailed(error.message);
+            core.setFailed((_b = (_a = error === null || error === void 0 ? void 0 : error.message) !== null && _a !== void 0 ? _a : error) !== null && _b !== void 0 ? _b : "Unknown error");
         }
     });
 }
@@ -84,6 +85,7 @@ function getPandoc(version) {
 }
 exports.getPandoc = getPandoc;
 function installPandocMac(version) {
+    var _a;
     return __awaiter(this, void 0, void 0, function* () {
         const fileName = util.format("pandoc-%s-macOS.pkg", version);
         const downloadUrl = util.format("https://github.com/jgm/pandoc/releases/download/%s/%s", version, fileName);
@@ -92,7 +94,7 @@ function installPandocMac(version) {
             downloadPath = yield tc.downloadTool(downloadUrl);
         }
         catch (error) {
-            throw `Failed to download Pandoc ${version}: ${error}`;
+            throw new Error(`Failed to download Pandoc ${version}: ${(_a = error === null || error === void 0 ? void 0 : error.message) !== null && _a !== void 0 ? _a : error}`);
         }
         yield io.mv(downloadPath, path.join(tempDirectory, fileName));
         exec.exec("sudo installer", [
@@ -106,6 +108,7 @@ function installPandocMac(version) {
     });
 }
 function installPandocWindows(version) {
+    var _a;
     return __awaiter(this, void 0, void 0, function* () {
         const fileName = util.format("pandoc-%s-windows-x86_64.zip", version);
         const downloadUrl = util.format("https://github.com/jgm/pandoc/releases/download/%s/%s", version, fileName);
@@ -114,7 +117,7 @@ function installPandocWindows(version) {
             downloadPath = yield tc.downloadTool(downloadUrl);
         }
         catch (error) {
-            throw `Failed to download Pandoc ${version}: ${error}`;
+            throw new Error(`Failed to download Pandoc ${version}: ${(_a = error === null || error === void 0 ? void 0 : error.message) !== null && _a !== void 0 ? _a : error}`);
         }
         //
         // Extract
@@ -140,6 +143,7 @@ function pandocSubdir(version) {
     return util.format("pandoc-%s-windows-x86_64", version);
 }
 function installPandocLinux(version) {
+    var _a;
     return __awaiter(this, void 0, void 0, function* () {
         const fileName = util.format("pandoc-%s-1-amd64.deb", version);
         const downloadUrl = util.format("https://github.com/jgm/pandoc/releases/download/%s/%s", version, fileName);
@@ -149,7 +153,7 @@ function installPandocLinux(version) {
             downloadPath = yield tc.downloadTool(downloadUrl);
         }
         catch (error) {
-            throw `Failed to download Pandoc ${version}: ${error}`;
+            throw new Error(`Failed to download Pandoc ${version}: ${error}`);
         }
         yield io.mv(downloadPath, path.join(tempDirectory, fileName));
         try {
@@ -162,8 +166,7 @@ function installPandocLinux(version) {
             ]);
         }
         catch (error) {
-            core.debug(error);
-            throw `Failed to install pandoc: ${error}`;
+            throw new Error(`Failed to install pandoc: ${(_a = error === null || error === void 0 ? void 0 : error.message) !== null && _a !== void 0 ? _a : error}`);
         }
         console.log("::endgroup::");
     });

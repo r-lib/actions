@@ -32,8 +32,8 @@ async function run() {
     let pandocVersion = core.getInput("pandoc-version");
     core.debug(`got pandoc-version ${pandocVersion}`);
     await getPandoc(pandocVersion);
-  } catch (error) {
-    core.setFailed(error.message);
+  } catch (error: any) {
+    core.setFailed(error?.message ?? error ?? "Unknown error");
   }
 }
 
@@ -58,8 +58,8 @@ async function installPandocMac(version: string): Promise<void> {
   let downloadPath: string;
   try {
     downloadPath = await tc.downloadTool(downloadUrl);
-  } catch (error) {
-    throw `Failed to download Pandoc ${version}: ${error}`;
+  } catch (error: any) {
+    throw new Error(`Failed to download Pandoc ${version}: ${error?.message ?? error}`);
   }
 
   await io.mv(downloadPath, path.join(tempDirectory, fileName));
@@ -85,8 +85,8 @@ async function installPandocWindows(version: string): Promise<void> {
   let downloadPath: string;
   try {
     downloadPath = await tc.downloadTool(downloadUrl);
-  } catch (error) {
-    throw `Failed to download Pandoc ${version}: ${error}`;
+  } catch (error: any) {
+    throw new Error(`Failed to download Pandoc ${version}: ${error?.message ?? error}`);
   }
 
   //
@@ -132,7 +132,7 @@ async function installPandocLinux(version: string): Promise<void> {
     console.log("::group::Download pandoc");
     downloadPath = await tc.downloadTool(downloadUrl);
   } catch (error) {
-    throw `Failed to download Pandoc ${version}: ${error}`;
+    throw new Error(`Failed to download Pandoc ${version}: ${error}`);
   }
 
   await io.mv(downloadPath, path.join(tempDirectory, fileName));
@@ -145,10 +145,8 @@ async function installPandocLinux(version: string): Promise<void> {
       "--non-interactive",
       path.join(tempDirectory, fileName)
     ]);
-  } catch (error) {
-    core.debug(error);
-
-    throw `Failed to install pandoc: ${error}`;
+  } catch (error: any) {
+    throw new Error(`Failed to install pandoc: ${error?.message ?? error}`);
   }
   console.log("::endgroup::");
 }
