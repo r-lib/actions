@@ -1,4 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -8,14 +31,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getPandoc = void 0;
 let tempDirectory = process.env["RUNNER_TEMP"] || "";
 const core = __importStar(require("@actions/core"));
 const exec = __importStar(require("@actions/exec"));
@@ -55,24 +72,22 @@ function run() {
     });
 }
 function getPandoc(version) {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (IS_WINDOWS) {
-            installPandocWindows(version);
-        }
-        else if (IS_MAC) {
-            installPandocMac(version);
-        }
-        else {
-            installPandocLinux(version);
-        }
-    });
+    if (IS_WINDOWS) {
+        return installPandocWindows(version);
+    }
+    else if (IS_MAC) {
+        return installPandocMac(version);
+    }
+    else {
+        return installPandocLinux(version);
+    }
 }
 exports.getPandoc = getPandoc;
 function installPandocMac(version) {
     return __awaiter(this, void 0, void 0, function* () {
         const fileName = util.format("pandoc-%s-macOS.pkg", version);
         const downloadUrl = util.format("https://github.com/jgm/pandoc/releases/download/%s/%s", version, fileName);
-        let downloadPath = null;
+        let downloadPath;
         try {
             downloadPath = yield tc.downloadTool(downloadUrl);
         }
@@ -94,7 +109,7 @@ function installPandocWindows(version) {
     return __awaiter(this, void 0, void 0, function* () {
         const fileName = util.format("pandoc-%s-windows-x86_64.zip", version);
         const downloadUrl = util.format("https://github.com/jgm/pandoc/releases/download/%s/%s", version, fileName);
-        let downloadPath = null;
+        let downloadPath;
         try {
             downloadPath = yield tc.downloadTool(downloadUrl);
         }
@@ -116,10 +131,10 @@ function installPandocWindows(version) {
     });
 }
 function pandocSubdir(version) {
-    if (compare_versions_1.compare(version, "2.9.2", ">=")) {
+    if ((0, compare_versions_1.compare)(version, "2.9.2", ">=")) {
         return util.format("pandoc-%s", version);
     }
-    if (compare_versions_1.compare(version, "2.9.1", "=")) {
+    if ((0, compare_versions_1.compare)(version, "2.9.1", "=")) {
         return "";
     }
     return util.format("pandoc-%s-windows-x86_64", version);
@@ -128,7 +143,7 @@ function installPandocLinux(version) {
     return __awaiter(this, void 0, void 0, function* () {
         const fileName = util.format("pandoc-%s-1-amd64.deb", version);
         const downloadUrl = util.format("https://github.com/jgm/pandoc/releases/download/%s/%s", version, fileName);
-        let downloadPath = null;
+        let downloadPath;
         try {
             console.log("::group::Download pandoc");
             downloadPath = yield tc.downloadTool(downloadUrl);
@@ -139,7 +154,7 @@ function installPandocLinux(version) {
         yield io.mv(downloadPath, path.join(tempDirectory, fileName));
         try {
             console.log("::group::Install gdebi-core");
-            yield exec.exec("sudo apt-get", ["install", "-y", "gdebi-core"]);
+            yield exec.exec("sudo apt-get", ["install", "-yqq", "gdebi-core"]);
             console.log("::group::Install pandoc");
             yield exec.exec("sudo gdebi", [
                 "--non-interactive",
