@@ -37,17 +37,17 @@ async function run() {
   }
 }
 
-export async function getPandoc(version: string) {
+export function getPandoc(version: string): Promise<void> {
   if (IS_WINDOWS) {
-    installPandocWindows(version);
+    return installPandocWindows(version);
   } else if (IS_MAC) {
-    installPandocMac(version);
+    return installPandocMac(version);
   } else {
-    installPandocLinux(version);
+    return installPandocLinux(version);
   }
 }
 
-async function installPandocMac(version: string) {
+async function installPandocMac(version: string): Promise<void> {
   const fileName = util.format("pandoc-%s-macOS.pkg", version);
   const downloadUrl = util.format(
     "https://github.com/jgm/pandoc/releases/download/%s/%s",
@@ -74,7 +74,7 @@ async function installPandocMac(version: string) {
   ]);
 }
 
-async function installPandocWindows(version: string) {
+async function installPandocWindows(version: string): Promise<void> {
   const fileName = util.format("pandoc-%s-windows-x86_64.zip", version);
   const downloadUrl = util.format(
     "https://github.com/jgm/pandoc/releases/download/%s/%s",
@@ -119,7 +119,7 @@ function pandocSubdir(version: string) {
   return util.format("pandoc-%s-windows-x86_64", version);
 }
 
-async function installPandocLinux(version: string) {
+async function installPandocLinux(version: string): Promise<void> {
   const fileName = util.format("pandoc-%s-1-amd64.deb", version);
   const downloadUrl = util.format(
     "https://github.com/jgm/pandoc/releases/download/%s/%s",
