@@ -154,7 +154,7 @@ function installPandocLinux(version) {
         yield io.mv(downloadPath, path.join(tempDirectory, fileName));
         try {
             console.log("::group::Install gdebi-core");
-            yield exec.exec("sudo apt-get", ["install", "-yqq", "gdebi-core"]);
+            yield exec.exec("sudo apt-get", ["install", "-y", "gdebi-core"]);
             console.log("::group::Install pandoc");
             yield exec.exec("sudo gdebi", [
                 "--non-interactive",
