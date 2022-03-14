@@ -32,7 +32,7 @@ async function run() {
     let pandocVersion = core.getInput("pandoc-version");
     core.debug(`got pandoc-version ${pandocVersion}`);
     await getPandoc(pandocVersion);
-  } catch (error: any) {
+  } catch (error) {
     core.setFailed(error?.message ?? error ?? "Unknown error");
   }
 }
@@ -58,7 +58,7 @@ async function installPandocMac(version: string): Promise<void> {
   let downloadPath: string;
   try {
     downloadPath = await tc.downloadTool(downloadUrl);
-  } catch (error: any) {
+  } catch (error) {
     throw new Error(`Failed to download Pandoc ${version}: ${error?.message ?? error}`);
   }
 
@@ -85,7 +85,7 @@ async function installPandocWindows(version: string): Promise<void> {
   let downloadPath: string;
   try {
     downloadPath = await tc.downloadTool(downloadUrl);
-  } catch (error: any) {
+  } catch (error) {
     throw new Error(`Failed to download Pandoc ${version}: ${error?.message ?? error}`);
   }
 
@@ -145,7 +145,7 @@ async function installPandocLinux(version: string): Promise<void> {
       "--non-interactive",
       path.join(tempDirectory, fileName)
     ]);
-  } catch (error: any) {
+  } catch (error) {
     throw new Error(`Failed to install pandoc: ${error?.message ?? error}`);
   }
   console.log("::endgroup::");
