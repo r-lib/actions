@@ -33,33 +33,33 @@ async function run() {
     core.debug(`got pandoc-version ${pandocVersion}`);
     await getPandoc(pandocVersion);
   } catch (error) {
-    core.setFailed(error.message);
+    core.setFailed(error?.message ?? error ?? "Unknown error");
   }
 }
 
-export async function getPandoc(version: string) {
+export function getPandoc(version: string): Promise<void> {
   if (IS_WINDOWS) {
-    installPandocWindows(version);
+    return installPandocWindows(version);
   } else if (IS_MAC) {
-    installPandocMac(version);
+    return installPandocMac(version);
   } else {
-    installPandocLinux(version);
+    return installPandocLinux(version);
   }
 }
 
-async function installPandocMac(version: string) {
+async function installPandocMac(version: string): Promise<void> {
   const fileName = util.format("pandoc-%s-macOS.pkg", version);
   const downloadUrl = util.format(
     "https://github.com/jgm/pandoc/releases/download/%s/%s",
     version,
     fileName
   );
-  let downloadPath: string | null = null;
 
+  let downloadPath: string;
   try {
     downloadPath = await tc.downloadTool(downloadUrl);
   } catch (error) {
-    throw `Failed to download Pandoc ${version}: ${error}`;
+    throw new Error(`Failed to download Pandoc ${version}: ${error?.message ?? error}`);
   }
 
   await io.mv(downloadPath, path.join(tempDirectory, fileName));
@@ -74,19 +74,19 @@ async function installPandocMac(version: string) {
   ]);
 }
 
-async function installPandocWindows(version: string) {
+async function installPandocWindows(version: string): Promise<void> {
   const fileName = util.format("pandoc-%s-windows-x86_64.zip", version);
   const downloadUrl = util.format(
     "https://github.com/jgm/pandoc/releases/download/%s/%s",
     version,
     fileName
   );
-  let downloadPath: string | null = null;
 
+  let downloadPath: string;
   try {
     downloadPath = await tc.downloadTool(downloadUrl);
   } catch (error) {
-    throw `Failed to download Pandoc ${version}: ${error}`;
+    throw new Error(`Failed to download Pandoc ${version}: ${error?.message ?? error}`);
   }
 
   //
@@ -119,20 +119,20 @@ function pandocSubdir(version: string) {
   return util.format("pandoc-%s-windows-x86_64", version);
 }
 
-async function installPandocLinux(version: string) {
+async function installPandocLinux(version: string): Promise<void> {
   const fileName = util.format("pandoc-%s-1-amd64.deb", version);
   const downloadUrl = util.format(
     "https://github.com/jgm/pandoc/releases/download/%s/%s",
     version,
     fileName
   );
-  let downloadPath: string | null = null;
 
+  let downloadPath: string;
   try {
     console.log("::group::Download pandoc");
     downloadPath = await tc.downloadTool(downloadUrl);
   } catch (error) {
-    throw `Failed to download Pandoc ${version}: ${error}`;
+    throw new Error(`Failed to download Pandoc ${version}: ${error}`);
   }
 
   await io.mv(downloadPath, path.join(tempDirectory, fileName));
@@ -146,9 +146,7 @@ async function installPandocLinux(version: string) {
       path.join(tempDirectory, fileName)
     ]);
   } catch (error) {
-    core.debug(error);
-
-    throw `Failed to install pandoc: ${error}`;
+    throw new Error(`Failed to install pandoc: ${error?.message ?? error}`);
   }
   console.log("::endgroup::");
 }
