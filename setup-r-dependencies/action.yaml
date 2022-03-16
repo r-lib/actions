@@ -2,8 +2,12 @@ name: 'setup-r-dependencies'
 description: 'Action to setup installation tools and install R dependencies'
 author: 'Jim Hester'
 inputs:
+  cache:
+    description: 'A boolen value indicating whether packages should be cached from one to the other'
+    required: true
+    default: true
   cache-version:
-    description: 'The version of the cache, change this from the default (1) to start over with a fresh cache'
+    description: 'The version of the cache, change this from the default (1) to start over with a fresh cache. Ignored if cache: false'
     required: true
     default: 1
   extra-packages:
@@ -53,6 +57,7 @@ runs:
         working-directory: ${{ inputs.working-directory }}
 
       - name: Restore R package cache
+        if: ${{ inputs.cache }}
         uses: actions/cache@v2
         with:
           path: |
@@ -84,7 +89,7 @@ runs:
         working-directory: ${{ inputs.working-directory }}
 
       - name: Don't use tar 1.30 from Rtools35 to store the cache
-        if: runner.os == 'Windows'
+        if: runner.os == 'Windows' && ${{ inputs.cache }}
         shell: bash
         run: |
           if command -v /c/Rtools/bin/tar && /c/Rtools/bin/tar --version | grep -q 'tar (GNU tar) 1.30'

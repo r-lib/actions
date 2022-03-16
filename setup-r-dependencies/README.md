@@ -13,8 +13,11 @@ This action install dependencies for the current R environment based on the DESC
 
 Inputs available
 
+- `cache` - default `true`. Whether packages should be cached across runs or 
+  not.
 - `cache-version` - default `1`. If you need to invalidate the existing
-  cache pass any other number and a new cache will be used.
+  cache pass any other number and a new cache will be used. Ignored if 
+  `cache: true`.
 - `dependencies` - default `'"all"'`. Types of dependencies to install. By
   default all direct dependencies of the current package are installed, and
   hard dependencies of these direct dependencies. See also the `needs` and
