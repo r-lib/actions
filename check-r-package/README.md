@@ -44,7 +44,7 @@ steps:
     extra-packages: rcmdcheck
 - uses: r-lib/actions/check-r-package@v2
   with:
-    error_on: error
+    error-on: error
 ```
 
 # License
