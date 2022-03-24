@@ -57,7 +57,7 @@ runs:
         working-directory: ${{ inputs.working-directory }}
 
       - name: Restore R package cache
-        if: ${{ inputs.cache }}
+        if: inputs.cache == 'true'
         uses: actions/cache@v2
         with:
           path: |
@@ -89,7 +89,7 @@ runs:
         working-directory: ${{ inputs.working-directory }}
 
       - name: Don't use tar 1.30 from Rtools35 to store the cache
-        if: runner.os == 'Windows' && ${{ inputs.cache }}
+        if: runner.os == 'Windows' && inputs.cache == 'true'
         shell: bash
         run: |
           if command -v /c/Rtools/bin/tar && /c/Rtools/bin/tar --version | grep -q 'tar (GNU tar) 1.30'
