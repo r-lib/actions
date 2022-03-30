@@ -30,3 +30,7 @@ jobs:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
+
+      - name: R version
+        run: sessionInfo()
+        shell: Rscript {0}
