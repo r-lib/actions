@@ -64,10 +64,17 @@ if (!tempDirectory) {
 }
 function getR(version) {
     return __awaiter(this, void 0, void 0, function* () {
+        // 'next' is not yet supported on Linux
+        if (IS_LINUX) {
+            if (version == "next" || version == "prerelease") {
+                version = "release";
+            }
+        }
         const selected = yield determineVersion(version);
         if (selected) {
             version = selected;
         }
+        // this works for 'next' and 'devel' as well, currently.
         let rtoolsVersion = core.getInput("rtools-version") || (version.charAt(0) == "3" ? "35" : "40");
         let toolPath = tc.find("R", version);
         if (toolPath) {
@@ -296,9 +303,12 @@ function acquireRMacOS(version) {
         // Download - a tool installer intimately knows how to get the tool (and construct urls)
         //
         let fileName = getFileNameMacOS(version);
-        let downloadUrl = getDownloadUrlMacOS(version);
+        let downloadUrl = yield getDownloadUrlMacOS(version);
         let downloadPath = null;
         try {
+            if (downloadUrl == "") {
+                throw ("Cannot determine download URL");
+            }
             downloadPath = yield tc.downloadTool(downloadUrl);
             yield io.mv(downloadPath, path.join(tempDirectory, fileName));
         }
@@ -355,6 +365,9 @@ function acquireRWindows(version) {
         let downloadUrl = yield getDownloadUrlWindows(version);
         let downloadPath = null;
         try {
+            if (downloadUrl == "") {
+                throw ("Cannot determine download URL");
+            }
             downloadPath = yield tc.downloadTool(downloadUrl);
             yield io.mv(downloadPath, path.join(tempDirectory, fileName));
         }
@@ -554,24 +567,29 @@ function getFileNameMacOS(version) {
     return filename;
 }
 function getDownloadUrlMacOS(version) {
-    if (version == "devel") {
-        return "https://mac.R-project.org/high-sierra/last-success/R-devel-x86_64.pkg";
-    }
-    const filename = getFileNameMacOS(version);
-    if (semver.eq(version, "3.2.5")) {
-        // 3.2.5 is 'special', it is actually 3.2.4-revised...
-        return "https://cloud.r-project.org/bin/macosx/old/R-3.2.4-revised.pkg";
-    }
-    if (semver.lt(version, "3.4.0")) {
-        // older versions are in /old
-        return util.format("https://cloud.r-project.org/bin/macosx/old/%s", filename);
-    }
-    if (semver.lt(version, "4.0.0")) {
-        // older versions are in el-capitan/base
-        return util.format("https://cloud.r-project.org/bin/macosx/el-capitan/base/%s", filename);
-    }
-    // 4.0.0+ are in base/
-    return util.format("https://cloud.r-project.org/bin/macosx/base/%s", filename);
+    return __awaiter(this, void 0, void 0, function* () {
+        if (version == "devel") {
+            return "https://mac.R-project.org/high-sierra/last-success/R-devel-x86_64.pkg";
+        }
+        if (version == "next" || version == "prerelease") {
+            return getDownloadUrlMacOSNext();
+        }
+        const filename = getFileNameMacOS(version);
+        if (semver.eq(version, "3.2.5")) {
+            // 3.2.5 is 'special', it is actually 3.2.4-revised...
+            return "https://cloud.r-project.org/bin/macosx/old/R-3.2.4-revised.pkg";
+        }
+        if (semver.lt(version, "3.4.0")) {
+            // older versions are in /old
+            return util.format("https://cloud.r-project.org/bin/macosx/old/%s", filename);
+        }
+        if (semver.lt(version, "4.0.0")) {
+            // older versions are in el-capitan/base
+            return util.format("https://cloud.r-project.org/bin/macosx/el-capitan/base/%s", filename);
+        }
+        // 4.0.0+ are in base/
+        return util.format("https://cloud.r-project.org/bin/macosx/base/%s", filename);
+    });
 }
 function getFileNameUbuntu(version) {
     const filename = util.format("r-%s_1_amd64.deb", version);
@@ -595,6 +613,9 @@ function getDownloadUrlWindows(version) {
     return __awaiter(this, void 0, void 0, function* () {
         if (version == "devel") {
             return "https://cloud.r-project.org/bin/windows/base/R-devel-win.exe";
+        }
+        if (version == "next" || version == "prerelease") {
+            return getDownloadUrlWindowsNext();
         }
         const filename = getFileNameWindows(version);
         const releaseVersion = yield getReleaseVersion("win");
@@ -706,5 +727,19 @@ function getLatestVersion(version) {
         }
         core.debug(`matched: ${versions[0]}`);
         return versions[0];
+    });
+}
+function getDownloadUrlWindowsNext() {
+    return __awaiter(this, void 0, void 0, function* () {
+        let rest = new restm.RestClient("setup-r");
+        let tags = (yield rest.get("https://api.r-hub.io/rversions/r-next-win")).result || { URL: "" };
+        return tags.URL;
+    });
+}
+function getDownloadUrlMacOSNext() {
+    return __awaiter(this, void 0, void 0, function* () {
+        let rest = new restm.RestClient("setup-r");
+        let tags = (yield rest.get("https://api.r-hub.io/rversions/r-next-macos")).result || { URL: "" };
+        return tags.URL;
     });
 }

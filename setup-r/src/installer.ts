@@ -31,10 +31,18 @@ if (!tempDirectory) {
 }
 
 export async function getR(version: string) {
+  // 'next' is not yet supported on Linux
+  if (IS_LINUX) {
+    if (version == "next" || version == "prerelease") {
+      version = "release"
+    }
+  }
   const selected = await determineVersion(version);
   if (selected) {
     version = selected;
   }
+
+  // this works for 'next' and 'devel' as well, currently.
   let rtoolsVersion =
     core.getInput("rtools-version") || (version.charAt(0) == "3" ? "35" : "40");
 
@@ -272,9 +280,12 @@ async function acquireRMacOS(version: string): Promise<string> {
   // Download - a tool installer intimately knows how to get the tool (and construct urls)
   //
   let fileName: string = getFileNameMacOS(version);
-  let downloadUrl: string = getDownloadUrlMacOS(version);
+  let downloadUrl: string = await getDownloadUrlMacOS(version);
   let downloadPath: string | null = null;
   try {
+    if (downloadUrl == "") {
+      throw("Cannot determine download URL");
+    }
     downloadPath = await tc.downloadTool(downloadUrl);
     await io.mv(downloadPath, path.join(tempDirectory, fileName));
   } catch (error) {
@@ -333,6 +344,9 @@ async function acquireRWindows(version: string): Promise<string> {
   let downloadUrl: string = await getDownloadUrlWindows(version);
   let downloadPath: string | null = null;
   try {
+    if (downloadUrl == "") {
+      throw("Cannot determine download URL");
+    }
     downloadPath = await tc.downloadTool(downloadUrl);
     await io.mv(downloadPath, path.join(tempDirectory, fileName));
   } catch (error) {
@@ -554,9 +568,12 @@ function getFileNameMacOS(version: string): string {
   return filename;
 }
 
-function getDownloadUrlMacOS(version: string): string {
+async function getDownloadUrlMacOS(version: string): Promise<string> {
   if (version == "devel") {
     return "https://mac.R-project.org/high-sierra/last-success/R-devel-x86_64.pkg";
+  }
+  if (version == "next" || version == "prerelease") {
+    return getDownloadUrlMacOSNext();
   }
   const filename: string = getFileNameMacOS(version);
 
@@ -615,6 +632,9 @@ async function getDownloadUrlWindows(version: string): Promise<string> {
   if (version == "devel") {
     return "https://cloud.r-project.org/bin/windows/base/R-devel-win.exe";
   }
+  if (version == "next" || version == "prerelease") {
+    return getDownloadUrlWindowsNext();
+  }
 
   const filename: string = getFileNameWindows(version);
 
@@ -643,6 +663,10 @@ function setREnvironmentVariables() {
 
 interface IRRef {
   version: string;
+}
+
+interface IRRefURL {
+  URL: string;
 }
 
 async function getReleaseVersion(platform: string): Promise<string> {
@@ -761,4 +785,26 @@ async function getLatestVersion(version: string): Promise<string> {
   core.debug(`matched: ${versions[0]}`);
 
   return versions[0];
+}
+
+async function getDownloadUrlWindowsNext(): Promise<string> {
+  let rest: restm.RestClient = new restm.RestClient("setup-r");
+  let tags: IRRefURL = (
+    await rest.get<IRRefURL>(
+      "https://api.r-hub.io/rversions/r-next-win"
+    )
+  ).result || { URL: "" };
+
+  return tags.URL;
+}
+
+async function getDownloadUrlMacOSNext() {
+  let rest: restm.RestClient = new restm.RestClient("setup-r");
+  let tags: IRRefURL = (
+    await rest.get<IRRefURL>(
+      "https://api.r-hub.io/rversions/r-next-macos"
+    )
+  ).result || { URL: "" };
+
+  return tags.URL;
 }
