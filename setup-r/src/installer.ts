@@ -46,7 +46,7 @@ export async function getR(version: string) {
     try {
       await acquireR(version, rtoolsVersion);
     } catch (error) {
-      core.debug(error);
+      core.debug(`${error}`);
 
       throw `Failed to get R ${version}: ${error}`;
     }
@@ -79,7 +79,8 @@ async function acquireR(version: string, rtoolsVersion: string) {
       await acquireRUbuntu(version);
     }
   } catch (error) {
-    core.debug(error);
+    core.debug(`${error}`);
+
 
     throw `Failed to get R ${version}: ${error}`;
   }
@@ -116,7 +117,7 @@ async function acquireFortranMacOS(): Promise<string> {
     downloadPath = await tc.downloadTool(downloadUrl);
     await io.mv(downloadPath, path.join(tempDirectory, fileName));
   } catch (error) {
-    core.debug(error);
+    core.debug(`${error}`);
 
     throw `Failed to download ${downloadUrl}: ${error}`;
   }
@@ -128,7 +129,7 @@ async function acquireFortranMacOS(): Promise<string> {
       path.join(tempDirectory, fileName)
     ]);
   } catch (error) {
-    core.debug(error);
+    core.debug(`${error}`);
 
     throw `Failed to mount ${fileName}: ${error}`;
   }
@@ -144,7 +145,7 @@ async function acquireFortranMacOS(): Promise<string> {
       "/"
     ]);
   } catch (error) {
-    core.debug(error);
+    core.debug(`${error}`);
 
     throw `Failed to install gfortran: ${error}`;
   }
@@ -169,7 +170,7 @@ async function acquireUtilsMacOS() {
   try {
     await exec.exec("brew", ["install", "qpdf", "pkgconfig", "checkbashisms"]);
   } catch (error) {
-    core.debug(error);
+    core.debug(`${error}`);
 
     throw `Failed to install qpdf: ${error}`;
   }
@@ -185,7 +186,7 @@ async function removeOpenmpFlags() {
       "/Library/Frameworks/R.framework/Resources/etc/Makeconf"
     ]);
   } catch (error) {
-    core.debug(error);
+    core.debug(`${error}`);
 
     throw `Failed to remove OpenMP flags: ${error}`;
   }
@@ -204,7 +205,7 @@ async function acquireRUbuntu(version: string): Promise<string> {
     downloadPath = await tc.downloadTool(downloadUrl);
     await io.mv(downloadPath, path.join(tempDirectory, fileName));
   } catch (error) {
-    core.debug(error);
+    core.debug(`${error}`);
 
     throw `Failed to download version ${version}: ${error}`;
   }
@@ -237,7 +238,7 @@ async function acquireRUbuntu(version: string): Promise<string> {
       ]);
     });
   } catch (error) {
-    core.debug(error);
+    core.debug(`${error}`);
 
     throw `Failed to install R: ${error}`;
   }
@@ -258,7 +259,7 @@ async function acquireRUbuntu(version: string): Promise<string> {
       "/usr/local/bin/Rscript"
     ]);
   } catch (error) {
-    core.debug(error);
+    core.debug(`${error}`);
 
     throw `Failed to setup symlinks to R: ${error}`;
   }
@@ -277,7 +278,7 @@ async function acquireRMacOS(version: string): Promise<string> {
     downloadPath = await tc.downloadTool(downloadUrl);
     await io.mv(downloadPath, path.join(tempDirectory, fileName));
   } catch (error) {
-    core.debug(error);
+    core.debug(`${error}`);
 
     throw `Failed to download version ${version}: ${error}`;
   }
@@ -301,7 +302,7 @@ async function acquireRMacOS(version: string): Promise<string> {
       "/"
     ]);
   } catch (error) {
-    core.debug(error);
+    core.debug(`${error}`);
 
     throw `Failed to install R: ${error}`;
   }
@@ -320,7 +321,7 @@ async function acquireRMacOS(version: string): Promise<string> {
       "/usr/local/bin/Rscript"
     ]);
   } catch (error) {
-    core.debug(error);
+    core.debug(`${error}`);
     core.debug("Marching on despite failed symlink creation.")
   }
 
@@ -335,7 +336,7 @@ async function acquireRWindows(version: string): Promise<string> {
     downloadPath = await tc.downloadTool(downloadUrl);
     await io.mv(downloadPath, path.join(tempDirectory, fileName));
   } catch (error) {
-    core.debug(error);
+    core.debug(`${error}`);
 
     throw `Failed to download version ${version}: ${error}`;
   }
@@ -355,7 +356,7 @@ async function acquireRWindows(version: string): Promise<string> {
       "/DIR=C:\\R"
     ]);
   } catch (error) {
-    core.debug(error);
+    core.debug(`${error}`);
 
     throw `Failed to install R: ${error}`;
   }
@@ -403,7 +404,7 @@ async function acquireRtools(version: string) {
       downloadPath = await tc.downloadTool(downloadUrl);
       await io.mv(downloadPath, path.join(tempDirectory, fileName));
     } catch (error) {
-      core.debug(error);
+      core.debug(`${error}`);
 
       throw `Failed to download version ${version}: ${error}`;
     }
@@ -414,7 +415,7 @@ async function acquireRtools(version: string) {
         "/SUPPRESSMSGBOXES"
       ]);
     } catch (error) {
-      core.debug(error);
+      core.debug(`${error}`);
 
       throw `Failed to install Rtools: ${error}`;
     }
@@ -436,7 +437,7 @@ async function acquireRtools(version: string) {
           "pacman -Syu --noconfirm"
         ]);
       } catch (error) {
-        core.debug(error);
+        core.debug(`${error}`);
         throw `Failed to update rtools40 libraries: ${error}`;
       }
     }
@@ -452,7 +453,7 @@ async function acquireQpdfWindows() {
   try {
     await exec.exec("choco", ["install", "qpdf", "--no-progress"]);
   } catch (error) {
-    core.debug(error);
+    core.debug(`${error}`);
 
     throw `Failed to install qpdf: ${error}`;
   }
@@ -486,7 +487,7 @@ async function setupRLibrary() {
           }
         });
       } catch (error) {
-        core.debug(error.message);
+        core.debug(`${error}`);
 
         throw `Failed to query the linux version: ${error}`;
       }

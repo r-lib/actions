@@ -14,7 +14,7 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
     __setModuleDefault(result, mod);
     return result;
 };
@@ -78,7 +78,7 @@ function getR(version) {
                 yield acquireR(version, rtoolsVersion);
             }
             catch (error) {
-                core.debug(error);
+                core.debug(`${error}`);
                 throw `Failed to get R ${version}: ${error}`;
             }
         }
@@ -113,7 +113,7 @@ function acquireR(version, rtoolsVersion) {
             }
         }
         catch (error) {
-            core.debug(error);
+            core.debug(`${error}`);
             throw `Failed to get R ${version}: ${error}`;
         }
         if (IS_WINDOWS) {
@@ -152,7 +152,7 @@ function acquireFortranMacOS() {
             yield io.mv(downloadPath, path.join(tempDirectory, fileName));
         }
         catch (error) {
-            core.debug(error);
+            core.debug(`${error}`);
             throw `Failed to download ${downloadUrl}: ${error}`;
         }
         try {
@@ -163,7 +163,7 @@ function acquireFortranMacOS() {
             ]);
         }
         catch (error) {
-            core.debug(error);
+            core.debug(`${error}`);
             throw `Failed to mount ${fileName}: ${error}`;
         }
         try {
@@ -178,7 +178,7 @@ function acquireFortranMacOS() {
             ]);
         }
         catch (error) {
-            core.debug(error);
+            core.debug(`${error}`);
             throw `Failed to install gfortran: ${error}`;
         }
         // We do not detach the volume here, because it might lead to hangs
@@ -201,7 +201,7 @@ function acquireUtilsMacOS() {
             yield exec.exec("brew", ["install", "qpdf", "pkgconfig", "checkbashisms"]);
         }
         catch (error) {
-            core.debug(error);
+            core.debug(`${error}`);
             throw `Failed to install qpdf: ${error}`;
         }
     });
@@ -218,7 +218,7 @@ function removeOpenmpFlags() {
             ]);
         }
         catch (error) {
-            core.debug(error);
+            core.debug(`${error}`);
             throw `Failed to remove OpenMP flags: ${error}`;
         }
     });
@@ -237,7 +237,7 @@ function acquireRUbuntu(version) {
             yield io.mv(downloadPath, path.join(tempDirectory, fileName));
         }
         catch (error) {
-            core.debug(error);
+            core.debug(`${error}`);
             throw `Failed to download version ${version}: ${error}`;
         }
         core.endGroup();
@@ -264,7 +264,7 @@ function acquireRUbuntu(version) {
             }));
         }
         catch (error) {
-            core.debug(error);
+            core.debug(`${error}`);
             throw `Failed to install R: ${error}`;
         }
         //
@@ -284,7 +284,7 @@ function acquireRUbuntu(version) {
             ]);
         }
         catch (error) {
-            core.debug(error);
+            core.debug(`${error}`);
             throw `Failed to setup symlinks to R: ${error}`;
         }
         return "/usr/local/bin";
@@ -303,7 +303,7 @@ function acquireRMacOS(version) {
             yield io.mv(downloadPath, path.join(tempDirectory, fileName));
         }
         catch (error) {
-            core.debug(error);
+            core.debug(`${error}`);
             throw `Failed to download version ${version}: ${error}`;
         }
         //
@@ -325,7 +325,7 @@ function acquireRMacOS(version) {
             ]);
         }
         catch (error) {
-            core.debug(error);
+            core.debug(`${error}`);
             throw `Failed to install R: ${error}`;
         }
         // Older R versions on newer macOS cannot create a symlink to R and
@@ -343,7 +343,7 @@ function acquireRMacOS(version) {
             ]);
         }
         catch (error) {
-            core.debug(error);
+            core.debug(`${error}`);
             core.debug("Marching on despite failed symlink creation.");
         }
         return "/";
@@ -359,7 +359,7 @@ function acquireRWindows(version) {
             yield io.mv(downloadPath, path.join(tempDirectory, fileName));
         }
         catch (error) {
-            core.debug(error);
+            core.debug(`${error}`);
             throw `Failed to download version ${version}: ${error}`;
         }
         //
@@ -377,7 +377,7 @@ function acquireRWindows(version) {
             ]);
         }
         catch (error) {
-            core.debug(error);
+            core.debug(`${error}`);
             throw `Failed to install R: ${error}`;
         }
         core.addPath(`C:\\R\\bin`);
@@ -418,7 +418,7 @@ function acquireRtools(version) {
                 yield io.mv(downloadPath, path.join(tempDirectory, fileName));
             }
             catch (error) {
-                core.debug(error);
+                core.debug(`${error}`);
                 throw `Failed to download version ${version}: ${error}`;
             }
             try {
@@ -428,7 +428,7 @@ function acquireRtools(version) {
                 ]);
             }
             catch (error) {
-                core.debug(error);
+                core.debug(`${error}`);
                 throw `Failed to install Rtools: ${error}`;
             }
         }
@@ -451,7 +451,7 @@ function acquireRtools(version) {
                     ]);
                 }
                 catch (error) {
-                    core.debug(error);
+                    core.debug(`${error}`);
                     throw `Failed to update rtools40 libraries: ${error}`;
                 }
             }
@@ -470,7 +470,7 @@ function acquireQpdfWindows() {
             yield exec.exec("choco", ["install", "qpdf", "--no-progress"]);
         }
         catch (error) {
-            core.debug(error);
+            core.debug(`${error}`);
             throw `Failed to install qpdf: ${error}`;
         }
     });
@@ -500,7 +500,7 @@ function setupRLibrary() {
                     });
                 }
                 catch (error) {
-                    core.debug(error.message);
+                    core.debug(`${error}`);
                     throw `Failed to query the linux version: ${error}`;
                 }
                 codename = codename.trim();
@@ -579,7 +579,7 @@ function getFileNameUbuntu(version) {
 }
 function getDownloadUrlUbuntu(filename) {
     try {
-        const info = linux_os_info_1.default({ mode: "sync" });
+        const info = (0, linux_os_info_1.default)({ mode: "sync" });
         const versionStr = info.version_id.replace(/[.]/g, "");
         return util.format("https://cdn.rstudio.com/r/ubuntu-%s/pkgs/%s", versionStr, filename);
     }

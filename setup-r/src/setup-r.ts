@@ -15,7 +15,7 @@ async function run() {
     console.log(`##[add-matcher]${path.join(matchersPath, "testthat.json")}`);
     console.log(`##[add-matcher]${path.join(matchersPath, "r.json")}`);
   } catch (error) {
-    core.setFailed(error);
+    core.setFailed(`${error}`);
   }
 }
 
