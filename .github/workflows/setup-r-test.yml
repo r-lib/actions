@@ -23,6 +23,8 @@ jobs:
           - {os: ubuntu-18.04,   r: 'next'}
 
     steps:
+      - uses: actions/checkout@v2
+
       - uses: ./setup-r
         with:
           r-version: ${{ matrix.config.r }}
