@@ -1,5 +1,14 @@
 on:
   workflow_dispatch:
+    inputs:
+      pak-version:
+        required: true
+        type: choice
+        options:
+        - 'stable'
+        - 'rc'
+        - 'devel'
+        default: 'stable'
 
 name: R-devel test
 
@@ -34,6 +43,7 @@ jobs:
 
       - uses: ./setup-r-dependencies
         with:
+          pak-version: ${{ github.event.inputs.pak-version || 'stable' }}
           extra-packages: any::rcmdcheck
           needs: check
 
