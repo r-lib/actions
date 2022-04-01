@@ -126,7 +126,9 @@ packages are not available:
 
 In special cases you may want to completely ignore an optional dependency. 
 
-For this, you can use the `extra-packages` parameter and pak's `package=?ignore` syntax.
+For this, you can use the `extra-packages` parameter and pak's
+`package=<packagename>?ignore` syntax. (Replace `<packagename>` with the name
+of the package you want to ignore.)
 
 ## Installing the local package
 
