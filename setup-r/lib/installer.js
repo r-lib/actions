@@ -64,12 +64,6 @@ if (!tempDirectory) {
 }
 function getR(version) {
     return __awaiter(this, void 0, void 0, function* () {
-        // 'next' is not yet supported on Linux
-        if (IS_LINUX) {
-            if (version == "next" || version == "prerelease") {
-                version = "release";
-            }
-        }
         const selected = yield determineVersion(version);
         if (selected) {
             version = selected;
@@ -684,6 +678,7 @@ function determineVersion(version) {
                 return yield getLatestVersion(version.concat(".x"));
             }
             else {
+                // This is also 'next' and 'devel'
                 return version;
             }
         }

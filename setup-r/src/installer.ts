@@ -31,12 +31,6 @@ if (!tempDirectory) {
 }
 
 export async function getR(version: string) {
-  // 'next' is not yet supported on Linux
-  if (IS_LINUX) {
-    if (version == "next" || version == "prerelease") {
-      version = "release"
-    }
-  }
   const selected = await determineVersion(version);
   if (selected) {
     version = selected;
@@ -733,6 +727,7 @@ async function determineVersion(version: string): Promise<string> {
     if (versionPart[1] == null || versionPart[2] == null) {
       return await getLatestVersion(version.concat(".x"));
     } else {
+      // This is also 'next' and 'devel'
       return version;
     }
   }
