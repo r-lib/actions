@@ -3,7 +3,9 @@ description: 'Setup a R environment and add it to the PATH'
 author: 'Jim Hester'
 inputs:
   r-version:
-    description: 'Version range or exact version of an R version to use.'
+    description: 'Version range or exact version of an R version to use. "devel" is
+    the current development version, and "next" is the next version of R, either
+    R-patched, or R-alpha, R-beta, R-rc or R-prerelease.'
     default: 'release'
   rtools-version:
     description: 'Exact version of Rtools to use. Default uses latest suitable

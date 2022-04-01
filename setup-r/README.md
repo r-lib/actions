@@ -27,7 +27,9 @@ This action sets up an R environment for use in actions by:
 ## Inputs
 
 -   **r-version** (`'release'`) - Version range or exact version of an R
-    version to use.
+    version to use. “devel” is the current development version, and
+    “next” is the next version of R, either R-patched, or R-alpha,
+    R-beta, R-rc or R-prerelease.
 -   **rtools-version** (`''`) - Exact version of Rtools to use. Default
     uses latest suitable rtools for the given version of R. Set it to
     “42” for Rtools42.
