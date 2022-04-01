@@ -30,8 +30,25 @@ steps:
 - uses: r-lib/actions/setup-r@v2
 - uses: r-lib/actions/setup-r-dependencies@v2
   with:
-    extra-packages: rcmdcheck
+    extra-packages: any::rcmdcheck
+    needs: check
 - uses: r-lib/actions/check-r-package@v2
+```
+
+With specified inputs:
+```yaml
+steps:
+- uses: actions/checkout@v2
+- uses: r-lib/actions/setup-r@v2
+- uses: r-lib/actions/setup-r-dependencies@v2
+  with:
+    extra-packages: any::rcmdcheck
+    needs: check
+- uses: r-lib/actions/check-r-package@v2
+    with:
+      args: 'c("--no-manual", "--as-cran")'
+      error-on: '"error"'
+      check-dir: '"check"'
 ```
 
 # License
