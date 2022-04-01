@@ -80,7 +80,7 @@
 <a href="https://github.com/r-lib/actions/tree/v2/setup-r-dependencies" class="external-link">r-lib/actions/setup-r-dependencies</a> - Installs packages declared in <code>DESCRIPTION</code>
 </li>
 <li>
-<a href="https://github.com/r-lib/actions/tree/v2/setup-renv" class="external-link">r-lib/actions/setup-renv</a> - Installs packages from renv lockfile.</li>
+<a href="https://github.com/r-lib/actions/tree/v2/setup-renv" class="external-link">r-lib/actions/setup-renv</a> - Installs packages from renv lockfile</li>
 <li>
 <a href="https://github.com/r-lib/actions/tree/v2/setup-pandoc" class="external-link">r-lib/actions/setup-pandoc</a> - Sets up <a href="https://pandoc.org/" class="external-link">pandoc</a>
 </li>
@@ -88,20 +88,20 @@
 <a href="https://github.com/r-lib/actions/tree/v2/setup-tinytex" class="external-link">r-lib/actions/setup-tinytex</a> - Sets up LaTeX with <a href="https://yihui.name/tinytex" class="external-link">tinytex</a>
 </li>
 <li>
-<a href="https://github.com/r-lib/actions/tree/v2/check-r-package" class="external-link">r-lib/actions/check-r-package</a> - Runs <code>R CMD check</code> on an R package.</li>
+<a href="https://github.com/r-lib/actions/tree/v2/check-r-package" class="external-link">r-lib/actions/check-r-package</a> - Runs <code>R CMD check</code> on an R package</li>
 <li>
 <a href="https://github.com/r-lib/actions/tree/v2/pr-fetch" class="external-link">r-lib/actions/pr-fetch</a> - Fetches changes of a PR associated with an event</li>
 <li>
 <a href="https://github.com/r-lib/actions/tree/v2/pr-push" class="external-link">r-lib/actions/pr-push</a> - Pushes changes to a PR associated with an event</li>
 <li>
-<a href="https://github.com/r-lib/actions/tree/v2/run-rchk" class="external-link">r-lib/actions/run-rchk</a> - Runs <a href="https://github.com/kalibera/rchk" class="external-link">rchk</a> tests to detect memory protection errors in C source code.</li>
+<a href="https://github.com/r-lib/actions/tree/v2/run-rchk" class="external-link">r-lib/actions/run-rchk</a> - Runs <a href="https://github.com/kalibera/rchk" class="external-link">rchk</a> tests to detect memory protection errors in C source code</li>
 </ol>
 <div class="section level2">
 <h2 id="releases-and-tags">Releases and tags<a class="anchor" aria-label="anchor" href="#releases-and-tags"></a>
 </h2>
 <p>We use major version tags to mark breaking changes in these actions. For the current version, please use the <code>v2</code> tag, e.g.:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> r-lib/actions/setup-r@v2</span></span></code></pre></div>
-<p>The <code>v2</code> tag occasionally changes, to introduce non-breaking fixes and improvements. These changes use more fine grained tags, e.g. <code>v2.0.1</code>. You can refer to these as well in your workflow files, if you need to.</p>
+<p>The <code>v2</code> tag occasionally changes, to introduce non-breaking fixes and improvements. These changes use more fine-grained tags, e.g. <code>v2.0.1</code>. You can refer to these as well in your workflow files if you need to.</p>
 </div>
 <div class="section level2">
 <h2 id="whats-new">What’s new?<a class="anchor" aria-label="anchor" href="#whats-new"></a>
@@ -116,14 +116,14 @@
 <div class="section level2">
 <h2 id="where-to-find-help">Where to find help<a class="anchor" aria-label="anchor" href="#where-to-find-help"></a>
 </h2>
-<p>If your build fails and you are unsure of why here are some useful strategies for getting help.</p>
+<p>If your build fails, and you are unsure of why, here are some useful strategies for getting help.</p>
 <ol style="list-style-type: decimal">
 <li>Figure out what caused the error. Look for the <em>first</em> time the word ‘error’ appears in the build log. Quite often errors at the end of the log are caused by an earlier issue, so it is best to look for the root cause.</li>
-<li>Take advantage of <a href="https://github.com/search?q=path%3A.github%2Fworkflows" class="external-link">GitHub’s code search</a> to find similar yaml files. Use ‘path:.github/workflows’ to restrict your search to GitHub Action workflow files and also include additional terms specific to your problem. e.g. If you need to figure out how to install geospatial libraries such as <a href="https://gdal.org/" class="external-link">gdal</a> use a search like <a href="https://github.com/search?q=gdal+path%3A.github%2Fworkflows" class="external-link">‘gdal path:.github/workflows’</a>. If you want to restrict results only to GitHub Actions workflows that use R you can add search for <a href="https://github.com/search?q=%22setup-r%22+path%3A.github%2Fworkflows" class="external-link">’“setup-r” path:.github/workflows</a>
+<li>Take advantage of <a href="https://github.com/search?q=path%3A.github%2Fworkflows" class="external-link">GitHub’s code search</a> to find similar yaml files. Use ‘path:.github/workflows’ to restrict your search to GitHub Action workflow files and also include additional terms specific to your problem. e.g. If you need to figure out how to install geospatial libraries such as <a href="https://gdal.org/" class="external-link">gdal</a>, use a search like <a href="https://github.com/search?q=gdal+path%3A.github%2Fworkflows" class="external-link">‘gdal path:.github/workflows’</a>. If you want to restrict results only to GitHub Actions workflows that use R you can add search for <a href="https://github.com/search?q=%22setup-r%22+path%3A.github%2Fworkflows" class="external-link">’“setup-r” path:.github/workflows</a>
 </li>
 <li>Open an issue on <a href="https://community.rstudio.com/new-topic?category=Package%20development&amp;tags=github-actions" class="external-link"><img src="https://img.shields.io/badge/community-github--actions-blue?style=social&amp;logo=rstudio&amp;logoColor=75AADB" alt="RStudio community"></a> about your problem. Be sure to link to the workflow file you are using and a failing build to help others help you.</li>
-<li>If your issue seems related to GitHub Actions, but is not R specific open an issue at the <a href="https://github.community/t5/GitHub-Actions/bd-p/actions" class="external-link">GitHub Actions Community</a> page.</li>
-<li>If you have done all of the above and are <strong>absolutely</strong> sure there is a bug in one of the R specifc actions listed above, open an <a href="https://github.com/r-lib/actions/issues/new/choose" class="external-link">issue here</a>.</li>
+<li>If your issue seems related to GitHub Actions, but is not specific to R, open an issue at the <a href="https://github.community/t5/GitHub-Actions/bd-p/actions" class="external-link">GitHub Actions Community</a> page.</li>
+<li>If you have done all of the above and are <strong>absolutely</strong> sure there is a bug in one of the R specific actions listed above, open an <a href="https://github.com/r-lib/actions/issues/new/choose" class="external-link">issue here</a>.</li>
 </ol>
 <blockquote>
 <p>If using a general search engine or GitHub search about your problem/idea, please note that content published prior to the Fall 2019 is probably outdated because the beta version of GitHub Actions was different. More recent posts or answers could be outdated too since GitHub Actions evolve, so refer to <a href="https://help.github.com/en/actions" class="external-link">GitHub Actions official docs</a> in case of doubt (and to existing working workflows) and <a href="https://github.blog/changelog/" class="external-link">GitHub changelog</a>.</p>
@@ -136,7 +136,7 @@
 <li><p><em>Why are my builds with plots failing on macOS?</em><br><br>
 You need to install XQuartz to do plotting with the default quartz device on macOS. This can be done by adding the following to your workflow. <code>yaml     - if: runner.os == 'macOS'       run: brew install --cask xquartz</code></p></li>
 <li><p><em>Why are my Windows builds failing with an error about <code>configure.ac</code> having CRLF line endings?</em><br><br>
-On Windows, when your repo is checked out using git the line endings are automatically changed to CRLF. R’s check process specifically checks if the <code>configure.ac</code> file has these line endings, and will error if it does. To avoid this, add a <code>.gitattributes</code> file to the top level of your package with the following to configure git to always use LF line endings for this file:<br><code>configure.ac text eol=lf</code></p></li>
+On Windows, when your repo is checked out using git, the line endings are automatically changed to CRLF. R’s check process specifically checks if the <code>configure.ac</code> file has these line endings, and will error if it does. To avoid this, add a <code>.gitattributes</code> file to the top level of your package with the following to configure git to always use LF line endings for this file:<br><code>configure.ac text eol=lf</code></p></li>
 <li><p><em>How can I customize an action to run R code?</em><br><br>
 The safest way is to add a <code>step</code> to your action, specifying <code>Rscript {0}</code> as the <code>shell</code> for that step. Here’s an example from the <a href="https://github.com/r-lib/actions/tree/v2-branch/examples#build-bookdown-site" class="external-link">bookdown action</a>: <code>yaml     - name: Build site       run: bookdown::render_book("index.Rmd", quiet = TRUE)       shell: Rscript {0}</code></p></li>
 </ol>
@@ -152,7 +152,7 @@ The safest way is to add a <code>step</code> to your action, specifying <code>Rs
 <li>
 <a href="https://ropenscilabs.github.io/actions_sandbox/" class="external-link">GitHub Actions with R</a> - a short online book about using GitHub Actions with R, produced as part of the <a href="https://ozunconf19.ropensci.org/" class="external-link">rOpenSci OzUnconf</a>.</li>
 <li>
-<a href="https://github.com/sdras/awesome-actions#awesome-actions---" class="external-link">Awesome Actions</a> - a curated list of custom actions. <strong>Note</strong> many of these are from early in the GitHub Actions beta and may no longer work.</li>
+<a href="https://github.com/sdras/awesome-actions#awesome-actions---" class="external-link">Awesome Actions</a> - a curated list of custom actions. <strong>Note</strong> that many of these are from early in the GitHub Actions beta and may no longer work.</li>
 </ul>
 </div>
 <div class="section level2">
