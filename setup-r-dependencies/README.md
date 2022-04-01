@@ -122,6 +122,14 @@ packages are not available:
     _R_CHECK_FORCE_SUGGESTS_: false
 ```
 
+## Ignoring optional dependencies
+
+In special cases you may want to completely ignore an optional dependency. 
+
+For this, you can use the `extra-packages` parameter and pak's
+`package=<packagename>?ignore` syntax. (Replace `<packagename>` with the name
+of the package you want to ignore.)
+
 ## Installing the local package
 
 Sometimes you need to install the R package in the repository, e.g.
