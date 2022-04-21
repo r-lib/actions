@@ -671,6 +671,9 @@ async function getReleaseVersion(platform: string): Promise<string> {
     )
   ).result || { version: "" };
 
+  if (platform == 'tarball') {
+    return "4.1.3";
+  }
   return tags.version;
 }
 
