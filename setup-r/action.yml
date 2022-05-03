@@ -28,7 +28,8 @@ inputs:
     default: 'default'
   install-r:
     description: 'If "true" download and install R during the setup. If "false"
-      use the existing installation in the GitHub Action image.'
+      use the existing installation in the GitHub Action image. Note that if it
+      is "false", you probably need to run `sudo apt-get update` yourself.'
     default: true
   windows-path-include-mingw:
     description: 'If "true" put the 64 bit mingw directory from Rtools on the
