@@ -117,7 +117,7 @@ print_yaml("test-coverage.yaml")
 
 `usethis::use_github_action("lint")`
 
-This example uses the [lintr](https://github.com/jimhester/lintr) package to lint your package and return the results as build annotations.
+This example uses the [lintr](https://github.com/r-lib/lintr) package to lint your package and return the results as build annotations.
 
 ```{r echo = FALSE, results = "asis"}
 print_yaml("lint.yaml")
@@ -272,7 +272,7 @@ usethis::use_github_action(
 
 `usethis::use_github_action("lint-project")`
 
-This example uses the [lintr](https://github.com/jimhester/lintr) package to lint your project and return the results as annotations.
+This example uses the [lintr](https://github.com/r-lib/lintr) package to lint your project and return the results as annotations.
 
 ```{r echo = FALSE, results = "asis"}
 print_yaml("lint-project.yaml")
