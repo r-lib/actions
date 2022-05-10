@@ -22,7 +22,7 @@ jobs:
 
       - uses: ./setup-r-dependencies
         with:
-          extra-packages: any::lintr
+          extra-packages: any::lintr, local::.
           needs: lint
 
       - name: Lint
