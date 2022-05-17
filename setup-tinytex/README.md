@@ -41,7 +41,7 @@ steps:
 
 ## TinyTeX bundled release
 
-TinyTeX is available as several bundles from https://github.com/yihui/tinytex-releases/. 
+TinyTeX is available as several bundles from https://github.com/rstudio/tinytex-releases/. 
 
 By default, the action will install the same bundle as
 `tinytex::install_tinytex()` which is the daily build of _TinyTeX-1_ bundle.
@@ -60,7 +60,7 @@ To change the bundle to install you can change the environment variable
 
 In addition to the daily commonly used, TinyTeX is also built in monthly
 releases. You can find all the releases in
-https://github.com/yihui/tinytex-releases/releases
+https://github.com/rstudio/tinytex-releases/releases
 
 To install a specific version, you can set the `TINYTEX_VERSION` environment variable
 
@@ -71,8 +71,8 @@ To install a specific version, you can set the `TINYTEX_VERSION` environment var
           TINYTEX_VERSION: 2021.11
 ````
 
-See more on those bundles in [`yihui/tinytex-releases`
-README](https://github.com/yihui/tinytex-releases#releases), especially the list
+See more on those bundles in [`rstudio/tinytex-releases`
+README](https://github.com/rstudio/tinytex-releases#releases), especially the list
 of bundled CTAN packages.
 
 # License
