@@ -28,13 +28,15 @@ runs:
   using: "composite"
   steps:
     - name: Check
+      id: rcmdcheck    
       env:
         _R_CHECK_CRAN_INCOMING_: false
       run: |
         ## --------------------------------------------------------------------
         options(crayon.enabled = TRUE)
         if (Sys.getenv("_R_CHECK_FORCE_SUGGESTS_", "") == "") Sys.setenv("_R_CHECK_FORCE_SUGGESTS_" = "false")
-        rcmdcheck::rcmdcheck(args = (${{ inputs.args }}), build_args = (${{ inputs.build_args }}), error_on = (${{ inputs.error-on }}), check_dir = (${{ inputs.check-dir }}))
+        check_results <- rcmdcheck::rcmdcheck(args = (${{ inputs.args }}), build_args = (${{ inputs.build_args }}), error_on = (${{ inputs.error-on }}), check_dir = (${{ inputs.check-dir }}))
+        cat("##[set-output name=check-dir-path;]", dirname(check_results$checkdir), "\n", sep = "")
       shell: Rscript {0}
       working-directory: ${{ inputs.working-directory }}
 
@@ -53,12 +55,12 @@ runs:
       uses: actions/upload-artifact@main
       with:
         name: ${{ runner.os }}-r${{ matrix.config.r }}-results
-        path: ${{ inputs.working-directory }}/check
+        path: ${{ steps.rcmdcheck.outputs.check-dir-path }}
 
     - name: Upload snapshots
       if: inputs.upload-snapshots != 'false'
       uses: actions/upload-artifact@main
       with:
         name: ${{ runner.os }}-r${{ matrix.config.r }}-testthat-snapshots
-        path: ${{ inputs.working-directory }}/check/**/tests*/testthat/_snaps
+        path: ${{ steps.rcmdcheck.outputs.check-dir-path }}/**/tests*/testthat/_snaps
         if-no-files-found: ignore
