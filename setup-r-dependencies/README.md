@@ -129,9 +129,16 @@ packages are not available:
 
 In special cases you may want to completely ignore an optional dependency. 
 
-For this, you can use the `extra-packages` parameter and pak's
-`package=<packagename>?ignore` syntax. (Replace `<packagename>` with the name
-of the package you want to ignore.)
+For this, you can use the extra-packages parameter and pak's `<packagename>?ignore` syntax. (Replace `<packagename>` with the name of the package you want to ignore.)
+
+Example:
+
+```yaml
+- uses: r-lib/actions/setup-r-dependencies@v2
+  with:
+    extra-packages: any::rcmdcheck, survival=?ignore
+    needs: check
+```
 
 ## Installing the local package
 
