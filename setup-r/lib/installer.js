@@ -14,7 +14,7 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
     __setModuleDefault(result, mod);
     return result;
 };
@@ -591,7 +591,7 @@ function getFileNameUbuntu(version) {
 }
 function getDownloadUrlUbuntu(filename) {
     try {
-        const info = (0, linux_os_info_1.default)({ mode: "sync" });
+        const info = linux_os_info_1.default({ mode: "sync" });
         const versionStr = info.version_id.replace(/[.]/g, "");
         return util.format("https://cdn.rstudio.com/r/ubuntu-%s/pkgs/%s", versionStr, filename);
     }
@@ -678,7 +678,7 @@ function determineVersion(version) {
         if (!version.endsWith(".x")) {
             const versionPart = version.split(".");
             if (versionPart[1] == null || versionPart[2] == null) {
-                return yield getLatestVersion(version.concat(".x"));
+                return yield getLatestVersion(version);
             }
             else {
                 // This is also 'next' and 'devel'
@@ -718,6 +718,10 @@ function getLatestVersion(version) {
     return __awaiter(this, void 0, void 0, function* () {
         // clean .x syntax: 1.10.x -> 1.10
         const trimmedVersion = version.slice(0, version.length - 2);
+        if (trimmedVersion == "4.2" && IS_MAC) {
+            // macOS installer for 4.2.1 is not yet available  
+            return ("4.2.0");
+        }
         const versions = yield getPossibleVersions(trimmedVersion);
         core.debug(`evaluating ${versions.length} versions`);
         if (version.length === 0) {

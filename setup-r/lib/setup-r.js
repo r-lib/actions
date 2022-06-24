@@ -14,7 +14,7 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
     __setModuleDefault(result, mod);
     return result;
 };
@@ -37,7 +37,7 @@ function run() {
             core.debug(`started action`);
             let version = core.getInput("r-version");
             core.debug(`got version ${version}`);
-            yield (0, installer_1.getR)(version);
+            yield installer_1.getR(version);
             const matchersPath = path.join(__dirname, "..", ".github");
             console.log(`##[add-matcher]${path.join(matchersPath, "rcmdcheck.json")}`);
             console.log(`##[add-matcher]${path.join(matchersPath, "testthat.json")}`);
