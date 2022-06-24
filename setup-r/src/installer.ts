@@ -728,7 +728,7 @@ async function determineVersion(version: string): Promise<string> {
     const versionPart = version.split(".");
 
     if (versionPart[1] == null || versionPart[2] == null) {
-      return await getLatestVersion(version.concat(".x"));
+      return await getLatestVersion(version);
     } else {
       // This is also 'next' and 'devel'
       return version;
@@ -771,7 +771,11 @@ async function getPossibleVersions(version: string): Promise<string[]> {
 async function getLatestVersion(version: string): Promise<string> {
   // clean .x syntax: 1.10.x -> 1.10
   const trimmedVersion = version.slice(0, version.length - 2);
-
+  if (trimmedVersion == "4.2" && IS_MAC) {
+    // macOS installer for 4.2.1 is not yet available  
+    return("4.2.0")
+  }
+  
   const versions = await getPossibleVersions(trimmedVersion);
 
   core.debug(`evaluating ${versions.length} versions`);
