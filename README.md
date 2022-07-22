@@ -8,15 +8,9 @@ for R projects, which can be used to do a variety of CI tasks. It also has a
 number of [example workflows](https://github.com/r-lib/actions/tree/v2/examples) which use
 these actions.
 
-1. [r-lib/actions/setup-r](https://github.com/r-lib/actions/tree/v2/setup-r) - Sets up [R](https://r-project.org)
-1. [r-lib/actions/setup-r-dependencies](https://github.com/r-lib/actions/tree/v2/setup-r-dependencies) - Installs packages declared in `DESCRIPTION`
-1. [r-lib/actions/setup-renv](https://github.com/r-lib/actions/tree/v2/setup-renv) - Installs packages from renv lockfile
-1. [r-lib/actions/setup-pandoc](https://github.com/r-lib/actions/tree/v2/setup-pandoc) - Sets up [pandoc](https://pandoc.org/)
-1. [r-lib/actions/setup-tinytex](https://github.com/r-lib/actions/tree/v2/setup-tinytex) - Sets up LaTeX with [tinytex](https://yihui.name/tinytex)
-1. [r-lib/actions/check-r-package](https://github.com/r-lib/actions/tree/v2/check-r-package) - Runs `R CMD check` on an R package
-1. [r-lib/actions/pr-fetch](https://github.com/r-lib/actions/tree/v2/pr-fetch) - Fetches changes of a PR associated with an event
-1. [r-lib/actions/pr-push](https://github.com/r-lib/actions/tree/v2/pr-push) - Pushes changes to a PR associated with an event
-1. [r-lib/actions/run-rchk](https://github.com/r-lib/actions/tree/v2/run-rchk) - Runs [rchk](https://github.com/kalibera/rchk) tests to detect memory protection errors in C source code
+## Getting started
+
+See [this blog post](https://www.tidyverse.org/blog/2022/06/actions-2-0-0/) on the Tidyverse blog.
 
 ## Releases and tags
 
@@ -30,6 +24,18 @@ For the current version, please use the `v2` tag, e.g.:
 The `v2` tag occasionally changes, to introduce non-breaking fixes and
 improvements. These changes use more fine-grained tags, e.g. `v2.0.1`.
 You can refer to these as well in your workflow files if you need to.
+
+## List of actions
+
+1. [r-lib/actions/setup-r](https://github.com/r-lib/actions/tree/v2/setup-r) - Sets up [R](https://r-project.org)
+1. [r-lib/actions/setup-r-dependencies](https://github.com/r-lib/actions/tree/v2/setup-r-dependencies) - Installs packages declared in `DESCRIPTION`
+1. [r-lib/actions/setup-renv](https://github.com/r-lib/actions/tree/v2/setup-renv) - Installs packages from renv lockfile
+1. [r-lib/actions/setup-pandoc](https://github.com/r-lib/actions/tree/v2/setup-pandoc) - Sets up [pandoc](https://pandoc.org/)
+1. [r-lib/actions/setup-tinytex](https://github.com/r-lib/actions/tree/v2/setup-tinytex) - Sets up LaTeX with [tinytex](https://yihui.name/tinytex)
+1. [r-lib/actions/check-r-package](https://github.com/r-lib/actions/tree/v2/check-r-package) - Runs `R CMD check` on an R package
+1. [r-lib/actions/pr-fetch](https://github.com/r-lib/actions/tree/v2/pr-fetch) - Fetches changes of a PR associated with an event
+1. [r-lib/actions/pr-push](https://github.com/r-lib/actions/tree/v2/pr-push) - Pushes changes to a PR associated with an event
+1. [r-lib/actions/run-rchk](https://github.com/r-lib/actions/tree/v2/run-rchk) - Runs [rchk](https://github.com/kalibera/rchk) tests to detect memory protection errors in C source code
 
 ## What's new?
 
@@ -60,8 +66,11 @@ If your build fails, and you are unsure of why, here are some useful strategies 
    issue at the [GitHub Actions
    Community](https://github.community/t5/GitHub-Actions/bd-p/actions) page.
 1. If you have done all of the above and are __absolutely__ sure there is a bug
-   in one of the R specific actions listed above, open an [issue
-   here](https://github.com/r-lib/actions/issues/new/choose).
+   in one of the R specific actions listed above, check if there is an open issue
+   about it [in this repo](https://github.com/r-lib/actions/issues). Look at the
+   pinned issues at the top first! We pin issues that affect many people, and the
+   issue discussions often contain workarounds.
+1. Otherwise open a [new issue in this repo](https://github.com/r-lib/actions/issues/new/choose).
    
 > If using a general search engine or GitHub search about your problem/idea, please note that content published prior to the Fall 2019 is probably outdated because the beta version of GitHub Actions was different. More recent posts or answers could be outdated too since GitHub Actions evolve, so refer to [GitHub Actions official docs](https://help.github.com/en/actions) in case of doubt (and to existing working workflows) and [GitHub changelog](https://github.blog/changelog/).
 
