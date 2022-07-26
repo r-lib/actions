@@ -74,6 +74,20 @@ information.
 If your platform does not have a static pak build, e.g. you are on
 s390x Linux, then you cannot use the `setup-r-dependencies` action currently.
 
+## Dependencies on GitHub
+
+If your package has a dependency that is not a CRAN or Bioconductor package,
+but it lives on GitHub, or it can be downloaded from a URL, then you can
+use the pak/pkgdepends syntax to specify it in the `Remotes` field of the
+`DESCRIPTION` file. See the [documentation in the pkgdepends package](https://r-lib.github.io/pkgdepends/reference/pkg_refs.html#github-packages-).
+
+## Dependencies in other CRAN-like repositories
+
+If your dependency is available in a CRAN-like repository
+(e.g. [R-universe](https://r-universe.dev/search/)), then you can use the
+`extra-repositories` parameter of the `setup-r` action. See more at
+the [`setup-r` documentation](https://github.com/r-lib/actions/tree/v2/setup-r#inputs).
+
 ## Extra packages and the `any::` prefix
 
 In the example above the `any::` prefix for ggplot2 and rcmdcheck tells pak
