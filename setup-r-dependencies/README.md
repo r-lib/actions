@@ -252,7 +252,7 @@ of these packages.
 Since GitHub Actions won't be able to able to access any internal package repositories (e.g., [JFrog Artifactory](https://jfrog.com/artifactory/)), 
 you can install internal packages from GitHub directly.
 
-1. Add repo name in the `Repos: mygithuborg/myinternalpackage` to your `DESCRIPTION` file. AFAIK, the `myinternalpackage` repo location must match the name of the package.
+1. Add repo name in the `Remotes: mygithuborg/myinternalpackage` to your `DESCRIPTION` file. AFAIK, the `myinternalpackage` repo location must match the name of the package.
 2. Generate a personal access token with `read:org, repo` permissions (`read:org` only didn't work).
 3. Add personal access token to the job:
 
