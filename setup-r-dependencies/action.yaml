@@ -3,7 +3,7 @@ description: 'Action to setup installation tools and install R dependencies'
 author: 'Jim Hester'
 inputs:
   cache:
-    description: 'A boolen value indicating whether packages should be cached from one to the other'
+    description: 'A boolean value indicating whether packages should be cached from one to the other'
     required: true
     default: true
   cache-version:
