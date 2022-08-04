@@ -58,7 +58,7 @@ runs:
 
       - name: Restore R package cache
         if: inputs.cache == 'true'
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ${{ env.R_LIBS_USER }}/*
