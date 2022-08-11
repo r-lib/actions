@@ -247,6 +247,21 @@ without a formal version requirement, then add the package to the
 `extra-packages` parameter. `setup-r-dependencies` installs the latest versions
 of these packages.
 
+# Using private packages from GitHub
+
+Since GitHub Actions won't be able to able to access any internal package repositories (e.g., [JFrog Artifactory](https://jfrog.com/artifactory/)), 
+you can install internal packages from GitHub directly.
+
+1. Add repo name in the `Remotes: mygithuborg/myinternalpackage` to your `DESCRIPTION` file. AFAIK, the `myinternalpackage` repo location must match the name of the package.
+2. Generate a personal access token with `read:org, repo` permissions (`read:org` only didn't work).
+3. Add personal access token to the job:
+
+```
+    - uses: r-lib/actions/setup-r-dependencies@v2
+      env:
+        GITHUB_PAT: ${{ secrets.MY_GH_READ_TOKEN }}
+```
+
 # License
 
 The scripts and documentation in this project are released under the [MIT License](LICENSE)
