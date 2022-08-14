@@ -24,7 +24,7 @@ jobs:
         config:
           - {os: macOS-latest,   r: 'devel'}
           - {os: windows-latest, r: 'devel'}
-          - {os: ubuntu-18.04,   r: 'devel', http-user-agent: 'release'}
+          - {os: ubuntu-20.04,   r: 'devel', http-user-agent: 'release'}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
