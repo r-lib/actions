@@ -19,8 +19,8 @@ jobs:
           - {os: windows-latest, r: 'release'}
           - {os: windows-latest, r: 'next'}
 
-          - {os: ubuntu-18.04,   r: 'release'}
-          - {os: ubuntu-18.04,   r: 'next'}
+          - {os: ubuntu-20.04,   r: 'release'}
+          - {os: ubuntu-20.04,   r: 'next'}
 
     steps:
       - uses: actions/checkout@v2
