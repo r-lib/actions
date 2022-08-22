@@ -81,7 +81,7 @@ Matrix Testing:
 ``` yaml
 jobs:
   build:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
         R: [ '3.5.3', '3.6.1' ]
