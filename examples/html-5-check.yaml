@@ -37,7 +37,7 @@ jobs:
       - uses: r-lib/actions/check-r-package@v2
         with:
           args: 'c("--as-cran", "--no-codoc", "--no-examples", "--no-tests", "--no-vignettes", "--no-build-vignettes", "--ignore-vignettes", "--no-install")'
-          build_args: 'character()'
+          build_args: 'c("--no-build-vignettes")'
           error-on: '"note"'
         env:
           _R_CHECK_CRAN_INCOMING_REMOTE_: false
