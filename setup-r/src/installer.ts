@@ -68,7 +68,7 @@ async function acquireR(version: string, rtoolsVersion: string) {
     if (IS_WINDOWS) {
       await Promise.all([
         await acquireRWindows(version),
-        await acquireRtools(rtoolsVersion),
+        await acquireRtools(rtoolsVersion, version),
       ]);
     } else if (IS_MAC) {
       await core.group('Downloading gfortran', async() => { await acquireFortranMacOS() });
@@ -374,7 +374,7 @@ async function acquireRWindows(version: string): Promise<string> {
   return "";
 }
 
-async function acquireRtools(version: string) {
+async function acquireRtools(version: string, rversion: string) {
   const versionNumber = parseInt(version.substring(0, 2));
   const rtools42 = versionNumber >= 41;
   const rtools40 = !rtools42 && versionNumber >= 40;
@@ -428,14 +428,21 @@ async function acquireRtools(version: string) {
       throw `Failed to install Rtools: ${error}`;
     }
   }
+  // we never want patches (by default)
+  core.exportVariable("_R_INSTALL_TIME_PATCHES_", "no");
   if (rtools42) {
     core.addPath(`C:\\rtools42\\usr\\bin`);
     core.addPath(`C:\\rtools42\\x86_64-w64-mingw32.static.posix\\bin`);
   } else if (rtools40) {
     core.addPath(`C:\\rtools40\\usr\\bin`);
-    if (core.getInput("r-version").match("devel")) {
+    // If we use Rtools40 and R 4.2.0 or later, then we need to add this
+    // to the path, because GHA might put a different gcc on the PATH,
+    // and R 4.2.x picks that up. We do this for R-devel, R-next and
+    // every numeric version that is not 4.0.x and 4.1.x. (For 3.x.y
+    // Rtools3.x is selected.) Issue #610.
+    if (rversion == "devel" || rversion == "next" ||
+        (!rversion.startsWith("4.0.") && !rversion.startsWith("4.1."))) {
       core.addPath(`C:\\rtools40\\ucrt64\\bin`);
-      core.exportVariable("_R_INSTALL_TIME_PATCHES_", "no");
     }
     if (core.getInput("update-rtools") === "true") {
       try {
