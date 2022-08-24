@@ -55,7 +55,7 @@ Matrix Testing:
 ```yaml
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         R: [ '3.5.3', '3.6.1' ]
