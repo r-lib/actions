@@ -2,5 +2,5 @@ name: 'Setup TinyTeX'
 description: 'Setup TinyTeX and add it to your PATH'
 author: 'Jim Hester'
 runs:
-  using: 'node12'
+  using: 'node16'
   main: 'lib/setup-tinytex.js'

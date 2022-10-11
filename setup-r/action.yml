@@ -51,5 +51,5 @@ outputs:
   installed-r-version:
     description: 'The full R version installed'
 runs:
-  using: 'node12'
+  using: 'node16'
   main: 'lib/setup-r.js'
