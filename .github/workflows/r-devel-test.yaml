@@ -22,7 +22,7 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {os: macOS-latest,   r: 'devel'}
+          - {os: macos-latest,   r: 'devel'}
           - {os: windows-latest, r: 'devel'}
           - {os: ubuntu-latest,  r: 'devel', http-user-agent: 'release'}
 
