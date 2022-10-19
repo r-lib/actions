@@ -4,7 +4,7 @@ author: 'Jim Hester'
 inputs:
   pandoc-version:
     description: 'Exact version of pandoc to use'
-    default: '2.14.2'
+    default: '2.19.2'
 runs:
   using: 'node16'
   main: 'lib/setup-pandoc.js'
