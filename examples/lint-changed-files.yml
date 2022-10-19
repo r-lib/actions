@@ -41,3 +41,5 @@ jobs:
           exclusions_list <- as.list(setdiff(all_files, changed_files))
           lintr::lint_package(exclusions = exclusions_list)
         shell: Rscript {0}
+        env:
+          LINTR_ERROR_ON_LINT: true
