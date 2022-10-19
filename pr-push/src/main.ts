@@ -29,7 +29,7 @@ async function run() {
     );
 
     await exec.exec("git", ["push", headCloneURL, cli_args, `HEAD:${headBranch}`]);
-  } catch (error) {
+  } catch (error: any) {
     core.setFailed(error.message);
   }
 }

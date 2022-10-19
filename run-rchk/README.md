@@ -17,7 +17,7 @@ Basic:
       image: rhub/ubuntu-rchk
       options: --user=root
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - uses: r-lib/actions/run-rchk@v2
 ```
 
@@ -29,7 +29,7 @@ If you want to have more control
       image: rhub/ubuntu-rchk
       options: --user=root
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - uses: r-lib/actions/run-rchk@v2
       with:
         setup-only: true
