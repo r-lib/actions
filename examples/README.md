@@ -214,7 +214,6 @@ jobs:
           # Use 3.6 to trigger usage of RTools35
           - {os: windows-latest, r: '3.6'}
 
-          # Use older ubuntu to maximise backward compatibility
           - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
           - {os: ubuntu-latest,   r: 'release'}
           - {os: ubuntu-latest,   r: 'oldrel-1'}
@@ -293,9 +292,8 @@ jobs:
 
 `usethis::use_github_action("lint")`
 
-This example uses the [lintr](https://github.com/jimhester/lintr)
-package to lint your package and return the results as build
-annotations.
+This example uses the [lintr](https://github.com/r-lib/lintr) package to
+lint your package and return the results as build annotations.
 
 ``` yaml
 # Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
@@ -322,7 +320,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::lintr
+          extra-packages: any::lintr, local::.
           needs: lint
 
       - name: Lint
@@ -637,9 +635,11 @@ jobs:
         id: styler-location
         run: |
           cat(
-            "##[set-output name=location;]",
+            "{location}={", 
             styler::cache_info(format = "tabular")$location,
-            "\n",
+            "}\n",
+            file = Sys.getenv("GITHUB_OUTPUT"),
+            append = TRUE,
             sep = ""
           )
         shell: Rscript {0}
@@ -848,9 +848,14 @@ jobs:
         shell: Rscript {0}
 
       - name: Authorize and deploy app
+        env: 
+          # Provide your app name, account name, and server to be deployed below
+          APPNAME: your-app-name
+          ACCOUNT: your-account-name
+          SERVER: shinyapps.io # server to deploy
         run: |
-          rsconnect::setAccountInfo(${{ secrets.RSCONNECT_USER }}, ${{ secrets.RSCONNECT_TOKEN }}, ${{ secrets.RSCONNECT_SECRET }})
-          rsconnect::deployApp()
+          rsconnect::setAccountInfo("${{ secrets.RSCONNECT_USER }}", "${{ secrets.RSCONNECT_TOKEN }}", "${{ secrets.RSCONNECT_SECRET }}")
+          rsconnect::deployApp(appName = "${{ env.APPNAME }}", account = "${{ env.ACCOUNT }}", server = "${{ env.SERVER }}")
         shell: Rscript {0}
 ```
 
@@ -921,8 +926,8 @@ usethis::use_github_action(
 
 `usethis::use_github_action("lint-project")`
 
-This example uses the [lintr](https://github.com/jimhester/lintr)
-package to lint your project and return the results as annotations.
+This example uses the [lintr](https://github.com/r-lib/lintr) package to
+lint your project and return the results as annotations.
 
 ``` yaml
 # Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
@@ -961,7 +966,7 @@ jobs:
 Code repositories such as [CRAN](http://cran.r-project.org) or
 [RStudio](http://rstudio.com)’s RSPM provide R packages in binary (=
 pre-compiled) form for some platforms, but these binaries can sometimes
-be missing our lag behind the package sources published on the
+be missing or lag behind the package sources published on the
 repository. The
 [setup-r](https://github.com/r-lib/actions/tree/v2/setup-r) action, and
 all example workflows utilizing it follow the

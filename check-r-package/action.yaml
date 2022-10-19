@@ -35,7 +35,7 @@ runs:
         ## --------------------------------------------------------------------
         options(crayon.enabled = TRUE)
         if (Sys.getenv("_R_CHECK_FORCE_SUGGESTS_", "") == "") Sys.setenv("_R_CHECK_FORCE_SUGGESTS_" = "false")
-        cat("##[set-output name=check-dir-path;]", (${{ inputs.check-dir }}), "\n", sep = "")
+        cat("{check-dir-path}={", ("${{ inputs.check-dir }}"), "}\n", file = Sys.getenv("GITHUB_OUTPUT"), sep = "", append = TRUE)
         check_results <- rcmdcheck::rcmdcheck(args = (${{ inputs.args }}), build_args = (${{ inputs.build_args }}), error_on = (${{ inputs.error-on }}), check_dir = (${{ inputs.check-dir }}))
       shell: Rscript {0}
       working-directory: ${{ inputs.working-directory }}

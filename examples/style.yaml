@@ -38,9 +38,11 @@ jobs:
         id: styler-location
         run: |
           cat(
-            "##[set-output name=location;]",
+            "{location}={", 
             styler::cache_info(format = "tabular")$location,
-            "\n",
+            "}\n",
+            file = Sys.getenv("GITHUB_OUTPUT"),
+            append = TRUE,
             sep = ""
           )
         shell: Rscript {0}
