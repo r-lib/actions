@@ -69,7 +69,7 @@ Basic:
 
 ``` yaml
 steps:
-- uses: actions/checkout@v2
+- uses: actions/checkout@v3
 - uses: r-lib/actions/setup-r@v2
   with:
     r-version: '3.5.3' # The R version to download (if necessary) and use.
@@ -87,7 +87,7 @@ jobs:
         R: [ '3.5.3', '3.6.1' ]
     name: R ${{ matrix.R }} sample
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Setup R
         uses: r-lib/actions/setup-r@v2
         with:

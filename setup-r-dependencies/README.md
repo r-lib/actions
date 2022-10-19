@@ -13,10 +13,10 @@ This action install dependencies for the current R environment based on the DESC
 
 Inputs available
 
-- `cache` - default `true`. Whether packages should be cached across runs or 
+- `cache` - default `true`. Whether packages should be cached across runs or
   not.
 - `cache-version` - default `1`. If you need to invalidate the existing
-  cache pass any other number and a new cache will be used. Ignored if 
+  cache pass any other number and a new cache will be used. Ignored if
   `cache: false`.
 - `dependencies` - default `'"all"'`. Types of dependencies to install. By
   default all direct dependencies of the current package are installed, and
@@ -40,7 +40,7 @@ Inputs available
 Basic:
 ```yaml
 steps:
-- uses: actions/checkout@v2
+- uses: actions/checkout@v3
 - uses: r-lib/actions/setup-r@v2
 - uses: r-lib/actions/setup-r-dependencies@v2
   with:
@@ -60,13 +60,13 @@ to resolve, download and install the dependencies. There are typically
 recent static pak builds available for:
 
 - x86_64 Linux, for the last 5 R releases and R-devel (currently this is
-  R 3.4.x through R 4.1.x and R-devel).
+  R 3.4.x through R 4.2.x and R-devel).
 - x86_64 macOS, for the last 5 R releases and R-devel.
 - Windows (x86_64 and i386), for the last 5 R releases and R-devel.
 
 There are typically less recent builds for
 
-- arm64 macOS, from R 4.1.x, but at most the last 5 R releases, and R devel.
+- arm64 macOS, from R 4.2.x, but at most the last 5 R releases, and R devel.
 
 See https://github.com/r-lib/pak#installation for the most accurate
 information.
@@ -119,7 +119,7 @@ write this in the butcher workflow file:
 
 ```yaml
 steps:
-- uses: actions/checkout@v2
+- uses: actions/checkout@v3
 - uses: r-lib/actions/setup-r@v2
 - uses: r-lib/actions/setup-r-dependencies@v2
   with:
@@ -141,11 +141,20 @@ packages are not available:
 
 ## Ignoring optional dependencies
 
-In special cases you may want to completely ignore an optional dependency. 
+In special cases you may want to completely ignore an optional dependency.
 
-For this, you can use the `extra-packages` parameter and pak's
-`package=<packagename>?ignore` syntax. (Replace `<packagename>` with the name
-of the package you want to ignore.)
+For this, you can use the extra-packages parameter and pak's
+`<packagename>=?ignore` syntax. (Replace `<packagename>` with the name of
+the package you want to ignore.)
+
+Example:
+
+```yaml
+- uses: r-lib/actions/setup-r-dependencies@v2
+  with:
+    extra-packages: any::rcmdcheck, survival=?ignore
+    needs: check
+```
 
 ## Installing the local package
 
@@ -155,7 +164,7 @@ package as `local::.` to pak:
 
 ```yaml
 steps:
-- uses: actions/checkout@v2
+- uses: actions/checkout@v3
 - uses: r-lib/actions/setup-r@v2
 - uses: r-lib/actions/setup-r-dependencies@v2
   with:

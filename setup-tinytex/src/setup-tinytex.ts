@@ -29,7 +29,7 @@ if (!tempDirectory) {
 async function run() {
   try {
     await getTinyTeX();
-  } catch (error) {
+  } catch (error: any) {
     core.setFailed(error.message);
     process.exit(1);
   }
