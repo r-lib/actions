@@ -635,9 +635,9 @@ jobs:
         id: styler-location
         run: |
           cat(
-            "{location}={", 
+            "location=", 
             styler::cache_info(format = "tabular")$location,
-            "}\n",
+            "\n",
             file = Sys.getenv("GITHUB_OUTPUT"),
             append = TRUE,
             sep = ""

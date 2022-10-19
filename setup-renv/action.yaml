@@ -23,8 +23,8 @@ runs:
       - name: Get R and OS version
         id: get-version
         run: |
-          cat("{os-version}={", sessionInfo()$running, "}\n", file = Sys.getenv("GITHUB_OUTPUT"), sep = "", append = TRUE)
-          cat("{r-version}={", R.Version()$version.string, "}\n", file = Sys.getenv("GITHUB_OUTPUT"), sep = "", append = TRUE)
+          cat("os-version=", sessionInfo()$running, "\n", file = Sys.getenv("GITHUB_OUTPUT"), sep = "", append = TRUE)
+          cat("r-version=", R.Version()$version.string, "\n", file = Sys.getenv("GITHUB_OUTPUT"), sep = "", append = TRUE)
         shell: Rscript {0}
 
       - name: Restore Renv package cache

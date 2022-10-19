@@ -34,8 +34,8 @@ runs:
         run: |
           ## Installing pak
           cat("::group::Installing pak\n")
-          cat("{os-version}={", sessionInfo()$running, "}\n", file = Sys.getenv("GITHUB_OUTPUT"), sep = "", append = TRUE)
-          cat("{r-version}={", if (grepl("development", rv <- R.Version()$version.string)) as.character(getRversion()) else rv, "}\n", file = Sys.getenv("GITHUB_OUTPUT"), sep = "", append = TRUE)
+          cat("os-version=", sessionInfo()$running, "\n", file = Sys.getenv("GITHUB_OUTPUT"), sep = "", append = TRUE)
+          cat("r-version=", if (grepl("development", rv <- R.Version()$version.string)) as.character(getRversion()) else rv, "\n", file = Sys.getenv("GITHUB_OUTPUT"), sep = "", append = TRUE)
           install.packages("pak", repos = "https://r-lib.github.io/p/pak/${{ inputs.pak-version }}/")
           cat("::endgroup::\n")
           cat("::group::Dependency resolution\n")
