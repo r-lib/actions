@@ -60,13 +60,13 @@ to resolve, download and install the dependencies. There are typically
 recent static pak builds available for:
 
 - x86_64 Linux, for the last 5 R releases and R-devel (currently this is
-  R 3.4.x through R 4.1.x and R-devel).
+  R 3.4.x through R 4.2.x and R-devel).
 - x86_64 macOS, for the last 5 R releases and R-devel.
 - Windows (x86_64 and i386), for the last 5 R releases and R-devel.
 
 There are typically less recent builds for
 
-- arm64 macOS, from R 4.1.x, but at most the last 5 R releases, and R devel.
+- arm64 macOS, from R 4.2.x, but at most the last 5 R releases, and R devel.
 
 See https://github.com/r-lib/pak#installation for the most accurate
 information.
