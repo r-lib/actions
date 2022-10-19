@@ -52,14 +52,14 @@ runs:
 
     - name: Upload check results
       if: failure() || inputs.upload-results != 'false'
-      uses: actions/upload-artifact@main
+      uses: actions/upload-artifact@v3
       with:
         name: ${{ runner.os }}-r${{ matrix.config.r }}-results
         path: ${{ steps.rcmdcheck.outputs.check-dir-path }}
 
     - name: Upload snapshots
       if: inputs.upload-snapshots != 'false'
-      uses: actions/upload-artifact@main
+      uses: actions/upload-artifact@v3
       with:
         name: ${{ runner.os }}-r${{ matrix.config.r }}-testthat-snapshots
         path: ${{ steps.rcmdcheck.outputs.check-dir-path }}/**/tests*/testthat/_snaps

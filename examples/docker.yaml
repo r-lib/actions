@@ -17,7 +17,7 @@ jobs:
         shell: Rscript {0}
 
       - name: Upload results
-        uses: actions/upload-artifact@main
+        uses: actions/upload-artifact@v3
         with:
           name: results
           path: report.html
