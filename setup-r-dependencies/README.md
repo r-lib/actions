@@ -40,7 +40,7 @@ Inputs available
 Basic:
 ```yaml
 steps:
-- uses: actions/checkout@v2
+- uses: actions/checkout@v3
 - uses: r-lib/actions/setup-r@v2
 - uses: r-lib/actions/setup-r-dependencies@v2
   with:
@@ -119,7 +119,7 @@ write this in the butcher workflow file:
 
 ```yaml
 steps:
-- uses: actions/checkout@v2
+- uses: actions/checkout@v3
 - uses: r-lib/actions/setup-r@v2
 - uses: r-lib/actions/setup-r-dependencies@v2
   with:
@@ -156,7 +156,7 @@ package as `local::.` to pak:
 
 ```yaml
 steps:
-- uses: actions/checkout@v2
+- uses: actions/checkout@v3
 - uses: r-lib/actions/setup-r@v2
 - uses: r-lib/actions/setup-r-dependencies@v2
   with:
