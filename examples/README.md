@@ -645,7 +645,7 @@ jobs:
         shell: Rscript {0}
 
       - name: Cache styler
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.styler-location.outputs.location }}
           key: ${{ runner.os }}-styler-${{ github.sha }}
@@ -714,7 +714,7 @@ jobs:
       - uses: r-lib/actions/setup-renv@v2
 
       - name: Cache bookdown results
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: _bookdown_files
           key: bookdown-${{ hashFiles('**/*Rmd') }}
