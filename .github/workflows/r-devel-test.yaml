@@ -1,0 +1,53 @@
+on:
+  workflow_dispatch:
+    inputs:
+      pak-version:
+        required: true
+        type: choice
+        options:
+        - 'stable'
+        - 'rc'
+        - 'devel'
+        default: 'stable'
+
+name: R-devel test
+
+jobs:
+  R-CMD-check:
+    runs-on: ${{ matrix.config.os }}
+
+    name: ${{ matrix.config.os }} (${{ matrix.config.r }})
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - {os: macos-latest,   r: 'devel'}
+          - {os: windows-latest, r: 'devel'}
+          - {os: ubuntu-latest,  r: 'devel', http-user-agent: 'release'}
+
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_KEEP_PKG_SOURCE: yes
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: ./setup-pandoc
+
+      - uses: ./setup-r
+        with:
+          r-version: ${{ matrix.config.r }}
+          http-user-agent: ${{ matrix.config.http-user-agent }}
+          use-public-rspm: true
+
+      - uses: ./setup-r-dependencies
+        with:
+          pak-version: ${{ github.event.inputs.pak-version || 'stable' }}
+          extra-packages: any::rcmdcheck
+          needs: check
+
+      - uses: ./check-r-package
+        with:
+          upload-snapshots: true
+

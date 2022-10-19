@@ -84,7 +84,7 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - uses: r-lib/actions/setup-r@v2
         with:
@@ -134,7 +134,7 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {os: macOS-latest,   r: 'release'}
+          - {os: macos-latest,   r: 'release'}
           - {os: windows-latest, r: 'release'}
           - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
           - {os: ubuntu-latest,   r: 'release'}
@@ -145,7 +145,7 @@ jobs:
       R_KEEP_PKG_SOURCE: yes
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - uses: r-lib/actions/setup-pandoc@v2
 
@@ -208,26 +208,25 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {os: macOS-latest,   r: 'release'}
+          - {os: macos-latest,   r: 'release'}
 
           - {os: windows-latest, r: 'release'}
           # Use 3.6 to trigger usage of RTools35
           - {os: windows-latest, r: '3.6'}
 
-          # Use older ubuntu to maximise backward compatibility
-          - {os: ubuntu-18.04,   r: 'devel', http-user-agent: 'release'}
-          - {os: ubuntu-18.04,   r: 'release'}
-          - {os: ubuntu-18.04,   r: 'oldrel-1'}
-          - {os: ubuntu-18.04,   r: 'oldrel-2'}
-          - {os: ubuntu-18.04,   r: 'oldrel-3'}
-          - {os: ubuntu-18.04,   r: 'oldrel-4'}
+          - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
+          - {os: ubuntu-latest,   r: 'release'}
+          - {os: ubuntu-latest,   r: 'oldrel-1'}
+          - {os: ubuntu-latest,   r: 'oldrel-2'}
+          - {os: ubuntu-latest,   r: 'oldrel-3'}
+          - {os: ubuntu-latest,   r: 'oldrel-4'}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - uses: r-lib/actions/setup-pandoc@v2
 
@@ -273,7 +272,7 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - uses: r-lib/actions/setup-r@v2
         with:
@@ -293,9 +292,8 @@ jobs:
 
 `usethis::use_github_action("lint")`
 
-This example uses the [lintr](https://github.com/jimhester/lintr)
-package to lint your package and return the results as build
-annotations.
+This example uses the [lintr](https://github.com/r-lib/lintr) package to
+lint your package and return the results as build annotations.
 
 ``` yaml
 # Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
@@ -314,7 +312,7 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - uses: r-lib/actions/setup-r@v2
         with:
@@ -322,7 +320,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::lintr
+          extra-packages: any::lintr, local::.
           needs: lint
 
       - name: Lint
@@ -363,7 +361,7 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - uses: r-lib/actions/pr-fetch@v2
         with:
@@ -400,7 +398,7 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - uses: r-lib/actions/pr-fetch@v2
         with:
@@ -452,7 +450,7 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
@@ -508,7 +506,7 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - uses: r-lib/actions/setup-pandoc@v2
 
@@ -527,7 +525,7 @@ jobs:
 
       - name: Deploy to GitHub pages 🚀
         if: github.event_name != 'pull_request'
-        uses: JamesIves/github-pages-deploy-action@4.1.4
+        uses: JamesIves/github-pages-deploy-action@v4.4.1
         with:
           clean: false
           branch: gh-pages
@@ -560,7 +558,7 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
@@ -614,7 +612,7 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
@@ -637,15 +635,17 @@ jobs:
         id: styler-location
         run: |
           cat(
-            "##[set-output name=location;]",
+            "location=", 
             styler::cache_info(format = "tabular")$location,
             "\n",
+            file = Sys.getenv("GITHUB_OUTPUT"),
+            append = TRUE,
             sep = ""
           )
         shell: Rscript {0}
 
       - name: Cache styler
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.styler-location.outputs.location }}
           key: ${{ runner.os }}-styler-${{ github.sha }}
@@ -703,7 +703,7 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - uses: r-lib/actions/setup-pandoc@v2
 
@@ -714,7 +714,7 @@ jobs:
       - uses: r-lib/actions/setup-renv@v2
 
       - name: Cache bookdown results
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: _bookdown_files
           key: bookdown-${{ hashFiles('**/*Rmd') }}
@@ -726,7 +726,7 @@ jobs:
 
       - name: Deploy to GitHub pages 🚀
         if: github.event_name != 'pull_request'
-        uses: JamesIves/github-pages-deploy-action@4.1.4
+        uses: JamesIves/github-pages-deploy-action@v4.4.1
         with:
           branch: gh-pages
           folder: _book
@@ -767,7 +767,7 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - uses: r-lib/actions/setup-pandoc@v2
 
@@ -787,7 +787,7 @@ jobs:
 
       - name: Deploy to GitHub pages 🚀
         if: github.event_name != 'pull_request'
-        uses: JamesIves/github-pages-deploy-action@4.1.4
+        uses: JamesIves/github-pages-deploy-action@v4.4.1
         with:
           branch: gh-pages
           folder: public
@@ -833,7 +833,7 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - uses: r-lib/actions/setup-pandoc@v2
 
@@ -848,9 +848,14 @@ jobs:
         shell: Rscript {0}
 
       - name: Authorize and deploy app
+        env: 
+          # Provide your app name, account name, and server to be deployed below
+          APPNAME: your-app-name
+          ACCOUNT: your-account-name
+          SERVER: shinyapps.io # server to deploy
         run: |
-          rsconnect::setAccountInfo(${{ secrets.RSCONNECT_USER }}, ${{ secrets.RSCONNECT_TOKEN }}, ${{ secrets.RSCONNECT_SECRET }})
-          rsconnect::deployApp()
+          rsconnect::setAccountInfo("${{ secrets.RSCONNECT_USER }}", "${{ secrets.RSCONNECT_TOKEN }}", "${{ secrets.RSCONNECT_SECRET }}")
+          rsconnect::deployApp(appName = "${{ env.APPNAME }}", account = "${{ env.ACCOUNT }}", server = "${{ env.SERVER }}")
         shell: Rscript {0}
 ```
 
@@ -877,7 +882,7 @@ jobs:
     runs-on: ubuntu-latest
     container: rocker/verse
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - run: |
           source("fit_model.R")
@@ -885,7 +890,7 @@ jobs:
         shell: Rscript {0}
 
       - name: Upload results
-        uses: actions/upload-artifact@main
+        uses: actions/upload-artifact@v3
         with:
           name: results
           path: report.html
@@ -921,8 +926,8 @@ usethis::use_github_action(
 
 `usethis::use_github_action("lint-project")`
 
-This example uses the [lintr](https://github.com/jimhester/lintr)
-package to lint your project and return the results as annotations.
+This example uses the [lintr](https://github.com/r-lib/lintr) package to
+lint your project and return the results as annotations.
 
 ``` yaml
 # Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
@@ -941,7 +946,7 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - uses: r-lib/actions/setup-r@v2
         with:
@@ -961,7 +966,7 @@ jobs:
 Code repositories such as [CRAN](http://cran.r-project.org) or
 [RStudio](http://rstudio.com)’s RSPM provide R packages in binary (=
 pre-compiled) form for some platforms, but these binaries can sometimes
-be missing our lag behind the package sources published on the
+be missing or lag behind the package sources published on the
 repository. The
 [setup-r](https://github.com/r-lib/actions/tree/v2/setup-r) action, and
 all example workflows utilizing it follow the

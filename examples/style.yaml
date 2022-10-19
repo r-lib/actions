@@ -15,7 +15,7 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
@@ -38,15 +38,17 @@ jobs:
         id: styler-location
         run: |
           cat(
-            "##[set-output name=location;]",
+            "location=", 
             styler::cache_info(format = "tabular")$location,
             "\n",
+            file = Sys.getenv("GITHUB_OUTPUT"),
+            append = TRUE,
             sep = ""
           )
         shell: Rscript {0}
 
       - name: Cache styler
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.styler-location.outputs.location }}
           key: ${{ runner.os }}-styler-${{ github.sha }}

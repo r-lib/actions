@@ -40,7 +40,7 @@ Inputs available
 Basic:
 ```yaml
 steps:
-- uses: actions/checkout@v2
+- uses: actions/checkout@v3
 - uses: r-lib/actions/setup-r@v2
 - uses: r-lib/actions/setup-r-dependencies@v2
   with:
@@ -60,19 +60,33 @@ to resolve, download and install the dependencies. There are typically
 recent static pak builds available for:
 
 - x86_64 Linux, for the last 5 R releases and R-devel (currently this is
-  R 3.4.x through R 4.1.x and R-devel).
+  R 3.4.x through R 4.2.x and R-devel).
 - x86_64 macOS, for the last 5 R releases and R-devel.
 - Windows (x86_64 and i386), for the last 5 R releases and R-devel.
 
 There are typically less recent builds for
 
-- arm64 macOS, from R 4.1.x, but at most the last 5 R releases, and R devel.
+- arm64 macOS, from R 4.2.x, but at most the last 5 R releases, and R devel.
 
 See https://github.com/r-lib/pak#installation for the most accurate
 information.
 
 If your platform does not have a static pak build, e.g. you are on
 s390x Linux, then you cannot use the `setup-r-dependencies` action currently.
+
+## Dependencies on GitHub
+
+If your package has a dependency that is not a CRAN or Bioconductor package,
+but it lives on GitHub, or it can be downloaded from a URL, then you can
+use the pak/pkgdepends syntax to specify it in the `Remotes` field of the
+`DESCRIPTION` file. See the [documentation in the pkgdepends package](https://r-lib.github.io/pkgdepends/reference/pkg_refs.html#github-packages-).
+
+## Dependencies in other CRAN-like repositories
+
+If your dependency is available in a CRAN-like repository
+(e.g. [R-universe](https://r-universe.dev/search/)), then you can use the
+`extra-repositories` parameter of the `setup-r` action. See more at
+the [`setup-r` documentation](https://github.com/r-lib/actions/tree/v2/setup-r#inputs).
 
 ## Extra packages and the `any::` prefix
 
@@ -105,7 +119,7 @@ write this in the butcher workflow file:
 
 ```yaml
 steps:
-- uses: actions/checkout@v2
+- uses: actions/checkout@v3
 - uses: r-lib/actions/setup-r@v2
 - uses: r-lib/actions/setup-r-dependencies@v2
   with:
@@ -150,7 +164,7 @@ package as `local::.` to pak:
 
 ```yaml
 steps:
-- uses: actions/checkout@v2
+- uses: actions/checkout@v3
 - uses: r-lib/actions/setup-r@v2
 - uses: r-lib/actions/setup-r-dependencies@v2
   with:

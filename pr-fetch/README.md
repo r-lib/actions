@@ -25,9 +25,9 @@ jobs:
   foo_command:
     if: startsWith(github.event.comment.body, '/foo')
     name: foo
-    runs-on: macOS-latest
+    runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: r-lib/actions/pr-fetch@v2
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}

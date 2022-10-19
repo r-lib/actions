@@ -1,0 +1,36 @@
+on:
+  workflow_dispatch:
+
+name: setup-r test
+
+jobs:
+  R-CMD-check:
+    runs-on: ${{ matrix.config.os }}
+
+    name: ${{ matrix.config.os }} (${{ matrix.config.r }})
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - {os: macos-latest,   r: 'release'}
+          - {os: macos-latest,   r: 'next'}
+
+          - {os: windows-latest, r: 'release'}
+          - {os: windows-latest, r: 'next'}
+
+          - {os: ubuntu-latest,  r: 'release'}
+          - {os: ubuntu-latest,  r: 'next'}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: ./setup-r
+        with:
+          r-version: ${{ matrix.config.r }}
+          http-user-agent: ${{ matrix.config.http-user-agent }}
+          use-public-rspm: true
+
+      - name: R version
+        run: sessionInfo()
+        shell: Rscript {0}

@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -98,7 +102,7 @@ function acquireR(version, rtoolsVersion) {
             if (IS_WINDOWS) {
                 yield Promise.all([
                     yield acquireRWindows(version),
-                    yield acquireRtools(rtoolsVersion),
+                    yield acquireRtools(rtoolsVersion, version),
                 ]);
             }
             else if (IS_MAC) {
@@ -391,7 +395,7 @@ function acquireRWindows(version) {
         return "";
     });
 }
-function acquireRtools(version) {
+function acquireRtools(version, rversion) {
     return __awaiter(this, void 0, void 0, function* () {
         const versionNumber = parseInt(version.substring(0, 2));
         const rtools42 = versionNumber >= 41;
@@ -439,15 +443,22 @@ function acquireRtools(version) {
                 throw `Failed to install Rtools: ${error}`;
             }
         }
+        // we never want patches (by default)
+        core.exportVariable("_R_INSTALL_TIME_PATCHES_", "no");
         if (rtools42) {
             core.addPath(`C:\\rtools42\\usr\\bin`);
             core.addPath(`C:\\rtools42\\x86_64-w64-mingw32.static.posix\\bin`);
         }
         else if (rtools40) {
             core.addPath(`C:\\rtools40\\usr\\bin`);
-            if (core.getInput("r-version").match("devel")) {
+            // If we use Rtools40 and R 4.2.0 or later, then we need to add this
+            // to the path, because GHA might put a different gcc on the PATH,
+            // and R 4.2.x picks that up. We do this for R-devel, R-next and
+            // every numeric version that is not 4.0.x and 4.1.x. (For 3.x.y
+            // Rtools3.x is selected.) Issue #610.
+            if (rversion == "devel" || rversion == "next" ||
+                (!rversion.startsWith("4.0.") && !rversion.startsWith("4.1."))) {
                 core.addPath(`C:\\rtools40\\ucrt64\\bin`);
-                core.exportVariable("_R_INSTALL_TIME_PATCHES_", "no");
             }
             if (core.getInput("update-rtools") === "true") {
                 try {

@@ -3,7 +3,7 @@ description: 'Action to setup installation tools and install R dependencies'
 author: 'Jim Hester'
 inputs:
   cache:
-    description: 'A boolen value indicating whether packages should be cached from one to the other'
+    description: 'A boolean value indicating whether packages should be cached from one to the other'
     required: true
     default: true
   cache-version:
@@ -34,8 +34,8 @@ runs:
         run: |
           ## Installing pak
           cat("::group::Installing pak\n")
-          cat("::set-output name=os-version::", sessionInfo()$running, "\n", sep = "")
-          cat("::set-output name=r-version::", if (grepl("development", rv <- R.Version()$version.string)) as.character(getRversion()) else rv, "\n", sep = "")
+          cat("os-version=", sessionInfo()$running, "\n", file = Sys.getenv("GITHUB_OUTPUT"), sep = "", append = TRUE)
+          cat("r-version=", if (grepl("development", rv <- R.Version()$version.string)) as.character(getRversion()) else rv, "\n", file = Sys.getenv("GITHUB_OUTPUT"), sep = "", append = TRUE)
           install.packages("pak", repos = "https://r-lib.github.io/p/pak/${{ inputs.pak-version }}/")
           cat("::endgroup::\n")
           cat("::group::Dependency resolution\n")
@@ -58,7 +58,7 @@ runs:
 
       - name: Restore R package cache
         if: inputs.cache == 'true'
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ${{ env.R_LIBS_USER }}/*

@@ -36,7 +36,7 @@ async function run() {
       `${headRepoOwnerLogin}-${headBranch}`,
       `pr/${headBranch}`
     ]);
-  } catch (error) {
+  } catch (error: any) {
     core.setFailed(error.message);
   }
 }
