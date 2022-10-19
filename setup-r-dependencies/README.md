@@ -13,10 +13,10 @@ This action install dependencies for the current R environment based on the DESC
 
 Inputs available
 
-- `cache` - default `true`. Whether packages should be cached across runs or 
+- `cache` - default `true`. Whether packages should be cached across runs or
   not.
 - `cache-version` - default `1`. If you need to invalidate the existing
-  cache pass any other number and a new cache will be used. Ignored if 
+  cache pass any other number and a new cache will be used. Ignored if
   `cache: false`.
 - `dependencies` - default `'"all"'`. Types of dependencies to install. By
   default all direct dependencies of the current package are installed, and
@@ -127,9 +127,11 @@ packages are not available:
 
 ## Ignoring optional dependencies
 
-In special cases you may want to completely ignore an optional dependency. 
+In special cases you may want to completely ignore an optional dependency.
 
-For this, you can use the extra-packages parameter and pak's `<packagename>?ignore` syntax. (Replace `<packagename>` with the name of the package you want to ignore.)
+For this, you can use the extra-packages parameter and pak's
+`<packagename>=?ignore` syntax. (Replace `<packagename>` with the name of
+the package you want to ignore.)
 
 Example:
 
