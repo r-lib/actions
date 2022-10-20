@@ -31,8 +31,17 @@ runs:
   steps:
       - name: Installing pak (Windows)
         run: |
-          dir.create(Sys.getenv("R_LIBS_SITE"), showWarnings = FALSE, recursive = TRUE)
-          install.packages("pak", repos = "https://r-lib.github.io/p/pak/${{ inputs.pak-version }}/", lib = Sys.getenv("R_LIBS_SITE"))
+          lib <- Sys.getenv("R_LIBS_SITE")
+          if (lib == "") {
+            lib <- file.path(dirname(.Library), "site-library")
+            cat(
+              "R_LIBS_SITE=", lib, "\n",
+              file = Sys.getenv("GITHUB_ENV"),
+              sep = "", append = TRUE
+            )
+          }
+          dir.create(lib, showWarnings = FALSE, recursive = TRUE)
+          install.packages("pak", repos = "https://r-lib.github.io/p/pak/${{ inputs.pak-version }}/", lib = lib)
         shell: Rscript {0}
 
       - name: Querying dependencies
