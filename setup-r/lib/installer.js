@@ -526,7 +526,9 @@ function setupRLibrary() {
             }
         }
         if (rspm !== "NULL") {
-            core.exportVariable("RSPM", rspm.replace(/^'|'$/g, ""));
+            rspm = rspm.replace(/^'|'$/g, "");
+            core.exportVariable("RSPM", rspm);
+            core.exportVariable("RENV_CONFIG_REPOS_OVERRIDE", rspm);
         }
         let cran = `'${core.getInput("cran") ||
             process.env["CRAN"] ||
