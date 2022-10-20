@@ -31,6 +31,8 @@ runs:
   steps:
       - name: Set site library path
         run: |
+          # Set site library path
+          cat("::group::Set site library path\n")
           lib <- Sys.getenv("R_LIBS_SITE")
           if (lib == "") {
             lib <- file.path(dirname(.Library), "site-library")
@@ -40,29 +42,36 @@ runs:
               sep = "", append = TRUE
             )
           }
+          cat("::endgroup::\n")
         shell: Rscript {0}
 
-      - name: Installing pak (Windows)
+      - name: Install pak (Windows)
         if: runner.os == 'Windows'
         run: |
+          # Install pak
+          echo "::group::Install pak"
           dir.create(Sys.getenv("R_LIBS_SITE"), showWarnings = FALSE, recursive = TRUE)
           install.packages("pak", repos = "https://r-lib.github.io/p/pak/${{ inputs.pak-version }}/", lib = Sys.getenv("R_LIBS_SITE"))
+          echo "::endgroup::"
         shell: Rscript {0}
 
-      - name: Installing pak (Unix)
+      - name: Install pak (Unix)
         if: runner.os != 'Windows'
         run: |
+          # Install pak
+          echo "::group::Install pak"
           sudo R -q -e 'dir.create(Sys.getenv("R_LIBS_SITE"), recursive = TRUE, showWarnings = FALSE)'
-          sudo R -q -e 'install.packages("pak", repos = "https://r-lib.github.io/p/pak/${{ inputs.pak-version }}/", lib = .Library.site)'
+          sudo R -q -e 'install.packages("pak", repos = "https://r-lib.github.io/p/pak/${{ inputs.pak-version }}/", lib = Sys.getenv("R_LIBS_SITE"))'
+          echo "::endgroup::"
         shell: bash
 
-      - name: Querying dependencies
+      - name: Query dependencies
         id: install
         run: |
-          ## Installing pak
+          # Query dependencies
+          cat("::group::Dependency resolution\n")
           cat("os-version=", sessionInfo()$running, "\n", file = Sys.getenv("GITHUB_OUTPUT"), sep = "", append = TRUE)
           cat("r-version=", if (grepl("development", rv <- R.Version()$version.string)) as.character(getRversion()) else rv, "\n", file = Sys.getenv("GITHUB_OUTPUT"), sep = "", append = TRUE)
-          cat("::group::Dependency resolution\n")
           needs <- sprintf("Config/Needs/%s", strsplit("${{ inputs.needs }}", "[[:space:],]+")[[1]])
           deps <- strsplit("${{ inputs.packages }}", "[[:space:],]+")[[1]]
           extra_deps <- strsplit("${{ inputs.extra-packages }}", "[[:space:],]+")[[1]]
@@ -92,7 +101,7 @@ runs:
 
       - name: Install dependencies
         run: |
-          ## Installing/Updating packages
+          ## Install/Update packages
           cat("::group::Installing/updating packages\n")
           Sys.setenv("PKGCACHE_HTTP_VERSION" = "2")
           pak::lockfile_install(".github/pkg.lock")
