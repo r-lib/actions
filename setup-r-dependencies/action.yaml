@@ -31,10 +31,9 @@ runs:
   steps:
       - name: Set site library path
         run: |
-          # Set site library path
+          'Set site library path'
           cat("::group::Set site library path\n")
           lib <- Sys.getenv("R_LIBS_SITE")
-          cat("::group::Install pak\n")
           if (lib == "") {
             lib <- file.path(dirname(.Library), "site-library")
             cat(sprintf("R_LIBS_SITE=%s\n", lib), file = Sys.getenv("GITHUB_ENV"), append = TRUE)
@@ -45,16 +44,10 @@ runs:
           cat("::endgroup::\n")
         shell: Rscript {0}
 
-      - name: check R_LIBS_SITE
-        run: |
-          echo "$R_LIBS_SITE"
-        shell:
-          bash
-
       - name: Install pak (Windows)
         if: runner.os == 'Windows'
         run: |
-          # Install pak
+          'Install pak'
           cat("::group::Install pak\n")
           dir.create(Sys.getenv("R_LIBS_SITE"), showWarnings = FALSE, recursive = TRUE)
           install.packages("pak", repos = "https://r-lib.github.io/p/pak/${{ inputs.pak-version }}/", lib = Sys.getenv("R_LIBS_SITE"))
@@ -64,20 +57,12 @@ runs:
       - name: Install pak (Unix)
         if: runner.os != 'Windows'
         run: |
-          # Install pak
+          'Install pak'
           echo "::group::Install pak"
-          echo "$R_LIBS_SITE"
-          R -q -e 'Sys.getenv("R_LIBS_SITE")'
-          sudo -E R -q -e 'Sys.getenv("R_LIBS_SITE")'
-          sudo -E R -q -e 'dir.create(Sys.getenv("R_LIBS_SITE"), recursive = TRUE)'
+          sudo -E R -q -e 'dir.create(Sys.getenv("R_LIBS_SITE"), recursive = TRUE, showWarnings = FALSE)'
           sudo -E R -q -e 'install.packages("pak", repos = "https://r-lib.github.io/p/pak/${{ inputs.pak-version }}/", lib = Sys.getenv("R_LIBS_SITE"))'
           echo "::endgroup::"
         shell: bash
-
-      - name: lib path
-        run: |
-          .libPaths()
-        shell: Rscript {0}
 
       - name: Query dependencies
         id: install
