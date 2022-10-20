@@ -53,7 +53,6 @@ runs:
         run: |
           # Install pak
           cat("::group::Install pak\n")
-          print(Sys.getenv("R_LIBS_SITE"))
           dir.create(Sys.getenv("R_LIBS_SITE"), showWarnings = FALSE, recursive = TRUE)
           install.packages("pak", repos = "https://r-lib.github.io/p/pak/${{ inputs.pak-version }}/", lib = Sys.getenv("R_LIBS_SITE"))
           cat("::endgroup::\n")
@@ -64,7 +63,10 @@ runs:
         run: |
           # Install pak
           echo "::group::Install pak"
-          sudo R -q -e 'dir.create(Sys.getenv("R_LIBS_SITE"), recursive = TRUE, showWarnings = FALSE)'
+          echo "$R_LIBS_SITE"
+          R -q -e 'Sys.getenv("R_LIBS_SITE")'
+          sudo R -q -e 'Sys.getenv("R_LIBS_SITE")'
+          sudo R -q -e 'dir.create(Sys.getenv("R_LIBS_SITE"), recursive = TRUE)'
           sudo R -q -e 'install.packages("pak", repos = "https://r-lib.github.io/p/pak/${{ inputs.pak-version }}/", lib = Sys.getenv("R_LIBS_SITE"))'
           echo "::endgroup::"
         shell: bash
