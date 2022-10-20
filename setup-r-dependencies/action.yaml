@@ -34,18 +34,26 @@ runs:
           # Set site library path
           cat("::group::Set site library path\n")
           lib <- Sys.getenv("R_LIBS_SITE")
+          cat("::group::Install pak\n")
           if (lib == "") {
             lib <- file.path(dirname(.Library), "site-library")
-            writeLines(sprintf("R_LIBS_SITE=%s", lib), "~/.Renviron")
+            cat(sprintf("R_LIBS_SITE=%s\n", lib), file = Sys.getenv("GITHUB_ENV"), append = TRUE)
           }
           cat("::endgroup::\n")
         shell: Rscript {0}
+
+      - name: check R_LIBS_SITE
+        run: |
+          echo "R_LIBS_SITE"
+        shell:
+          bash
 
       - name: Install pak (Windows)
         if: runner.os == 'Windows'
         run: |
           # Install pak
           cat("::group::Install pak\n")
+          print(Sys.getenv("R_LIBS_SITE"))
           dir.create(Sys.getenv("R_LIBS_SITE"), showWarnings = FALSE, recursive = TRUE)
           install.packages("pak", repos = "https://r-lib.github.io/p/pak/${{ inputs.pak-version }}/", lib = Sys.getenv("R_LIBS_SITE"))
           cat("::endgroup::\n")
@@ -60,6 +68,11 @@ runs:
           sudo R -q -e 'install.packages("pak", repos = "https://r-lib.github.io/p/pak/${{ inputs.pak-version }}/", lib = Sys.getenv("R_LIBS_SITE"))'
           echo "::endgroup::"
         shell: bash
+
+      - name: lib path
+        run: |
+          .libPaths()
+        shell: Rscript {0}
 
       - name: Query dependencies
         id: install
