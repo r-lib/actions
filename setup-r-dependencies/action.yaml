@@ -44,7 +44,7 @@ runs:
 
       - name: check R_LIBS_SITE
         run: |
-          echo "R_LIBS_SITE"
+          echo "$R_LIBS_SITE"
         shell:
           bash
 
