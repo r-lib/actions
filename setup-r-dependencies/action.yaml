@@ -38,6 +38,9 @@ runs:
           if (lib == "") {
             lib <- file.path(dirname(.Library), "site-library")
             cat(sprintf("R_LIBS_SITE=%s\n", lib), file = Sys.getenv("GITHUB_ENV"), append = TRUE)
+            message("Setting R_LIBS_SITE to ", lib)
+          } else {
+            message("R_LIBS_SITE is already set to ", lib)
           }
           cat("::endgroup::\n")
         shell: Rscript {0}
@@ -65,9 +68,9 @@ runs:
           echo "::group::Install pak"
           echo "$R_LIBS_SITE"
           R -q -e 'Sys.getenv("R_LIBS_SITE")'
-          sudo R -q -e 'Sys.getenv("R_LIBS_SITE")'
-          sudo R -q -e 'dir.create(Sys.getenv("R_LIBS_SITE"), recursive = TRUE)'
-          sudo R -q -e 'install.packages("pak", repos = "https://r-lib.github.io/p/pak/${{ inputs.pak-version }}/", lib = Sys.getenv("R_LIBS_SITE"))'
+          sudo -E R -q -e 'Sys.getenv("R_LIBS_SITE")'
+          sudo -E R -q -e 'dir.create(Sys.getenv("R_LIBS_SITE"), recursive = TRUE)'
+          sudo -E R -q -e 'install.packages("pak", repos = "https://r-lib.github.io/p/pak/${{ inputs.pak-version }}/", lib = Sys.getenv("R_LIBS_SITE"))'
           echo "::endgroup::"
         shell: bash
 
