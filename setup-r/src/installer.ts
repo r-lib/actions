@@ -170,7 +170,7 @@ async function acquireFortranMacOS(): Promise<string> {
 async function acquireUtilsMacOS() {
   // qpdf is needed by `--as-cran`
   try {
-    await exec.exec("brew", ["install", "qpdf", "pkgconfig", "checkbashisms"]);
+    await exec.exec("brew", ["install", "qpdf", "pkgconfig", "checkbashisms", "ghostscript"]);
   } catch (error) {
     core.debug(`${error}`);
 
@@ -230,7 +230,7 @@ async function acquireRUbuntu(version: string): Promise<string> {
     // install gdbi-core and also qpdf, which is used by `--as-cran`
     await core.group('Installing R system requirements', async() => {
       await exec.exec(
-        "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y gdebi-core qpdf devscripts"
+        "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y gdebi-core qpdf devscripts ghostscript"
       );
     });
     await core.group("Installing R", async() => {
@@ -473,7 +473,7 @@ async function acquireRtools(version: string, rversion: string) {
 
 async function acquireQpdfWindows() {
   try {
-    await exec.exec("choco", ["install", "qpdf", "--no-progress"]);
+    await exec.exec("choco", ["install", "qpdf", "ghostscript", "--no-progress"]);
   } catch (error) {
     core.debug(`${error}`);
 

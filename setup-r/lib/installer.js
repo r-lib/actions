@@ -203,7 +203,7 @@ function acquireUtilsMacOS() {
     return __awaiter(this, void 0, void 0, function* () {
         // qpdf is needed by `--as-cran`
         try {
-            yield exec.exec("brew", ["install", "qpdf", "pkgconfig", "checkbashisms"]);
+            yield exec.exec("brew", ["install", "qpdf", "pkgconfig", "checkbashisms", "ghostscript"]);
         }
         catch (error) {
             core.debug(`${error}`);
@@ -259,7 +259,7 @@ function acquireRUbuntu(version) {
             }));
             // install gdbi-core and also qpdf, which is used by `--as-cran`
             yield core.group('Installing R system requirements', () => __awaiter(this, void 0, void 0, function* () {
-                yield exec.exec("sudo DEBIAN_FRONTEND=noninteractive apt-get install -y gdebi-core qpdf devscripts");
+                yield exec.exec("sudo DEBIAN_FRONTEND=noninteractive apt-get install -y gdebi-core qpdf devscripts ghostscript");
             }));
             yield core.group("Installing R", () => __awaiter(this, void 0, void 0, function* () {
                 yield exec.exec("sudo gdebi", [
@@ -492,7 +492,7 @@ function acquireRtools(version, rversion) {
 function acquireQpdfWindows() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            yield exec.exec("choco", ["install", "qpdf", "--no-progress"]);
+            yield exec.exec("choco", ["install", "qpdf", "ghostscript", "--no-progress"]);
         }
         catch (error) {
             core.debug(`${error}`);
