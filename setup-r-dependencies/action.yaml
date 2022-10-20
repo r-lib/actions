@@ -54,6 +54,7 @@ runs:
         run: |
           sudo R -q -e 'dir.create(Sys.getenv("R_LIBS_SITE"), recursive = TRUE, showWarnings = FALSE)'
           sudo R -q -e 'install.packages("pak", repos = "https://r-lib.github.io/p/pak/${{ inputs.pak-version }}/", lib = .Library.site)'
+        shell: bash
 
       - name: Querying dependencies
         id: install
