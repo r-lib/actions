@@ -29,15 +29,17 @@ inputs:
 runs:
   using: "composite"
   steps:
-      - name: Installing pak querying dependencies
+      - name: Installing pak (Windows)
+        run: |
+          dir.create(Sys.getenv("R_LIBS_SITE"), showWarnings = FALSE, recursive = TRUE))
+          install.packages("pak", repos = "https://r-lib.github.io/p/pak/${{ inputs.pak-version }}/", lib = Sys.getenv("R_LIBS_SITE"))
+
+      - name: Querying dependencies
         id: install
         run: |
           ## Installing pak
-          cat("::group::Installing pak\n")
           cat("os-version=", sessionInfo()$running, "\n", file = Sys.getenv("GITHUB_OUTPUT"), sep = "", append = TRUE)
           cat("r-version=", if (grepl("development", rv <- R.Version()$version.string)) as.character(getRversion()) else rv, "\n", file = Sys.getenv("GITHUB_OUTPUT"), sep = "", append = TRUE)
-          install.packages("pak", repos = "https://r-lib.github.io/p/pak/${{ inputs.pak-version }}/")
-          cat("::endgroup::\n")
           cat("::group::Dependency resolution\n")
           needs <- sprintf("Config/Needs/%s", strsplit("${{ inputs.needs }}", "[[:space:],]+")[[1]])
           deps <- strsplit("${{ inputs.packages }}", "[[:space:],]+")[[1]]
