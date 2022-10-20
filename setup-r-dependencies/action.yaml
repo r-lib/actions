@@ -33,6 +33,7 @@ runs:
         run: |
           dir.create(Sys.getenv("R_LIBS_SITE"), showWarnings = FALSE, recursive = TRUE))
           install.packages("pak", repos = "https://r-lib.github.io/p/pak/${{ inputs.pak-version }}/", lib = Sys.getenv("R_LIBS_SITE"))
+        shell: Rscript {0}
 
       - name: Querying dependencies
         id: install
