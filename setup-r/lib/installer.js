@@ -444,21 +444,26 @@ function acquireRtools(version, rversion) {
             }
         }
         // we never want patches (by default)
+        let addpath = core.getInput("windows-path-include-rtools") === "true";
         core.exportVariable("_R_INSTALL_TIME_PATCHES_", "no");
         if (rtools42) {
-            core.addPath(`C:\\rtools42\\usr\\bin`);
-            core.addPath(`C:\\rtools42\\x86_64-w64-mingw32.static.posix\\bin`);
+            if (addpath) {
+                core.addPath(`C:\\rtools42\\usr\\bin`);
+                core.addPath(`C:\\rtools42\\x86_64-w64-mingw32.static.posix\\bin`);
+            }
         }
         else if (rtools40) {
-            core.addPath(`C:\\rtools40\\usr\\bin`);
-            // If we use Rtools40 and R 4.2.0 or later, then we need to add this
-            // to the path, because GHA might put a different gcc on the PATH,
-            // and R 4.2.x picks that up. We do this for R-devel, R-next and
-            // every numeric version that is not 4.0.x and 4.1.x. (For 3.x.y
-            // Rtools3.x is selected.) Issue #610.
-            if (rversion == "devel" || rversion == "next" ||
-                (!rversion.startsWith("4.0.") && !rversion.startsWith("4.1."))) {
-                core.addPath(`C:\\rtools40\\ucrt64\\bin`);
+            if (addpath) {
+                core.addPath(`C:\\rtools40\\usr\\bin`);
+                // If we use Rtools40 and R 4.2.0 or later, then we need to add this
+                // to the path, because GHA might put a different gcc on the PATH,
+                // and R 4.2.x picks that up. We do this for R-devel, R-next and
+                // every numeric version that is not 4.0.x and 4.1.x. (For 3.x.y
+                // Rtools3.x is selected.) Issue #610.
+                if (rversion == "devel" || rversion == "next" ||
+                    (!rversion.startsWith("4.0.") && !rversion.startsWith("4.1."))) {
+                    core.addPath(`C:\\rtools40\\ucrt64\\bin`);
+                }
             }
             if (core.getInput("update-rtools") === "true") {
                 try {
@@ -475,9 +480,11 @@ function acquireRtools(version, rversion) {
             }
         }
         else { // rtools3x
-            core.addPath(`C:\\Rtools\\bin`);
-            if (core.getInput("windows-path-include-mingw") === "true") {
-                core.addPath(`C:\\Rtools\\mingw_64\\bin`);
+            if (addpath) {
+                core.addPath(`C:\\Rtools\\bin`);
+                if (core.getInput("windows-path-include-mingw") === "true") {
+                    core.addPath(`C:\\Rtools\\mingw_64\\bin`);
+                }
             }
         }
     });
