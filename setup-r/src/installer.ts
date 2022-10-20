@@ -513,9 +513,9 @@ async function setupRLibrary() {
   }
 
   if (rspm !== "NULL") {
-    rspm = rspm.replace(/^'|'$/g, "");
-    core.exportVariable("RSPM", rspm);
-    core.exportVariable("RENV_CONFIG_REPOS_OVERRIDE", rspm);
+    let rspm_noq = rspm.replace(/^'|'$/g, "");
+    core.exportVariable("RSPM", rspm_noq);
+    core.exportVariable("RENV_CONFIG_REPOS_OVERRIDE", rspm_noq);
   }
 
   let cran = `'${core.getInput("cran") ||
