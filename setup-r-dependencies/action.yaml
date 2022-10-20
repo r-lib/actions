@@ -67,7 +67,7 @@ runs:
       - name: Query dependencies
         id: install
         run: |
-          # Query dependencies
+          # Dependency resolution
           cat("::group::Dependency resolution\n")
           cat("os-version=", sessionInfo()$running, "\n", file = Sys.getenv("GITHUB_OUTPUT"), sep = "", append = TRUE)
           cat("r-version=", if (grepl("development", rv <- R.Version()$version.string)) as.character(getRversion()) else rv, "\n", file = Sys.getenv("GITHUB_OUTPUT"), sep = "", append = TRUE)
@@ -101,7 +101,7 @@ runs:
       - name: Install dependencies
         run: |
           ## Install/Update packages
-          cat("::group::Installing/updating packages\n")
+          cat("::group::Install/update packages\n")
           Sys.setenv("PKGCACHE_HTTP_VERSION" = "2")
           pak::lockfile_install(".github/pkg.lock")
           cat("::endgroup::\n")
