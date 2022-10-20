@@ -100,12 +100,20 @@ runs:
 
       - name: Install dependencies
         run: |
-          ## Install/Update packages
+          # Install/Update packages
           cat("::group::Install/update packages\n")
           Sys.setenv("PKGCACHE_HTTP_VERSION" = "2")
           library(pak, lib.loc = .Library.site)
           pak::lockfile_install(".github/pkg.lock")
+          ## Clean up lock file
+          unlink(".github/pkg.lock")
           cat("::endgroup::\n")
+        shell: Rscript {0}
+        working-directory: ${{ inputs.working-directory }}
+
+      - name: Session info
+        run: |
+          # Session info
           cat("::group::Session info\n")
           if (requireNamespace("sessioninfo", quietly = TRUE)) {
             if (packageVersion("sessioninfo") >= "1.2.1") {
@@ -117,8 +125,6 @@ runs:
           } else {
             sessionInfo()
           }
-          ## Clean up lock file
-          unlink(".github/pkg.lock")
           cat("::endgroup::\n")
         shell: Rscript {0}
         working-directory: ${{ inputs.working-directory }}
