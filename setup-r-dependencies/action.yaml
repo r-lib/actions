@@ -36,11 +36,7 @@ runs:
           lib <- Sys.getenv("R_LIBS_SITE")
           if (lib == "") {
             lib <- file.path(dirname(.Library), "site-library")
-            cat(
-              "R_LIBS_SITE=", lib, "\n",
-              file = Sys.getenv("GITHUB_ENV"),
-              sep = "", append = TRUE
-            )
+            writeLines(sprintf("R_LIBS_SITE=%s", lib), "~/.Renviron")
           }
           cat("::endgroup::\n")
         shell: Rscript {0}
@@ -49,10 +45,10 @@ runs:
         if: runner.os == 'Windows'
         run: |
           # Install pak
-          echo "::group::Install pak"
+          cat("::group::Install pak\n")
           dir.create(Sys.getenv("R_LIBS_SITE"), showWarnings = FALSE, recursive = TRUE)
           install.packages("pak", repos = "https://r-lib.github.io/p/pak/${{ inputs.pak-version }}/", lib = Sys.getenv("R_LIBS_SITE"))
-          echo "::endgroup::"
+          cat("::endgroup::\n")
         shell: Rscript {0}
 
       - name: Install pak (Unix)
