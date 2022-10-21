@@ -140,6 +140,10 @@ function acquireR(version, rtoolsVersion) {
             if (!ok) {
                 throw `Failed to get qpdf and ghostscript in 10 tries :(`;
             }
+            let gspath = "c:\\program files\\gs\\" +
+                fs.readdirSync("c:\\program files\\gs") +
+                "\\bin";
+            core.addPath(gspath);
         }
     });
 }
