@@ -40,9 +40,7 @@ jobs:
         if: always()
         run: |
           ## --------------------------------------------------------------------
-          echo ::group::Show testthat output
           find ${{ runner.temp }}/package -name 'testthat.Rout*' -exec cat '{}' \; || true
-          echo ::endgroup::
         shell: bash
 
       - name: Upload test results
