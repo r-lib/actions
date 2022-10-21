@@ -90,21 +90,19 @@ async function acquireR(version: string, rtoolsVersion: string) {
   if (IS_WINDOWS) {
     const rtoolsVersionNumber = parseInt(rtoolsVersion.substring(0, 2));
     const rtools42 = rtoolsVersionNumber >= 41;
-    if (rtools42) {
-      var tries_left = 10;
-      var ok = false;
-      while (!ok && tries_left > 0) {
-        try {
-          await acquireQpdfWindows();
-          ok = true;
-        } catch (error) {
-          core.warning("Failed to download qpdf: ${error}");
-            await new Promise(f => setTimeout(f, 10000));
-            tries_left = tries_left - 1;
-        }
+    var tries_left = 10;
+    var ok = false;
+    while (!ok && tries_left > 0) {
+      try {
+        await acquireQpdfWindows(rtools42);
+        ok = true;
+      } catch (error) {
+        core.warning("Failed to download qpdf or ghostscript: ${error}");
+          await new Promise(f => setTimeout(f, 10000));
+          tries_left = tries_left - 1;
       }
-      if (!ok) { throw `Failed to get qpdf in 10 tries :(` }
     }
+    if (!ok) { throw `Failed to get qpdf and ghostscript in 10 tries :(` }
   }
 }
 
@@ -471,9 +469,14 @@ async function acquireRtools(version: string, rversion: string) {
   }
 }
 
-async function acquireQpdfWindows() {
+async function acquireQpdfWindows(rtools42) {
+  var pkgs = ["ghostscript"];
+  if (rtools42) {
+    pkgs = pkgs.concat(["qpdf"]);
+  }
+  var args = ["install"].concat(pkgs).concat(["--no-progress"]);
   try {
-    await exec.exec("choco", ["install", "qpdf", "ghostscript", "--no-progress"]);
+    await exec.exec("choco", args);
   } catch (error) {
     core.debug(`${error}`);
 

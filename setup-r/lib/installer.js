@@ -124,23 +124,21 @@ function acquireR(version, rtoolsVersion) {
         if (IS_WINDOWS) {
             const rtoolsVersionNumber = parseInt(rtoolsVersion.substring(0, 2));
             const rtools42 = rtoolsVersionNumber >= 41;
-            if (rtools42) {
-                var tries_left = 10;
-                var ok = false;
-                while (!ok && tries_left > 0) {
-                    try {
-                        yield acquireQpdfWindows();
-                        ok = true;
-                    }
-                    catch (error) {
-                        core.warning("Failed to download qpdf: ${error}");
-                        yield new Promise(f => setTimeout(f, 10000));
-                        tries_left = tries_left - 1;
-                    }
+            var tries_left = 10;
+            var ok = false;
+            while (!ok && tries_left > 0) {
+                try {
+                    yield acquireQpdfWindows(rtools42);
+                    ok = true;
                 }
-                if (!ok) {
-                    throw `Failed to get qpdf in 10 tries :(`;
+                catch (error) {
+                    core.warning("Failed to download qpdf or ghostscript: ${error}");
+                    yield new Promise(f => setTimeout(f, 10000));
+                    tries_left = tries_left - 1;
                 }
+            }
+            if (!ok) {
+                throw `Failed to get qpdf and ghostscript in 10 tries :(`;
             }
         }
     });
@@ -489,10 +487,15 @@ function acquireRtools(version, rversion) {
         }
     });
 }
-function acquireQpdfWindows() {
+function acquireQpdfWindows(rtools42) {
     return __awaiter(this, void 0, void 0, function* () {
+        var pkgs = ["ghostscript"];
+        if (rtools42) {
+            pkgs = pkgs.concat(["qpdf"]);
+        }
+        var args = ["install"].concat(pkgs).concat(["--no-progress"]);
         try {
-            yield exec.exec("choco", ["install", "qpdf", "ghostscript", "--no-progress"]);
+            yield exec.exec("choco", args);
         }
         catch (error) {
             core.debug(`${error}`);
