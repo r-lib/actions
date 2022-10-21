@@ -8,14 +8,17 @@ This action checks an R package using the [rcmdcheck](https://r-lib.github.io/rc
 
 Inputs available:
 - args - default `c("--no-manual", "--as-cran")`. Arguments to pass to the
-  `args` parameter of `rcmdcheck`. It must be an R expression in single
-  quotes.
+  `args` parameter of `rcmdcheck`. It must be an R expression.
+  Note that you often need to quote it, see details below.
 - build_args - default `"--no-manual"`. Arguments to pass to the `build_args`
-  parameter of `rcmdcheck`. it must be an R expression in single quotes.
-- check-dir - default `"check"`. Arguments to pass to the `check-dir` 
-  parameter of `rcmdcheck`. It must be an R expression in single quotes.
+  parameter of `rcmdcheck`. It must be an R expression.
+  Note that you often need to quote it, see details below.
+- check-dir - default `"check"`. Arguments to pass to the `check-dir`
+  parameter of `rcmdcheck`. It must be an R expression.
+  Note that you often need to quote it, see details below.
 - error-on - default `"warning"`. Arguments to pass to the `error-on`
-  parameter of `rcmdcheck`. It must be an R expression in single quotes.
+  parameter of `rcmdcheck`. It must be an R expression.
+  Note that you often need to quote it, see details below.
 - upload-snapshots - default `false`. Whether to upload all testthat
   snapshots as an artifact.
 - upload-results - default `false`. Whether to upload check results for
@@ -23,7 +26,7 @@ Inputs available:
 - working-directory - default `"."`. If the R package to check is not in
   the root directory of your repository.
 
-Basic: 
+Basic:
 ```yaml
 steps:
 - uses: actions/checkout@v3
@@ -50,6 +53,16 @@ steps:
       error-on: '"error"'
       check-dir: '"check"'
 ```
+
+## Quoting R expressions
+
+Several input arguments must be specified as an R expression.
+This increases flexibility, but it also causes some inconvenience, since
+these expressions often need to be quoted in the YAML file.
+A handy tip is is that if your R expression does not contain a single quote,
+and you specify it in the YAML in a single line, surrounded by single
+quotes (like in the example above for `args`, `error-on` and `check-dir`
+right above), that will work.
 
 # License
 

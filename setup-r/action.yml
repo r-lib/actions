@@ -31,6 +31,9 @@ inputs:
       use the existing installation in the GitHub Action image. Note that if it
       is "false", you probably need to run `sudo apt-get update` yourself.'
     default: true
+  windows-path-include-rtools:
+    description: "Whether to add Rtools to the PATH."
+    default: true
   windows-path-include-mingw:
     description: 'If "true" put the 64 bit mingw directory from Rtools on the
     PATH for Windows builds. This argument is now defunct on Rtools40 and later,

@@ -5,5 +5,5 @@ add_one <- function(x) {
 }
 
 times2 <- function(x) {
-  .Call(test_fun, as.integer(x)[1]);
+  .Call(test_fun, as.integer(x)[1])
 }

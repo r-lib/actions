@@ -21,9 +21,9 @@ Inputs available
 - `dependencies` - default `'"all"'`. Types of dependencies to install. By
   default all direct dependencies of the current package are installed, and
   hard dependencies of these direct dependencies. See also the `needs` and
-  `extra-packages` parameters. This parameter must be a valid R expression
-  in single quotes and it is passed to the `dependencies` argument of
-  `pak::lockfile_create().`
+  `extra-packages` parameters. This parameter must be a valid R expression,
+  and it is passed to the `dependencies` argument of `pak::lockfile_create().`
+  Note that you often need to quote it, see details below.
 - `extra-packages` - One or more extra package references to install.
   Separate each reference by newlines or commas for more than one package.
 - `needs` - `Config/Needs` fields to install from the DESCRIPTION, the
@@ -52,6 +52,15 @@ steps:
       website
       coverage
 ```
+
+## Quoting R expressions
+
+The `dependencies` parameter must be specified as an R expression.
+This increases flexibility, but it also causes some inconvenience, since
+these expressions often need to be quoted in the YAML file.
+A handy tip is is that if your R expression does not contain a single quote,
+and you specify it in the YAML in a single line, surrounded by single
+quotes, that will work.
 
 ## Supported R versions and operating systems
 

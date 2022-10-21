@@ -24,26 +24,59 @@ inputs:
     description: 'Using the working-directory keyword, you can specify the working directory of where "pkg_deps" command searches for dependencies in the "DESCRIPTION" file.'
     default: '.'
   dependencies:
-    description: 'Types of dependencies to install. Must be an R expression in single quotes.'
+    description: 'Types of dependencies to install. Must be an R expression. Note that it often needs to be quoted in YAML, see the README for details.'
     default: '"all"'
 runs:
   using: "composite"
   steps:
-      - name: Installing pak querying dependencies
+      - name: Set site library path
+        run: |
+          # Set site library path
+          cat("::group::Set site library path\n")
+          lib <- Sys.getenv("R_LIBS_SITE")
+          if (lib == "") {
+            lib <- file.path(dirname(.Library), "site-library")
+            cat(sprintf("R_LIBS_SITE=%s\n", lib), file = Sys.getenv("GITHUB_ENV"), append = TRUE)
+            message("Setting R_LIBS_SITE to ", lib)
+          } else {
+            message("R_LIBS_SITE is already set to ", lib)
+          }
+          cat("::endgroup::\n")
+        shell: Rscript {0}
+
+      - name: Install pak (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          # Install pak
+          cat("::group::Install pak\n")
+          dir.create(Sys.getenv("R_LIBS_SITE"), showWarnings = FALSE, recursive = TRUE)
+          install.packages("pak", repos = "https://r-lib.github.io/p/pak/${{ inputs.pak-version }}/", lib = Sys.getenv("R_LIBS_SITE"))
+          cat("::endgroup::\n")
+        shell: Rscript {0}
+
+      - name: Install pak (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          # Install pak
+          echo "::group::Install pak"
+          sudo -E R -q -e 'dir.create(Sys.getenv("R_LIBS_SITE"), recursive = TRUE, showWarnings = FALSE)'
+          sudo -E R -q -e 'install.packages("pak", repos = "https://r-lib.github.io/p/pak/${{ inputs.pak-version }}/", lib = Sys.getenv("R_LIBS_SITE"))'
+          echo "::endgroup::"
+        shell: bash
+
+      - name: Query dependencies
         id: install
         run: |
-          ## Installing pak
-          cat("::group::Installing pak\n")
+          # Dependency resolution
+          cat("::group::Dependency resolution\n")
           cat("os-version=", sessionInfo()$running, "\n", file = Sys.getenv("GITHUB_OUTPUT"), sep = "", append = TRUE)
           cat("r-version=", if (grepl("development", rv <- R.Version()$version.string)) as.character(getRversion()) else rv, "\n", file = Sys.getenv("GITHUB_OUTPUT"), sep = "", append = TRUE)
-          install.packages("pak", repos = "https://r-lib.github.io/p/pak/${{ inputs.pak-version }}/")
-          cat("::endgroup::\n")
-          cat("::group::Dependency resolution\n")
           needs <- sprintf("Config/Needs/%s", strsplit("${{ inputs.needs }}", "[[:space:],]+")[[1]])
           deps <- strsplit("${{ inputs.packages }}", "[[:space:],]+")[[1]]
           extra_deps <- strsplit("${{ inputs.extra-packages }}", "[[:space:],]+")[[1]]
           dir.create(".github", showWarnings=FALSE)
           Sys.setenv("PKGCACHE_HTTP_VERSION" = "2")
+          library(pak, lib.loc = .Library.site)
           pak::lockfile_create(
             c(deps, extra_deps),
             lockfile = ".github/pkg.lock",
@@ -68,11 +101,20 @@ runs:
 
       - name: Install dependencies
         run: |
-          ## Installing/Updating packages
-          cat("::group::Installing/updating packages\n")
+          # Install/Update packages
+          cat("::group::Install/update packages\n")
           Sys.setenv("PKGCACHE_HTTP_VERSION" = "2")
+          library(pak, lib.loc = .Library.site)
           pak::lockfile_install(".github/pkg.lock")
+          ## Clean up lock file
+          unlink(".github/pkg.lock")
           cat("::endgroup::\n")
+        shell: Rscript {0}
+        working-directory: ${{ inputs.working-directory }}
+
+      - name: Session info
+        run: |
+          # Session info
           cat("::group::Session info\n")
           if (requireNamespace("sessioninfo", quietly = TRUE)) {
             if (packageVersion("sessioninfo") >= "1.2.1") {
@@ -84,8 +126,6 @@ runs:
           } else {
             sessionInfo()
           }
-          ## Clean up lock file
-          unlink(".github/pkg.lock")
           cat("::endgroup::\n")
         shell: Rscript {0}
         working-directory: ${{ inputs.working-directory }}

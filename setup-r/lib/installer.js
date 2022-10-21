@@ -203,7 +203,7 @@ function acquireUtilsMacOS() {
     return __awaiter(this, void 0, void 0, function* () {
         // qpdf is needed by `--as-cran`
         try {
-            yield exec.exec("brew", ["install", "qpdf", "pkgconfig", "checkbashisms"]);
+            yield exec.exec("brew", ["install", "qpdf", "pkgconfig", "checkbashisms", "ghostscript"]);
         }
         catch (error) {
             core.debug(`${error}`);
@@ -259,7 +259,7 @@ function acquireRUbuntu(version) {
             }));
             // install gdbi-core and also qpdf, which is used by `--as-cran`
             yield core.group('Installing R system requirements', () => __awaiter(this, void 0, void 0, function* () {
-                yield exec.exec("sudo DEBIAN_FRONTEND=noninteractive apt-get install -y gdebi-core qpdf devscripts");
+                yield exec.exec("sudo DEBIAN_FRONTEND=noninteractive apt-get install -y gdebi-core qpdf devscripts ghostscript");
             }));
             yield core.group("Installing R", () => __awaiter(this, void 0, void 0, function* () {
                 yield exec.exec("sudo gdebi", [
@@ -444,21 +444,26 @@ function acquireRtools(version, rversion) {
             }
         }
         // we never want patches (by default)
+        let addpath = core.getInput("windows-path-include-rtools") === "true";
         core.exportVariable("_R_INSTALL_TIME_PATCHES_", "no");
         if (rtools42) {
-            core.addPath(`C:\\rtools42\\usr\\bin`);
-            core.addPath(`C:\\rtools42\\x86_64-w64-mingw32.static.posix\\bin`);
+            if (addpath) {
+                core.addPath(`C:\\rtools42\\usr\\bin`);
+                core.addPath(`C:\\rtools42\\x86_64-w64-mingw32.static.posix\\bin`);
+            }
         }
         else if (rtools40) {
-            core.addPath(`C:\\rtools40\\usr\\bin`);
-            // If we use Rtools40 and R 4.2.0 or later, then we need to add this
-            // to the path, because GHA might put a different gcc on the PATH,
-            // and R 4.2.x picks that up. We do this for R-devel, R-next and
-            // every numeric version that is not 4.0.x and 4.1.x. (For 3.x.y
-            // Rtools3.x is selected.) Issue #610.
-            if (rversion == "devel" || rversion == "next" ||
-                (!rversion.startsWith("4.0.") && !rversion.startsWith("4.1."))) {
-                core.addPath(`C:\\rtools40\\ucrt64\\bin`);
+            if (addpath) {
+                core.addPath(`C:\\rtools40\\usr\\bin`);
+                // If we use Rtools40 and R 4.2.0 or later, then we need to add this
+                // to the path, because GHA might put a different gcc on the PATH,
+                // and R 4.2.x picks that up. We do this for R-devel, R-next and
+                // every numeric version that is not 4.0.x and 4.1.x. (For 3.x.y
+                // Rtools3.x is selected.) Issue #610.
+                if (rversion == "devel" || rversion == "next" ||
+                    (!rversion.startsWith("4.0.") && !rversion.startsWith("4.1."))) {
+                    core.addPath(`C:\\rtools40\\ucrt64\\bin`);
+                }
             }
             if (core.getInput("update-rtools") === "true") {
                 try {
@@ -475,9 +480,11 @@ function acquireRtools(version, rversion) {
             }
         }
         else { // rtools3x
-            core.addPath(`C:\\Rtools\\bin`);
-            if (core.getInput("windows-path-include-mingw") === "true") {
-                core.addPath(`C:\\Rtools\\mingw_64\\bin`);
+            if (addpath) {
+                core.addPath(`C:\\Rtools\\bin`);
+                if (core.getInput("windows-path-include-mingw") === "true") {
+                    core.addPath(`C:\\Rtools\\mingw_64\\bin`);
+                }
             }
         }
     });
@@ -485,7 +492,7 @@ function acquireRtools(version, rversion) {
 function acquireQpdfWindows() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            yield exec.exec("choco", ["install", "qpdf", "--no-progress"]);
+            yield exec.exec("choco", ["install", "qpdf", "ghostscript", "--no-progress"]);
         }
         catch (error) {
             core.debug(`${error}`);
@@ -526,7 +533,9 @@ function setupRLibrary() {
             }
         }
         if (rspm !== "NULL") {
-            core.exportVariable("RSPM", rspm.replace(/^'|'$/g, ""));
+            let rspm_noq = rspm.replace(/^'|'$/g, "");
+            core.exportVariable("RSPM", rspm_noq);
+            core.exportVariable("RENV_CONFIG_REPOS_OVERRIDE", rspm_noq);
         }
         let cran = `'${core.getInput("cran") ||
             process.env["CRAN"] ||
