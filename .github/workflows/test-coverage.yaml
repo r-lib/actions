@@ -5,6 +5,7 @@ on:
     branches: [main, master, v2-branch]
   pull_request:
     branches: [main, master, v2-branch]
+  workflow_dispatch:
 
 name: test-coverage
 
@@ -27,5 +28,17 @@ jobs:
           needs: coverage
 
       - name: Test coverage
-        run: covr::codecov(quiet = FALSE)
+        run: |
+          covr::codecov(
+            quiet = FALSE,
+            clean = FALSE,
+            install_path = file.path("RUNNER_TEMP", package)
+          )
         shell: Rscript {0}
+
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-test-failures
+          path: ${{ env.RUNNER_TEMP }}/package
