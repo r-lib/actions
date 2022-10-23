@@ -26,6 +26,8 @@ inputs:
 
 runs:
   using: "composite"
+  with:
+    pak-version: devel
   steps:
     - name: Check
       id: rcmdcheck    
