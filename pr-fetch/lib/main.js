@@ -22,7 +22,7 @@ const exec = __importStar(require("@actions/exec"));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            console.log("::warning r-lib/actions/pr-fetch@v1 is deprecated. Please update your workflow to use the '@v2' version.");
+            console.log("::warning title=r-lib/actions/pr-fetch@v1 is deprecated.::r-lib/actions/pr-fetch@v1 is deprecated. Please update your workflow to use the 'v2' version.");
             const token = core.getInput("repo-token", { required: true });
             const client = new github.GitHub(token);
             const context = github.context;

@@ -35,7 +35,7 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             core.debug(`started action`);
-            console.log("::warning r-lib/actions/setup-r@v1 is deprecated. Please update your workflow to use the '@v2' version. Also look at the examples at https://github.com/r-lib/actions/tree/v2/examples because '@v2' workflows are much simpler than '@v1' workflows.");
+            console.log("::warning title=r-lib/actions/setup-r@v1 is deprecated.::r-lib/actions/setup-r@v1 is deprecated. Please update your workflow to use the 'v2' version. Also look at the examples at https://github.com/r-lib/actions/tree/v2/examples because '@v2' workflows are much simpler than 'v1' workflows.");
             let version = core.getInput("r-version");
             core.debug(`got version ${version}`);
             yield installer_1.getR(version);
