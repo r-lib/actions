@@ -4,6 +4,9 @@ import * as exec from "@actions/exec";
 
 async function run() {
   try {
+
+    console.log("::warning title=r-lib/action/pr-fetch@v1 is deprecated::Please update your workflow to use the '@v2' version.");
+
     const token: string = core.getInput("repo-token", { required: true });
 
     const client: github.GitHub = new github.GitHub(token);
