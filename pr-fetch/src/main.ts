@@ -5,7 +5,7 @@ import * as exec from "@actions/exec";
 async function run() {
   try {
 
-    console.log("::warning r-lib/action/pr-fetch@v1 is deprecated. Please update your workflow to use the '@v2' version.");
+    console.log("::warning r-lib/actions/pr-fetch@v1 is deprecated. Please update your workflow to use the '@v2' version.");
 
     const token: string = core.getInput("repo-token", { required: true });
 

@@ -44,6 +44,7 @@ if (!tempDirectory) {
 }
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
+        console.log("::warning r-lib/actions/setup-tinytex@v1 is deprecated. Please update your workflow to use the '@v2' version.");
         try {
             yield getTinyTeX();
         }

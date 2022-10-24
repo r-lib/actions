@@ -27,6 +27,7 @@ if (!tempDirectory) {
 }
 
 async function run() {
+  console.log("::warning r-lib/actions/setup-tinytex@v1 is deprecated. Please update your workflow to use the '@v2' version.");
   try {
     await getTinyTeX();
   } catch (error) {
