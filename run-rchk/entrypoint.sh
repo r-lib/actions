@@ -2,6 +2,8 @@
 
 set -eo pipefail
 
+echo "::warning title=r-lib/action/run-rchk@v1 is deprecated::Please update your workflow to use the '@v2' version."
+
 cd /home/docker/R-svn/
 . /home/docker/rchk/scripts/cmpconfig.inc
 cd -
