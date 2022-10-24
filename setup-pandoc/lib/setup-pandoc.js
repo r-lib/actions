@@ -44,6 +44,7 @@ if (!tempDirectory) {
 }
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
+        console.log("::warning title=r-lib/action/setup-pandoc@v1 is deprecated::Please update your workflow to use the '@v2' version.");
         try {
             let pandocVersion = core.getInput("pandoc-version");
             core.debug(`got pandoc-version ${pandocVersion}`);
