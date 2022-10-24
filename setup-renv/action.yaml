@@ -3,7 +3,7 @@ description: 'Action to setup renv and install R dependencies in the lockfile'
 author: 'Jim Hester'
 inputs:
   profile:
-    description: 'The renv profile that should be activated. Forwarded to `renv::activate()`. Note that it often needs to be quoted in YAML, see the README for details.'
+    description: 'The renv profile that should be activated. Forwarded to `renv::activate()`. Must be an R expression. Note that it often needs to be quoted in YAML, see the README for details.'
   cache-version:
     description: 'The version of the cache, change this from the default (1) to start over with a fresh cache'
     required: true
