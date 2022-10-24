@@ -46,8 +46,7 @@ This increases flexibility, but it also causes some inconvenience, since
 these expressions often need to be quoted in the YAML file.
 A handy tip is is that if your R expression does not contain a single quote,
 and you specify it in the YAML in a single line, surrounded by single
-quotes (like in the example above for `args`, `error-on` and `check-dir`
-right above), that will work.
+quotes (like in the example above for `profile`), that will work.
 
 # License
 
