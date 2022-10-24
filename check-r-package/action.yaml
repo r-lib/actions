@@ -17,6 +17,10 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: @v1 is deprecated
+      run: |
+        echo "::warning title=r-lib/action/check-r-packages@v1 is deprecated::Please update your workflow to use the `@v2` version. Also look at the examples at https://github.com/r-lib/actions/tree/v2/examples because `@v2` workflows are much simpler than `@v1` workflows."
+
     - name: Check
       env:
         _R_CHECK_CRAN_INCOMING_: false
