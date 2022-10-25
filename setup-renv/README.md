@@ -18,6 +18,7 @@ must be an R expression. Note that you often need to quote it, see details
 below.
 
 Basic:
+
 ```yaml
 steps:
 - uses: actions/checkout@v3
@@ -30,6 +31,7 @@ steps:
 - `cache-version` - default `1`. If you need to invalidate the existing cache pass any other number and a new cache will be used.
 
 Basic:
+
 ```yaml
 steps:
 - uses: actions/checkout@v3
