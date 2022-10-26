@@ -16,21 +16,9 @@ Forwarded to
 [`renv::activate()`](https://rstudio.github.io/renv/reference/activate.html). It
 must be an R expression. Note that you often need to quote it, see details
 below.
-
-Basic:
-
-```yaml
-steps:
-- uses: actions/checkout@v3
-- uses: r-lib/actions/setup-r@v2
-- uses: r-lib/actions/setup-renv@v2
-  with:
-    profile: "'shiny'"
-```
-
 - `cache-version` - default `1`. If you need to invalidate the existing cache pass any other number and a new cache will be used.
 
-Basic:
+Example:
 
 ```yaml
 steps:
@@ -38,12 +26,12 @@ steps:
 - uses: r-lib/actions/setup-r@v2
 - uses: r-lib/actions/setup-renv@v2
   with:
-    cache-version: 2
+    profile: '"shiny"'
 ```
 
 ## Quoting R expressions
 
-Several input arguments must be specified as an R expression.
+The `profile` input parameter must be specified as an R expression.
 This increases flexibility, but it also causes some inconvenience, since
 these expressions often need to be quoted in the YAML file.
 A handy tip is that if your R expression does not contain a single quote,
