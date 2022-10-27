@@ -49,8 +49,9 @@ runs:
         run: |
           # Install pak
           cat("::group::Install pak\n")
-          dir.create(Sys.getenv("R_LIBS_SITE"), showWarnings = FALSE, recursive = TRUE)
-          install.packages("pak", repos = "https://r-lib.github.io/p/pak/${{ inputs.pak-version }}/", lib = Sys.getenv("R_LIBS_SITE"))
+          lib <- strsplit(Sys.getenv("R_LIBS_SITE"), .Platform$path.sep)[[1]][[1]]
+          dir.create(lib, showWarnings = FALSE, recursive = TRUE)
+          install.packages("pak", repos = "https://r-lib.github.io/p/pak/${{ inputs.pak-version }}/", lib = lib)
           cat("::endgroup::\n")
         shell: Rscript {0}
 
@@ -59,8 +60,8 @@ runs:
         run: |
           # Install pak
           echo "::group::Install pak"
-          sudo -E R -q -e 'dir.create(Sys.getenv("R_LIBS_SITE"), recursive = TRUE, showWarnings = FALSE)'
-          sudo -E R -q -e 'install.packages("pak", repos = "https://r-lib.github.io/p/pak/${{ inputs.pak-version }}/", lib = Sys.getenv("R_LIBS_SITE"))'
+          sudo -E R -q -e 'dir.create(strsplit(Sys.getenv("R_LIBS_SITE"), .Platform$path.sep)[[1]][[1]], recursive = TRUE, showWarnings = FALSE)'
+          sudo -E R -q -e 'install.packages("pak", repos = "https://r-lib.github.io/p/pak/${{ inputs.pak-version }}/", lib = strsplit(Sys.getenv("R_LIBS_SITE"), .Platform$path.sep)[[1]][[1]])'
           echo "::endgroup::"
         shell: bash
 
