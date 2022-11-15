@@ -520,7 +520,7 @@ function setupRLibrary() {
         let rspm = process.env["RSPM"] ? `'${process.env["RSPM"]}'` : "NULL";
         if (rspm === "NULL" && core.getInput("use-public-rspm") === "true") {
             if (IS_WINDOWS) {
-                rspm = "'https://packagemanager.rstudio.com/all/latest'";
+                rspm = "'https://packagemanager.posit.co/cran/latest'";
             }
             if (IS_LINUX) {
                 let codename = "";
@@ -536,7 +536,7 @@ function setupRLibrary() {
                     throw `Failed to query the linux version: ${error}`;
                 }
                 codename = codename.trim();
-                rspm = `'https://packagemanager.rstudio.com/all/__linux__/${codename}/latest'`;
+                rspm = `'https://packagemanager.posit.co/cran/__linux__/${codename}/latest'`;
             }
         }
         if (rspm !== "NULL") {
