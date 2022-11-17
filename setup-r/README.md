@@ -55,8 +55,8 @@ This action sets up an R environment for use in actions by:
     mingw directory to the path.
 -   **update-rtools** (`false`) - Update rtools40 compilers and
     libraries to the latest builds.
--   **use-public-rspm** (`false`) - Use the public version of RStudio
-    package manager available at <https://packagemanager.rstudio.com/>
+-   **use-public-rspm** (`false`) - Use the public version of Posit
+    package manager available at <https://packagemanager.posit.co/>
     to serve binaries for Linux and Windows.
 -   **extra-repositories** (`''`) - One or more extra CRAN-like
     repositories to include in the `repos` global option

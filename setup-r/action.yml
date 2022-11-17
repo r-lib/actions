@@ -43,8 +43,8 @@ inputs:
     description: 'Update rtools40 compilers and libraries to the latest builds.'
     default: false
   use-public-rspm:
-    description: 'Use the public version of RStudio package manager available
-      at https://packagemanager.rstudio.com/ to serve binaries for Linux and
+    description: 'Use the public version of Posit package manager available
+      at https://packagemanager.posit.co/ to serve binaries for Linux and
       Windows.'
     default: false
   extra-repositories:
