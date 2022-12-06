@@ -8,6 +8,9 @@ inputs:
     description: 'The version of the cache, change this from the default (1) to start over with a fresh cache'
     required: true
     default: 1
+  bypass-cache:
+    description: 'Whether attempts to cache should be completely skipped (for non GitHub testing). Set to `true` to skip.'
+    default: "false"
 runs:
   using: "composite"
   steps:
@@ -30,6 +33,7 @@ runs:
         shell: Rscript {0}
 
       - name: Restore Renv package cache
+        if: ${{ inputs.bypass-cache != 'true' }}
         uses: actions/cache@v3
         with:
           path: ${{ env.RENV_PATHS_ROOT }}
