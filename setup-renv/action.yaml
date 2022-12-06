@@ -1,52 +1,52 @@
-name: "setup-renv"
-description: "Action to setup renv and install R dependencies in the lockfile"
-author: "Jim Hester"
+name: 'setup-renv'
+description: 'Action to setup renv and install R dependencies in the lockfile'
+author: 'Jim Hester'
 inputs:
   profile:
-    description: "The renv profile that should be activated. Forwarded to `renv::activate()`. Must be an R expression. Note that it often needs to be quoted in YAML, see the README for details."
+    description: 'The renv profile that should be activated. Forwarded to `renv::activate()`. Must be an R expression. Note that it often needs to be quoted in YAML, see the README for details.'
   cache-version:
-    description: "The version of the cache, change this from the default (1) to start over with a fresh cache"
+    description: 'The version of the cache, change this from the default (1) to start over with a fresh cache'
     required: true
     default: 1
   bypass-cache:
-    description: "Whether attempts to cache should be completely skipped (for non GitHub testing). Set to `true` to skip."
+    description: 'Whether attempts to cache should be completely skipped (for non GitHub testing). Set to `true` to skip.'
     default: "false"
 runs:
   using: "composite"
   steps:
-    - name: Set RENV_PATHS_ROOT
-      shell: bash
-      run: |
-        echo "RENV_PATHS_ROOT=${{ runner.temp }}/renv" >> $GITHUB_ENV
+      - name: Set RENV_PATHS_ROOT
+        shell: bash
+        run: |
+          echo "RENV_PATHS_ROOT=${{ runner.temp }}/renv" >> $GITHUB_ENV
 
-    - name: Install and activate renv
-      run: |
-        install.packages("renv")
-        renv::activate(profile = ${{ inputs.profile }})
-      shell: Rscript {0}
+      - name: Install and activate renv
+        run: |
+          install.packages("renv")
+          renv::activate(profile = ${{ inputs.profile }})
+        shell: Rscript {0}
 
-    - name: Get R and OS version
-      id: get-version
-      run: |
-        cat("os-version=", sessionInfo()$running, "\n", file = Sys.getenv("GITHUB_OUTPUT"), sep = "", append = TRUE)
-        cat("r-version=", R.Version()$version.string, "\n", file = Sys.getenv("GITHUB_OUTPUT"), sep = "", append = TRUE)
-      shell: Rscript {0}
+      - name: Get R and OS version
+        id: get-version
+        run: |
+          cat("os-version=", sessionInfo()$running, "\n", file = Sys.getenv("GITHUB_OUTPUT"), sep = "", append = TRUE)
+          cat("r-version=", R.Version()$version.string, "\n", file = Sys.getenv("GITHUB_OUTPUT"), sep = "", append = TRUE)
+        shell: Rscript {0}
 
-    - name: Restore Renv package cache
-      if: ${{ inputs.bypass-cache != 'true' }}
-      uses: actions/cache@v3
-      with:
-        path: ${{ env.RENV_PATHS_ROOT }}
-        key: ${{ steps.get-version.outputs.os-version }}-${{ steps.get-version.outputs.r-version }}-${{inputs.cache-version }}-${{ hashFiles('renv.lock') }}
-        restore-keys: ${{ steps.get-version.outputs.os-version }}-${{ steps.get-version.outputs.r-version }}-${{inputs.cache-version }}-
+      - name: Restore Renv package cache
+        if: ${{ inputs.bypass-cache != 'true' }}
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.RENV_PATHS_ROOT }}
+          key: ${{ steps.get-version.outputs.os-version }}-${{ steps.get-version.outputs.r-version }}-${{inputs.cache-version }}-${{ hashFiles('renv.lock') }}
+          restore-keys: ${{ steps.get-version.outputs.os-version }}-${{ steps.get-version.outputs.r-version }}-${{inputs.cache-version }}-
 
-    - name: Install renv dependencies
-      run: renv::restore()
-      shell: Rscript {0}
+      - name: Install renv dependencies
+        run: renv::restore()
+        shell: Rscript {0}
 
-    - name: Don't use tar 1.30 from Rtools35 to store the cache
-      shell: bash
-      run: |
-        if command -v /c/Rtools/bin/tar && /c/Rtools/bin/tar --version | grep -q 'tar (GNU tar) 1.30'
-          then echo 'C:/Program Files/Git/usr/bin' >> $GITHUB_PATH
-        fi
+      - name: Don't use tar 1.30 from Rtools35 to store the cache
+        shell: bash
+        run: |
+          if command -v /c/Rtools/bin/tar && /c/Rtools/bin/tar --version | grep -q 'tar (GNU tar) 1.30'
+            then echo 'C:/Program Files/Git/usr/bin' >> $GITHUB_PATH
+          fi
