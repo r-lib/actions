@@ -9,7 +9,17 @@ name: "setup-tinytex test"
 
 jobs:
   tinytex:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.config.os }}
+    name: ${{ matrix.config.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { os: macos-latest   }
+          - { os: windows-latest }
+          - { os: ubuntu-latest  }
+
     steps:
       - uses: actions/checkout@v3
 
