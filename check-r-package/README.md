@@ -48,10 +48,10 @@ steps:
     extra-packages: any::rcmdcheck
     needs: check
 - uses: r-lib/actions/check-r-package@v2
-    with:
-      args: 'c("--no-manual", "--as-cran")'
-      error-on: '"error"'
-      check-dir: '"check"'
+  with:
+    args: 'c("--no-manual", "--as-cran")'
+    error-on: '"error"'
+    check-dir: '"check"'
 ```
 
 ## Quoting R expressions
