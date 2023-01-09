@@ -36,12 +36,11 @@ jobs:
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
 
-      - uses: ./setup-r-dependencies
-        with:
-          pak-version: ${{ github.event.inputs.pak-version || 'stable' }}
-          extra-packages: any::rcmdcheck
-          needs: check
+      - name: "Check what version of rtools is installed"
+      - run: |
+          ls c:/
 
-      - uses: ./check-r-package
-        with:
-          upload-snapshots: true
+      - name: "Install package from source"
+        run: |
+          install.packages("filelock", type = "source")
+        shell: Rscript {0}
