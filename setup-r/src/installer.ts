@@ -38,7 +38,8 @@ export async function getR(version: string) {
 
   // this works for 'next' and 'devel' as well, currently.
   let rtoolsVersion =
-    core.getInput("rtools-version") || (version.charAt(0) == "3" ? "35" : "40");
+	core.getInput("rtools-version") ||
+	(version.charAt(0) == "3" ? "35" : (version == "devel" ? "43" : "40"));
 
   let toolPath = tc.find("R", version);
 
@@ -89,12 +90,12 @@ async function acquireR(version: string, rtoolsVersion: string) {
 
   if (IS_WINDOWS) {
     const rtoolsVersionNumber = parseInt(rtoolsVersion.substring(0, 2));
-    const rtools42 = rtoolsVersionNumber >= 41;
+    const noqpdf = rtoolsVersionNumber >= 41;
     var tries_left = 10;
     var ok = false;
     while (!ok && tries_left > 0) {
       try {
-        await acquireQpdfWindows(rtools42);
+        await acquireQpdfWindows(noqpdf);
         ok = true;
       } catch (error) {
         core.warning("Failed to download qpdf or ghostscript: ${error}");
@@ -378,7 +379,8 @@ async function acquireRWindows(version: string): Promise<string> {
 
 async function acquireRtools(version: string, rversion: string) {
   const versionNumber = parseInt(version.substring(0, 2));
-  const rtools42 = versionNumber >= 41;
+  const rtools43 = versionNumber >= 42;
+  const rtools42 = !rtools43 && versionNumber >= 41;
   const rtools40 = !rtools42 && versionNumber >= 40;
   const rtools3x = !rtools42 && !rtools40;
   var downloadUrl, fileName;
@@ -392,14 +394,19 @@ async function acquireRtools(version: string, rversion: string) {
     downloadUrl = util.format(
       "http://cloud.r-project.org/bin/windows/Rtools/%s",
       fileName)
-  } else { // rtools42
-    fileName = "rtools42-5038-5046.exe";
-    downloadUrl = "https://github.com/gaborcsardi/Rtools42/releases/download/5038-5046/rtools42-5038-5046.exe";
+  } else if (rtools42) {
+    fileName = "rtools42.exe";
+    downloadUrl = "https://github.com/r-hub/rtools42/releases/download/latest/rtools42.exe";
+  } else {
+    // rtools43
+    fileName = "rtools43.exe";
+    downloadUrl = "https://github.com/r-hub/rtools43/releases/download/latest/rtools43.exe";
   }
 
   // If Rtools is already installed just return, as there is a message box
   // which hangs the build otherwise.
   if (
+      (rtools43 && fs.existsSync("C:\\Rtools43")) ||
       (rtools42 && fs.existsSync("C:\\Rtools42")) ||
       (rtools40 && fs.existsSync("C:\\rtools40")) ||
       (rtools3x && fs.existsSync("C:\\Rtools"))
@@ -433,7 +440,12 @@ async function acquireRtools(version: string, rversion: string) {
   // we never want patches (by default)
   let addpath = core.getInput("windows-path-include-rtools") === "true";
   core.exportVariable("_R_INSTALL_TIME_PATCHES_", "no");
-  if (rtools42) {
+  if (rtools43) {
+    if (addpath) {
+      core.addPath(`C:\\rtools43\\usr\\bin`);
+      core.addPath(`C:\\rtools43\\x86_64-w64-mingw32.static.posix\\bin`);
+    }
+  } else if (rtools42) {
     if (addpath) {
       core.addPath(`C:\\rtools42\\usr\\bin`);
       core.addPath(`C:\\rtools42\\x86_64-w64-mingw32.static.posix\\bin`);
@@ -473,9 +485,9 @@ async function acquireRtools(version: string, rversion: string) {
   }
 }
 
-async function acquireQpdfWindows(rtools42) {
+async function acquireQpdfWindows(noqpdf) {
   var pkgs = ["ghostscript"];
-  if (rtools42) {
+  if (noqpdf) {
     pkgs = pkgs.concat(["qpdf"]);
   }
   var args = ["install"].concat(pkgs).concat(["--no-progress"]);
