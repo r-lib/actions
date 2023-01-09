@@ -7,7 +7,7 @@ jobs:
   R-CMD-check:
     runs-on: windows-latest
 
-    name: Windows, R ${{ matrix.config.r }}, Rtools ${{ matrix.config.rtools }}
+    name: Windows, R ${{ matrix.config.r }}, Rtools ${{ matrix.config.rtools-version }}
 
     strategy:
       fail-fast: false
