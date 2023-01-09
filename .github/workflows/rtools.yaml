@@ -37,7 +37,7 @@ jobs:
           use-public-rspm: true
 
       - name: "Check what version of rtools is installed"
-      - run: |
+        run: |
           ls c:/
 
       - name: "Install package from source"
