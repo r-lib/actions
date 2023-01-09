@@ -379,9 +379,9 @@ async function acquireRWindows(version: string): Promise<string> {
 
 async function acquireRtools(version: string, rversion: string) {
   const versionNumber = parseInt(version.substring(0, 2));
-  const rtools43 = versionNumber >= 42;
+  const rtools43 = versionNumber >= 43;
   const rtools42 = !rtools43 && versionNumber >= 41;
-  const rtools40 = !rtools42 && versionNumber >= 40;
+  const rtools40 = !rtools43 && !rtools42 && versionNumber >= 40;
   const rtools3x = !rtools43 && !rtools42 && !rtools40;
   var downloadUrl, fileName;
   if (rtools3x) {

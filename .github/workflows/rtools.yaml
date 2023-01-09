@@ -16,7 +16,7 @@ jobs:
           # the default is rtools40 here
           - { r: 'release'                       }
           # manually select rtools42
-          - { r: 'release', rtools-version: "42" }
+          - { r: 'release', rtools-version: '42' }
           # defaults to rtools43
           - { r: 'devel'                         }
 
@@ -33,7 +33,6 @@ jobs:
         with:
           r-version: ${{ matrix.config.r }}
           rtools-version: ${{ matrix.config.rtools-version }}
-          http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
 
       - name: "Check what version of rtools is installed"
