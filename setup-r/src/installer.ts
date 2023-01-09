@@ -382,7 +382,7 @@ async function acquireRtools(version: string, rversion: string) {
   const rtools43 = versionNumber >= 42;
   const rtools42 = !rtools43 && versionNumber >= 41;
   const rtools40 = !rtools42 && versionNumber >= 40;
-  const rtools3x = !rtools42 && !rtools40;
+  const rtools3x = !rtools43 && !rtools42 && !rtools40;
   var downloadUrl, fileName;
   if (rtools3x) {
     fileName = util.format("Rtools%s.exe", version);
