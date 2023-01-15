@@ -213,6 +213,8 @@ jobs:
           - {os: windows-latest, r: 'release'}
           # Use 3.6 to trigger usage of RTools35
           - {os: windows-latest, r: '3.6'}
+          # use 4.1 to check with rtools40's older compiler
+          - {os: windows-latest, r: '4.1'}
 
           - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
           - {os: ubuntu-latest,   r: 'release'}
@@ -284,8 +286,27 @@ jobs:
           needs: coverage
 
       - name: Test coverage
-        run: covr::codecov(quiet = FALSE)
+        run: |
+          covr::codecov(
+            quiet = FALSE,
+            clean = FALSE,
+            install_path = file.path(Sys.getenv("RUNNER_TEMP"), "package")
+          )
         shell: Rscript {0}
+
+      - name: Show testthat output
+        if: always()
+        run: |
+          ## --------------------------------------------------------------------
+          find ${{ runner.temp }}/package -name 'testthat.Rout*' -exec cat '{}' \; || true
+        shell: bash
+
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-test-failures
+          path: ${{ runner.temp }}/package
 ```
 
 ## Lint workflow
@@ -326,6 +347,8 @@ jobs:
       - name: Lint
         run: lintr::lint_package()
         shell: Rscript {0}
+        env:
+          LINTR_ERROR_ON_LINT: true
 ```
 
 ## Commands workflow
@@ -599,9 +622,9 @@ changes to the same branch.
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    paths: ["**.[rR]", "**.[rR]md", "**.[rR]markdown", "**.[rR]nw"]
+    paths: ["**.[rR]", "**.[qrR]md", "**.[rR]markdown", "**.[rR]nw"]
   pull_request:
-    paths: ["**.[rR]", "**.[rR]md", "**.[rR]markdown", "**.[rR]nw"]
+    paths: ["**.[rR]", "**.[qrR]md", "**.[rR]markdown", "**.[rR]nw"]
 
 name: Style
 
@@ -959,6 +982,8 @@ jobs:
       - name: Lint root directory
         run: lintr::lint_dir()
         shell: Rscript {0}
+        env:
+          LINTR_ERROR_ON_LINT: true
 ```
 
 ## Forcing binaries
