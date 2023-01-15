@@ -647,7 +647,7 @@ jobs:
       - name: Install dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::styler
+          extra-packages: any::styler, any::roxygen2
           needs: styler
 
       - name: Enable styler cache
@@ -658,7 +658,7 @@ jobs:
         id: styler-location
         run: |
           cat(
-            "location=", 
+            "location=",
             styler::cache_info(format = "tabular")$location,
             "\n",
             file = Sys.getenv("GITHUB_OUTPUT"),
