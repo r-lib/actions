@@ -5,51 +5,50 @@
 
 Package workflows:
 
--   [`check-release`](#quickstart-ci-workflow) - A simple CI workflow to
-    check with the release version of R.
--   [`check-standard`](#standard-ci-workflow) - A standard CI workflow
-    to check with the release version of R on the three major OSs.
--   [`check-full`](#tidyverse-ci-workflow) - A more complex CI workflow
--   [`test-coverage`](#test-coverage-workflow) - Run `covr::codecov()`
-    on an R package.
--   [`lint`](#lint-workflow) - Run `lintr::lint_package()` on an R
-    package.
--   [`pr-commands`](#commands-workflow) - Adds `/document` and `/style`
-    commands for pull requests.
--   [`pkgdown`](#build-pkgdown-site) - Build a
-    [pkgdown](https://pkgdown.r-lib.org/) site for an R package and
-    deploy it to [GitHub Pages](https://pages.github.com/).
--   [`document`](#document-package) - Run `roxygen2::roxygenise()` on an
-    R package.
--   [`style`](#style-package) - Run `styler::style_pkg()` on an R
-    package.
+- [`check-release`](#quickstart-ci-workflow) - A simple CI workflow to
+  check with the release version of R.
+- [`check-standard`](#standard-ci-workflow) - A standard CI workflow to
+  check with the release version of R on the three major OSs.
+- [`check-full`](#tidyverse-ci-workflow) - A more complex CI workflow
+- [`test-coverage`](#test-coverage-workflow) - Run `covr::codecov()` on
+  an R package.
+- [`lint`](#lint-workflow) - Run `lintr::lint_package()` on an R
+  package.
+- [`pr-commands`](#commands-workflow) - Adds `/document` and `/style`
+  commands for pull requests.
+- [`pkgdown`](#build-pkgdown-site) - Build a
+  [pkgdown](https://pkgdown.r-lib.org/) site for an R package and deploy
+  it to [GitHub Pages](https://pages.github.com/).
+- [`document`](#document-package) - Run `roxygen2::roxygenise()` on an R
+  package.
+- [`style`](#style-package) - Run `styler::style_pkg()` on an R package.
 
 RMarkdown workflows:
 
--   [`render-rmarkdown`](#render-rmarkdown) - Render one or more
-    Rmarkdown files when they change and commit the result.
--   [`bookdown`](#build-bookdown-site) - Build a
-    [bookdown](https://bookdown.org) site and deploy it to [GitHub
-    Pages](https://pages.github.com/).
--   [`blogdown`](#build-blogdown-site) - Build a
-    [blogdown](https://bookdown.org/yihui/blogdown/) site and deploy it
-    to [GitHub Pages](https://pages.github.com/).
+- [`render-rmarkdown`](#render-rmarkdown) - Render one or more Rmarkdown
+  files when they change and commit the result.
+- [`bookdown`](#build-bookdown-site) - Build a
+  [bookdown](https://bookdown.org) site and deploy it to [GitHub
+  Pages](https://pages.github.com/).
+- [`blogdown`](#build-blogdown-site) - Build a
+  [blogdown](https://bookdown.org/yihui/blogdown/) site and deploy it to
+  [GitHub Pages](https://pages.github.com/).
 
 Other workflows:
 
--   [`docker`](#docker-based-workflow) - For custom workflows based on
-    docker containers.
--   [Bioconductor](#bioconductor-friendly-workflow) - A CI workflow for
-    packages to be released on Bioconductor.
--   [`lint-project`](#lint-project-workflow) - Run `lintr::lint_dir()`
-    on an R project.
--   [`shiny-deploy`](#shiny-app-deployment) - Deploy a Shiny app to
-    shinyapps.io or RStudio Connect.
+- [`docker`](#docker-based-workflow) - For custom workflows based on
+  docker containers.
+- [Bioconductor](#bioconductor-friendly-workflow) - A CI workflow for
+  packages to be released on Bioconductor.
+- [`lint-project`](#lint-project-workflow) - Run `lintr::lint_dir()` on
+  an R project.
+- [`shiny-deploy`](#shiny-app-deployment) - Deploy a Shiny app to
+  shinyapps.io or RStudio Connect.
 
 Options and advice:
 
--   [Forcing binaries](#forcing-binaries) - An environment variable to
-    always use binary packages.
+- [Forcing binaries](#forcing-binaries) - An environment variable to
+  always use binary packages.
 
 ## Quickstart CI workflow
 
@@ -569,8 +568,6 @@ branch.
 on:
   push:
     paths: ["R/**"]
-  pull_request:
-    paths: ["R/**"]
 
 name: Document
 
@@ -622,8 +619,6 @@ changes to the same branch.
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    paths: ["**.[rR]", "**.[qrR]md", "**.[rR]markdown", "**.[rR]nw"]
-  pull_request:
     paths: ["**.[rR]", "**.[qrR]md", "**.[rR]markdown", "**.[rR]nw"]
 
 name: Style
@@ -833,13 +828,13 @@ This action assumes you have an `renv` lockfile in your repository that
 describes the `R` packages and versions required for your Shiny
 application.
 
--   See here for information on how to obtain the token and secret for
-    configuring `rsconnect`:
-    <https://shiny.rstudio.com/articles/shinyapps.html>
+- See here for information on how to obtain the token and secret for
+  configuring `rsconnect`:
+  <https://shiny.rstudio.com/articles/shinyapps.html>
 
--   See here for information on how to store private tokens in a
-    repository as GitHub Secrets:
-    <https://docs.github.com/en/actions/reference/encrypted-secrets#creating-encrypted-secrets-for-a-repository>
+- See here for information on how to store private tokens in a
+  repository as GitHub Secrets:
+  <https://docs.github.com/en/actions/reference/encrypted-secrets#creating-encrypted-secrets-for-a-repository>
 
 ``` yaml
 # Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
