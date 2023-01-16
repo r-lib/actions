@@ -3,8 +3,6 @@
 on:
   push:
     paths: ["R/**"]
-  pull_request:
-    paths: ["R/**"]
 
 name: Document
 
