@@ -622,9 +622,7 @@ changes to the same branch.
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    paths: ["**.[rR]", "**.[qrR]md", "**.[rR]markdown", "**.[rR]nw"]
-  pull_request:
-    paths: ["**.[rR]", "**.[qrR]md", "**.[rR]markdown", "**.[rR]nw"]
+    paths: ["**.[rR]", "**.[qrR]md", "**.[rR]markdown", "**.[rR]nw", , "**.[rR]profile"]
 
 name: Style
 
@@ -677,14 +675,14 @@ jobs:
             ${{ runner.os }}-
 
       - name: Style
-        run: styler::style_pkg(filetype = c(".R", ".Rmd", ".Rmarkdown", ".Rnw"))
+        run: styler::style_pkg()
         shell: Rscript {0}
 
       - name: Commit and push changes
         run: |
           git config --local user.name "$GITHUB_ACTOR"
           git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
-          git add R/\*
+          git add \*.[rR] \*.[qrR]md \*.[rR]markdown \*.[rR]nw \*.[rR]profile
           git commit -m "Style code" || echo "No changes to commit"
           git pull --ff-only
           git push origin
