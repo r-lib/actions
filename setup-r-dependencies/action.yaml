@@ -3,7 +3,7 @@ description: 'Action to setup installation tools and install R dependencies'
 author: 'Jim Hester'
 inputs:
   cache:
-    description: 'A boolean value indicating whether packages should be cached from one to the other'
+    description: 'A boolean value indicating whether packages should be cached (on success) from one to the other. If `"always"` is provided, the package cache will be saved even if the Action fails.'
     required: true
     default: true
   cache-version:
@@ -110,15 +110,39 @@ runs:
         shell: Rscript {0}
         working-directory: ${{ inputs.working-directory }}
 
-      - name: Restore R package cache
+      - name: Restore R package cache keys
+        id: cache-args
+        if: inputs.cache != 'false'
+        shell: bash
+        run: |
+          # Make cache args
+          RESTORE_KEY="${{ format('{0}-{1}-{2}', steps.install.outputs.os-version, steps.install.outputs.r-version, inputs.cache-version) }}"
+          PRIMARY_KEY="$RESTORE_KEY-${{ hashFiles(format('{0}/.github/pkg.lock', inputs.working-directory )) }}"
+          echo "key=$PRIMARY_KEY" >> $GITHUB_OUTPUT
+          echo "restore-keys=$RESTORE_KEY" >> $GITHUB_OUTPUT
+
+          # Make cache path
+          echo "path<<EOF" >> $GITHUB_OUTPUT
+          echo '${{ env.R_LIBS_USER }}/*' >> $GITHUB_OUTPUT
+          echo '!${{ env.R_LIBS_USER }}/pak' >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Restore R package cache (and save cache on successful Action)
         if: inputs.cache == 'true'
         uses: actions/cache@v3
         with:
-          path: |
-            ${{ env.R_LIBS_USER }}/*
-            !${{ env.R_LIBS_USER }}/pak
-          key: ${{ format('{0}-{1}-{2}-{3}', steps.install.outputs.os-version, steps.install.outputs.r-version, inputs.cache-version, hashFiles(format('{0}/.github/pkg.lock', inputs.working-directory ))) }}
-          restore-keys: ${{ steps.install.outputs.os-version }}-${{ steps.install.outputs.r-version }}-${{inputs.cache-version }}-
+          path: ${{ steps.cache-args.outputs.path }}
+          key: ${{ steps.cache-args.outputs.key }}
+          restore-keys: ${{ steps.cache-args.outputs.restore-keys }}
+
+      - name: Restore R package cache
+        if: inputs.cache == 'always'
+        id: r-pkg-cache
+        uses: actions/cache/restore@v3
+        with:
+          path: ${{ steps.cache-args.outputs.path }}
+          key: ${{ steps.cache-args.outputs.key }}
+          restore-keys: ${{ steps.cache-args.outputs.restore-keys }}
 
       - name: Install dependencies
         run: |
@@ -132,6 +156,15 @@ runs:
           cat("::endgroup::\n")
         shell: Rscript {0}
         working-directory: ${{ inputs.working-directory }}
+
+      # Step used to help speed up package installation on troublesome Actions
+      - name: Save R package cache
+        # If `actions/cache/restore@v3` restored from `cache-primary-key`, then `cache-hit == 'true'`; If so, do not save cache
+        if: inputs.cache == 'always' && steps.r-pkg-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v3
+        with:
+          path: ${{ steps.cache-args.outputs.path }}
+          key: ${{ steps.r-pkg-cache.outputs.cache-primary-key }}
 
       - name: Session info
         run: |
