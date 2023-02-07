@@ -34,6 +34,9 @@ Inputs available
   by newlines or commas.
 - `pak-version`: Which pak version to use. Possible values are
   `stable`, `rc` and `devel`. Defaults to `stable`.
+- `upgrade`: Whether to install the latest available versions of the
+  dependencies. Must be an R expression. See the README for details if
+  you need quoting. Defaults to `FALSE`.
 - `working-directory` - default `'.'`. If the DESCRIPTION file is not in the
   root directory of your repository.
 

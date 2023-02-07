@@ -26,6 +26,9 @@ inputs:
   dependencies:
     description: 'Types of dependencies to install. Must be an R expression. Note that it often needs to be quoted in YAML, see the README for details.'
     default: '"all"'
+  upgrade:
+    description: 'Whether to install the latest available versions of the dependencies. Must be an R expression. See the README for details if you need quoting.'
+    default: 'FALSE'
 runs:
   using: "composite"
   steps:
@@ -88,6 +91,7 @@ runs:
           pak::lockfile_create(
             c(deps, extra_deps),
             lockfile = ".github/pkg.lock",
+            upgrade = (${{ inputs.upgrade }}),
             dependencies = c(needs, (${{ inputs.dependencies }}))
           )
           cat("::endgroup::\n")
