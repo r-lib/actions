@@ -81,7 +81,17 @@ runs:
           # Dependency resolution
           cat("::group::Dependency resolution\n")
           cat("os-version=", sessionInfo()$running, "\n", file = Sys.getenv("GITHUB_OUTPUT"), sep = "", append = TRUE)
-          cat("r-version=", if (grepl("development", rv <- R.Version()$version.string)) paste0("R version ", getRversion(), " (r", R.Version()$`svn rev`, ")") else rv, "\n", file = Sys.getenv("GITHUB_OUTPUT"), sep = "", append = TRUE)
+          r_version <-
+            if (grepl("development", R.version.string)) {
+              dev.new()
+              ge_ver <- attr(recordPlot(), "engineVersion")
+              dev.off()
+              paste0("R version ", getRversion(), " (ge", ge_ver,":", .Internal(internalsID()), ")")
+            } else {
+              R.version.string
+            }
+             attr(a, "engineVersion")
+          cat("r-version=", r_version, "\n", file = Sys.getenv("GITHUB_OUTPUT"), sep = "", append = TRUE)
           needs <- sprintf("Config/Needs/%s", strsplit("${{ inputs.needs }}", "[[:space:],]+")[[1]])
           deps <- strsplit("${{ inputs.packages }}", "[[:space:],]+")[[1]]
           extra_deps <- strsplit("${{ inputs.extra-packages }}", "[[:space:],]+")[[1]]
