@@ -35,12 +35,28 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(require("@actions/core"));
 const installer_1 = require("./installer");
 const path = __importStar(require("path"));
+const fs = __importStar(require("fs"));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             core.debug(`started action`);
-            let version = core.getInput("r-version");
-            core.debug(`got version ${version}`);
+            var version;
+            version = core.getInput("r-version");
+            if (version === "renv") {
+                let renv_lock_path = "./renv.lock";
+                if (fs.existsSync(renv_lock_path)) {
+                    let renv_lock = fs.readFileSync(renv_lock_path).toString();
+                    version = JSON.parse(renv_lock).R.Version;
+                    core.debug(`got version ${version} from renv.lock`);
+                }
+                else {
+                    core.setFailed("./renv.lock does not exist.");
+                }
+            }
+            else {
+                version = version;
+                core.debug(`got version ${version} from input`);
+            }
             yield (0, installer_1.getR)(version);
             const matchersPath = path.join(__dirname, "..", ".github");
             console.log(`##[add-matcher]${path.join(matchersPath, "rcmdcheck.json")}`);
