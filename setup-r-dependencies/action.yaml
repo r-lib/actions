@@ -90,7 +90,6 @@ runs:
             } else {
               R.version.string
             }
-             attr(a, "engineVersion")
           cat("r-version=", r_version, "\n", file = Sys.getenv("GITHUB_OUTPUT"), sep = "", append = TRUE)
           needs <- sprintf("Config/Needs/%s", strsplit("${{ inputs.needs }}", "[[:space:],]+")[[1]])
           deps <- strsplit("${{ inputs.packages }}", "[[:space:],]+")[[1]]
