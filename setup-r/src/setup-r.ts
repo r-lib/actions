@@ -3,7 +3,6 @@ import { getR } from "./installer";
 import * as path from "path";
 import * as fs from "fs";
 
-
 async function run() {
   try {
     core.debug(`started action`);
