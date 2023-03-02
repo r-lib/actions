@@ -71,9 +71,9 @@ probably what you want to use.
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches: [main, master]
+    branches: [$default-branch]
   pull_request:
-    branches: [main, master]
+    branches: [$default-branch]
 
 name: R-CMD-check
 
@@ -118,9 +118,9 @@ CRAN or Bioconductor this is likely the workflow you want to use.
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches: [main, master]
+    branches: [$default-branch]
   pull_request:
-    branches: [main, master]
+    branches: [$default-branch]
 
 name: R-CMD-check
 
@@ -192,9 +192,9 @@ CI workflow.
 # usethis::use_github_action("check-standard") will install it.
 on:
   push:
-    branches: [main, master]
+    branches: [$default-branch]
   pull_request:
-    branches: [main, master]
+    branches: [$default-branch]
 
 name: R-CMD-check
 
@@ -261,9 +261,9 @@ the test coverage of your package and upload the result to
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches: [main, master]
+    branches: [$default-branch]
   pull_request:
-    branches: [main, master]
+    branches: [$default-branch]
 
 name: test-coverage
 
@@ -321,9 +321,9 @@ lint your package and return the results as build annotations.
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches: [main, master]
+    branches: [$default-branch]
   pull_request:
-    branches: [main, master]
+    branches: [$default-branch]
 
 name: lint
 
@@ -511,9 +511,9 @@ API](https://docs.github.com/en/rest/reference/actions/#create-a-workflow-dispat
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches: [main, master]
+    branches: [$default-branch]
   pull_request:
-    branches: [main, master]
+    branches: [$default-branch]
   release:
     types: [published]
   workflow_dispatch:
@@ -710,9 +710,9 @@ additional information.
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches: [main, master]
+    branches: [$default-branch]
   pull_request:
-    branches: [main, master]
+    branches: [$default-branch]
   workflow_dispatch:
 
 name: bookdown
@@ -774,9 +774,9 @@ additional information.
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches: [main, master]
+    branches: [$default-branch]
   pull_request:
-    branches: [main, master]
+    branches: [$default-branch]
   workflow_dispatch:
 
 name: blogdown
@@ -846,7 +846,7 @@ application.
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches: [main, master]
+    branches: [$default-branch]
 
 name: shiny-deploy
 
@@ -957,9 +957,9 @@ lint your project and return the results as annotations.
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches: [main, master]
+    branches: [$default-branch]
   pull_request:
-    branches: [main, master]
+    branches: [$default-branch]
 
 name: lint-project
 

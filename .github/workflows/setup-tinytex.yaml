@@ -1,8 +1,8 @@
 on:
   push:
-    branches: [main, master, v2-branch]
+    branches: [$default-branch, v2-branch]
   pull_request:
-    branches: [main, master, v2-branch]
+    branches: [$default-branch, v2-branch]
   workflow_dispatch:
     
 name: "setup-tinytex test"
