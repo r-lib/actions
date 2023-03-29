@@ -87,7 +87,8 @@ exports.getPandoc = getPandoc;
 function installPandocMac(version) {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
-        const fileName = util.format("pandoc-%s-macOS.pkg", version);
+        const is_new_macos_installer = compare(version, "3.1.2", ">=") ? true : false;
+        const fileName = is_new_macos_installer ? util.format("pandoc-%s-x86_64-macOS.pkg", version) : util.format("pandoc-%s-macOS.pkg", version);
         const downloadUrl = util.format("https://github.com/jgm/pandoc/releases/download/%s/%s", version, fileName);
         let downloadPath;
         try {
