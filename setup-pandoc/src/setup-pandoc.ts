@@ -48,7 +48,10 @@ export function getPandoc(version: string): Promise<void> {
 }
 
 async function installPandocMac(version: string): Promise<void> {
-  const fileName = util.format("pandoc-%s-macOS.pkg", version);
+  // Since 3.1.2, Pandoc uses cabal instead of stack to build the macOS binary.
+  const is_new_macos_installer = compare(version, "3.1.2", ">=") ? true : false;
+  const fileName = is_new_macos_installer ? util.format("pandoc-%s-x86_64-macOS.pkg", version) : util.format("pandoc-%s-macOS.pkg", version);
+
   const downloadUrl = util.format(
     "https://github.com/jgm/pandoc/releases/download/%s/%s",
     version,
