@@ -9,7 +9,6 @@ on:
     branches: [main, master, v2-branch]
   pull_request:
     branches: [main, master, v2-branch]
-  workflow_dispatch:
 
 name: R-CMD-check
 
@@ -24,9 +23,6 @@ jobs:
       matrix:
         config:
           - {os: macos-latest,   r: 'release'}
-
-          - {os: windows-latest, r: 'devel'}
-          - {os: windows-latest, r: 'next'}
 
           - {os: windows-latest, r: 'release'}
           # Use 3.6 to trigger usage of RTools35
