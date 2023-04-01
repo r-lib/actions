@@ -86,7 +86,7 @@ runs:
               pdf(tempfile())
               ge_ver <- attr(recordPlot(), "engineVersion")
               dev.off()
-              paste0("R version ", getRversion(), " (ge", ge_ver,":", .Internal(internalsID()), ")")
+              paste0("R version ", getRversion(), " (ge:", ge_ver, "; iid:", .Internal(internalsID()), ")")
             } else {
               R.version.string
             }
