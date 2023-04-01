@@ -83,7 +83,7 @@ runs:
           cat("os-version=", sessionInfo()$running, "\n", file = Sys.getenv("GITHUB_OUTPUT"), sep = "", append = TRUE)
           r_version <-
             if (grepl("development", R.version.string)) {
-              dev.new()
+              pdf(tempfile())
               ge_ver <- attr(recordPlot(), "engineVersion")
               dev.off()
               paste0("R version ", getRversion(), " (ge", ge_ver,":", .Internal(internalsID()), ")")
