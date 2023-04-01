@@ -74,7 +74,9 @@ function getR(version) {
         }
         // this works for 'next' and 'devel' as well, currently.
         let rtoolsVersion = core.getInput("rtools-version") ||
-            (version.charAt(0) == "3" ? "35" : (version == "devel" ? "43" : "40"));
+            (version.charAt(0) == "3" ?
+                "35" :
+                (version == "devel" || semver.gte(version, "4.3.0") ? "43" : "40"));
         let toolPath = tc.find("R", version);
         if (toolPath) {
             core.debug(`Tool found in cache ${toolPath}`);

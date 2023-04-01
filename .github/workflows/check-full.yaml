@@ -24,6 +24,9 @@ jobs:
         config:
           - {os: macos-latest,   r: 'release'}
 
+          - {os: windows-latest, r: 'devel'}
+          - {os: windows-latest, r: 'next'}
+
           - {os: windows-latest, r: 'release'}
           # Use 3.6 to trigger usage of RTools35
           - {os: windows-latest, r: '3.6'}
