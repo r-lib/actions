@@ -569,8 +569,6 @@ branch.
 on:
   push:
     paths: ["R/**"]
-  pull_request:
-    paths: ["R/**"]
 
 name: Document
 
@@ -604,7 +602,7 @@ jobs:
         run: |
           git config --local user.name "$GITHUB_ACTOR"
           git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
-          git add man/\* NAMESPACE
+          git add man/\* NAMESPACE DESCRIPTION
           git commit -m "Update documentation" || echo "No changes to commit"
           git pull --ff-only
           git push origin
