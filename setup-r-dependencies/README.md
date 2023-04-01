@@ -17,7 +17,8 @@ Inputs available
   not.
 - `cache-version` - default `1`. If you need to invalidate the existing
   cache pass any other number and a new cache will be used. Ignored if
-  `cache: false`.
+  `cache: false`. Note that you can also [delete caches
+  manually(https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#deleting-cache-entries).
 - `dependencies` - default `'"all"'`. Types of dependencies to install. By
   default all direct dependencies of the current package are installed, and
   hard dependencies of these direct dependencies. See also the `needs` and
