@@ -120,9 +120,16 @@ async function installTinyTeXWindows() {
     throw `Failed to install TinyTeX: ${error}`;
   }
 
-  core.addPath(
-    path.join(process.env["APPDATA"] || "C:\\", "TinyTeX", "bin", "win32")
-  );
+  const binDir = "win32"
+
+  let winBin = path.join(process.env["APPDATA"] || "C:\\", "TinyTeX", "bin")
+
+  winBin = fs.existsSync(path.join(winBin, binDir)) ?
+    path.join(winBin, binDir) :
+    path.join(winBin, "windows")
+
+  core.addPath(winBin);
+
 }
 
 run();
