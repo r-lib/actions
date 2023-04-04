@@ -17,7 +17,8 @@ Inputs available
   not.
 - `cache-version` - default `1`. If you need to invalidate the existing
   cache pass any other number and a new cache will be used. Ignored if
-  `cache: false`.
+  `cache: false`. Note that you can also [delete caches
+  manually(https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#deleting-cache-entries).
 - `dependencies` - default `'"all"'`. Types of dependencies to install. By
   default all direct dependencies of the current package are installed, and
   hard dependencies of these direct dependencies. See also the `needs` and
@@ -34,6 +35,9 @@ Inputs available
   by newlines or commas.
 - `pak-version`: Which pak version to use. Possible values are
   `stable`, `rc` and `devel`. Defaults to `stable`.
+- `upgrade`: Whether to install the latest available versions of the
+  dependencies. Must be an R expression. See the README for details if
+  you need quoting. Defaults to `FALSE`.
 - `working-directory` - default `'.'`. If the DESCRIPTION file is not in the
   root directory of your repository.
 
