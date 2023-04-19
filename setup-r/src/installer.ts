@@ -587,7 +587,7 @@ async function getLinuxPlatform() : Promise<string> {
       return process.env.SETUP_R_LINUX_PLATFORM;
     } else {
         const info = await osInfo();
-        return "linux- " + info.id + "-" + info.version_id;
+        return "linux-" + info.id + "-" + info.version_id;
     }
 }
 
