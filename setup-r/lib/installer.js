@@ -129,8 +129,8 @@ function acquireR(version) {
         }
         // version.rtools_cersion is always trithy on Windows, but typescript
         // does not know that
-        if (IS_WINDOWS && version.rtools_version) {
-            const rtoolsVersionNumber = parseInt(version.rtools_version);
+        if (IS_WINDOWS && version.rtools) {
+            const rtoolsVersionNumber = parseInt(version.rtools);
             const noqpdf = rtoolsVersionNumber >= 41;
             var tries_left = 10;
             var ok = false;
@@ -402,7 +402,7 @@ function acquireRWindows(version) {
 }
 function acquireRtools(version) {
     return __awaiter(this, void 0, void 0, function* () {
-        const versionNumber = parseInt(version.rtools_version || 'error');
+        const versionNumber = parseInt(version.rtools || 'error');
         const rtools43 = versionNumber >= 43;
         const rtools42 = !rtools43 && versionNumber >= 41;
         const rtools40 = !rtools43 && !rtools42 && versionNumber >= 40;
@@ -413,7 +413,7 @@ function acquireRtools(version) {
         // which hangs the build otherwise.
         if ((rtools43 && fs.existsSync("C:\\Rtools43")) ||
             (rtools42 && fs.existsSync("C:\\Rtools42")) ||
-            (rtools40 && fs.existsSync("C:\\rtools40")) ||
+            (rtools40 && fs.existsSync("C:\\Rtools40")) ||
             (rtools3x && fs.existsSync("C:\\Rtools"))) {
             core.debug("Skipping Rtools installation as a suitable Rtools is already installed");
         }

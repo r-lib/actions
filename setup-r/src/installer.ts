@@ -5,7 +5,7 @@ interface IRRef {
 interface IRVersion {
   version: string;
   url: string;
-  rtools_version?: string;
+  rtools?: string;
   rtools_url?: string;
   type: string;
 }
@@ -109,8 +109,8 @@ async function acquireR(version: IRVersion) {
 
   // version.rtools_cersion is always trithy on Windows, but typescript
   // does not know that
-  if (IS_WINDOWS && version.rtools_version) {
-    const rtoolsVersionNumber = parseInt(version.rtools_version);
+  if (IS_WINDOWS && version.rtools) {
+    const rtoolsVersionNumber = parseInt(version.rtools);
     const noqpdf = rtoolsVersionNumber >= 41;
     var tries_left = 10;
     var ok = false;
@@ -387,7 +387,7 @@ async function acquireRWindows(version: IRVersion): Promise<string> {
 }
 
 async function acquireRtools(version: IRVersion) {
-  const versionNumber = parseInt(version.rtools_version || 'error');
+  const versionNumber = parseInt(version.rtools || 'error');
   const rtools43 = versionNumber >= 43;
   const rtools42 = !rtools43 && versionNumber >= 41;
   const rtools40 = !rtools43 && !rtools42 && versionNumber >= 40;
@@ -400,7 +400,7 @@ async function acquireRtools(version: IRVersion) {
   if (
       (rtools43 && fs.existsSync("C:\\Rtools43")) ||
       (rtools42 && fs.existsSync("C:\\Rtools42")) ||
-      (rtools40 && fs.existsSync("C:\\rtools40")) ||
+      (rtools40 && fs.existsSync("C:\\Rtools40")) ||
       (rtools3x && fs.existsSync("C:\\Rtools"))
   ) {
     core.debug(
