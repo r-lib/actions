@@ -24,7 +24,7 @@ jobs:
     - name: Set up build matrix
       id: setup-matrix
       run: |
-        rversions=$(echo -n '["'; echo -n '${{ github.event.inputs.inpos }}' | sed 's/,/","/g'; echo '"]')
+        rversions=$(echo -n '["'; echo -n '${{ github.event.inputs.inprversion }}' | sed 's/,/","/g'; echo '"]')
         echo "rversions=$rversions" >> $GITHUB_OUTPUT
 
   R-CMD-check:
@@ -33,8 +33,8 @@ jobs:
       fail-fast: false
       matrix:
         r: ${{ fromJson(needs.setup-matrix.outputs.rversions) }}
-    runs-on: inpos
-    name: inpos (${{ matrix.r }})
+    runs-on: ${{ github.event.inputs.inpos }}
+    name: ${{ github.event.inputs.inpos }} (${{ matrix.r }})
 
     steps:
     - uses: actions/checkout@v3
