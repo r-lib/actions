@@ -32,7 +32,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        r: ${{ fromJson(needs.setup=matrix.outputs.rversions) }}
+        r: ${{ fromJson(needs.setup-matrix.outputs.rversions) }}
     runs-on: inpos
     name: inpos (${{ matrix.r }})
 
