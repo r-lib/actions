@@ -620,6 +620,9 @@ export async function determineVersion(version: string): Promise<IRVersion> {
   } else if (version.endsWith(".x")) {
     version = version.replace(/[.]x$/, "")
   }
+  if (version.startsWith("oldrel-")) {
+    version = version.replace(/^oldrel[-]/, "oldrel/");
+  }
 
   let rest: restm.RestClient = new restm.RestClient("setup-r");
   let os: string = OS != "linux" ? OS : await getLinuxPlatform();

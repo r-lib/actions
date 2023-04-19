@@ -621,6 +621,9 @@ function determineVersion(version) {
         else if (version.endsWith(".x")) {
             version = version.replace(/[.]x$/, "");
         }
+        if (version.startsWith("oldrel-")) {
+            version = version.replace(/^oldrel[-]/, "oldrel/");
+        }
         let rest = new restm.RestClient("setup-r");
         let os = OS != "linux" ? OS : yield getLinuxPlatform();
         let url = "https://api.r-hub.io/rversions/resolve/" +
