@@ -629,7 +629,7 @@ export async function determineVersion(version: string): Promise<IRVersion> {
   let tags = (await rest.get<IRVersion>(url)).result;
 
   if (!tags) {
-    throw new Error(`Failed to resolve R version ${version}`);
+    throw new Error(`Failed to resolve R version ${version} at ${url}.`);
   }
 
   return tags;

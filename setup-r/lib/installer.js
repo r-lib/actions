@@ -630,7 +630,7 @@ function determineVersion(version) {
         }
         let tags = (yield rest.get(url)).result;
         if (!tags) {
-            throw new Error(`Failed to resolve R version ${version}`);
+            throw new Error(`Failed to resolve R version ${version} at ${url}.`);
         }
         return tags;
     });
