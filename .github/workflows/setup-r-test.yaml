@@ -1,36 +1,49 @@
 on:
   workflow_dispatch:
+    inputs:
+      inpos:
+        description: 'OS, e.g. macos-latest, windows-latest, ubuntu-latest'
+        required: true
+        default: 'ubuntu-latest'
+        type: string
+      inprversion:
+        description: 'R versions (comma separated)'
+        required: true
+        default: 'devel,next,release,latest,oldrel/1,4.0,3.6.x'
+        type: string
 
 name: setup-r test
 
 jobs:
+  setup-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      rversions: ${{ steps.setup-matrix.outputs.rversions }}
+
+    steps:
+    - name: Set up build matrix
+      id: setup-matrix
+      run: |
+        rversions=$(echo -n '["'; echo -n '${{ github.event.inputs.inpos }}' | sed 's/,/","/g'; echo '"]')
+        echo "rversions=$rversions" >> $GITHUB_OUTPUT
+
   R-CMD-check:
-    runs-on: ${{ matrix.config.os }}
-
-    name: ${{ matrix.config.os }} (${{ matrix.config.r }})
-
+    needs: setup-matrix
     strategy:
       fail-fast: false
       matrix:
-        config:
-          - {os: macos-latest,   r: 'release'}
-          - {os: macos-latest,   r: 'next'}
-
-          - {os: windows-latest, r: 'release'}
-          - {os: windows-latest, r: 'next'}
-
-          - {os: ubuntu-latest,  r: 'release'}
-          - {os: ubuntu-latest,  r: 'next'}
+        r: ${{ fromJson(needs.setup=matrix.outputs.rversions) }}
+    runs-on: inpos
+    name: inpos (${{ matrix.r }})
 
     steps:
-      - uses: actions/checkout@v3
+    - uses: actions/checkout@v3
 
-      - uses: ./setup-r
-        with:
-          r-version: ${{ matrix.config.r }}
-          http-user-agent: ${{ matrix.config.http-user-agent }}
-          use-public-rspm: true
+    - uses: ./setup-r
+      with:
+        r-version: ${{ matrix.r }}
+        use-public-rspm: true
 
-      - name: R version
-        run: sessionInfo()
-        shell: Rscript {0}
+    - name: R version
+      run: sessionInfo()
+      shell: Rscript {0}

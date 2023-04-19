@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getR = void 0;
+exports.determineVersion = exports.getR = void 0;
 let tempDirectory = process.env["RUNNER_TEMP"] || "";
 const core = __importStar(require("@actions/core"));
 const exec = __importStar(require("@actions/exec"));
@@ -50,6 +50,13 @@ const linux_os_info_1 = __importDefault(require("linux-os-info"));
 const IS_WINDOWS = process.platform === "win32";
 const IS_MAC = process.platform === "darwin";
 const IS_LINUX = process.platform === "linux";
+const OS = !!process.env.SETUP_R_OS ? process.env.SETUP_R_OS :
+    IS_WINDOWS ? "win" : IS_MAC ? "mac" : "linux";
+const ARCH = !!process.env.SETUP_R_ARCH ? process.env.SETUP_R_ARCH :
+    OS == "win" ? undefined :
+        (OS == "mac" && process.arch == "arm64") ? "arm64" :
+            (OS == "mac" && process.arch == "x64") ? "x86_64" :
+                process.arch == "x64" ? "x86_64" : process.arch;
 if (!tempDirectory) {
     let baseLocation;
     if (IS_WINDOWS) {
@@ -69,22 +76,17 @@ if (!tempDirectory) {
 function getR(version) {
     return __awaiter(this, void 0, void 0, function* () {
         const selected = yield determineVersion(version);
-        if (selected) {
-            version = selected;
+        var ok = false;
+        if (!!process.env.RUNNER_TOOL_CACHE) {
+            let toolPath = tc.find("R", selected.version);
+            if (toolPath) {
+                ok = true;
+                core.debug(`Tool found in cache ${toolPath}`);
+            }
         }
-        // this works for 'next' and 'devel' as well, currently, release and oldrel should
-        // have been converted to version numbers here.
-        let rtoolsVersion = core.getInput("rtools-version") ||
-            (version.charAt(0) == "3" ?
-                "35" :
-                (version == "devel" || version == "next" || semver.gte(version, "4.3.0") ? "43" : "40"));
-        let toolPath = tc.find("R", version);
-        if (toolPath) {
-            core.debug(`Tool found in cache ${toolPath}`);
-        }
-        else {
+        if (!ok) {
             try {
-                yield acquireR(version, rtoolsVersion);
+                yield acquireR(selected);
             }
             catch (error) {
                 core.debug(`${error}`);
@@ -97,7 +99,7 @@ function getR(version) {
     });
 }
 exports.getR = getR;
-function acquireR(version, rtoolsVersion) {
+function acquireR(version) {
     return __awaiter(this, void 0, void 0, function* () {
         if (core.getInput("install-r") !== "true") {
             return;
@@ -106,7 +108,7 @@ function acquireR(version, rtoolsVersion) {
             if (IS_WINDOWS) {
                 yield Promise.all([
                     yield acquireRWindows(version),
-                    yield acquireRtools(rtoolsVersion, version),
+                    yield acquireRtools(version)
                 ]);
             }
             else if (IS_MAC) {
@@ -125,8 +127,10 @@ function acquireR(version, rtoolsVersion) {
             core.debug(`${error}`);
             throw `Failed to get R ${version}: ${error}`;
         }
-        if (IS_WINDOWS) {
-            const rtoolsVersionNumber = parseInt(rtoolsVersion.substring(0, 2));
+        // version.rtools_cersion is always trithy on Windows, but typescript
+        // does not know that
+        if (IS_WINDOWS && version.rtools_version) {
+            const rtoolsVersionNumber = parseInt(version.rtools_version);
             const noqpdf = rtoolsVersionNumber >= 41;
             var tries_left = 10;
             var ok = false;
@@ -239,8 +243,8 @@ function acquireRUbuntu(version) {
         //
         // Download - a tool installer intimately knows how to get the tool (and construct urls)
         //
-        let fileName = getFileNameUbuntu(version);
-        let downloadUrl = getDownloadUrlUbuntu(fileName);
+        let downloadUrl = version.url;
+        let fileName = path.basename(downloadUrl);
         let downloadPath = null;
         core.startGroup('Downloading R');
         try {
@@ -282,15 +286,17 @@ function acquireRUbuntu(version) {
         // Add symlinks to the installed R to the path
         //
         //
+        let rdir = (version.type == "next" || version.type == "devel") ?
+            version.type : version.version;
         try {
             yield exec.exec("sudo ln", [
                 "-sf",
-                path.join("/opt", "R", version, "bin", "R"),
+                path.join("/opt", "R", rdir, "bin", "R"),
                 "/usr/local/bin/R"
             ]);
             yield exec.exec("sudo ln", [
                 "-sf",
-                path.join("/opt", "R", version, "bin", "Rscript"),
+                path.join("/opt", "R", rdir, "bin", "Rscript"),
                 "/usr/local/bin/Rscript"
             ]);
         }
@@ -306,13 +312,10 @@ function acquireRMacOS(version) {
         //
         // Download - a tool installer intimately knows how to get the tool (and construct urls)
         //
-        let fileName = getFileNameMacOS(version);
-        let downloadUrl = yield getDownloadUrlMacOS(version);
+        let downloadUrl = version.url;
+        let fileName = path.basename(downloadUrl);
         let downloadPath = null;
         try {
-            if (downloadUrl == "") {
-                throw ("Cannot determine download URL");
-            }
             downloadPath = yield tc.downloadTool(downloadUrl);
             yield io.mv(downloadPath, path.join(tempDirectory, fileName));
         }
@@ -365,14 +368,10 @@ function acquireRMacOS(version) {
 }
 function acquireRWindows(version) {
     return __awaiter(this, void 0, void 0, function* () {
-        let fileName = getFileNameWindows(version);
-        let downloadUrl = yield getDownloadUrlWindows(version);
+        let fileName = path.basename(version.url);
         let downloadPath = null;
         try {
-            if (downloadUrl == "") {
-                throw ("Cannot determine download URL");
-            }
-            downloadPath = yield tc.downloadTool(downloadUrl);
+            downloadPath = yield tc.downloadTool(version.url);
             yield io.mv(downloadPath, path.join(tempDirectory, fileName));
         }
         catch (error) {
@@ -401,31 +400,15 @@ function acquireRWindows(version) {
         return "";
     });
 }
-function acquireRtools(version, rversion) {
+function acquireRtools(version) {
     return __awaiter(this, void 0, void 0, function* () {
-        const versionNumber = parseInt(version.substring(0, 2));
+        const versionNumber = parseInt(version.rtools_version || 'error');
         const rtools43 = versionNumber >= 43;
         const rtools42 = !rtools43 && versionNumber >= 41;
         const rtools40 = !rtools43 && !rtools42 && versionNumber >= 40;
         const rtools3x = !rtools43 && !rtools42 && !rtools40;
-        var downloadUrl, fileName;
-        if (rtools3x) {
-            fileName = util.format("Rtools%s.exe", version);
-            downloadUrl = util.format("http://cloud.r-project.org/bin/windows/Rtools/%s", fileName);
-        }
-        else if (rtools40) {
-            fileName = util.format("rtools%s-x86_64.exe", version);
-            downloadUrl = util.format("http://cloud.r-project.org/bin/windows/Rtools/%s", fileName);
-        }
-        else if (rtools42) {
-            fileName = "rtools42.exe";
-            downloadUrl = "https://github.com/r-hub/rtools42/releases/download/latest/rtools42.exe";
-        }
-        else {
-            // rtools43
-            fileName = "rtools43.exe";
-            downloadUrl = "https://github.com/r-hub/rtools43/releases/download/latest/rtools43.exe";
-        }
+        var downloadUrl = version.rtools_url || 'error';
+        var fileName = path.basename(downloadUrl);
         // If Rtools is already installed just return, as there is a message box
         // which hangs the build otherwise.
         if ((rtools43 && fs.existsSync("C:\\Rtools43")) ||
@@ -479,8 +462,7 @@ function acquireRtools(version, rversion) {
                 // and R 4.2.x picks that up. We do this for R-devel, R-next and
                 // every numeric version that is not 4.0.x and 4.1.x. (For 3.x.y
                 // Rtools3.x is selected.) Issue #610.
-                if (rversion == "devel" || rversion == "next" ||
-                    (!rversion.startsWith("4.0.") && !rversion.startsWith("4.1."))) {
+                if (semver.gte(version.version, "4.2.0")) {
                     core.addPath(`C:\\rtools40\\ucrt64\\bin`);
                 }
             }
@@ -600,67 +582,15 @@ options(
         io.mkdirP(process.env["R_LIBS_USER"] || path.join(tempDirectory, "Library"));
     });
 }
-function getFileNameMacOS(version) {
-    const filename = util.format("R-%s.pkg", version);
-    return filename;
-}
-function getDownloadUrlMacOS(version) {
+function getLinuxPlatform() {
     return __awaiter(this, void 0, void 0, function* () {
-        if (version == "devel") {
-            return "https://mac.R-project.org/high-sierra/last-success/R-devel-x86_64.pkg";
+        if (process.env.SETUP_R_LINUX_PLATFORM) {
+            return process.env.SETUP_R_LINUX_PLATFORM;
         }
-        if (version == "next" || version == "prerelease") {
-            return getDownloadUrlMacOSNext();
+        else {
+            const info = yield (0, linux_os_info_1.default)();
+            return "linux- " + info.id + "-" + info.version_id;
         }
-        const filename = getFileNameMacOS(version);
-        if (semver.eq(version, "3.2.5")) {
-            // 3.2.5 is 'special', it is actually 3.2.4-revised...
-            return "https://cloud.r-project.org/bin/macosx/old/R-3.2.4-revised.pkg";
-        }
-        if (semver.lt(version, "3.4.0")) {
-            // older versions are in /old
-            return util.format("https://cloud.r-project.org/bin/macosx/old/%s", filename);
-        }
-        if (semver.lt(version, "4.0.0")) {
-            // older versions are in el-capitan/base
-            return util.format("https://cloud.r-project.org/bin/macosx/el-capitan/base/%s", filename);
-        }
-        // 4.0.0+ are in base/
-        return util.format("https://cloud.r-project.org/bin/macosx/base/%s", filename);
-    });
-}
-function getFileNameUbuntu(version) {
-    const filename = util.format("r-%s_1_amd64.deb", version);
-    return filename;
-}
-function getDownloadUrlUbuntu(filename) {
-    try {
-        const info = (0, linux_os_info_1.default)({ mode: "sync" });
-        const versionStr = info.version_id.replace(/[.]/g, "");
-        return util.format("https://cdn.rstudio.com/r/ubuntu-%s/pkgs/%s", versionStr, filename);
-    }
-    catch (error) {
-        throw `Failed to get OS info: ${error}`;
-    }
-}
-function getFileNameWindows(version) {
-    const filename = util.format("R-%s-win.exe", version);
-    return filename;
-}
-function getDownloadUrlWindows(version) {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (version == "devel") {
-            return "https://cloud.r-project.org/bin/windows/base/R-devel-win.exe";
-        }
-        if (version == "next" || version == "prerelease") {
-            return getDownloadUrlWindowsNext();
-        }
-        const filename = getFileNameWindows(version);
-        const releaseVersion = yield getReleaseVersion("win");
-        if (version == releaseVersion) {
-            return util.format("https://cloud.r-project.org/bin/windows/base/%s", filename);
-        }
-        return util.format("https://cloud.r-project.org/bin/windows/base/old/%s/%s", version, filename);
     });
 }
 function setREnvironmentVariables() {
@@ -670,6 +600,8 @@ function setREnvironmentVariables() {
     if (!process.env["NOT_CRAN"])
         core.exportVariable("NOT_CRAN", "true");
 }
+// Need to keep this for setting the HTTP User-Agent header to
+// R-release for RSPM
 function getReleaseVersion(platform) {
     return __awaiter(this, void 0, void 0, function* () {
         let rest = new restm.RestClient("setup-r");
@@ -677,108 +609,30 @@ function getReleaseVersion(platform) {
         return tags.version;
     });
 }
-function getOldrelVersion(version) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let rest = new restm.RestClient("setup-r");
-        let tags = (yield rest.get(util.format("https://api.r-hub.io/rversions/r-oldrel/%s", version))).result || { version: "" };
-        return tags.version;
-    });
-}
-function getAvailableVersions() {
-    return __awaiter(this, void 0, void 0, function* () {
-        let rest = new restm.RestClient("setup-r");
-        let tags = (yield rest.get("https://api.r-hub.io/rversions/r-versions"))
-            .result || [];
-        return tags.map(tag => tag.version);
-    });
-}
 function determineVersion(version) {
     return __awaiter(this, void 0, void 0, function* () {
-        // There is no linux endpoint, so we just use the tarball one for linux.
-        version = version.toLowerCase();
-        // Formerly called 'devel-ucrt' is now just 'devel'
-        if (version == "devel-ucrt") {
-            return "devel";
+        // A temporary hack to make these work
+        if (version == "latest" || version == "4" || version == "4.x" || version == "4.x.x") {
+            version = "release";
         }
-        if (version == "latest" || version == "release") {
-            if (IS_WINDOWS) {
-                return getReleaseVersion("win");
-            }
-            if (IS_MAC) {
-                return getReleaseVersion("macos");
-            }
-            return getReleaseVersion("tarball");
+        else if (version == "3" || version == "3.x" || version == "3.x.x") {
+            version = "3.6.3";
         }
-        if (version.startsWith("oldrel")) {
-            const [, oldRelVersion] = version.split(/[-\/]/);
-            if (oldRelVersion == null) {
-                return getOldrelVersion("1");
-            }
-            return getOldrelVersion(oldRelVersion);
+        else if (version.endsWith(".x")) {
+            version = version.replace(/[.]x$/, "");
         }
-        if (!version.endsWith(".x")) {
-            const versionPart = version.split(".");
-            if (versionPart[1] == null || versionPart[2] == null) {
-                return yield getLatestVersion(version.concat(".x"));
-            }
-            else {
-                // This is also 'next' and 'devel'
-                return version;
-            }
-        }
-        return yield getLatestVersion(version);
-    });
-}
-// This function is required to convert the version 1.10 to 1.10.0.
-// Because caching utility accept only sementic version,
-// which have patch number as well.
-function normalizeVersion(version) {
-    const versionPart = version.split(".");
-    if (versionPart[1] == null) {
-        //append minor and patch version if not available
-        return version.concat(".0.0");
-    }
-    if (versionPart[2] == null) {
-        //append patch version if not available
-        return version.concat(".0");
-    }
-    return version;
-}
-function getPossibleVersions(version) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const versions = yield getAvailableVersions();
-        const possibleVersions = versions.filter(v => v.startsWith(version));
-        const versionMap = new Map();
-        possibleVersions.forEach(v => versionMap.set(normalizeVersion(v), v));
-        return Array.from(versionMap.keys())
-            .sort(semver.rcompare)
-            .map(v => versionMap.get(v));
-    });
-}
-function getLatestVersion(version) {
-    return __awaiter(this, void 0, void 0, function* () {
-        // clean .x syntax: 1.10.x -> 1.10
-        const trimmedVersion = version.slice(0, version.length - 2);
-        const versions = yield getPossibleVersions(trimmedVersion);
-        core.debug(`evaluating ${versions.length} versions`);
-        if (version.length === 0) {
-            throw new Error("unable to get latest version");
-        }
-        core.debug(`matched: ${versions[0]}`);
-        return versions[0];
-    });
-}
-function getDownloadUrlWindowsNext() {
-    return __awaiter(this, void 0, void 0, function* () {
         let rest = new restm.RestClient("setup-r");
-        let tags = (yield rest.get("https://api.r-hub.io/rversions/r-next-win")).result || { URL: "" };
-        return tags.URL;
+        let os = OS != "linux" ? OS : yield getLinuxPlatform();
+        let url = "https://api.r-hub.io/rversions/resolve/" +
+            version + "/" + os;
+        if (ARCH) {
+            url = url + "/" + ARCH;
+        }
+        let tags = (yield rest.get(url)).result;
+        if (!tags) {
+            throw new Error(`Failed to resolve R version ${version}`);
+        }
+        return tags;
     });
 }
-function getDownloadUrlMacOSNext() {
-    return __awaiter(this, void 0, void 0, function* () {
-        let rest = new restm.RestClient("setup-r");
-        let tags = (yield rest.get("https://api.r-hub.io/rversions/r-next-macos")).result || { URL: "" };
-        return tags.URL;
-    });
-}
+exports.determineVersion = determineVersion;
