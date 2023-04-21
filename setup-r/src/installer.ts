@@ -386,13 +386,34 @@ async function acquireRWindows(version: IRVersion): Promise<string> {
   return "";
 }
 
+function getRtoolsUrl(version: string): string {
+    if (version == "43") {
+	return "https://github.com/r-hub/rtools43/releases/download/latest/rtools43.exe";
+    } else if (version == "42") {
+	return "https://github.com/r-hub/rtools42/releases/download/latest/rtools42.exe";
+    } else if (version == "40") {
+	return "https://cran.r-project.org/bin/windows/Rtools/rtools40-x86_64.exe";
+    } else {
+	return `https://cran.r-project.org/bin/windows/Rtools/Rtools${version}.exe`;
+    }
+}
+
 async function acquireRtools(version: IRVersion) {
-  const versionNumber = parseInt(version.rtools || 'error');
+  var rtoolsVersion: string = "", downloadUrl: string = "";
+  const inpver = core.getInput("rtools-version");
+  if (inpver == "") {
+    rtoolsVersion = version.rtools || 'error';;
+    downloadUrl = version.rtools_url || 'error';
+  } else {
+    rtoolsVersion = inpver;
+    downloadUrl = getRtoolsUrl(rtoolsVersion);
+  }
+
+  const versionNumber = parseInt(rtoolsVersion || 'error');
   const rtools43 = versionNumber >= 43;
   const rtools42 = !rtools43 && versionNumber >= 41;
   const rtools40 = !rtools43 && !rtools42 && versionNumber >= 40;
   const rtools3x = !rtools43 && !rtools42 && !rtools40;
-  var downloadUrl = version.rtools_url || 'error';
   var fileName = path.basename(downloadUrl);
 
   // If Rtools is already installed just return, as there is a message box
