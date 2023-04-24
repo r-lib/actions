@@ -112,7 +112,7 @@ function acquireR(version) {
                 ]);
             }
             else if (IS_MAC) {
-                yield core.group('Downloading gfortran', () => __awaiter(this, void 0, void 0, function* () { yield acquireFortranMacOS(); }));
+                yield core.group('Downloading gfortran', () => __awaiter(this, void 0, void 0, function* () { yield acquireFortranMacOS(version.version); }));
                 yield core.group('Downloading macOS utils', () => __awaiter(this, void 0, void 0, function* () { yield acquireUtilsMacOS(); }));
                 yield core.group('Downloading R', () => __awaiter(this, void 0, void 0, function* () { yield acquireRMacOS(version); }));
                 if (core.getInput("remove-openmp-macos") === "true") {
@@ -155,7 +155,49 @@ function acquireR(version) {
         }
     });
 }
-function acquireFortranMacOS() {
+function acquireFortranMacOS(version) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (semver.lt(version, "4.0.0")) {
+            return acquireFortranMacOSOld();
+        }
+        else {
+            return acquireFortranMacOSNew();
+        }
+    });
+}
+function acquireFortranMacOSNew() {
+    return __awaiter(this, void 0, void 0, function* () {
+        let downloadUrl = "https://mac.r-project.org/tools/gfortran-12.2-universal.pkg";
+        let fileName = path.basename(downloadUrl);
+        let downloadPath = null;
+        try {
+            downloadPath = yield tc.downloadTool(downloadUrl);
+            yield io.mv(downloadPath, path.join(tempDirectory, fileName));
+        }
+        catch (error) {
+            core.debug(`${error}`);
+            throw `Failed to download gfortran: ${error}`;
+        }
+        try {
+            yield exec.exec("sudo", [
+                "installer",
+                "-allowUntrusted",
+                "-dumplog",
+                "-pkg",
+                path.join(tempDirectory, fileName),
+                "-target",
+                "/"
+            ]);
+        }
+        catch (error) {
+            core.debug(`${error}`);
+            throw `Failed to install gfortran: ${error}`;
+        }
+        core.addPath("/opt/gfortran/bin");
+        return "/";
+    });
+}
+function acquireFortranMacOSOld() {
     return __awaiter(this, void 0, void 0, function* () {
         let gfortran = "gfortran-8.2-Mojave";
         let mntPath = path.join("/Volumes", gfortran);

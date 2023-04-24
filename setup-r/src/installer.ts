@@ -92,7 +92,7 @@ async function acquireR(version: IRVersion) {
         await acquireRtools(version)
       ]);
     } else if (IS_MAC) {
-      await core.group('Downloading gfortran', async() => { await acquireFortranMacOS() });
+      await core.group('Downloading gfortran', async() => { await acquireFortranMacOS(version.version) });
       await core.group('Downloading macOS utils', async() => { await acquireUtilsMacOS() });
       await core.group('Downloading R', async() => { await acquireRMacOS(version) });
       if (core.getInput("remove-openmp-macos") === "true") {
@@ -132,7 +132,47 @@ async function acquireR(version: IRVersion) {
   }
 }
 
-async function acquireFortranMacOS(): Promise<string> {
+async function acquireFortranMacOS(version: string): Promise<string> {
+  if (semver.lt(version, "4.0.0")) {
+    return acquireFortranMacOSOld();
+  } else {
+    return acquireFortranMacOSNew();
+  }
+}
+
+async function acquireFortranMacOSNew(): Promise<string> {
+  let downloadUrl = "https://mac.r-project.org/tools/gfortran-12.2-universal.pkg";
+  let fileName = path.basename(downloadUrl);
+  let downloadPath: string | null = null;
+  try {
+    downloadPath = await tc.downloadTool(downloadUrl);
+    await io.mv(downloadPath, path.join(tempDirectory, fileName));
+  } catch (error) {
+    core.debug(`${error}`);
+    throw `Failed to download gfortran: ${error}`;
+  }
+
+  try {
+    await exec.exec("sudo", [
+      "installer",
+      "-allowUntrusted",
+      "-dumplog",
+      "-pkg",
+      path.join(tempDirectory, fileName),
+      "-target",
+      "/"
+    ]);
+  } catch (error) {
+    core.debug(`${error}`);
+    throw `Failed to install gfortran: ${error}`;
+  }
+
+  core.addPath("/opt/gfortran/bin");
+
+  return "/";
+}
+
+async function acquireFortranMacOSOld(): Promise<string> {
   let gfortran: string = "gfortran-8.2-Mojave";
   let mntPath: string = path.join("/Volumes", gfortran);
   let fileName: string = `${gfortran}.dmg`;
