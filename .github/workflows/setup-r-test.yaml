@@ -48,6 +48,8 @@ jobs:
     - name: Check output
       run: |
         echo Installed R ${{ steps.setup-r.outputs.installed-r-version }}
+        which gfortran
+        gfortran --version
 
     - name: R version
       run: sessionInfo()
