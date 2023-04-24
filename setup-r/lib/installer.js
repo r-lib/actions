@@ -95,7 +95,7 @@ function getR(version) {
         }
         setREnvironmentVariables();
         setupRLibrary();
-        core.setOutput("installed-r-version", version);
+        core.setOutput("installed-r-version", selected.version);
     });
 }
 exports.getR = getR;
