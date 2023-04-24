@@ -52,3 +52,7 @@ jobs:
     - name: R version
       run: sessionInfo()
       shell: Rscript {0}
+
+    - name: Test Fortran compilation
+      run: install.packages("nlme", type = "source")
+      shell: Rscript {0}
