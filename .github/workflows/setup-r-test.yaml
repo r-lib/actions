@@ -40,9 +40,14 @@ jobs:
     - uses: actions/checkout@v3
 
     - uses: ./setup-r
+      id: setup-r
       with:
         r-version: ${{ matrix.r }}
         use-public-rspm: true
+
+    - name: Check output
+      run: |
+        echo Installed R ${{ steps.setup-r.outputs.installed-r-version }}
 
     - name: R version
       run: sessionInfo()
