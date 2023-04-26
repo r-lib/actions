@@ -125,7 +125,7 @@ function acquireR(version) {
         }
         catch (error) {
             core.debug(`${error}`);
-            throw `Failed to get R ${version}: ${error}`;
+            throw `Failed to get R ${version.version}: ${error}`;
         }
         // version.rtools_cersion is always trithy on Windows, but typescript
         // does not know that
