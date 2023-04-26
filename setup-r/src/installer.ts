@@ -133,7 +133,7 @@ async function acquireR(version: IRVersion) {
 }
 
 async function acquireFortranMacOS(version: string): Promise<string> {
-  if (semver.lt(version, "4.0.0")) {
+  if (semver.lt(version, "4.3.0")) {
     return acquireFortranMacOSOld();
   } else {
     return acquireFortranMacOSNew();
