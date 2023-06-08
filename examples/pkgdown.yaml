@@ -43,6 +43,6 @@ jobs:
         if: github.event_name != 'pull_request'
         uses: JamesIves/github-pages-deploy-action@v4.4.1
         with:
-          clean: false
+          clean: ${{ github.event_name == 'release' }}
           branch: gh-pages
           folder: docs
