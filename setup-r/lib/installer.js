@@ -140,7 +140,7 @@ function acquireR(version) {
                     ok = true;
                 }
                 catch (error) {
-                    core.warning("Failed to download qpdf or ghostscript: ${error}");
+                    core.warning(`Failed to download qpdf or ghostscript: ${error}`);
                     yield new Promise(f => setTimeout(f, 10000));
                     tries_left = tries_left - 1;
                 }
