@@ -29,7 +29,7 @@
     "@actions/io": "^1.0.0",
     "@actions/tool-cache": "^1.0.0",
     "linux-os-info": "^2.0.0",
-    "semver": "^6.1.1",
+    "semver": "^6.3.1",
     "typed-rest-client": "^1.7.3"
   },
   "devDependencies": {
