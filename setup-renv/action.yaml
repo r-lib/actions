@@ -21,7 +21,7 @@ runs:
 
       - name: Install and activate renv
         run: |
-          install.packages("renv")
+          if (!requireNamespace("renv", quietly=TRUE)) install.packages("renv")
           renv::activate(profile = ${{ inputs.profile }})
         shell: Rscript {0}
 
