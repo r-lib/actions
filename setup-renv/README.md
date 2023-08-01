@@ -18,6 +18,7 @@ must be an R expression. Note that you often need to quote it, see details
 below.
 - `cache-version` - default `1`. If you need to invalidate the existing cache pass any other number and a new cache will be used.
 - `bypass-cache` - default `false`. To skip the use of the GitHub cache completely (such as for local testing), set to `true`.
+- `sandbox` - default `true`. To disable sandboxing within renv, set to `false`.
 
 Example:
 
