@@ -123,7 +123,7 @@ function pandocSubdir(version: string) {
 }
 
 async function installPandocLinux(version: string): Promise<void> {
-  const fileName = util.format("pandoc-%s-1-amd64.deb", version);
+  const fileName = process.arch !== "arm64" ? util.format("pandoc-%s-1-amd64.deb", version) : util.format("pandoc-%s-1-arm64.deb", version);
   const downloadUrl = util.format(
     "https://github.com/jgm/pandoc/releases/download/%s/%s",
     version,
