@@ -11,6 +11,9 @@ inputs:
   bypass-cache:
     description: 'Whether attempts to cache should be completely skipped (for non GitHub testing). Set to `true` to skip.'
     default: "false"
+  sandbox:
+    description: 'Whether renv should use sandbox (see documentation). Set to `false` to disable.'
+    default: "true"
 runs:
   using: "composite"
   steps:
@@ -23,6 +26,7 @@ runs:
         run: |
           if (!requireNamespace("renv", quietly=TRUE)) install.packages("renv")
           renv::activate(profile = ${{ inputs.profile }})
+          options(renv.config.sandbox.enabled = as.logical(${{ inputs.sandbox }}))
         shell: Rscript {0}
 
       - name: Get R and OS version
