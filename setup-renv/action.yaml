@@ -11,6 +11,9 @@ inputs:
   bypass-cache:
     description: 'Whether attempts to cache should be completely skipped (for non GitHub testing). Set to `true` to skip.'
     default: "false"
+  working-directory:
+    description: 'Using the working-directory keyword, you can specify a subdirectory of the repo where `renv` should be run.'
+    default: '.'
 runs:
   using: "composite"
   steps:
@@ -24,6 +27,7 @@ runs:
           if (!requireNamespace("renv", quietly=TRUE)) install.packages("renv")
           renv::activate(profile = ${{ inputs.profile }})
         shell: Rscript {0}
+        working-directory: ${{ inputs.working-directory }}
 
       - name: Get R and OS version
         id: get-version
@@ -37,12 +41,13 @@ runs:
         uses: actions/cache@v3
         with:
           path: ${{ env.RENV_PATHS_ROOT }}
-          key: ${{ steps.get-version.outputs.os-version }}-${{ steps.get-version.outputs.r-version }}-${{inputs.cache-version }}-${{ hashFiles('renv.lock') }}
+          key: ${{ steps.get-version.outputs.os-version }}-${{ steps.get-version.outputs.r-version }}-${{inputs.cache-version }}-${{ hashFiles(format('{0}/renv.lock', inputs.working-directory)) }}
           restore-keys: ${{ steps.get-version.outputs.os-version }}-${{ steps.get-version.outputs.r-version }}-${{inputs.cache-version }}-
 
       - name: Install renv dependencies
         run: renv::restore()
         shell: Rscript {0}
+        working-directory: ${{ inputs.working-directory }}
 
       - name: Don't use tar 1.30 from Rtools35 to store the cache
         shell: bash
