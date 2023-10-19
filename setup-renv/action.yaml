@@ -47,6 +47,7 @@ runs:
       - name: Install renv dependencies
         run: renv::restore()
         shell: Rscript {0}
+        working-directory: ${{ inputs.working-directory }}
 
       - name: Don't use tar 1.30 from Rtools35 to store the cache
         shell: bash
