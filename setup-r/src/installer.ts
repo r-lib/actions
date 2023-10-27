@@ -141,7 +141,7 @@ async function acquireFortranMacOS(version: string): Promise<string> {
 }
 
 async function acquireFortranMacOSNew(): Promise<string> {
-  let downloadUrl = "https://mac.r-project.org/tools/gfortran-12.2-universal.pkg";
+  let downloadUrl = "https://github.com/r-hub/mac-tools/releases/download/tools/gfortran-12.2-universal.pkg";
   let fileName = path.basename(downloadUrl);
   let downloadPath: string | null = null;
   try {
@@ -176,7 +176,7 @@ async function acquireFortranMacOSOld(): Promise<string> {
   let gfortran: string = "gfortran-8.2-Mojave";
   let mntPath: string = path.join("/Volumes", gfortran);
   let fileName: string = `${gfortran}.dmg`;
-  let downloadUrl: string = `https://mac.r-project.org/tools/${fileName}`;
+  let downloadUrl: string = `https://github.com/r-hub/mac-tools/releases/download/tools/${fileName}`;
   let downloadPath: string | null = null;
 
   try {
@@ -432,9 +432,9 @@ function getRtoolsUrl(version: string): string {
     } else if (version == "42") {
 	return "https://github.com/r-hub/rtools42/releases/download/latest/rtools42.exe";
     } else if (version == "40") {
-	return "https://cran.r-project.org/bin/windows/Rtools/rtools40-x86_64.exe";
+	return "https://cran.rstudio.com/bin/windows/Rtools/rtools40-x86_64.exe";
     } else {
-	return `https://cran.r-project.org/bin/windows/Rtools/Rtools${version}.exe`;
+	return `https://cran.rstudio.com/bin/windows/Rtools/Rtools${version}.exe`;
     }
 }
 
@@ -597,7 +597,7 @@ async function setupRLibrary() {
 
   let cran = `'${core.getInput("cran") ||
     process.env["CRAN"] ||
-    "https://cloud.r-project.org"}'`;
+    "https://cran.rstudio.com"}'`;
 
   let user_agent;
 
