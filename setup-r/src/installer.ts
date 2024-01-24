@@ -370,16 +370,23 @@ async function acquireRMacOS(version: IRVersion): Promise<string> {
     throw `Failed to install R: ${error}`;
   }
 
+  // Remove homebrew R from the PATH
+  try {
+    await exec.exec("brew", ["unlink", "r"]);
+  } catch (error) {
+    core.debug(`${error}`);
+  }
+
   // Older R versions on newer macOS cannot create a symlink to R and
   // Rscript, we'll need to do it manually.
   try {
     await exec.exec("sudo ln", [
-      "-sf",
+      "-sfv",
       "/Library/Frameworks/R.framework/Resources/bin/R",
       "/usr/local/bin/R"
     ]);
     await exec.exec("sudo ln", [
-      "-sf",
+      "-sfv",
       "/Library/Frameworks/R.framework/Resources/bin/Rscript",
       "/usr/local/bin/Rscript"
     ]);
