@@ -14,7 +14,7 @@ Basic:
 
 ```yaml
 steps:
-- uses: actions/checkout@v3
+- uses: actions/checkout@v4
 - uses: r-lib/actions/setup-pandoc@v2
   with:
     pandoc-version: '2.17.1' # The pandoc version to download (if necessary) and use.
