@@ -13,7 +13,7 @@ See [action.yml](action.yml)
 Basic:
 ```yaml
 steps:
-- uses: actions/checkout@v3
+- uses: actions/checkout@v4
 - uses: r-lib/actions/setup-tinytex@v2
 - run: tlmgr --version
 ```
@@ -29,7 +29,7 @@ For example this is the case if your R package builds its PDF reference manual a
 To install CTAN packages manually, you can call `tlmgr` from your workflow, here is a complete example:
 ```yaml
 steps:
-  - uses: actions/checkout@v3
+  - uses: actions/checkout@v4
   - uses: r-lib/actions/setup-tinytex@v2
   - run: tlmgr --version
 
