@@ -10,5 +10,5 @@ module.exports = {
     orderByFirstCall: require("./order-by-first-call"),
     prototypes: require("./prototypes"),
     typeOf: require("./type-of"),
-    valueToString: require("./value-to-string")
+    valueToString: require("./value-to-string"),
 };

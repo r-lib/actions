@@ -36,29 +36,35 @@ const core = __importStar(require("@actions/core"));
 const github = __importStar(require("@actions/github"));
 const exec = __importStar(require("@actions/exec"));
 function run() {
+    var _a, _b;
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const token = core.getInput("repo-token", { required: true });
-            const client = new github.GitHub(token);
+            const client = github.getOctokit(token);
             const context = github.context;
             const issue = context.issue;
             console.log(`Collecting information about PR #${issue.number}...`);
-            const { status, data: pr } = yield client.pulls.get({
+            const { status, data: pr } = yield client.rest.pulls.get({
                 owner: issue.owner,
                 repo: issue.repo,
                 pull_number: issue.number
             });
             const headBranch = pr.head.ref;
-            const headCloneURL = pr.head.repo.clone_url.replace("https://", `https://x-access-token:${token}@`);
-            const headRepoOwnerLogin = pr.head.repo.owner.login;
-            yield exec.exec("git", ["remote", "add", "pr", headCloneURL]);
-            yield exec.exec("git", ["fetch", "pr", headBranch]);
-            yield exec.exec("git", [
-                "checkout",
-                "-b",
-                `${headRepoOwnerLogin}-${headBranch}`,
-                `pr/${headBranch}`
-            ]);
+            const headCloneURL = (_a = pr.head.repo) === null || _a === void 0 ? void 0 : _a.clone_url.replace("https://", `https://x-access-token:${token}@`);
+            const headRepoOwnerLogin = (_b = pr.head.repo) === null || _b === void 0 ? void 0 : _b.owner.login;
+            if (headCloneURL !== undefined && headRepoOwnerLogin !== undefined) {
+                yield exec.exec("git", ["remote", "add", "pr", headCloneURL]);
+                yield exec.exec("git", ["fetch", "pr", headBranch]);
+                yield exec.exec("git", [
+                    "checkout",
+                    "-b",
+                    `${headRepoOwnerLogin}-${headBranch}`,
+                    `pr/${headBranch}`
+                ]);
+            }
+            else {
+                throw new Error("Could not find repository, this should not happen");
+            }
         }
         catch (error) {
             core.setFailed(error.message);

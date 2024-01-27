@@ -1,5 +1,7 @@
 # Open Collective postinstall
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/opencollective/opencollective-postinstall.svg)](https://greenkeeper.io/)
+
 Lightweight npm postinstall message to invite people to donate to your collective
 
 ## Installation

@@ -3,42 +3,46 @@
 // Exits successfully and prints matching version(s) if
 // any supplied version is valid and passes all tests.
 
-var argv = process.argv.slice(2)
+const argv = process.argv.slice(2)
 
-var versions = []
+let versions = []
 
-var range = []
+const range = []
 
-var inc = null
+let inc = null
 
-var version = require('../package.json').version
+const version = require('../package.json').version
 
-var loose = false
+let loose = false
 
-var includePrerelease = false
+let includePrerelease = false
 
-var coerce = false
+let coerce = false
 
-var rtl = false
+let rtl = false
 
-var identifier
+let identifier
 
-var semver = require('../semver')
+let identifierBase
 
-var reverse = false
+const semver = require('../')
+const parseOptions = require('../internal/parse-options')
 
-var options = {}
+let reverse = false
 
-main()
+let options = {}
 
-function main () {
-  if (!argv.length) return help()
+const main = () => {
+  if (!argv.length) {
+    return help()
+  }
   while (argv.length) {
-    var a = argv.shift()
-    var indexOfEqualSign = a.indexOf('=')
+    let a = argv.shift()
+    const indexOfEqualSign = a.indexOf('=')
     if (indexOfEqualSign !== -1) {
+      const value = a.slice(indexOfEqualSign + 1)
       a = a.slice(0, indexOfEqualSign)
-      argv.unshift(a.slice(indexOfEqualSign + 1))
+      argv.unshift(value)
     }
     switch (a) {
       case '-rv': case '-rev': case '--rev': case '--reverse':
@@ -70,6 +74,12 @@ function main () {
       case '-r': case '--range':
         range.push(argv.shift())
         break
+      case '-n':
+        identifierBase = argv.shift()
+        if (identifierBase === 'false') {
+          identifierBase = false
+        }
+        break
       case '-c': case '--coerce':
         coerce = true
         break
@@ -87,88 +97,101 @@ function main () {
     }
   }
 
-  var options = { loose: loose, includePrerelease: includePrerelease, rtl: rtl }
+  options = parseOptions({ loose, includePrerelease, rtl })
 
-  versions = versions.map(function (v) {
+  versions = versions.map((v) => {
     return coerce ? (semver.coerce(v, options) || { version: v }).version : v
-  }).filter(function (v) {
+  }).filter((v) => {
     return semver.valid(v)
   })
-  if (!versions.length) return fail()
-  if (inc && (versions.length !== 1 || range.length)) { return failInc() }
+  if (!versions.length) {
+    return fail()
+  }
+  if (inc && (versions.length !== 1 || range.length)) {
+    return failInc()
+  }
 
-  for (var i = 0, l = range.length; i < l; i++) {
-    versions = versions.filter(function (v) {
+  for (let i = 0, l = range.length; i < l; i++) {
+    versions = versions.filter((v) => {
       return semver.satisfies(v, range[i], options)
     })
-    if (!versions.length) return fail()
+    if (!versions.length) {
+      return fail()
+    }
   }
   return success(versions)
 }
 
-function failInc () {
+const failInc = () => {
   console.error('--inc can only be used on a single version with no range')
   fail()
 }
 
-function fail () { process.exit(1) }
+const fail = () => process.exit(1)
 
-function success () {
-  var compare = reverse ? 'rcompare' : 'compare'
-  versions.sort(function (a, b) {
+const success = () => {
+  const compare = reverse ? 'rcompare' : 'compare'
+  versions.sort((a, b) => {
     return semver[compare](a, b, options)
-  }).map(function (v) {
+  }).map((v) => {
     return semver.clean(v, options)
-  }).map(function (v) {
-    return inc ? semver.inc(v, inc, options, identifier) : v
-  }).forEach(function (v, i, _) { console.log(v) })
+  }).map((v) => {
+    return inc ? semver.inc(v, inc, options, identifier, identifierBase) : v
+  }).forEach((v, i, _) => {
+    console.log(v)
+  })
 }
 
-function help () {
-  console.log(['SemVer ' + version,
-    '',
-    'A JavaScript implementation of the https://semver.org/ specification',
-    'Copyright Isaac Z. Schlueter',
-    '',
-    'Usage: semver [options] <version> [<version> [...]]',
-    'Prints valid versions sorted by SemVer precedence',
-    '',
-    'Options:',
-    '-r --range <range>',
-    '        Print versions that match the specified range.',
-    '',
-    '-i --increment [<level>]',
-    '        Increment a version by the specified level.  Level can',
-    '        be one of: major, minor, patch, premajor, preminor,',
-    "        prepatch, or prerelease.  Default level is 'patch'.",
-    '        Only one version may be specified.',
-    '',
-    '--preid <identifier>',
-    '        Identifier to be used to prefix premajor, preminor,',
-    '        prepatch or prerelease version increments.',
-    '',
-    '-l --loose',
-    '        Interpret versions and ranges loosely',
-    '',
-    '-p --include-prerelease',
-    '        Always include prerelease versions in range matching',
-    '',
-    '-c --coerce',
-    '        Coerce a string into SemVer if possible',
-    '        (does not imply --loose)',
-    '',
-    '--rtl',
-    '        Coerce version strings right to left',
-    '',
-    '--ltr',
-    '        Coerce version strings left to right (default)',
-    '',
-    'Program exits successfully if any valid version satisfies',
-    'all supplied ranges, and prints all satisfying versions.',
-    '',
-    'If no satisfying versions are found, then exits failure.',
-    '',
-    'Versions are printed in ascending order, so supplying',
-    'multiple versions to the utility will just sort them.'
-  ].join('\n'))
-}
+const help = () => console.log(
+`SemVer ${version}
+
+A JavaScript implementation of the https://semver.org/ specification
+Copyright Isaac Z. Schlueter
+
+Usage: semver [options] <version> [<version> [...]]
+Prints valid versions sorted by SemVer precedence
+
+Options:
+-r --range <range>
+        Print versions that match the specified range.
+
+-i --increment [<level>]
+        Increment a version by the specified level.  Level can
+        be one of: major, minor, patch, premajor, preminor,
+        prepatch, or prerelease.  Default level is 'patch'.
+        Only one version may be specified.
+
+--preid <identifier>
+        Identifier to be used to prefix premajor, preminor,
+        prepatch or prerelease version increments.
+
+-l --loose
+        Interpret versions and ranges loosely
+
+-p --include-prerelease
+        Always include prerelease versions in range matching
+
+-c --coerce
+        Coerce a string into SemVer if possible
+        (does not imply --loose)
+
+--rtl
+        Coerce version strings right to left
+
+--ltr
+        Coerce version strings left to right (default)
+
+-n <base>
+        Base number to be used for the prerelease identifier.
+        Can be either 0 or 1, or false to omit the number altogether.
+        Defaults to 0.
+
+Program exits successfully if any valid version satisfies
+all supplied ranges, and prints all satisfying versions.
+
+If no satisfying versions are found, then exits failure.
+
+Versions are printed in ascending order, so supplying
+multiple versions to the utility will just sort them.`)
+
+main()

@@ -1,4 +1,4 @@
-# sourcemap-codec
+# @jridgewell/sourcemap-codec
 
 Encode/decode the `mappings` property of a [sourcemap](https://docs.google.com/document/d/1U1RGAehQwRypUTovF1KRlpiOFze0b-_2gc6fAH0KY0k/edit).
 
@@ -13,14 +13,14 @@ This package makes the process slightly easier.
 ## Installation
 
 ```bash
-npm install sourcemap-codec
+npm install @jridgewell/sourcemap-codec
 ```
 
 
 ## Usage
 
 ```js
-import { encode, decode } from 'sourcemap-codec';
+import { encode, decode } from '@jridgewell/sourcemap-codec';
 
 var decoded = decode( ';EAEEA,EAAE,EAAC,CAAE;ECQY,UACC' );
 

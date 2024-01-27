@@ -70,7 +70,7 @@
  * @experimental
  * @see [source](https://github.com/nodejs/node/blob/v16.9.0/lib/wasi.js)
  */
-declare module 'wasi' {
+declare module "wasi" {
     interface WASIOptions {
         /**
          * An array of strings that the WebAssembly application will
@@ -133,7 +133,7 @@ declare module 'wasi' {
          * If `start()` is called more than once, an exception is thrown.
          * @since v13.3.0, v12.16.0
          */
-        start(instance: object): void; // TODO: avoid DOM dependency until WASM moved to own lib.
+        start(instance: object): number; // TODO: avoid DOM dependency until WASM moved to own lib.
         /**
          * Attempt to initialize `instance` as a WASI reactor by invoking its`_initialize()` export, if it is present. If `instance` contains a `_start()`export, then an exception is thrown.
          *
@@ -153,6 +153,6 @@ declare module 'wasi' {
         readonly wasiImport: NodeJS.Dict<any>; // TODO: Narrow to DOM types
     }
 }
-declare module 'node:wasi' {
-    export * from 'wasi';
+declare module "node:wasi" {
+    export * from "wasi";
 }

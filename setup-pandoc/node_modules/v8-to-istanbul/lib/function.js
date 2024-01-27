@@ -22,7 +22,7 @@ module.exports = class CovFunction {
     return {
       name: this.name,
       decl: loc,
-      loc: loc,
+      loc,
       line: this.startLine
     }
   }

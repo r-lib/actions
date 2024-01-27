@@ -50,6 +50,7 @@ function getInfo(path, flags) {
 function getFileType(flags) {
   if (events.ItemIsFile & flags) return "file";
   if (events.ItemIsDir & flags) return "directory";
+  if (events.MustScanSubDirs & flags) return "directory"; 
   if (events.ItemIsSymlink & flags) return "symlink";
 }
 function anyIsTrue(obj) {

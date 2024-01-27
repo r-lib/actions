@@ -10,7 +10,11 @@ const createRequire = require(`./createRequire`);
 const getDefaultResolver = require(`./getDefaultResolver`);
 
 module.exports = (request, options) => {
-  const {basedir, defaultResolver, extensions} = options;
+  const {
+    basedir,
+    defaultResolver = getDefaultResolver(),
+    extensions,
+  } = options;
 
   if (process.versions.pnp) {
     let pnpApi = globalPnpApi;
@@ -41,9 +45,6 @@ module.exports = (request, options) => {
       return resolution;
     }
   }
-
-  if (!defaultResolver)
-    defaultResolver = getDefaultResolver();
 
   return defaultResolver(request, {...options, allowPnp: false});
 };

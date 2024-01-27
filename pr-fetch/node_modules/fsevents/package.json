@@ -1,6 +1,6 @@
 {
   "name": "fsevents",
-  "version": "2.3.2",
+  "version": "2.3.3",
   "description": "Native Access to MacOS FSEvents",
   "main": "fsevents.js",
   "types": "fsevents.d.ts",
@@ -57,6 +57,6 @@
   },
   "homepage": "https://github.com/fsevents/fsevents",
   "devDependencies": {
-    "node-gyp": "^6.1.0"
+    "node-gyp": "^9.4.0"
   }
 }

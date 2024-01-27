@@ -5,7 +5,7 @@ inputs:
   r-version:
     description: 'Version range or exact version of an R version to use. "devel" is
     the current development version, and "next" is the next version of R, either
-    R-patched, or R-alpha, R-beta, R-rc or R-prerelease. Use "renv" to retrieve R 
+    R-patched, or R-alpha, R-beta, R-rc or R-prerelease. Use "renv" to retrieve R
     version recorded in renv.lock file.'
     default: 'release'
   rtools-version:
@@ -55,5 +55,5 @@ outputs:
   installed-r-version:
     description: 'The full R version installed'
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'lib/setup-r.js'

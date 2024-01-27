@@ -47,7 +47,7 @@ const matchPatterns = (patterns, negPatterns, args, returnIndex) => {
     throw new TypeError('anymatch: second argument must be a string: got ' +
       Object.prototype.toString.call(_path))
   }
-  const path = normalizePath(_path);
+  const path = normalizePath(_path, false);
 
   for (let index = 0; index < negPatterns.length; index++) {
     const nglob = negPatterns[index];
