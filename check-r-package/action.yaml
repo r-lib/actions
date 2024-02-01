@@ -54,13 +54,13 @@ runs:
       if: failure() || inputs.upload-results != 'false'
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ runner.os }}-r${{ matrix.config.r }}-results
+        name: ${{ runner.os }}-${{ runner.arch }}-r${{ matrix.config.r }}-${{ github.run_number }}-${{ github.run_attempt }}-results
         path: ${{ steps.rcmdcheck.outputs.check-dir-path }}
 
     - name: Upload snapshots
       if: inputs.upload-snapshots != 'false'
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ runner.os }}-${{ runner.arch }}-r${{ matrix.config.r }}-testthat-snapshots
+        name: ${{ runner.os }}-${{ runner.arch }}-r${{ matrix.config.r }}-${{ github.run_number }}-${{ github.run_attempt }}-testthat-snapshots
         path: ${{ steps.rcmdcheck.outputs.check-dir-path }}/**/tests*/testthat/_snaps
         if-no-files-found: ignore
