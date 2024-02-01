@@ -27,3 +27,5 @@ jobs:
           needs: check
 
       - uses: ./check-r-package
+        with:
+          upload-snapshots: true
