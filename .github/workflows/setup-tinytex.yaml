@@ -26,6 +26,7 @@ jobs:
       - uses: ./setup-tinytex
         env:
           TINYTEX_INSTALLER: TinyTeX
+          TINYTEX_VERSION: 2024.02
 
       - run: tlmgr --version
 
