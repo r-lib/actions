@@ -2,9 +2,9 @@
 const fs = require('fs');
 const path = require('path');
 const {promisify} = require('util');
-const semver = require('semver');
+const semverGte = require('semver/functions/gte');
 
-const useNativeRecursiveOption = semver.satisfies(process.version, '>=10.12.0');
+const useNativeRecursiveOption = semverGte(process.version, '10.12.0');
 
 // https://github.com/nodejs/node/issues/8987
 // https://github.com/libuv/libuv/pull/1088
@@ -21,7 +21,6 @@ const checkPath = pth => {
 };
 
 const processOptions = options => {
-	// https://github.com/sindresorhus/make-dir/issues/18
 	const defaults = {
 		mode: 0o777,
 		fs
@@ -91,7 +90,7 @@ const makeDir = async (input, options) => {
 				if (!stats.isDirectory()) {
 					throw new Error('The path is not a directory');
 				}
-			} catch (_) {
+			} catch {
 				throw error;
 			}
 
@@ -144,7 +143,7 @@ module.exports.sync = (input, options) => {
 				if (!options.fs.statSync(pth).isDirectory()) {
 					throw new Error('The path is not a directory');
 				}
-			} catch (_) {
+			} catch {
 				throw error;
 			}
 		}

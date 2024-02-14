@@ -8,5 +8,5 @@ inputs:
     description: 'String of additional command line args to `git push`'
     default: '-q'
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'lib/main.js'

@@ -2,38 +2,46 @@
 const path = require('path');
 const pathKey = require('path-key');
 
-module.exports = opts => {
-	opts = Object.assign({
+const npmRunPath = options => {
+	options = {
 		cwd: process.cwd(),
-		path: process.env[pathKey()]
-	}, opts);
+		path: process.env[pathKey()],
+		execPath: process.execPath,
+		...options
+	};
 
-	let prev;
-	let pth = path.resolve(opts.cwd);
-	const ret = [];
+	let previous;
+	let cwdPath = path.resolve(options.cwd);
+	const result = [];
 
-	while (prev !== pth) {
-		ret.push(path.join(pth, 'node_modules/.bin'));
-		prev = pth;
-		pth = path.resolve(pth, '..');
+	while (previous !== cwdPath) {
+		result.push(path.join(cwdPath, 'node_modules/.bin'));
+		previous = cwdPath;
+		cwdPath = path.resolve(cwdPath, '..');
 	}
 
-	// ensure the running `node` binary is used
-	ret.push(path.dirname(process.execPath));
+	// Ensure the running `node` binary is used
+	const execPathDir = path.resolve(options.cwd, options.execPath, '..');
+	result.push(execPathDir);
 
-	return ret.concat(opts.path).join(path.delimiter);
+	return result.concat(options.path).join(path.delimiter);
 };
 
-module.exports.env = opts => {
-	opts = Object.assign({
-		env: process.env
-	}, opts);
+module.exports = npmRunPath;
+// TODO: Remove this for the next major release
+module.exports.default = npmRunPath;
 
-	const env = Object.assign({}, opts.env);
+module.exports.env = options => {
+	options = {
+		env: process.env,
+		...options
+	};
+
+	const env = {...options.env};
 	const path = pathKey({env});
 
-	opts.path = env[path];
-	env[path] = module.exports(opts);
+	options.path = env[path];
+	env[path] = module.exports(options);
 
 	return env;
 };

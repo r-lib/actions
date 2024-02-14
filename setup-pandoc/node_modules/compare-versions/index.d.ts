@@ -17,7 +17,7 @@ declare const compareVersions: {
 
   /**
    * Compare [semver](https://semver.org/) version strings using the specified operator.
-   * 
+   *
    * @param firstVersion First version to compare
    * @param secondVersion Second version to compare
    * @param operator Allowed arithmetic operator to use
@@ -32,15 +32,15 @@ declare const compareVersions: {
    * compareVersions.compare('10.1.1', '10.2.2', '>='); // return false
    * ```
    */
-	compare(
-    firstVersion: string, 
-    secondVersion: string, 
+  compare(
+    firstVersion: string,
+    secondVersion: string,
     operator: compareVersions.CompareOperator
   ): boolean;
 
   /**
    * Validate [semver](https://semver.org/) version strings.
-   * 
+   *
    * @param version Version number to validate
    * @returns `true` if the version number is a valid semver version number, `false` otherwise.
    *
@@ -51,9 +51,22 @@ declare const compareVersions: {
    * compareVersions.validate('foo'); // return false
    * ```
    */
-	validate(
-    version: string
-  ): boolean;
+  validate(version: string): boolean;
+
+  /**
+   * Match [npm semver](https://docs.npmjs.com/cli/v6/using-npm/semver) version range.
+   *
+   * @param version Version number to match
+   * @param range Range pattern for version
+   * @returns `true` if the version number is within the range, `false` otherwise.
+   *
+   * @example
+   * ```
+   * satisfies('1.1.0', '^1.0.0'); // return true
+   * satisfies('1.1.0', '~1.0.0'); // return false
+   * ```
+   */
+  satisfies(version: string, range: string): boolean;
 };
 
 export = compareVersions;

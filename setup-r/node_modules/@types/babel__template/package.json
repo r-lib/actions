@@ -1,29 +1,29 @@
 {
     "name": "@types/babel__template",
-    "version": "7.4.1",
+    "version": "7.4.4",
     "description": "TypeScript definitions for @babel/template",
     "homepage": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/babel__template",
     "license": "MIT",
     "contributors": [
         {
             "name": "Troy Gerwien",
-            "url": "https://github.com/yortus",
-            "githubUsername": "yortus"
+            "githubUsername": "yortus",
+            "url": "https://github.com/yortus"
         },
         {
             "name": "Marvin Hagemeister",
-            "url": "https://github.com/marvinhagemeister",
-            "githubUsername": "marvinhagemeister"
+            "githubUsername": "marvinhagemeister",
+            "url": "https://github.com/marvinhagemeister"
         },
         {
             "name": "Melvin Groenhoff",
-            "url": "https://github.com/mgroenhoff",
-            "githubUsername": "mgroenhoff"
+            "githubUsername": "mgroenhoff",
+            "url": "https://github.com/mgroenhoff"
         },
         {
             "name": "ExE Boss",
-            "url": "https://github.com/ExE-Boss",
-            "githubUsername": "ExE-Boss"
+            "githubUsername": "ExE-Boss",
+            "url": "https://github.com/ExE-Boss"
         }
     ],
     "main": "",
@@ -38,6 +38,6 @@
         "@babel/parser": "^7.1.0",
         "@babel/types": "^7.0.0"
     },
-    "typesPublisherContentHash": "8b488d3b882af8da43e3bb35fc9efcf3bd5fdaec465b98ed620d47b2231b62ed",
-    "typeScriptVersion": "3.6"
+    "typesPublisherContentHash": "5730d754b4d1fcd41676b093f9e32b340c749c4d37b126dfa312e394467e86c6",
+    "typeScriptVersion": "4.5"
 }

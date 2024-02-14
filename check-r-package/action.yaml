@@ -28,14 +28,13 @@ runs:
   using: "composite"
   steps:
     - name: Check
-      id: rcmdcheck    
-      env:
-        _R_CHECK_CRAN_INCOMING_: false
+      id: rcmdcheck
       run: |
         ## --------------------------------------------------------------------
         options(crayon.enabled = TRUE)
         cat("LOGNAME=", Sys.info()[["user"]], "\n", sep = "", file = Sys.getenv("GITHUB_ENV"), append = TRUE)
         if (Sys.getenv("_R_CHECK_FORCE_SUGGESTS_", "") == "") Sys.setenv("_R_CHECK_FORCE_SUGGESTS_" = "false")
+        if (Sys.getenv("_R_CHECK_CRAN_INCOMING_", "") == "") Sys.setenv("_R_CHECK_CRAN_INCOMING_" = "false")
         cat("check-dir-path=", file.path(getwd(), (${{ inputs.check-dir }})), "\n", file = Sys.getenv("GITHUB_OUTPUT"), sep = "", append = TRUE)
         check_results <- rcmdcheck::rcmdcheck(args = (${{ inputs.args }}), build_args = (${{ inputs.build_args }}), error_on = (${{ inputs.error-on }}), check_dir = (${{ inputs.check-dir }}))
       shell: Rscript {0}
@@ -53,15 +52,15 @@ runs:
 
     - name: Upload check results
       if: failure() || inputs.upload-results != 'false'
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
-        name: ${{ runner.os }}-r${{ matrix.config.r }}-results
+        name: ${{ runner.os }}-${{ runner.arch }}-r${{ matrix.config.r }}-${{ matrix.config.id || strategy.job-index }}-results
         path: ${{ steps.rcmdcheck.outputs.check-dir-path }}
 
     - name: Upload snapshots
       if: inputs.upload-snapshots != 'false'
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
-        name: ${{ runner.os }}-r${{ matrix.config.r }}-testthat-snapshots
+        name: ${{ runner.os }}-${{ runner.arch }}-r${{ matrix.config.r }}-${{ matrix.config.id || strategy.job-index }}-testthat-snapshots
         path: ${{ steps.rcmdcheck.outputs.check-dir-path }}/**/tests*/testthat/_snaps
         if-no-files-found: ignore

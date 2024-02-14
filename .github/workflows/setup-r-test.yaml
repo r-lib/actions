@@ -37,7 +37,7 @@ jobs:
     name: ${{ github.event.inputs.inpos }} (${{ matrix.r }})
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - uses: ./setup-r
       id: setup-r

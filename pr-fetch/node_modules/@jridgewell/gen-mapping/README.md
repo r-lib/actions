@@ -18,7 +18,7 @@ npm install @jridgewell/gen-mapping
 ## Usage
 
 ```typescript
-import { GenMapping, addMapping, setSourceContent, encodedMap } from '@jridgewell/gen-mapping';
+import { GenMapping, addMapping, setSourceContent, toEncodedMap, toDecodedMap } from '@jridgewell/gen-mapping';
 
 const map = new GenMapping({
   file: 'output.js',
@@ -41,7 +41,19 @@ addMapping(map, {
   name: 'foo',
 });
 
-assert.deepEqual(encodedMap(map), {
+assert.deepEqual(toDecodedMap(map), {
+  version: 3,
+  file: 'output.js',
+  names: ['foo'],
+  sourceRoot: 'https://example.com/',
+  sources: ['input.js'],
+  sourcesContent: ['function foo() {}'],
+  mappings: [
+    [ [0, 0, 0, 0], [9, 0, 0, 9, 0] ]
+  ],
+});
+
+assert.deepEqual(toEncodedMap(map), {
   version: 3,
   file: 'output.js',
   names: ['foo'],
@@ -52,75 +64,162 @@ assert.deepEqual(encodedMap(map), {
 });
 ```
 
+### Smaller Sourcemaps
+
+Not everything needs to be added to a sourcemap, and needless markings can cause signficantly
+larger file sizes. `gen-mapping` exposes `maybeAddSegment`/`maybeAddMapping` APIs that will
+intelligently determine if this marking adds useful information. If not, the marking will be
+skipped.
+
+```typescript
+import { maybeAddMapping } from '@jridgewell/gen-mapping';
+
+const map = new GenMapping();
+
+// Adding a sourceless marking at the beginning of a line isn't useful.
+maybeAddMapping(map, {
+  generated: { line: 1, column: 0 },
+});
+
+// Adding a new source marking is useful.
+maybeAddMapping(map, {
+  generated: { line: 1, column: 0 },
+  source: 'input.js',
+  original: { line: 1, column: 0 },
+});
+
+// But adding another marking pointing to the exact same original location isn't, even if the
+// generated column changed.
+maybeAddMapping(map, {
+  generated: { line: 1, column: 9 },
+  source: 'input.js',
+  original: { line: 1, column: 0 },
+});
+
+assert.deepEqual(toEncodedMap(map), {
+  version: 3,
+  names: [],
+  sources: ['input.js'],
+  sourcesContent: [null],
+  mappings: 'AAAA',
+});
+```
+
 ## Benchmarks
 
 ```
 node v18.0.0
 
 amp.js.map
-gen-mapping:      addSegment x 462 ops/sec ±1.53% (91 runs sampled)
-gen-mapping:      addMapping x 471 ops/sec ±0.77% (93 runs sampled)
-source-map-js:    addMapping x 178 ops/sec ±1.14% (84 runs sampled)
-source-map-0.6.1: addMapping x 178 ops/sec ±1.21% (84 runs sampled)
-source-map-0.8.0: addMapping x 177 ops/sec ±1.21% (83 runs sampled)
-Fastest is gen-mapping:      addMapping,gen-mapping:      addSegment
+Memory Usage:
+gen-mapping: addSegment      5852872 bytes
+gen-mapping: addMapping      7716042 bytes
+source-map-js                6143250 bytes
+source-map-0.6.1             6124102 bytes
+source-map-0.8.0             6121173 bytes
+Smallest memory usage is gen-mapping: addSegment
 
-gen-mapping:      decoded output x 157,499,812 ops/sec ±0.25% (100 runs sampled)
-gen-mapping:      encoded output x 625 ops/sec ±1.95% (88 runs sampled)
-source-map-js:    encoded output x 162 ops/sec ±0.37% (84 runs sampled)
-source-map-0.6.1: encoded output x 161 ops/sec ±0.51% (84 runs sampled)
-source-map-0.8.0: encoded output x 191 ops/sec ±0.12% (90 runs sampled)
+Adding speed:
+gen-mapping:      addSegment x 441 ops/sec ±2.07% (90 runs sampled)
+gen-mapping:      addMapping x 350 ops/sec ±2.40% (86 runs sampled)
+source-map-js:    addMapping x 169 ops/sec ±2.42% (80 runs sampled)
+source-map-0.6.1: addMapping x 167 ops/sec ±2.56% (80 runs sampled)
+source-map-0.8.0: addMapping x 168 ops/sec ±2.52% (80 runs sampled)
+Fastest is gen-mapping:      addSegment
+
+Generate speed:
+gen-mapping:      decoded output x 150,824,370 ops/sec ±0.07% (102 runs sampled)
+gen-mapping:      encoded output x 663 ops/sec ±0.22% (98 runs sampled)
+source-map-js:    encoded output x 197 ops/sec ±0.45% (84 runs sampled)
+source-map-0.6.1: encoded output x 198 ops/sec ±0.33% (85 runs sampled)
+source-map-0.8.0: encoded output x 197 ops/sec ±0.06% (93 runs sampled)
 Fastest is gen-mapping:      decoded output
 
+
 ***
+
 
 babel.min.js.map
-gen-mapping:      addSegment x 35.38 ops/sec ±4.48% (48 runs sampled)
-gen-mapping:      addMapping x 29.93 ops/sec ±5.03% (55 runs sampled)
-source-map-js:    addMapping x 22.19 ops/sec ±3.39% (41 runs sampled)
-source-map-0.6.1: addMapping x 22.57 ops/sec ±2.90% (41 runs sampled)
-source-map-0.8.0: addMapping x 22.73 ops/sec ±2.84% (41 runs sampled)
+Memory Usage:
+gen-mapping: addSegment     37578063 bytes
+gen-mapping: addMapping     37212897 bytes
+source-map-js               47638527 bytes
+source-map-0.6.1            47690503 bytes
+source-map-0.8.0            47470188 bytes
+Smallest memory usage is gen-mapping: addMapping
+
+Adding speed:
+gen-mapping:      addSegment x 31.05 ops/sec ±8.31% (43 runs sampled)
+gen-mapping:      addMapping x 29.83 ops/sec ±7.36% (51 runs sampled)
+source-map-js:    addMapping x 20.73 ops/sec ±6.22% (38 runs sampled)
+source-map-0.6.1: addMapping x 20.03 ops/sec ±10.51% (38 runs sampled)
+source-map-0.8.0: addMapping x 19.30 ops/sec ±8.27% (37 runs sampled)
 Fastest is gen-mapping:      addSegment
 
-gen-mapping:      decoded output x 157,767,591 ops/sec ±0.10% (99 runs sampled)
-gen-mapping:      encoded output x 97.06 ops/sec ±1.69% (73 runs sampled)
-source-map-js:    encoded output x 17.51 ops/sec ±2.27% (37 runs sampled)
-source-map-0.6.1: encoded output x 17.40 ops/sec ±4.61% (35 runs sampled)
-source-map-0.8.0: encoded output x 17.83 ops/sec ±4.85% (36 runs sampled)
+Generate speed:
+gen-mapping:      decoded output x 381,379,234 ops/sec ±0.29% (96 runs sampled)
+gen-mapping:      encoded output x 95.15 ops/sec ±2.98% (72 runs sampled)
+source-map-js:    encoded output x 15.20 ops/sec ±7.41% (33 runs sampled)
+source-map-0.6.1: encoded output x 16.36 ops/sec ±10.46% (31 runs sampled)
+source-map-0.8.0: encoded output x 16.06 ops/sec ±6.45% (31 runs sampled)
 Fastest is gen-mapping:      decoded output
 
+
 ***
+
 
 preact.js.map
-gen-mapping:      addSegment x 13,516 ops/sec ±0.27% (98 runs sampled)
-gen-mapping:      addMapping x 12,117 ops/sec ±0.25% (97 runs sampled)
-source-map-js:    addMapping x 4,285 ops/sec ±1.53% (98 runs sampled)
-source-map-0.6.1: addMapping x 4,482 ops/sec ±0.20% (100 runs sampled)
-source-map-0.8.0: addMapping x 4,482 ops/sec ±0.28% (99 runs sampled)
+Memory Usage:
+gen-mapping: addSegment       416247 bytes
+gen-mapping: addMapping       419824 bytes
+source-map-js                1024619 bytes
+source-map-0.6.1             1146004 bytes
+source-map-0.8.0             1113250 bytes
+Smallest memory usage is gen-mapping: addSegment
+
+Adding speed:
+gen-mapping:      addSegment x 13,755 ops/sec ±0.15% (98 runs sampled)
+gen-mapping:      addMapping x 13,013 ops/sec ±0.11% (101 runs sampled)
+source-map-js:    addMapping x 4,564 ops/sec ±0.21% (98 runs sampled)
+source-map-0.6.1: addMapping x 4,562 ops/sec ±0.11% (99 runs sampled)
+source-map-0.8.0: addMapping x 4,593 ops/sec ±0.11% (100 runs sampled)
 Fastest is gen-mapping:      addSegment
 
-gen-mapping:      decoded output x 157,769,691 ops/sec ±0.06% (92 runs sampled)
-gen-mapping:      encoded output x 18,610 ops/sec ±1.03% (93 runs sampled)
-source-map-js:    encoded output x 5,397 ops/sec ±0.38% (97 runs sampled)
-source-map-0.6.1: encoded output x 5,422 ops/sec ±0.16% (100 runs sampled)
-source-map-0.8.0: encoded output x 5,595 ops/sec ±0.11% (100 runs sampled)
+Generate speed:
+gen-mapping:      decoded output x 379,864,020 ops/sec ±0.23% (93 runs sampled)
+gen-mapping:      encoded output x 14,368 ops/sec ±4.07% (82 runs sampled)
+source-map-js:    encoded output x 5,261 ops/sec ±0.21% (99 runs sampled)
+source-map-0.6.1: encoded output x 5,124 ops/sec ±0.58% (99 runs sampled)
+source-map-0.8.0: encoded output x 5,434 ops/sec ±0.33% (96 runs sampled)
 Fastest is gen-mapping:      decoded output
+
 
 ***
 
+
 react.js.map
-gen-mapping:      addSegment x 5,058 ops/sec ±0.27% (100 runs sampled)
-gen-mapping:      addMapping x 4,352 ops/sec ±0.13% (97 runs sampled)
-source-map-js:    addMapping x 1,569 ops/sec ±0.19% (99 runs sampled)
-source-map-0.6.1: addMapping x 1,550 ops/sec ±0.31% (97 runs sampled)
-source-map-0.8.0: addMapping x 1,560 ops/sec ±0.18% (99 runs sampled)
+Memory Usage:
+gen-mapping: addSegment       975096 bytes
+gen-mapping: addMapping      1102981 bytes
+source-map-js                2918836 bytes
+source-map-0.6.1             2885435 bytes
+source-map-0.8.0             2874336 bytes
+Smallest memory usage is gen-mapping: addSegment
+
+Adding speed:
+gen-mapping:      addSegment x 4,772 ops/sec ±0.15% (100 runs sampled)
+gen-mapping:      addMapping x 4,456 ops/sec ±0.13% (97 runs sampled)
+source-map-js:    addMapping x 1,618 ops/sec ±0.24% (97 runs sampled)
+source-map-0.6.1: addMapping x 1,622 ops/sec ±0.12% (99 runs sampled)
+source-map-0.8.0: addMapping x 1,631 ops/sec ±0.12% (100 runs sampled)
 Fastest is gen-mapping:      addSegment
 
-gen-mapping:      decoded output x 157,479,701 ops/sec ±0.14% (99 runs sampled)
-gen-mapping:      encoded output x 6,392 ops/sec ±1.03% (94 runs sampled)
-source-map-js:    encoded output x 2,213 ops/sec ±0.36% (99 runs sampled)
-source-map-0.6.1: encoded output x 2,238 ops/sec ±0.23% (100 runs sampled)
-source-map-0.8.0: encoded output x 2,304 ops/sec ±0.20% (100 runs sampled)
+Generate speed:
+gen-mapping:      decoded output x 379,107,695 ops/sec ±0.07% (99 runs sampled)
+gen-mapping:      encoded output x 5,421 ops/sec ±1.60% (89 runs sampled)
+source-map-js:    encoded output x 2,113 ops/sec ±1.81% (98 runs sampled)
+source-map-0.6.1: encoded output x 2,126 ops/sec ±0.10% (100 runs sampled)
+source-map-0.8.0: encoded output x 2,176 ops/sec ±0.39% (98 runs sampled)
 Fastest is gen-mapping:      decoded output
 ```
 

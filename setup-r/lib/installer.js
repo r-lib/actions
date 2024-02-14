@@ -140,7 +140,7 @@ function acquireR(version) {
                     ok = true;
                 }
                 catch (error) {
-                    core.warning("Failed to download qpdf or ghostscript: ${error}");
+                    core.warning(`Failed to download qpdf or ghostscript: ${error}`);
                     yield new Promise(f => setTimeout(f, 10000));
                     tries_left = tries_left - 1;
                 }
@@ -167,7 +167,7 @@ function acquireFortranMacOS(version) {
 }
 function acquireFortranMacOSNew() {
     return __awaiter(this, void 0, void 0, function* () {
-        let downloadUrl = "https://mac.r-project.org/tools/gfortran-12.2-universal.pkg";
+        let downloadUrl = "https://github.com/r-hub/mac-tools/releases/download/tools/gfortran-12.2-universal.pkg";
         let fileName = path.basename(downloadUrl);
         let downloadPath = null;
         try {
@@ -202,7 +202,7 @@ function acquireFortranMacOSOld() {
         let gfortran = "gfortran-8.2-Mojave";
         let mntPath = path.join("/Volumes", gfortran);
         let fileName = `${gfortran}.dmg`;
-        let downloadUrl = `https://mac.r-project.org/tools/${fileName}`;
+        let downloadUrl = `https://github.com/r-hub/mac-tools/releases/download/tools/${fileName}`;
         let downloadPath = null;
         try {
             downloadPath = yield tc.downloadTool(downloadUrl);
@@ -387,16 +387,23 @@ function acquireRMacOS(version) {
             core.debug(`${error}`);
             throw `Failed to install R: ${error}`;
         }
+        // Remove homebrew R from the PATH
+        try {
+            yield exec.exec("brew", ["unlink", "r"]);
+        }
+        catch (error) {
+            core.debug(`${error}`);
+        }
         // Older R versions on newer macOS cannot create a symlink to R and
         // Rscript, we'll need to do it manually.
         try {
             yield exec.exec("sudo ln", [
-                "-sf",
+                "-sfv",
                 "/Library/Frameworks/R.framework/Resources/bin/R",
                 "/usr/local/bin/R"
             ]);
             yield exec.exec("sudo ln", [
-                "-sf",
+                "-sfv",
                 "/Library/Frameworks/R.framework/Resources/bin/Rscript",
                 "/usr/local/bin/Rscript"
             ]);
@@ -450,10 +457,10 @@ function getRtoolsUrl(version) {
         return "https://github.com/r-hub/rtools42/releases/download/latest/rtools42.exe";
     }
     else if (version == "40") {
-        return "https://cran.r-project.org/bin/windows/Rtools/rtools40-x86_64.exe";
+        return "https://cran.rstudio.com/bin/windows/Rtools/rtools40-x86_64.exe";
     }
     else {
-        return `https://cran.r-project.org/bin/windows/Rtools/Rtools${version}.exe`;
+        return `https://cran.rstudio.com/bin/windows/Rtools/Rtools${version}.exe`;
     }
 }
 function acquireRtools(version) {
@@ -611,7 +618,7 @@ function setupRLibrary() {
         }
         let cran = `'${core.getInput("cran") ||
             process.env["CRAN"] ||
-            "https://cloud.r-project.org"}'`;
+            "https://cran.rstudio.com"}'`;
         let user_agent;
         if (core.getInput("http-user-agent") === "release") {
             let os = IS_WINDOWS ? "win" : IS_MAC ? "macos" : "tarball";

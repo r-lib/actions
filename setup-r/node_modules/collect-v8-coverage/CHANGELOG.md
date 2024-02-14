@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/SimenB/collect-v8-coverage/compare/v1.0.1...v1.0.2) (2023-07-05)
+
+
+### Bug Fixes
+
+* workaround for networked filesystems on Windows ([#174](https://github.com/SimenB/collect-v8-coverage/issues/174)) ([4de72ea](https://github.com/SimenB/collect-v8-coverage/commit/4de72ea976228d6d8b7fb78207c1187aa58ddf50))
+
 ## [1.0.1](https://github.com/SimenB/collect-v8-coverage/compare/v1.0.0...v1.0.1) (2020-04-02)
 
 ### Bug Fixes

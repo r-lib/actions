@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main, master, v2-branch]
   workflow_dispatch:
-    
+
 name: "setup-tinytex test"
 
 jobs:
@@ -21,10 +21,16 @@ jobs:
           - { os: ubuntu-latest  }
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: ./setup-tinytex
         env:
           TINYTEX_INSTALLER: TinyTeX
+          
+      - run: tlmgr --version
+
+      - run: tlmgr update --self
 
       - run: tlmgr --version
+
+      - run: tlmgr install colortbl grfext ae

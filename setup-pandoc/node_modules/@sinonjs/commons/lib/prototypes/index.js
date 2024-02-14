@@ -6,5 +6,5 @@ module.exports = {
     map: require("./map"),
     object: require("./object"),
     set: require("./set"),
-    string: require("./string")
+    string: require("./string"),
 };

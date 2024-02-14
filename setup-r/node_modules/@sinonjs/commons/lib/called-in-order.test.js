@@ -5,19 +5,19 @@ var calledInOrder = require("./called-in-order");
 var sinon = require("@sinonjs/referee-sinon").sinon;
 
 var testObject1 = {
-    someFunction: function() {
+    someFunction: function () {
         return;
-    }
+    },
 };
 var testObject2 = {
-    otherFunction: function() {
+    otherFunction: function () {
         return;
-    }
+    },
 };
 var testObject3 = {
-    thirdFunction: function() {
+    thirdFunction: function () {
         return;
-    }
+    },
 };
 
 function testMethod() {
@@ -28,26 +28,26 @@ function testMethod() {
     testObject3.thirdFunction();
 }
 
-describe("calledInOrder", function() {
-    beforeEach(function() {
+describe("calledInOrder", function () {
+    beforeEach(function () {
         sinon.stub(testObject1, "someFunction");
         sinon.stub(testObject2, "otherFunction");
         sinon.stub(testObject3, "thirdFunction");
         testMethod();
     });
-    afterEach(function() {
+    afterEach(function () {
         testObject1.someFunction.restore();
         testObject2.otherFunction.restore();
         testObject3.thirdFunction.restore();
     });
 
-    describe("given single array argument", function() {
-        describe("when stubs were called in expected order", function() {
-            it("returns true", function() {
+    describe("given single array argument", function () {
+        describe("when stubs were called in expected order", function () {
+            it("returns true", function () {
                 assert.isTrue(
                     calledInOrder([
                         testObject1.someFunction,
-                        testObject2.otherFunction
+                        testObject2.otherFunction,
                     ])
                 );
                 assert.isTrue(
@@ -55,18 +55,18 @@ describe("calledInOrder", function() {
                         testObject1.someFunction,
                         testObject2.otherFunction,
                         testObject2.otherFunction,
-                        testObject3.thirdFunction
+                        testObject3.thirdFunction,
                     ])
                 );
             });
         });
 
-        describe("when stubs were called in unexpected order", function() {
-            it("returns false", function() {
+        describe("when stubs were called in unexpected order", function () {
+            it("returns false", function () {
                 assert.isFalse(
                     calledInOrder([
                         testObject2.otherFunction,
-                        testObject1.someFunction
+                        testObject1.someFunction,
                     ])
                 );
                 assert.isFalse(
@@ -74,16 +74,16 @@ describe("calledInOrder", function() {
                         testObject2.otherFunction,
                         testObject1.someFunction,
                         testObject1.someFunction,
-                        testObject3.thirdFunction
+                        testObject3.thirdFunction,
                     ])
                 );
             });
         });
     });
 
-    describe("given multiple arguments", function() {
-        describe("when stubs were called in expected order", function() {
-            it("returns true", function() {
+    describe("given multiple arguments", function () {
+        describe("when stubs were called in expected order", function () {
+            it("returns true", function () {
                 assert.isTrue(
                     calledInOrder(
                         testObject1.someFunction,
@@ -100,8 +100,8 @@ describe("calledInOrder", function() {
             });
         });
 
-        describe("when stubs were called in unexpected order", function() {
-            it("returns false", function() {
+        describe("when stubs were called in unexpected order", function () {
+            it("returns false", function () {
                 assert.isFalse(
                     calledInOrder(
                         testObject2.otherFunction,

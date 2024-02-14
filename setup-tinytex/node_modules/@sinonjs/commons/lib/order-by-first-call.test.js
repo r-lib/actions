@@ -5,8 +5,8 @@ var knuthShuffle = require("knuth-shuffle").knuthShuffle;
 var sinon = require("@sinonjs/referee-sinon").sinon;
 var orderByFirstCall = require("./order-by-first-call");
 
-describe("orderByFirstCall", function() {
-    it("should order an Array of spies by the callId of the first call, ascending", function() {
+describe("orderByFirstCall", function () {
+    it("should order an Array of spies by the callId of the first call, ascending", function () {
         // create an array of spies
         var spies = [
             sinon.spy(),
@@ -14,11 +14,11 @@ describe("orderByFirstCall", function() {
             sinon.spy(),
             sinon.spy(),
             sinon.spy(),
-            sinon.spy()
+            sinon.spy(),
         ];
 
         // call all the spies
-        spies.forEach(function(spy) {
+        spies.forEach(function (spy) {
             spy();
         });
 
@@ -33,7 +33,7 @@ describe("orderByFirstCall", function() {
 
         assert.equals(sortedSpies.length, spies.length);
 
-        var orderedByFirstCall = sortedSpies.every(function(spy, index) {
+        var orderedByFirstCall = sortedSpies.every(function (spy, index) {
             if (index + 1 === sortedSpies.length) {
                 return true;
             }

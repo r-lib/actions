@@ -10,19 +10,21 @@ var expectedMethods = [
     "functionName",
     "orderByFirstCall",
     "typeOf",
-    "valueToString"
+    "valueToString",
 ];
 var expectedObjectProperties = ["deprecated", "prototypes"];
 
-describe("package", function() {
-    expectedMethods.forEach(function(name) {
-        it("should export a method named " + name, function() {
+describe("package", function () {
+    // eslint-disable-next-line mocha/no-setup-in-describe
+    expectedMethods.forEach(function (name) {
+        it(`should export a method named ${name}`, function () {
             assert.isFunction(index[name]);
         });
     });
 
-    expectedObjectProperties.forEach(function(name) {
-        it("should export an object property named " + name, function() {
+    // eslint-disable-next-line mocha/no-setup-in-describe
+    expectedObjectProperties.forEach(function (name) {
+        it(`should export an object property named ${name}`, function () {
             assert.isObject(index[name]);
         });
     });

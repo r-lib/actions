@@ -4,7 +4,7 @@ function isTrue(value) {
   return !!value && value !== "0" && value !== "false"
 }
 
-var envDisable = isTrue(process.env.DISABLE_OPENCOLLECTIVE) || isTrue(process.env.CI);
+var envDisable = isTrue(process.env.DISABLE_OPENCOLLECTIVE) || isTrue(process.env.OPEN_SOURCE_CONTRIBUTOR) || isTrue(process.env.CI);
 var logLevel = process.env.npm_config_loglevel;
 var logLevelDisplay = ['silent', 'error', 'warn'].indexOf(logLevel) > -1;
 

@@ -13,7 +13,7 @@ See [action.yml](action.yml)
 Basic:
 ```yaml
 steps:
-- uses: actions/checkout@v3
+- uses: actions/checkout@v4
 - uses: r-lib/actions/setup-tinytex@v2
 - run: tlmgr --version
 ```
@@ -29,7 +29,7 @@ For example this is the case if your R package builds its PDF reference manual a
 To install CTAN packages manually, you can call `tlmgr` from your workflow, here is a complete example:
 ```yaml
 steps:
-  - uses: actions/checkout@v3
+  - uses: actions/checkout@v4
   - uses: r-lib/actions/setup-tinytex@v2
   - run: tlmgr --version
 
@@ -41,7 +41,7 @@ steps:
 
 ## TinyTeX bundled release
 
-TinyTeX is available as several bundles from https://github.com/rstudio/tinytex-releases/. 
+TinyTeX is available as several bundles from https://github.com/rstudio/tinytex-releases/.
 
 By default, the action will install the same bundle as
 `tinytex::install_tinytex()` which is the daily build of _TinyTeX-1_ bundle.

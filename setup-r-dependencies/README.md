@@ -18,7 +18,7 @@ Inputs available
 - `cache-version` - default `1`. If you need to invalidate the existing
   cache pass any other number and a new cache will be used. Ignored if
   `cache: false`. Note that you can also [delete caches
-  manually(https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#deleting-cache-entries).
+  manually](https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#deleting-cache-entries).
 - `dependencies` - default `'"all"'`. Types of dependencies to install. By
   default all direct dependencies of the current package are installed, and
   hard dependencies of these direct dependencies. See also the `needs` and
@@ -46,7 +46,7 @@ Inputs available
 Basic:
 ```yaml
 steps:
-- uses: actions/checkout@v3
+- uses: actions/checkout@v4
 - uses: r-lib/actions/setup-r@v2
 - uses: r-lib/actions/setup-r-dependencies@v2
   with:
@@ -75,7 +75,7 @@ to resolve, download and install the dependencies. There are typically
 recent static pak builds available for:
 
 - x86_64 Linux, for the last 5 R releases and R-devel (currently this is
-  R 3.4.x through R 4.2.x and R-devel).
+  R 3.5.x through R 4.2.x and R-devel).
 - x86_64 macOS, for the last 5 R releases and R-devel.
 - Windows (x86_64 and i386), for the last 5 R releases and R-devel.
 
@@ -134,7 +134,7 @@ write this in the butcher workflow file:
 
 ```yaml
 steps:
-- uses: actions/checkout@v3
+- uses: actions/checkout@v4
 - uses: r-lib/actions/setup-r@v2
 - uses: r-lib/actions/setup-r-dependencies@v2
   with:
@@ -179,7 +179,7 @@ package as `local::.` to pak:
 
 ```yaml
 steps:
-- uses: actions/checkout@v3
+- uses: actions/checkout@v4
 - uses: r-lib/actions/setup-r@v2
 - uses: r-lib/actions/setup-r-dependencies@v2
   with:

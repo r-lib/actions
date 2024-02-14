@@ -22,6 +22,7 @@ jobs:
       fail-fast: false
       matrix:
         config:
+          - {os: macos-14,       r: 'devel'}
           - {os: macos-latest,   r: 'devel'}
           - {os: windows-latest, r: 'devel'}
           - {os: ubuntu-latest,  r: 'devel', http-user-agent: 'release'}
@@ -31,7 +32,7 @@ jobs:
       R_KEEP_PKG_SOURCE: yes
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: ./setup-pandoc
 
@@ -50,4 +51,3 @@ jobs:
       - uses: ./check-r-package
         with:
           upload-snapshots: true
-
