@@ -14,7 +14,7 @@ This action install dependencies for the current R environment based on the DESC
 Inputs available
 
 - `cache` - default `true`. Whether packages should be cached across runs or
-  not.
+  not. If `"always"` is provided, the package cache will be saved even if the Action fails.
 - `cache-version` - default `1`. If you need to invalidate the existing
   cache pass any other number and a new cache will be used. Ignored if
   `cache: false`. Note that you can also [delete caches
@@ -40,6 +40,8 @@ Inputs available
   you need quoting. Defaults to `FALSE`.
 - `working-directory` - default `'.'`. If the DESCRIPTION file is not in the
   root directory of your repository.
+- `prune` - default `true`. Used when `cache="always"`. Whether to prune the R
+  library of packages not found within the lock file used for installation.
 
 Basic:
 ```yaml
