@@ -33,3 +33,15 @@ jobs:
 
       - run: where.exe pandoc
         if: ${{ runner.os == 'Windows' }}
+
+  linux-arm64:
+    runs-on: [self-hosted, linux, ARM64]
+    name: arm64 Linux
+    container:
+      image: "ubuntu:22.04"
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./setup-pandoc
+      - run: pandoc --version
+      - run: which pandoc
