@@ -156,7 +156,7 @@ function pandocSubdir(version) {
 function installPandocLinux(version) {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
-        const fileName = util.format("pandoc-%s-1-amd64.deb", version);
+        const fileName = util.format("pandoc-%s-linux-amd64.tar.gz", version);
         const downloadUrl = util.format("https://github.com/jgm/pandoc/releases/download/%s/%s", version, fileName);
         let downloadPath;
         try {
@@ -166,20 +166,15 @@ function installPandocLinux(version) {
         catch (error) {
             throw new Error(`Failed to download Pandoc ${version}: ${error}`);
         }
-        yield io.mv(downloadPath, path.join(tempDirectory, fileName));
         try {
-            console.log("::group::Install gdebi-core");
-            yield exec.exec("sudo apt-get", ["install", "-y", "gdebi-core"]);
-            console.log("::group::Install pandoc");
-            yield exec.exec("sudo gdebi", [
-                "--non-interactive",
-                path.join(tempDirectory, fileName)
-            ]);
+            const extractionPath = yield tc.extractTar(downloadPath);
+            const binDirPath = path.join(extractionPath, `pandoc-${version}/bin`);
+            const cachedBinDirPath = yield tc.cacheDir(binDirPath, "pandoc", version);
+            core.addPath(cachedBinDirPath);
         }
         catch (error) {
             throw new Error(`Failed to install pandoc: ${(_a = error === null || error === void 0 ? void 0 : error.message) !== null && _a !== void 0 ? _a : error}`);
         }
-        console.log("::endgroup::");
     });
 }
 run();

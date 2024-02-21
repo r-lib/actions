@@ -132,7 +132,7 @@ function pandocSubdir(version: string) {
 }
 
 async function installPandocLinux(version: string): Promise<void> {
-  const fileName = util.format("pandoc-%s-1-amd64.deb", version);
+  const fileName = util.format("pandoc-%s-linux-amd64.tar.gz", version);
   const downloadUrl = util.format(
     "https://github.com/jgm/pandoc/releases/download/%s/%s",
     version,
@@ -147,20 +147,14 @@ async function installPandocLinux(version: string): Promise<void> {
     throw new Error(`Failed to download Pandoc ${version}: ${error}`);
   }
 
-  await io.mv(downloadPath, path.join(tempDirectory, fileName));
-
   try {
-    console.log("::group::Install gdebi-core");
-    await exec.exec("sudo apt-get", ["install", "-y", "gdebi-core"]);
-    console.log("::group::Install pandoc");
-    await exec.exec("sudo gdebi", [
-      "--non-interactive",
-      path.join(tempDirectory, fileName)
-    ]);
-  } catch (error: any) {
+    const extractionPath = await tc.extractTar(downloadPath);
+    const binDirPath = path.join(extractionPath, `pandoc-${version}/bin`);
+    const cachedBinDirPath = await tc.cacheDir(binDirPath, "pandoc", version);
+    core.addPath(cachedBinDirPath);
+  } catch(error: any) {
     throw new Error(`Failed to install pandoc: ${error?.message ?? error}`);
   }
-  console.log("::endgroup::");
 }
 
 run();
