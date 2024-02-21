@@ -49,7 +49,7 @@ const ARCH = !!process.env.SETUP_R_ARCH ? process.env.SETUP_R_ARCH :
     OS == "win" ? undefined :
         (OS == "mac" && process.arch == "arm64") ? "arm64" :
             (OS == "mac" && process.arch == "x64") ? "x86_64" :
-                process.arch == "x64" ? "x86_64" : process.arch;
+                process.arch == "x64" ? "amd64" : process.arch;
 if (!tempDirectory) {
     let baseLocation;
     if (IS_WINDOWS) {
@@ -156,7 +156,7 @@ function pandocSubdir(version) {
 function installPandocLinux(version) {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
-        const fileName = util.format("pandoc-%s-linux-amd64.tar.gz", version);
+        const fileName = util.format("pandoc-%s-linux-%s.tar.gz", version, ARCH);
         const downloadUrl = util.format("https://github.com/jgm/pandoc/releases/download/%s/%s", version, fileName);
         let downloadPath;
         try {
