@@ -11,6 +11,13 @@ import { compare } from 'compare-versions';
 
 const IS_WINDOWS = process.platform === "win32";
 const IS_MAC = process.platform === "darwin";
+const OS = !!process.env.SETUP_R_OS ? process.env.SETUP_R_OS :
+    IS_WINDOWS ? "win" : IS_MAC ? "mac" : "linux";
+const ARCH = !!process.env.SETUP_R_ARCH ? process.env.SETUP_R_ARCH :
+    OS == "win" ? undefined :
+    (OS == "mac" && process.arch == "arm64") ? "arm64" :
+    (OS == "mac" && process.arch == "x64") ? "x86_64" :
+    process.arch == "x64" ? "x86_64" : process.arch;
 
 if (!tempDirectory) {
   let baseLocation;
@@ -50,7 +57,9 @@ export function getPandoc(version: string): Promise<void> {
 async function installPandocMac(version: string): Promise<void> {
   // Since 3.1.2, Pandoc uses cabal instead of stack to build the macOS binary.
   const is_new_macos_installer = compare(version, "3.1.2", ">=") ? true : false;
-  const fileName = is_new_macos_installer ? util.format("pandoc-%s-x86_64-macOS.pkg", version) : util.format("pandoc-%s-macOS.pkg", version);
+  const fileName = is_new_macos_installer ?
+    util.format("pandoc-%s-%s-macOS.pkg", version, ARCH) :
+    util.format("pandoc-%s-macOS.pkg", version);
 
   const downloadUrl = util.format(
     "https://github.com/jgm/pandoc/releases/download/%s/%s",
