@@ -1,0 +1,29 @@
+name: Test setup-pandoc on all OSes
+
+on:
+  push:
+    branches: [main, master, v2-branch]
+  pull_request:
+    branches: [main, master, v2-branch]
+  workflow_dispatch:
+
+jobs:
+  pandoc:
+    runs-on: ${{ matrix.config.os }}
+    name: ${{ matrix.config.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { os: macos-14       }
+          - { os: macos-13       }
+          - { os: windows-latest }
+          - { os: ubuntu-latest  }
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./setup-pandoc
+
+      - run: pandoc --version
