@@ -27,3 +27,9 @@ jobs:
       - uses: ./setup-pandoc
 
       - run: pandoc --version
+
+      - run: which pandoc
+        if: ${{ runner.os == 'Linux' || runner.os == 'macOS' }}
+
+      - run: where.exe pandoc
+        if: ${{ runner.os == 'Windows' }}
