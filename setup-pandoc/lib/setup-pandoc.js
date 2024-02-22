@@ -31,6 +31,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getPandoc = void 0;
 let tempDirectory = process.env["RUNNER_TEMP"] || "";
@@ -41,6 +44,7 @@ const tc = __importStar(require("@actions/tool-cache"));
 const path = __importStar(require("path"));
 const util = __importStar(require("util"));
 const compare_versions_1 = require("compare-versions");
+const got_1 = __importDefault(require("got"));
 const IS_WINDOWS = process.platform === "win32";
 const IS_MAC = process.platform === "darwin";
 const OS = !!process.env.SETUP_R_OS ? process.env.SETUP_R_OS :
@@ -70,13 +74,26 @@ function run() {
     var _a, _b;
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            let pandocVersion = core.getInput("pandoc-version");
+            var pandocVersion = core.getInput("pandoc-version");
             core.debug(`got pandoc-version ${pandocVersion}`);
+            if (pandocVersion == "latest") {
+                pandocVersion = yield getLatestVersion();
+            }
             yield getPandoc(pandocVersion);
         }
         catch (error) {
             core.setFailed((_b = (_a = error === null || error === void 0 ? void 0 : error.message) !== null && _a !== void 0 ? _a : error) !== null && _b !== void 0 ? _b : "Unknown error");
         }
+    });
+}
+function getLatestVersion() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const resp = yield (0, got_1.default)('https://github.com/jgm/pandoc/releases/latest', { followRedirect: false });
+        const location = resp.headers.location;
+        if (!location) {
+            throw "Failed to deduce latest Pandoc release";
+        }
+        return path.basename(location);
     });
 }
 function getPandoc(version) {

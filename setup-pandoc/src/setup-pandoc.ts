@@ -8,6 +8,7 @@ import * as path from "path";
 import * as util from "util";
 import * as fs from "fs";
 import { compare } from 'compare-versions';
+import got from 'got';
 
 const IS_WINDOWS = process.platform === "win32";
 const IS_MAC = process.platform === "darwin";
@@ -36,12 +37,28 @@ if (!tempDirectory) {
 
 async function run() {
   try {
-    let pandocVersion = core.getInput("pandoc-version");
+    var pandocVersion: string = core.getInput("pandoc-version");
     core.debug(`got pandoc-version ${pandocVersion}`);
+    if (pandocVersion == "latest") {
+      pandocVersion = await getLatestVersion();
+    }
     await getPandoc(pandocVersion);
   } catch (error: any) {
     core.setFailed(error?.message ?? error ?? "Unknown error");
   }
+}
+
+async function getLatestVersion(): Promise<string> {
+  const resp = await got(
+    'https://github.com/jgm/pandoc/releases/latest',
+    { followRedirect: false }
+  );
+  const location = resp.headers.location;
+  if (!location) {
+    throw "Failed to deduce latest Pandoc release";
+  }
+
+  return path.basename(location);
 }
 
 export function getPandoc(version: string): Promise<void> {
