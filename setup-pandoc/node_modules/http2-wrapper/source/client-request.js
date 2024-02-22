@@ -1,26 +1,24 @@
 'use strict';
-// See https://github.com/facebook/jest/issues/2549
-// eslint-disable-next-line node/prefer-global/url
-const {URL, urlToHttpOptions} = require('url');
 const http2 = require('http2');
 const {Writable} = require('stream');
-const {Agent, globalAgent} = require('./agent.js');
-const IncomingMessage = require('./incoming-message.js');
-const proxyEvents = require('./utils/proxy-events.js');
+const {Agent, globalAgent} = require('./agent');
+const IncomingMessage = require('./incoming-message');
+const urlToOptions = require('./utils/url-to-options');
+const proxyEvents = require('./utils/proxy-events');
+const isRequestPseudoHeader = require('./utils/is-request-pseudo-header');
 const {
 	ERR_INVALID_ARG_TYPE,
 	ERR_INVALID_PROTOCOL,
-	ERR_HTTP_HEADERS_SENT
-} = require('./utils/errors.js');
-const validateHeaderName = require('./utils/validate-header-name.js');
-const validateHeaderValue = require('./utils/validate-header-value.js');
-const proxySocketHandler = require('./utils/proxy-socket-handler.js');
+	ERR_HTTP_HEADERS_SENT,
+	ERR_INVALID_HTTP_TOKEN,
+	ERR_HTTP_INVALID_HEADER_VALUE,
+	ERR_INVALID_CHAR
+} = require('./utils/errors');
 
 const {
 	HTTP2_HEADER_STATUS,
 	HTTP2_HEADER_METHOD,
 	HTTP2_HEADER_PATH,
-	HTTP2_HEADER_AUTHORITY,
 	HTTP2_METHOD_CONNECT
 } = http2.constants;
 
@@ -30,66 +28,59 @@ const kSession = Symbol('session');
 const kOptions = Symbol('options');
 const kFlushedHeaders = Symbol('flushedHeaders');
 const kJobs = Symbol('jobs');
-const kPendingAgentPromise = Symbol('pendingAgentPromise');
+
+const isValidHttpToken = /^[\^`\-\w!#$%&*+.|~]+$/;
+const isInvalidHeaderValue = /[^\t\u0020-\u007E\u0080-\u00FF]/;
 
 class ClientRequest extends Writable {
 	constructor(input, options, callback) {
 		super({
-			autoDestroy: false,
-			emitClose: false
+			autoDestroy: false
 		});
 
-		if (typeof input === 'string') {
-			input = urlToHttpOptions(new URL(input));
-		} else if (input instanceof URL) {
-			input = urlToHttpOptions(input);
-		} else {
-			input = {...input};
+		const hasInput = typeof input === 'string' || input instanceof URL;
+		if (hasInput) {
+			input = urlToOptions(input instanceof URL ? input : new URL(input));
 		}
 
 		if (typeof options === 'function' || options === undefined) {
 			// (options, callback)
 			callback = options;
-			options = input;
+			options = hasInput ? input : {...input};
 		} else {
 			// (input, options, callback)
-			options = Object.assign(input, options);
+			options = {...input, ...options};
 		}
 
 		if (options.h2session) {
 			this[kSession] = options.h2session;
-
-			if (this[kSession].destroyed) {
-				throw new Error('The session has been closed already');
-			}
-
-			this.protocol = this[kSession].socket.encrypted ? 'https:' : 'http:';
 		} else if (options.agent === false) {
-			this.agent = new Agent({maxEmptySessions: 0});
+			this.agent = new Agent({maxFreeSessions: 0});
 		} else if (typeof options.agent === 'undefined' || options.agent === null) {
-			this.agent = globalAgent;
+			if (typeof options.createConnection === 'function') {
+				// This is a workaround - we don't have to create the session on our own.
+				this.agent = new Agent({maxFreeSessions: 0});
+				this.agent.createConnection = options.createConnection;
+			} else {
+				this.agent = globalAgent;
+			}
 		} else if (typeof options.agent.request === 'function') {
 			this.agent = options.agent;
 		} else {
-			throw new ERR_INVALID_ARG_TYPE('options.agent', ['http2wrapper.Agent-like Object', 'undefined', 'false'], options.agent);
+			throw new ERR_INVALID_ARG_TYPE('options.agent', ['Agent-like Object', 'undefined', 'false'], options.agent);
 		}
 
-		if (this.agent) {
-			this.protocol = this.agent.protocol;
+		if (options.protocol && options.protocol !== 'https:') {
+			throw new ERR_INVALID_PROTOCOL(options.protocol, 'https:');
 		}
 
-		if (options.protocol && options.protocol !== this.protocol) {
-			throw new ERR_INVALID_PROTOCOL(options.protocol, this.protocol);
-		}
+		const port = options.port || options.defaultPort || (this.agent && this.agent.defaultPort) || 443;
+		const host = options.hostname || options.host || 'localhost';
 
-		if (!options.port) {
-			options.port = options.defaultPort || (this.agent && this.agent.defaultPort) || 443;
-		}
-
-		options.host = options.hostname || options.host || 'localhost';
-
-		// Unused
+		// Don't enforce the origin via options. It may be changed in an Agent.
 		delete options.hostname;
+		delete options.host;
+		delete options.port;
 
 		const {timeout} = options;
 		options.timeout = undefined;
@@ -97,26 +88,19 @@ class ClientRequest extends Writable {
 		this[kHeaders] = Object.create(null);
 		this[kJobs] = [];
 
-		this[kPendingAgentPromise] = undefined;
-
 		this.socket = null;
 		this.connection = null;
 
 		this.method = options.method || 'GET';
-
-		if (!(this.method === 'CONNECT' && (options.path === '/' || options.path === undefined))) {
-			this.path = options.path;
-		}
+		this.path = options.path;
 
 		this.res = null;
 		this.aborted = false;
 		this.reusedSocket = false;
 
-		const {headers} = options;
-		if (headers) {
-			// eslint-disable-next-line guard-for-in
-			for (const header in headers) {
-				this.setHeader(header, headers[header]);
+		if (options.headers) {
+			for (const [header, value] of Object.entries(options.headers)) {
+				this.setHeader(header, value);
 			}
 		}
 
@@ -130,21 +114,18 @@ class ClientRequest extends Writable {
 		this[kOptions] = options;
 
 		// Clients that generate HTTP/2 requests directly SHOULD use the :authority pseudo-header field instead of the Host header field.
-		this[kOrigin] = new URL(`${this.protocol}//${options.servername || options.host}:${options.port}`);
+		if (port === 443) {
+			this[kOrigin] = `https://${host}`;
 
-		// A socket is being reused
-		const reuseSocket = options._reuseSocket;
-		if (reuseSocket) {
-			options.createConnection = (...args) => {
-				if (reuseSocket.destroyed) {
-					return this.agent.createConnection(...args);
-				}
+			if (!(':authority' in this[kHeaders])) {
+				this[kHeaders][':authority'] = host;
+			}
+		} else {
+			this[kOrigin] = `https://${host}:${port}`;
 
-				return reuseSocket;
-			};
-
-			// eslint-disable-next-line promise/prefer-await-to-then
-			this.agent.getSession(this[kOrigin], this[kOptions]).catch(() => {});
+			if (!(':authority' in this[kHeaders])) {
+				this[kHeaders][':authority'] = `${host}:${port}`;
+			}
 		}
 
 		if (timeout) {
@@ -169,25 +150,13 @@ class ClientRequest extends Writable {
 	}
 
 	get path() {
-		const header = this.method === 'CONNECT' ? HTTP2_HEADER_AUTHORITY : HTTP2_HEADER_PATH;
-
-		return this[kHeaders][header];
+		return this[kHeaders][HTTP2_HEADER_PATH];
 	}
 
 	set path(value) {
 		if (value) {
-			const header = this.method === 'CONNECT' ? HTTP2_HEADER_AUTHORITY : HTTP2_HEADER_PATH;
-
-			this[kHeaders][header] = value;
+			this[kHeaders][HTTP2_HEADER_PATH] = value;
 		}
-	}
-
-	get host() {
-		return this[kOrigin].hostname;
-	}
-
-	set host(_value) {
-		// Do nothing as this is read only.
 	}
 
 	get _mustNotHaveABody() {
@@ -213,11 +182,15 @@ class ClientRequest extends Writable {
 	}
 
 	_final(callback) {
+		if (this.destroyed) {
+			return;
+		}
+
 		this.flushHeaders();
 
 		const callEnd = () => {
-			// For GET, HEAD and DELETE and CONNECT
-			if (this._mustNotHaveABody || this.method === 'CONNECT') {
+			// For GET, HEAD and DELETE
+			if (this._mustNotHaveABody) {
 				callback();
 				return;
 			}
@@ -246,25 +219,13 @@ class ClientRequest extends Writable {
 		this.destroy();
 	}
 
-	async _destroy(error, callback) {
+	_destroy(error, callback) {
 		if (this.res) {
 			this.res._dump();
 		}
 
 		if (this._request) {
 			this._request.destroy();
-		} else {
-			process.nextTick(() => {
-				this.emit('close');
-			});
-		}
-
-		try {
-			await this[kPendingAgentPromise];
-		} catch (internalError) {
-			if (this.aborted) {
-				error = internalError;
-			}
 		}
 
 		callback(error);
@@ -290,33 +251,29 @@ class ClientRequest extends Writable {
 
 			// Forwards `timeout`, `continue`, `close` and `error` events to this instance.
 			if (!isConnectMethod) {
-				// TODO: Should we proxy `close` here?
-				proxyEvents(stream, this, ['timeout', 'continue']);
+				proxyEvents(stream, this, ['timeout', 'continue', 'close', 'error']);
 			}
 
-			stream.once('error', error => {
-				this.destroy(error);
-			});
+			// Wait for the `finish` event. We don't want to emit the `response` event
+			// before `request.end()` is called.
+			const waitForEnd = fn => {
+				return (...args) => {
+					if (!this.writable && !this.destroyed) {
+						fn(...args);
+					} else {
+						this.once('finish', () => {
+							fn(...args);
+						});
+					}
+				};
+			};
 
-			stream.once('aborted', () => {
-				const {res} = this;
-				if (res) {
-					res.aborted = true;
-					res.emit('aborted');
-					res.destroy();
-				} else {
-					this.destroy(new Error('The server aborted the HTTP/2 stream'));
-				}
-			});
-
-			const onResponse = (headers, flags, rawHeaders) => {
+			// This event tells we are ready to listen for the data.
+			stream.once('response', waitForEnd((headers, flags, rawHeaders) => {
 				// If we were to emit raw request stream, it would be as fast as the native approach.
 				// Note that wrapping the raw stream in a Proxy instance won't improve the performance (already tested it).
 				const response = new IncomingMessage(this.socket, stream.readableHighWaterMark);
 				this.res = response;
-
-				// Undocumented, but it is used by `cacheable-request`
-				response.url = `${this[kOrigin].origin}${this.path}`;
 
 				response.req = this;
 				response.statusCode = headers[HTTP2_HEADER_STATUS];
@@ -324,11 +281,16 @@ class ClientRequest extends Writable {
 				response.rawHeaders = rawHeaders;
 
 				response.once('end', () => {
-					response.complete = true;
+					if (this.aborted) {
+						response.aborted = true;
+						response.emit('aborted');
+					} else {
+						response.complete = true;
 
-					// Has no effect, just be consistent with the Node.js behavior
-					response.socket = null;
-					response.connection = null;
+						// Has no effect, just be consistent with the Node.js behavior
+						response.socket = null;
+						response.connection = null;
+					}
 				});
 
 				if (isConnectMethod) {
@@ -351,9 +313,7 @@ class ClientRequest extends Writable {
 					});
 
 					stream.once('end', () => {
-						if (!this.aborted) {
-							response.push(null);
-						}
+						response.push(null);
 					});
 
 					if (!this.emit('response', response)) {
@@ -361,121 +321,48 @@ class ClientRequest extends Writable {
 						response._dump();
 					}
 				}
-			};
-
-			// This event tells we are ready to listen for the data.
-			stream.once('response', onResponse);
+			}));
 
 			// Emits `information` event
-			stream.once('headers', headers => this.emit('information', {statusCode: headers[HTTP2_HEADER_STATUS]}));
+			stream.once('headers', waitForEnd(
+				headers => this.emit('information', {statusCode: headers[HTTP2_HEADER_STATUS]})
+			));
 
-			stream.once('trailers', (trailers, flags, rawTrailers) => {
+			stream.once('trailers', waitForEnd((trailers, flags, rawTrailers) => {
 				const {res} = this;
-
-				// https://github.com/nodejs/node/issues/41251
-				if (res === null) {
-					onResponse(trailers, flags, rawTrailers);
-					return;
-				}
 
 				// Assigns trailers to the response object.
 				res.trailers = trailers;
 				res.rawTrailers = rawTrailers;
-			});
+			}));
 
-			stream.once('close', () => {
-				const {aborted, res} = this;
-				if (res) {
-					if (aborted) {
-						res.aborted = true;
-						res.emit('aborted');
-						res.destroy();
-					}
-
-					const finish = () => {
-						res.emit('close');
-
-						this.destroy();
-						this.emit('close');
-					};
-
-					if (res.readable) {
-						res.once('end', finish);
-					} else {
-						finish();
-					}
-
-					return;
-				}
-
-				if (!this.destroyed) {
-					this.destroy(new Error('The HTTP/2 stream has been early terminated'));
-					this.emit('close');
-					return;
-				}
-
-				this.destroy();
-				this.emit('close');
-			});
-
-			this.socket = new Proxy(stream, proxySocketHandler);
+			const {socket} = stream.session;
+			this.socket = socket;
+			this.connection = socket;
 
 			for (const job of this[kJobs]) {
 				job();
 			}
 
-			this[kJobs].length = 0;
-
 			this.emit('socket', this.socket);
 		};
-
-		if (!(HTTP2_HEADER_AUTHORITY in this[kHeaders]) && !isConnectMethod) {
-			this[kHeaders][HTTP2_HEADER_AUTHORITY] = this[kOrigin].host;
-		}
 
 		// Makes a HTTP2 request
 		if (this[kSession]) {
 			try {
 				onStream(this[kSession].request(this[kHeaders]));
 			} catch (error) {
-				this.destroy(error);
+				this.emit('error', error);
 			}
 		} else {
 			this.reusedSocket = true;
 
 			try {
-				const promise = this.agent.request(this[kOrigin], this[kOptions], this[kHeaders]);
-				this[kPendingAgentPromise] = promise;
-
-				onStream(await promise);
-
-				this[kPendingAgentPromise] = false;
+				onStream(await this.agent.request(this[kOrigin], this[kOptions], this[kHeaders]));
 			} catch (error) {
-				this[kPendingAgentPromise] = false;
-
-				this.destroy(error);
+				this.emit('error', error);
 			}
 		}
-	}
-
-	get connection() {
-		return this.socket;
-	}
-
-	set connection(value) {
-		this.socket = value;
-	}
-
-	getHeaderNames() {
-		return Object.keys(this[kHeaders]);
-	}
-
-	hasHeader(name) {
-		if (typeof name !== 'string') {
-			throw new ERR_INVALID_ARG_TYPE('name', 'string', name);
-		}
-
-		return Boolean(this[kHeaders][name.toLowerCase()]);
 	}
 
 	getHeader(name) {
@@ -507,24 +394,19 @@ class ClientRequest extends Writable {
 			throw new ERR_HTTP_HEADERS_SENT('set');
 		}
 
-		validateHeaderName(name);
-		validateHeaderValue(name, value);
-
-		const lowercased = name.toLowerCase();
-
-		if (lowercased === 'connection') {
-			if (value.toLowerCase() === 'keep-alive') {
-				return;
-			}
-
-			throw new Error(`Invalid 'connection' header: ${value}`);
+		if (typeof name !== 'string' || (!isValidHttpToken.test(name) && !isRequestPseudoHeader(name))) {
+			throw new ERR_INVALID_HTTP_TOKEN('Header name', name);
 		}
 
-		if (lowercased === 'host' && this.method === 'CONNECT') {
-			this[kHeaders][HTTP2_HEADER_AUTHORITY] = value;
-		} else {
-			this[kHeaders][lowercased] = value;
+		if (typeof value === 'undefined') {
+			throw new ERR_HTTP_INVALID_HEADER_VALUE(value, name);
 		}
+
+		if (isInvalidHeaderValue.test(value)) {
+			throw new ERR_INVALID_CHAR('header content', name);
+		}
+
+		this[kHeaders][name.toLowerCase()] = value;
 	}
 
 	setNoDelay() {

@@ -24,28 +24,22 @@ makeError(TypeError, 'ERR_INVALID_ARG_TYPE', args => {
 	return `The "${args[0]}" ${type} must be ${isManyTypes ? 'one of' : 'of'} type ${valid}. Received ${typeof args[2]}`;
 });
 
-makeError(TypeError, 'ERR_INVALID_PROTOCOL', args =>
-	`Protocol "${args[0]}" not supported. Expected "${args[1]}"`
-);
+makeError(TypeError, 'ERR_INVALID_PROTOCOL', args => {
+	return `Protocol "${args[0]}" not supported. Expected "${args[1]}"`;
+});
 
-makeError(Error, 'ERR_HTTP_HEADERS_SENT', args =>
-	`Cannot ${args[0]} headers after they are sent to the client`
-);
+makeError(Error, 'ERR_HTTP_HEADERS_SENT', args => {
+	return `Cannot ${args[0]} headers after they are sent to the client`;
+});
 
-makeError(TypeError, 'ERR_INVALID_HTTP_TOKEN', args =>
-	`${args[0]} must be a valid HTTP token [${args[1]}]`
-);
+makeError(TypeError, 'ERR_INVALID_HTTP_TOKEN', args => {
+	return `${args[0]} must be a valid HTTP token [${args[1]}]`;
+});
 
-makeError(TypeError, 'ERR_HTTP_INVALID_HEADER_VALUE', args =>
-	`Invalid value "${args[0]} for header "${args[1]}"`
-);
+makeError(TypeError, 'ERR_HTTP_INVALID_HEADER_VALUE', args => {
+	return `Invalid value "${args[0]} for header "${args[1]}"`;
+});
 
-makeError(TypeError, 'ERR_INVALID_CHAR', args =>
-	`Invalid character in ${args[0]} [${args[1]}]`
-);
-
-makeError(
-	Error,
-	'ERR_HTTP2_NO_SOCKET_MANIPULATION',
-	'HTTP/2 sockets should not be directly manipulated (e.g. read and written)'
-);
+makeError(TypeError, 'ERR_INVALID_CHAR', args => {
+	return `Invalid character in ${args[0]} [${args[1]}]`;
+});

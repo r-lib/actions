@@ -4,9 +4,8 @@ const {Readable} = require('stream');
 class IncomingMessage extends Readable {
 	constructor(socket, highWaterMark) {
 		super({
-			emitClose: false,
-			autoDestroy: true,
-			highWaterMark
+			highWaterMark,
+			autoDestroy: false
 		});
 
 		this.statusCode = null;
@@ -26,26 +25,12 @@ class IncomingMessage extends Readable {
 		this.rawTrailers = [];
 
 		this.socket = socket;
+		this.connection = socket;
 
 		this._dumped = false;
 	}
 
-	get connection() {
-		return this.socket;
-	}
-
-	set connection(value) {
-		this.socket = value;
-	}
-
-	_destroy(error, callback) {
-		if (!this.readableEnded) {
-			this.aborted = true;
-		}
-
-		// See https://github.com/nodejs/node/issues/35303
-		callback();
-
+	_destroy(error) {
 		this.req._request.destroy(error);
 	}
 

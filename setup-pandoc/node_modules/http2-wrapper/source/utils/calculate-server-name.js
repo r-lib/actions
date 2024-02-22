@@ -1,27 +1,25 @@
 'use strict';
-const {isIP} = require('net');
-const assert = require('assert');
+const net = require('net');
+/* istanbul ignore file: https://github.com/nodejs/node/blob/v13.0.1/lib/_http_agent.js */
 
-const getHost = host => {
-	if (host[0] === '[') {
-		const idx = host.indexOf(']');
+module.exports = options => {
+	let servername = options.host;
+	const hostHeader = options.headers && options.headers.host;
 
-		assert(idx !== -1);
-		return host.slice(1, idx);
+	if (hostHeader) {
+		if (hostHeader.startsWith('[')) {
+			const index = hostHeader.indexOf(']');
+			if (index === -1) {
+				servername = hostHeader;
+			} else {
+				servername = hostHeader.slice(1, -1);
+			}
+		} else {
+			servername = hostHeader.split(':', 1)[0];
+		}
 	}
 
-	const idx = host.indexOf(':');
-	if (idx === -1) {
-		return host;
-	}
-
-	return host.slice(0, idx);
-};
-
-module.exports = host => {
-	const servername = getHost(host);
-
-	if (isIP(servername)) {
+	if (net.isIP(servername)) {
 		return '';
 	}
 
