@@ -8,7 +8,8 @@ import * as path from "path";
 import * as util from "util";
 import * as fs from "fs";
 import { compare } from 'compare-versions';
-import got from 'got';
+import { HttpClient } from "@actions/http-client";
+import { Octokit } from "@octokit/action";
 
 const IS_WINDOWS = process.platform === "win32";
 const IS_MAC = process.platform === "darwin";
@@ -19,6 +20,8 @@ const ARCH = !!process.env.SETUP_R_ARCH ? process.env.SETUP_R_ARCH :
     (OS == "mac" && process.arch == "arm64") ? "arm64" :
     (OS == "mac" && process.arch == "x64") ? "x86_64" :
     process.arch == "x64" ? "amd64" : process.arch;
+
+const api_url = process.env.GITHUB_API_URL || "https://api.github.com"
 
 if (!tempDirectory) {
   let baseLocation;
@@ -42,18 +45,22 @@ async function run() {
     if (pandocVersion == "latest") {
       pandocVersion = await getLatestVersion();
     }
-    await getPandoc(pandocVersion);
+    if (pandocVersion == "nightly") {
+      await getNightlyPandoc();
+    } else {
+      await getPandoc(pandocVersion);
+    }
   } catch (error: any) {
     core.setFailed(error?.message ?? error ?? "Unknown error");
   }
 }
 
 async function getLatestVersion(): Promise<string> {
-  const resp = await got(
-    'https://github.com/jgm/pandoc/releases/latest',
-    { followRedirect: false }
-  );
-  const location = resp.headers.location;
+  const http = new HttpClient("setup-pandoc", [], {
+    allowRedirects: false,
+  });
+  const resp = await http.head("https://github.com/jgm/pandoc/releases/latest");
+  const location = resp.message.headers.location;
   if (!location) {
     throw "Failed to deduce latest Pandoc release";
   }
@@ -69,6 +76,93 @@ export function getPandoc(version: string): Promise<void> {
   } else {
     return installPandocLinux(version);
   }
+}
+
+function getAuthHeaderValue(): `Bearer ${string}` | undefined {
+  const authToken =
+    core.getInput("token", {
+      required: false,
+      trimWhitespace: true,
+    }) ?? undefined;
+
+  return !!authToken ? `Bearer ${authToken}` : undefined;
+}
+
+async function getNightlyPandoc(): Promise<void> {
+  if (OS == "mac" || OS == "linux") {
+    if (ARCH == "arm64") {
+      throw "Nightly Pandoc is not supported on arm64 OS."
+    }
+  }
+
+  // There is no way to query a single workflow, so we need to paginate
+  // to find the one called 'Nightly'.
+  const octokit = new Octokit();
+  const owner = "jgm";
+  const repo = "pandoc";
+  const res = await octokit.paginate(
+    'GET /repos/{owner}/{repo}/actions/runs',
+    {
+      owner,
+      repo,
+      status: "success"
+    },
+    (response, done) => {
+      var bld = response.data.find(x => x.name == "Nightly");
+      if (!!bld) {
+        done();
+        return [bld.id];
+      }
+      return [];
+    }
+  );
+
+  const run_id = res[0];
+  const res2 = await octokit.request(
+    'GET /repos/{owner}/{repo}/actions/runs/{run_id}/artifacts',
+    {
+      owner,
+      repo,
+      run_id
+    }
+  );
+
+  var arts = { };
+  for (var i in res2.data.artifacts) {
+    arts[res2.data.artifacts[i].name] = res2.data.artifacts[i].id;
+  }
+
+  const which = IS_WINDOWS ? 'nightly-windows' : (IS_MAC ? 'nightly-macos' : 'nightly-linux');
+  const artifact_id = arts[which];
+  let { url } = await octokit.request(
+    "HEAD /repos/{owner}/{repo}/actions/artifacts/{artifact_id}/{archive_format}",
+    {
+      owner,
+      repo,
+      artifact_id,
+      archive_format: "zip",
+      request: {
+        redirect: "manual",
+      },
+    }
+  );
+
+  let downloadPath: string;
+  try {
+   downloadPath = await tc.downloadTool(url);
+  } catch(error) {
+    throw new Error('Failed to download Pandoc nightly build: ' + error);
+  }
+  const fileName = which + '.zip';
+  const extractionPath = await tc.extractZip(downloadPath);
+  const subdir = await fs.promises.readdir(extractionPath);
+  const pandocPath = extractionPath + '/' + subdir[0];
+  if (!IS_WINDOWS) {
+    const pandoc = pandocPath + '/pandoc';
+    await fs.promises.chmod(pandoc, '755');
+  }
+  core.debug(`Adding '${pandocPath}' to PATH.`);
+  core.addPath(pandocPath);
 }
 
 async function installPandocMac(version: string): Promise<void> {

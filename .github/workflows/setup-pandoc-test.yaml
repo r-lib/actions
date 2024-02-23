@@ -34,6 +34,7 @@ jobs:
       - uses: ./setup-pandoc
         with:
           pandoc-version: ${{ github.event.inputs.version }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - run: pandoc --version
 
@@ -54,5 +55,6 @@ jobs:
       - uses: ./setup-pandoc
         with:
           pandoc-version: ${{ github.event.inputs.version }}
+          token: ${{ secrets.GITHUB_TOKEN }}
       - run: pandoc --version
       - run: which pandoc
