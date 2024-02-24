@@ -1,9 +1,18 @@
 name: 'Setup pandoc'
-description: 'Setup pandoc and add it to your PATH'
+description: |
+  Setup pandoc and add it to your PATH. Supports Windows (x86_64),
+  macOS (x86_64 and arm64) and Linux (x86_64 and aarch64).
 author: 'Jim Hester'
 inputs:
   pandoc-version:
-    description: 'Exact version of pandoc to use'
+    description: |
+      It can be a version number, e.g. '3.1.11', or 'latest' for
+      installing the latest pandoc release, or 'nightly' to for
+      installing the latest nightly build from
+      https://github.com/jgm/pandoc/actions/workflows/nightly.yml.
+      For 'nightly' you also need to specify 'token'. pandoc does
+      not currently have nightly builds for arm64 machines, so using
+      'nigthly' will error on these.
     default: '3.1.11'
   token:
     description: |
