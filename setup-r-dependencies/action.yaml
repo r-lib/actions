@@ -30,7 +30,7 @@ inputs:
     description: 'Whether to install the latest available versions of the dependencies. Must be an R expression. See the README for details if you need quoting.'
     default: 'FALSE'
   prune:
-    description: 'Whether to prune the R library of packages not found within the lock file used for installation.'
+    description: 'Whether to prune the R packages not found within the lock file used during installation.'
     default: true
 runs:
   using: "composite"

@@ -40,8 +40,7 @@ Inputs available
   you need quoting. Defaults to `FALSE`.
 - `working-directory` - default `'.'`. If the DESCRIPTION file is not in the
   root directory of your repository.
-- `prune` - default `true`. Used when `cache="always"`. Whether to prune the R
-  library of packages not found within the lock file used for installation.
+- `prune` - default `true`. Used when `cache="always"`. Whether to prune the R packages not found within the lock file used during installation.
 
 Basic:
 ```yaml
