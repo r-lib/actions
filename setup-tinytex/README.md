@@ -26,7 +26,7 @@ The tinytex R package (which is not the same as the TinyTeX TeX distribution) su
 If you are using TinyTeX without rmarkdown (including using it without R!), then you will need to install CTAN packages manually.
 For example this is the case if your R package builds its PDF reference manual at `R CMD build` or while being checked.
 
-To install CTAN packages manually, you can call `tlmgr` from your workflow, here is a complete example:
+To install CTAN packages manually, you can call `tlmgr` from your workflow. We suggest you also run `tlmgr update --self` before installing, otherwise the installation may fail. Here is a complete example:
 ```yaml
 steps:
   - uses: actions/checkout@v4
@@ -35,6 +35,7 @@ steps:
 
   - name: Install additional LaTeX packages
     run: |
+      tlmgr update --self
       tlmgr install titlesec
       tlmgr list --only-installed
 ```
