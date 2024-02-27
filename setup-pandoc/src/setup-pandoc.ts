@@ -243,7 +243,11 @@ function pandocSubdir(version: string) {
 }
 
 async function installPandocLinux(version: string): Promise<void> {
-  const fileName = util.format("pandoc-%s-linux-%s.tar.gz", version, ARCH);
+  const is_new_linux_installer = compare(version, "2.8", ">=") ? true : false;
+  const fileName = is_new_linux_installer ?
+    util.format("pandoc-%s-linux-%s.tar.gz", version, ARCH) :
+    util.format("pandoc-%s-linux.tar.gz", version);
+
   const downloadUrl = util.format(
     "https://github.com/jgm/pandoc/releases/download/%s/%s",
     version,
