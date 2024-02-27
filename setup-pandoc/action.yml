@@ -13,6 +13,7 @@ inputs:
       For 'nightly' you also need to specify 'token'. pandoc does
       not currently have nightly builds for arm64 machines, so using
       'nigthly' will error on these.
+    required: true
     default: '3.1.11'
   token:
     description: |
