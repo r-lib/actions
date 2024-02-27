@@ -9,8 +9,12 @@ inputs:
     version recorded in renv.lock file.'
     default: 'release'
   rtools-version:
-    description: 'Exact version of Rtools to use. Default uses latest suitable
-    rtools for the given version of R. Set it to "42" for Rtools42.'
+    description: |
+      Exact version of Rtools to use. Default uses latest suitable
+      rtools for the given version of R. Set it to "42" for Rtools42.
+      If it is 'none', then Rtools will not be installed. (Note that
+      there is still a pre-installed version of Rtools on the
+      GitHub-hoested GHA runners.)
     default: ''
   Ncpus:
     description: 'Value to set the R option `Ncpus` to.'
