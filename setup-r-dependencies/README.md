@@ -21,10 +21,13 @@ Inputs available
   manually](https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#deleting-cache-entries).
 - `dependencies` - default `'"all"'`. Types of dependencies to install. By
   default all direct dependencies of the current package are installed, and
-  hard dependencies of these direct dependencies. See also the `needs` and
-  `extra-packages` parameters. This parameter must be a valid R expression,
-  and it is passed to the `dependencies` argument of `pak::lockfile_create().`
-  Note that you often need to quote it, see details below.
+  hard dependencies of these direct dependencies.
+  If you only want to install hard (required) dependecies, use
+  `dependencies: '"hard"'`.
+  See also the `needs` and `extra-packages` parameters. This parameter must
+  be a valid R expression, and it is passed to the `dependencies` argument
+  of `pak::lockfile_create().` Note that you often need to quote it, see
+  details below.
 - `extra-packages` - One or more extra package references to install.
   Separate each reference by newlines or commas for more than one package.
 - `install-pandoc` - Whether to install pandoc. By default it is installed
