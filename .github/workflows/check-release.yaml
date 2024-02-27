@@ -29,4 +29,4 @@ jobs:
       - uses: ./check-r-package
         with:
           upload-snapshots: true
-          build_args: 'c("--no-build-vignettes","--compact-vignettes=gs+qpdf")'
+          build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
