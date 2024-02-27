@@ -29,6 +29,11 @@ inputs:
   upgrade:
     description: 'Whether to install the latest available versions of the dependencies. Must be an R expression. See the README for details if you need quoting.'
     default: 'FALSE'
+  install-pandoc:
+    description: 'Whether to install pandoc. By default it is installed if it is not on the PATH and the local package suggests or depends on the rmarkdown package.'
+  pandoc-version:
+    description: 'Pandoc version to install.'
+    default: '3.1.11'
 runs:
   using: "composite"
   steps:
@@ -120,6 +125,37 @@ runs:
             !${{ env.R_LIBS_USER }}/pak
           key: ${{ format('{0}-{1}-{2}-{3}', steps.install.outputs.os-version, steps.install.outputs.r-version, inputs.cache-version, hashFiles(format('{0}/.github/pkg.lock', inputs.working-directory ))) }}
           restore-keys: ${{ steps.install.outputs.os-version }}-${{ steps.install.outputs.r-version }}-${{inputs.cache-version }}-
+
+      - name: Check whether pandoc needs to be installed
+        id: check-pandoc
+        run: |
+          cat("::group::Check if package needs pandoc\n")
+          o <- '${{ inputs.install-pandoc }}'
+          if (! o %in% c('true', 'false')) {
+            if (Sys.which("pandoc") != "") {
+              o <- 'false'
+            } else if (file.exists("DESCRIPTION")) {
+              deptypes <- list(direct = "all", indirect = character())
+              deps <- pak::pkg_deps(".", dependencies = deptypes)
+              if ("rmarkdown" %in% deps$package) {
+                o <- 'true'
+              } else {
+                o <- 'false'
+              }
+            } else {
+              o <- 'false'
+            }
+          }
+          cat("install=", o, "\n", file = Sys.getenv("GITHUB_OUTPUT"), sep = "", append = TRUE)
+          cat("::endgroup::\n")
+        shell: Rscript {0}
+        working-directory: ${{ inputs.working-directory }}
+
+      - name: Install pandoc if needed
+        if: ${{ steps.check-pandoc.outputs.install }}
+        uses: r-lib/actions/setup-pandoc@v2
+        with:
+          pandoc-version: ${{ inputs.pandoc-version }}
 
       - name: Install dependencies
         run: |

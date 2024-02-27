@@ -27,6 +27,8 @@ Inputs available
   Note that you often need to quote it, see details below.
 - `extra-packages` - One or more extra package references to install.
   Separate each reference by newlines or commas for more than one package.
+- `install-pandoc` - Whether to install pandoc. By default it is installed
+  if it is not already on the PATH and the R package depends in rmarkdown.
 - `needs` - `Config/Needs` fields to install from the DESCRIPTION, the
   `Config/Needs/` prefix will be automatically included.
 - `packages`: - default `deps::., any::sessioninfo`. Which package(s) to
@@ -35,6 +37,8 @@ Inputs available
   by newlines or commas.
 - `pak-version`: Which pak version to use. Possible values are
   `stable`, `rc` and `devel`. Defaults to `stable`.
+- `pandoc-version`: Which pandoc version to install (see the
+  `r-lib/actions/setup-pandoc` action), if pandoc is installed.
 - `upgrade`: Whether to install the latest available versions of the
   dependencies. Must be an R expression. See the README for details if
   you need quoting. Defaults to `FALSE`.
