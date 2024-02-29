@@ -165,7 +165,7 @@ runs:
         working-directory: ${{ inputs.working-directory }}
 
       - name: Install pandoc if needed
-        if: ${{ steps.check-pandoc.outputs.install }}
+        if: ${{ steps.check-pandoc.outputs.install == 'true' }}
         uses: r-lib/actions/setup-pandoc@v2
         with:
           pandoc-version: ${{ inputs.pandoc-version }}
