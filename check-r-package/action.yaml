@@ -59,14 +59,14 @@ runs:
       working-directory: ${{ inputs.working-directory }}
 
     - name: Upload check results
-      if: (failure() && inputs.upload-results != 'never') || inputs.upload-results != 'false'
+      if: ${{ (failure() && inputs.upload-results != 'never') || inputs.upload-results != 'false' }}
       uses: actions/upload-artifact@v4
       with:
         name: ${{ inputs.artifact-name || format('{0}-{1}-r{2}-{3}-results', runner.os, runner.arch, matrix.config.r, matrix.config.id || strategy.job-index ) }}
         path: ${{ steps.rcmdcheck.outputs.check-dir-path }}
 
     - name: Upload snapshots
-      if: inputs.upload-snapshots != 'false'
+      if: ${{ inputs.upload-snapshots != 'false' }}
       uses: actions/upload-artifact@v4
       with:
         name: ${{ inputs.snapshot-artifact-name || format('{0}-{1}-r{2}-{3}-testthat-snapshots', runner.os, runner.arch, matrix.config.r, matrix.config.id || strategy.job-index ) }}
