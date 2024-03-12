@@ -32,6 +32,11 @@ inputs:
   prune:
     description: 'Whether to prune the R packages not found within the lock file used during installation.'
     default: true
+  install-pandoc:
+    description: 'Whether to install pandoc. By default it is installed if it is not on the PATH and the local package suggests or depends on the rmarkdown package.'
+  pandoc-version:
+    description: 'Pandoc version to install.'
+    default: '3.1.11'
 runs:
   using: "composite"
   steps:
@@ -206,6 +211,37 @@ runs:
         with:
           path: ${{ steps.cache-args.outputs.path }}
           key: ${{ steps.r-pkg-cache.outputs.cache-primary-key }}
+
+      - name: Check whether pandoc needs to be installed
+        id: check-pandoc
+        run: |
+          cat("::group::Check if package needs pandoc\n")
+          o <- '${{ inputs.install-pandoc }}'
+          if (! o %in% c('true', 'false')) {
+            if (Sys.which("pandoc") != "") {
+              o <- 'false'
+            } else if (file.exists("DESCRIPTION")) {
+              deptypes <- list(direct = "all", indirect = character())
+              deps <- pak::pkg_deps(".", dependencies = deptypes)
+              if ("rmarkdown" %in% deps$package) {
+                o <- 'true'
+              } else {
+                o <- 'false'
+              }
+            } else {
+              o <- 'false'
+            }
+          }
+          cat("install=", o, "\n", file = Sys.getenv("GITHUB_OUTPUT"), sep = "", append = TRUE)
+          cat("::endgroup::\n")
+        shell: Rscript {0}
+        working-directory: ${{ inputs.working-directory }}
+
+      - name: Install pandoc if needed
+        if: ${{ steps.check-pandoc.outputs.install == 'true' }}
+        uses: r-lib/actions/setup-pandoc@v2
+        with:
+          pandoc-version: ${{ inputs.pandoc-version }}
 
       - name: Session info
         run: |

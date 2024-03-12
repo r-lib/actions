@@ -448,7 +448,10 @@ function getRtoolsUrl(version: string): string {
 async function acquireRtools(version: IRVersion) {
   var rtoolsVersion: string = "", downloadUrl: string = "";
   const inpver = core.getInput("rtools-version");
-  if (inpver == "") {
+  if (inpver == "none") {
+    console.log("Skipping RTools installation, as requested");
+    return;
+  } else if (inpver == "") {
     rtoolsVersion = version.rtools || 'error';;
     downloadUrl = version.rtools_url || 'error';
   } else {

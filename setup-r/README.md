@@ -31,34 +31,46 @@ This action sets up an R environment for use in actions by:
   is the next version of R, either R-patched, or R-alpha, R-beta, R-rc
   or R-prerelease. Use “renv” to retrieve R version recorded in
   renv.lock file.
+
 - **rtools-version** (`''`) - Exact version of Rtools to use. Default
   uses latest suitable rtools for the given version of R. Set it to “42”
-  for Rtools42.
+  for Rtools42. If it is ‘none’, then Rtools will not be installed.
+  (Note that there is still a pre-installed version of Rtools on the
+  GitHub-hoested GHA runners.)
+
 - **Ncpus** (`'1'`) - Value to set the R option `Ncpus` to.
+
 - **remove-openmp-macos** (`true`) - If true, remove `-fopenmp` from the
   default compilation flags, e.g. `SHLIB_OPENMP_CFLAGS`, as the macOS
   Command Line Tools do not support OpenMP.
+
 - **http-user-agent** (`'default'`) - If `"default"` or `""`, sets the
   HTTPUserAgent option to e.g. for R 3.6.3 running on macOS Catalina,
   `"R/3.6.3 R (3.6.3 x86_64-apple-darwin17.0 x86_64 darwin17.0) on GitHub Actions"`.
   If `"release"` sets the user agent to the default user agent for the
   current R release. Otherwise uses whatever value is passed to
   `http-user-agent`.
+
 - **install-r** (`true`) - If “true” download and install R during the
   setup. If “false” use the existing installation in the GitHub Action
   image. Note that if it is “false”, you probably need to run
   `sudo apt-get update` yourself.
+
 - **windows-path-include-rtools** (`true`) - Whether to add Rtools to
   the PATH.
+
 - **windows-path-include-mingw** (`true`) - If “true” put the 64 bit
   mingw directory from Rtools on the PATH for Windows builds. This
   argument is now defunct on Rtools40 and later, which never add the
   mingw directory to the path.
+
 - **update-rtools** (`false`) - Update rtools40 compilers and libraries
   to the latest builds.
+
 - **use-public-rspm** (`false`) - Use the public version of Posit
   package manager available at <https://packagemanager.posit.co/> to
   serve binaries for Linux and Windows.
+
 - **extra-repositories** (`''`) - One or more extra CRAN-like
   repositories to include in the `repos` global option
 

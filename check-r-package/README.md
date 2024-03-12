@@ -25,6 +25,14 @@ Inputs available:
   successful runs too.
 - working-directory - default `"."`. If the R package to check is not in
   the root directory of your repository.
+- artifact-name - Use this to override the default artifact name for the
+  check results. The default is `{os}-{arch}-r{rversion}-{id}-result`, where
+  `{id}` is `matrix.config.id` or `strategy.job-index` if the former is
+  not defined.
+- snapshot-artifact-name: Use this to override the default artifact name
+  for testthat snapshots. The default is
+  `{os}-{arch}-r{rversion}-{id}-testthat-snapsots`, where `{id}` is
+  `matrix.config.id` or `strategy.job-index` if the former is not defined.
 
 Basic:
 ```yaml

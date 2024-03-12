@@ -1,0 +1,60 @@
+name: Test setup-pandoc on all OSes
+
+on:
+  push:
+    branches: [main, master, v2-branch]
+  pull_request:
+    branches: [main, master, v2-branch]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: |
+          Pandoc version, may be "latest".
+        required: true
+        default: '3.1.11'
+        type: string
+
+jobs:
+  pandoc:
+    runs-on: ${{ matrix.config.os }}
+    name: ${{ matrix.config.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { os: macos-14       }
+          - { os: macos-13       }
+          - { os: windows-latest }
+          - { os: ubuntu-latest  }
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./setup-pandoc
+        with:
+          pandoc-version: ${{ github.event.inputs.version || '3.1.11' }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - run: pandoc --version
+
+      - run: which pandoc
+        if: ${{ runner.os == 'Linux' || runner.os == 'macOS' }}
+
+      - run: where.exe pandoc
+        if: ${{ runner.os == 'Windows' }}
+
+  linux-arm64:
+    runs-on: [self-hosted, linux, ARM64]
+    name: arm64 Linux
+    container:
+      image: "ubuntu:22.04"
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./setup-pandoc
+        with:
+          pandoc-version: ${{ github.event.inputs.version || '3.1.11' }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - run: pandoc --version
+      - run: which pandoc

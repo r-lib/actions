@@ -21,12 +21,17 @@ Inputs available
   manually](https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#deleting-cache-entries).
 - `dependencies` - default `'"all"'`. Types of dependencies to install. By
   default all direct dependencies of the current package are installed, and
-  hard dependencies of these direct dependencies. See also the `needs` and
-  `extra-packages` parameters. This parameter must be a valid R expression,
-  and it is passed to the `dependencies` argument of `pak::lockfile_create().`
-  Note that you often need to quote it, see details below.
+  hard dependencies of these direct dependencies.
+  If you only want to install hard (required) dependecies, use
+  `dependencies: '"hard"'`.
+  See also the `needs` and `extra-packages` parameters. This parameter must
+  be a valid R expression, and it is passed to the `dependencies` argument
+  of `pak::lockfile_create().` Note that you often need to quote it, see
+  details below.
 - `extra-packages` - One or more extra package references to install.
   Separate each reference by newlines or commas for more than one package.
+- `install-pandoc` - Whether to install pandoc. By default it is installed
+  if it is not already on the PATH and the R package depends in rmarkdown.
 - `needs` - `Config/Needs` fields to install from the DESCRIPTION, the
   `Config/Needs/` prefix will be automatically included.
 - `packages`: - default `deps::., any::sessioninfo`. Which package(s) to
@@ -35,6 +40,8 @@ Inputs available
   by newlines or commas.
 - `pak-version`: Which pak version to use. Possible values are
   `stable`, `rc` and `devel`. Defaults to `stable`.
+- `pandoc-version`: Which pandoc version to install (see the
+  `r-lib/actions/setup-pandoc` action), if pandoc is installed.
 - `upgrade`: Whether to install the latest available versions of the
   dependencies. Must be an R expression. See the README for details if
   you need quoting. Defaults to `FALSE`.

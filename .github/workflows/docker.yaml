@@ -1,0 +1,21 @@
+name: Test Docker in Docker on self hosted runner
+
+on:
+  workflow_dispatch:
+
+jobs:
+  linux-arm64:
+    runs-on: [self-hosted, linux, ARM64]
+    name: arm64 Linux
+    container:
+      image: "ubuntu:22.04"
+
+    steps:
+      - run: |
+          apt-get update && apt-get install -y docker.io
+      - run: |
+          docker ps
+      - run: |
+          docker run alpine cat /etc/os-release
+      - run: |
+          docker run alpine arch

@@ -467,7 +467,11 @@ function acquireRtools(version) {
     return __awaiter(this, void 0, void 0, function* () {
         var rtoolsVersion = "", downloadUrl = "";
         const inpver = core.getInput("rtools-version");
-        if (inpver == "") {
+        if (inpver == "none") {
+            console.log("Skipping RTools installation, as requested");
+            return;
+        }
+        else if (inpver == "") {
             rtoolsVersion = version.rtools || 'error';
             ;
             downloadUrl = version.rtools_url || 'error';
