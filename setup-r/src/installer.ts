@@ -33,11 +33,17 @@ const IS_LINUX = process.platform === "linux";
 
 const OS = !!process.env.SETUP_R_OS ? process.env.SETUP_R_OS :
     IS_WINDOWS ? "win" : IS_MAC ? "mac" : "linux";
-const ARCH = !!process.env.SETUP_R_ARCH ? process.env.SETUP_R_ARCH :
-    OS == "win" ? undefined :
-    (OS == "mac" && process.arch == "arm64") ? "arm64" :
-    (OS == "mac" && process.arch == "x64") ? "x86_64" :
-    process.arch == "x64" ? "x86_64" : process.arch;
+
+function detect_arch(): string {
+    var a = process.env.SETUP_R_ARCH
+    if (!! a) { return a; }
+    a = process.arch;
+    if (a == "x64") { return "x86_64"; }
+    if (a == "aarch64") { return "arm64"; }
+    return a;
+}
+
+const ARCH = detect_arch();
 
 if (!tempDirectory) {
   let baseLocation: string;
@@ -434,7 +440,11 @@ async function acquireRWindows(version: IRVersion): Promise<string> {
 }
 
 function getRtoolsUrl(version: string): string {
-    if (version == "43") {
+    if (version == "44" && ARCH == "arm64") {
+	return "https://github.com/r-hub/rtools44/releases/download/latest/rtools44-aarch64.exe";
+    } else if (version == "44") {
+	return "https://github.com/r-hub/rtools44/releases/download/latest/rtools44.exe";
+    } else if (version == "43") {
 	return "https://github.com/r-hub/rtools43/releases/download/latest/rtools43.exe";
     } else if (version == "42") {
 	return "https://github.com/r-hub/rtools42/releases/download/latest/rtools42.exe";
@@ -460,15 +470,16 @@ async function acquireRtools(version: IRVersion) {
   }
 
   const versionNumber = parseInt(rtoolsVersion || 'error');
-  const rtools43 = versionNumber >= 43;
-  const rtools42 = !rtools43 && versionNumber >= 41;
-  const rtools40 = !rtools43 && !rtools42 && versionNumber >= 40;
-  const rtools3x = !rtools43 && !rtools42 && !rtools40;
+  const rtools44 = versionNumber >= 44;
+  const rtools43 = !rtools44 && versionNumber >= 43;
+  const rtools42 = !rtools44 && !rtools43 && versionNumber >= 41;
+  const rtools40 = !rtools44 && !rtools43 && !rtools42 && versionNumber >= 40;
+  const rtools3x = !rtools44 && !rtools43 && !rtools42 && !rtools40;
   var fileName = path.basename(downloadUrl);
 
   // If Rtools is already installed just return, as there is a message box
   // which hangs the build otherwise.
-  if (
+  if ((rtools44 && fs.existsSync("C:\\Rtools44")) ||
       (rtools43 && fs.existsSync("C:\\Rtools43")) ||
       (rtools42 && fs.existsSync("C:\\Rtools42")) ||
       (rtools40 && fs.existsSync("C:\\Rtools40")) ||
@@ -502,7 +513,17 @@ async function acquireRtools(version: IRVersion) {
   // we never want patches (by default)
   let addpath = core.getInput("windows-path-include-rtools") === "true";
   core.exportVariable("_R_INSTALL_TIME_PATCHES_", "no");
-  if (rtools43) {
+  if (rtools44) {
+    if (addpath) {
+      if (ARCH == "arm64") {
+	core.addPath(`C:\\rtools44-aarch64\\usr\\bin`);
+        core.addPath(`C:\\rtools44-aarch64\\aarch64-w64-mingw32.static.posix\\bin`);
+      } else {
+	core.addPath(`C:\\rtools44\\usr\\bin`);
+        core.addPath(`C:\\rtools44\\x86_64-w64-mingw32.static.posix\\bin`);
+      }
+    }
+  } else  if (rtools43) {
     if (addpath) {
       core.addPath(`C:\\rtools43\\usr\\bin`);
       core.addPath(`C:\\rtools43\\x86_64-w64-mingw32.static.posix\\bin`);
