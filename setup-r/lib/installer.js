@@ -265,7 +265,7 @@ function acquireUtilsMacOS() {
     return __awaiter(this, void 0, void 0, function* () {
         // qpdf is needed by `--as-cran`
         try {
-            yield exec.exec("brew", ["install", "qpdf", "pkgconfig", "checkbashisms", "ghostscript"]);
+            yield exec.exec("brew", ["install", "qpdf", "pkgconfig", "checkbashisms", "ghostscript"], { env: { "HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK": "true" } });
         }
         catch (error) {
             core.debug(`${error}`);
