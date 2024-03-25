@@ -597,8 +597,8 @@ function acquireQpdfWindows() {
             yield io.mv(dlpath, path.join(tempDirectory, "Ghostscipt.app.nupkg"));
             dlpath = yield tc.downloadTool("https://github.com/r-lib/actions/releases/download/sysreqs/qpdf.nupkg");
             yield io.mv(dlpath, path.join(tempDirectory, "qpdf.nupkg"));
+            yield exec.exec("choco", ["install", "autohotkey.portable", "--source", tempDirectory]);
             yield exec.exec("choco", ["install", "Ghostscript.app", "qpdf", "--source", tempDirectory]);
-            ;
         }));
     });
 }

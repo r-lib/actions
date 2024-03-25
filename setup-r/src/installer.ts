@@ -571,8 +571,12 @@ async function acquireQpdfWindows() {
     await io.mv(dlpath, path.join(tempDirectory, "qpdf.nupkg"));
     await exec.exec(
       "choco",
+      ["install", "autohotkey.portable", "--source", tempDirectory]
+    );
+    await exec.exec(
+      "choco",
       ["install", "Ghostscript.app", "qpdf", "--source", tempDirectory]
-    );;
+    );
   })
 }
 
