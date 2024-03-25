@@ -117,24 +117,14 @@ async function acquireR(version: IRVersion) {
   // does not know that
   if (IS_WINDOWS && version.rtools) {
     const rtoolsVersionNumber = parseInt(version.rtools);
-    const noqpdf = rtoolsVersionNumber >= 41;
-    var tries_left = 10;
     var ok = false;
-    while (!ok && tries_left > 0) {
-      try {
-        await acquireQpdfWindows(noqpdf);
-        ok = true;
-      } catch (error) {
-        core.warning(`Failed to download qpdf or ghostscript: ${error}`);
-          await new Promise(f => setTimeout(f, 10000));
-          tries_left = tries_left - 1;
-      }
+    try {
+      await acquireQpdfWindows();
+      ok = true;
+    } catch (error) {
+      throw "Failed to get qpdf and ghostscript."
     }
     if (!ok) { throw `Failed to get qpdf and ghostscript in 10 tries :(` }
-    let gspath = "c:\\program files\\gs\\" +
-          fs.readdirSync("c:\\program files\\gs") +
-          "\\bin";
-    core.addPath(gspath);
   }
 }
 
@@ -571,19 +561,19 @@ async function acquireRtools(version: IRVersion) {
   }
 }
 
-async function acquireQpdfWindows(noqpdf) {
-  var pkgs = ["ghostscript"];
-  if (noqpdf) {
-    pkgs = pkgs.concat(["qpdf"]);
-  }
-  var args = ["install"].concat(pkgs).concat(["--no-progress"]);
-  try {
-    await exec.exec("choco", args);
-  } catch (error) {
-    core.debug(`${error}`);
-
-    throw `Failed to install qpdf: ${error}`;
-  }
+async function acquireQpdfWindows() {
+  await core.group("Downloading and installing Ghostscript, qpdf", async() => {
+    let dlpath = await tc.downloadTool("https://github.com/r-lib/actions/releases/download/sysreqs/autohotkey.portable.nupkg");
+    await io.mv(dlpath, path.join(tempDirectory, "autohotkey.portable.nupkg"));
+    dlpath = await tc.downloadTool("https://github.com/r-lib/actions/releases/download/sysreqs/Ghostscipt.app.nupkg");
+    await io.mv(dlpath, path.join(tempDirectory, "Ghostscipt.app.nupkg"));
+    dlpath = await tc.downloadTool("https://github.com/r-lib/actions/releases/download/sysreqs/qpdf.nupkg");
+    await io.mv(dlpath, path.join(tempDirectory, "qpdf.nupkg"));
+    await exec.exec(
+      "choco",
+      ["install", "Ghostscript.app", "qpdf", "--source", tempDirectory]
+    );;
+  })
 }
 
 async function setupRLibrary() {

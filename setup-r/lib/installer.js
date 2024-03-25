@@ -141,27 +141,17 @@ function acquireR(version) {
         // does not know that
         if (IS_WINDOWS && version.rtools) {
             const rtoolsVersionNumber = parseInt(version.rtools);
-            const noqpdf = rtoolsVersionNumber >= 41;
-            var tries_left = 10;
             var ok = false;
-            while (!ok && tries_left > 0) {
-                try {
-                    yield acquireQpdfWindows(noqpdf);
-                    ok = true;
-                }
-                catch (error) {
-                    core.warning(`Failed to download qpdf or ghostscript: ${error}`);
-                    yield new Promise(f => setTimeout(f, 10000));
-                    tries_left = tries_left - 1;
-                }
+            try {
+                yield acquireQpdfWindows();
+                ok = true;
+            }
+            catch (error) {
+                throw "Failed to get qpdf and ghostscript.";
             }
             if (!ok) {
                 throw `Failed to get qpdf and ghostscript in 10 tries :(`;
             }
-            let gspath = "c:\\program files\\gs\\" +
-                fs.readdirSync("c:\\program files\\gs") +
-                "\\bin";
-            core.addPath(gspath);
         }
     });
 }
@@ -598,20 +588,18 @@ function acquireRtools(version) {
         }
     });
 }
-function acquireQpdfWindows(noqpdf) {
+function acquireQpdfWindows() {
     return __awaiter(this, void 0, void 0, function* () {
-        var pkgs = ["ghostscript"];
-        if (noqpdf) {
-            pkgs = pkgs.concat(["qpdf"]);
-        }
-        var args = ["install"].concat(pkgs).concat(["--no-progress"]);
-        try {
-            yield exec.exec("choco", args);
-        }
-        catch (error) {
-            core.debug(`${error}`);
-            throw `Failed to install qpdf: ${error}`;
-        }
+        yield core.group("Downloading and installing Ghostscript, qpdf", () => __awaiter(this, void 0, void 0, function* () {
+            let dlpath = yield tc.downloadTool("https://github.com/r-lib/actions/releases/download/sysreqs/autohotkey.portable.nupkg");
+            yield io.mv(dlpath, path.join(tempDirectory, "autohotkey.portable.nupkg"));
+            dlpath = yield tc.downloadTool("https://github.com/r-lib/actions/releases/download/sysreqs/Ghostscipt.app.nupkg");
+            yield io.mv(dlpath, path.join(tempDirectory, "Ghostscipt.app.nupkg"));
+            dlpath = yield tc.downloadTool("https://github.com/r-lib/actions/releases/download/sysreqs/qpdf.nupkg");
+            yield io.mv(dlpath, path.join(tempDirectory, "qpdf.nupkg"));
+            yield exec.exec("choco", ["install", "Ghostscript.app", "qpdf", "--source", tempDirectory]);
+            ;
+        }));
     });
 }
 function setupRLibrary() {
