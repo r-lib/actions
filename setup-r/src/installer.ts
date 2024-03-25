@@ -117,15 +117,15 @@ async function acquireR(version: IRVersion) {
   // does not know that
   if (IS_WINDOWS && version.rtools) {
     const rtoolsVersionNumber = parseInt(version.rtools);
-    var ok = false;
     try {
       await acquireQpdfWindows();
-      ok = true;
     } catch (error) {
       throw "Failed to get qpdf and ghostscript."
     }
-    if (!ok) { throw `Failed to get qpdf and ghostscript in 10 tries :(` }
-  }
+    let gspath = "c:\\program files\\gs\\" +
+      fs.readdirSync("c:\\program files\\gs") +
+      "\\bin";
+    core.addPath(gspath);  }
 }
 
 async function acquireFortranMacOS(version: string): Promise<string> {
