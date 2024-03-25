@@ -42,6 +42,12 @@ jobs:
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
 
+      - name: Check that GS and QPDF are installed
+        run: |
+          Sys.which("gswin64c")
+          Sys.which("qpdf")
+        shell: Rscript {0}
+
       - uses: ./setup-r-dependencies
         with:
           pak-version: ${{ github.event.inputs.pak-version || 'stable' }}
