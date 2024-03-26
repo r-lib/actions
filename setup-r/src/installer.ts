@@ -563,11 +563,11 @@ async function acquireRtools(version: IRVersion) {
 
 async function acquireQpdfWindows() {
   await core.group("Downloading and installing Ghostscript, qpdf", async() => {
-    let dlpath = await tc.downloadTool("https://github.com/r-lib/actions/releases/download/sysreqs/autohotkey.portable.nupkg");
+    let dlpath = await tc.downloadTool("https://github.com/r-lib/actions/releases/download/sysreqs0/autohotkey.portable.nupkg");
     await io.mv(dlpath, path.join(tempDirectory, "autohotkey.portable.nupkg"));
-    dlpath = await tc.downloadTool("https://github.com/r-lib/actions/releases/download/sysreqs/Ghostscipt.app.nupkg");
+    dlpath = await tc.downloadTool("https://github.com/r-lib/actions/releases/download/sysreqs0/Ghostscipt.app.nupkg");
     await io.mv(dlpath, path.join(tempDirectory, "Ghostscipt.app.nupkg"));
-    dlpath = await tc.downloadTool("https://github.com/r-lib/actions/releases/download/sysreqs/qpdf.nupkg");
+    dlpath = await tc.downloadTool("https://github.com/r-lib/actions/releases/download/sysreqs0/qpdf.nupkg");
     await io.mv(dlpath, path.join(tempDirectory, "qpdf.nupkg"));
     await exec.exec(
       "choco",
