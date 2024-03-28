@@ -119,39 +119,17 @@ runs:
         shell: Rscript {0}
         working-directory: ${{ inputs.working-directory }}
 
-      - name: Restore R package cache keys
-        id: cache-args
+      - name: R package cache
         if: inputs.cache != 'false'
-        shell: bash
-        run: |
-          # Make cache args
-          RESTORE_KEY="${{ format('{0}-{1}-{2}', steps.install.outputs.os-version, steps.install.outputs.r-version, inputs.cache-version) }}"
-          PRIMARY_KEY="$RESTORE_KEY-${{ hashFiles(format('{0}/.github/pkg.lock', inputs.working-directory )) }}"
-          echo "key=$PRIMARY_KEY" >> $GITHUB_OUTPUT
-          echo "restore-keys=$RESTORE_KEY" >> $GITHUB_OUTPUT
-
-          # Make cache path
-          echo "path<<EOF" >> $GITHUB_OUTPUT
-          echo '${{ env.R_LIBS_USER }}/*' >> $GITHUB_OUTPUT
-          echo '!${{ env.R_LIBS_USER }}/pak' >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-
-      - name: Restore R package cache (and save cache on successful Action)
-        if: inputs.cache == 'true'
         uses: actions/cache@v4
         with:
-          path: ${{ steps.cache-args.outputs.path }}
-          key: ${{ steps.cache-args.outputs.key }}
-          restore-keys: ${{ steps.cache-args.outputs.restore-keys }}
-
-      - name: Restore R package cache
-        if: inputs.cache == 'always'
-        id: r-pkg-cache
-        uses: actions/cache/restore@v3
-        with:
-          path: ${{ steps.cache-args.outputs.path }}
-          key: ${{ steps.cache-args.outputs.key }}
-          restore-keys: ${{ steps.cache-args.outputs.restore-keys }}
+          path: |
+            ${{ env.R_LIBS_USER }}/*
+            !${{ env.R_LIBS_USER }}/pak
+          key: ${{ format('{0}-{1}-{2}-{3}', steps.install.outputs.os-version, steps.install.outputs.r-version, inputs.cache-version, hashFiles(format('{0}/.github/pkg.lock', inputs.working-directory ))) }}
+          restore-keys: ${{ format('{0}-{1}-{2}-', steps.install.outputs.os-version, steps.install.outputs.r-version, inputs.cache-version) }}
+          # Used to save package installation on troublesome Actions
+          save-always: ${{ inputs.cache == 'always' }}
 
       - name: Install dependencies
         id: install-pkgs
@@ -202,15 +180,6 @@ runs:
           cat("::endgroup::\n")
         shell: Rscript {0}
         working-directory: ${{ inputs.working-directory }}
-
-      # Step used to help speed up package installation on troublesome Actions
-      - name: Save R package cache
-        # If `actions/cache/restore@v3` restored from `cache-primary-key`, then `cache-hit == 'true'`; If so, do not save cache
-        if: inputs.cache == 'always' && steps.r-pkg-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v3
-        with:
-          path: ${{ steps.cache-args.outputs.path }}
-          key: ${{ steps.r-pkg-cache.outputs.cache-primary-key }}
 
       - name: Check whether pandoc needs to be installed
         id: check-pandoc
