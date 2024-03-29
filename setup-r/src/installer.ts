@@ -116,22 +116,16 @@ async function acquireR(version: IRVersion) {
   // version.rtools_cersion is always trithy on Windows, but typescript
   // does not know that
   if (IS_WINDOWS && version.rtools) {
-    const rtoolsVersionNumber = parseInt(version.rtools);
-    try {
-      await acquireQpdfWindows();
-    } catch (error) {
-      throw "Failed to get qpdf."
-    }
     try {
       await acquireGsWindows();
     } catch (error: any) {
       throw "Failed to get Ghostscript:\n" + error.toString();
     }
-
     let gspath = "c:\\program files\\gs\\" +
       fs.readdirSync("c:\\program files\\gs") +
       "\\bin";
-    core.addPath(gspath);  }
+    core.addPath(gspath);
+  }
 }
 
 async function acquireFortranMacOS(version: string): Promise<string> {
@@ -565,17 +559,6 @@ async function acquireRtools(version: IRVersion) {
       }
     }
   }
-}
-
-async function acquireQpdfWindows() {
-  await core.group("Downloading and installing qpdf", async() => {
-    const dlpath = await tc.downloadTool("https://github.com/r-lib/actions/releases/download/sysreqs0/qpdf.nupkg");
-    await io.mv(dlpath, path.join(tempDirectory, "qpdf.nupkg"));
-    await exec.exec(
-      "choco",
-      ["install", "qpdf", "--source", tempDirectory]
-    );
-  })
 }
 
 async function acquireGsWindows() {

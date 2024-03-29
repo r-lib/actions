@@ -140,13 +140,6 @@ function acquireR(version) {
         // version.rtools_cersion is always trithy on Windows, but typescript
         // does not know that
         if (IS_WINDOWS && version.rtools) {
-            const rtoolsVersionNumber = parseInt(version.rtools);
-            try {
-                yield acquireQpdfWindows();
-            }
-            catch (error) {
-                throw "Failed to get qpdf.";
-            }
             try {
                 yield acquireGsWindows();
             }
@@ -591,15 +584,6 @@ function acquireRtools(version) {
                 }
             }
         }
-    });
-}
-function acquireQpdfWindows() {
-    return __awaiter(this, void 0, void 0, function* () {
-        yield core.group("Downloading and installing qpdf", () => __awaiter(this, void 0, void 0, function* () {
-            const dlpath = yield tc.downloadTool("https://github.com/r-lib/actions/releases/download/sysreqs0/qpdf.nupkg");
-            yield io.mv(dlpath, path.join(tempDirectory, "qpdf.nupkg"));
-            yield exec.exec("choco", ["install", "qpdf", "--source", tempDirectory]);
-        }));
     });
 }
 function acquireGsWindows() {
