@@ -151,7 +151,7 @@ function acquireR(version) {
                 yield acquireGsWindows();
             }
             catch (error) {
-                throw "Failed to get Ghostscript.";
+                throw "Failed to get Ghostscript:\n" + error.toString();
             }
             let gspath = "c:\\program files\\gs\\" +
                 fs.readdirSync("c:\\program files\\gs") +

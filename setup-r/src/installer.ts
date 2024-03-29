@@ -124,8 +124,8 @@ async function acquireR(version: IRVersion) {
     }
     try {
       await acquireGsWindows();
-    } catch (error) {
-      throw "Failed to get Ghostscript."
+    } catch (error: any) {
+      throw "Failed to get Ghostscript:\n" + error.toString();
     }
 
     let gspath = "c:\\program files\\gs\\" +
