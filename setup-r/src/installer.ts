@@ -120,8 +120,14 @@ async function acquireR(version: IRVersion) {
     try {
       await acquireQpdfWindows();
     } catch (error) {
-      throw "Failed to get qpdf and ghostscript."
+      throw "Failed to get qpdf."
     }
+    try {
+      await acquireGsWindows();
+    } catch (error) {
+      throw "Failed to get Ghostscript."
+    }
+
     let gspath = "c:\\program files\\gs\\" +
       fs.readdirSync("c:\\program files\\gs") +
       "\\bin";
@@ -562,22 +568,22 @@ async function acquireRtools(version: IRVersion) {
 }
 
 async function acquireQpdfWindows() {
-  await core.group("Downloading and installing Ghostscript, qpdf", async() => {
-    let dlpath = await tc.downloadTool("https://github.com/r-lib/actions/releases/download/sysreqs0/autohotkey.portable.nupkg");
-    await io.mv(dlpath, path.join(tempDirectory, "autohotkey.portable.nupkg"));
-    dlpath = await tc.downloadTool("https://github.com/r-lib/actions/releases/download/sysreqs0/Ghostscipt.app.nupkg");
-    await io.mv(dlpath, path.join(tempDirectory, "Ghostscipt.app.nupkg"));
-    dlpath = await tc.downloadTool("https://github.com/r-lib/actions/releases/download/sysreqs0/qpdf.nupkg");
+  await core.group("Downloading and installing qpdf", async() => {
+    const dlpath = await tc.downloadTool("https://github.com/r-lib/actions/releases/download/sysreqs0/qpdf.nupkg");
     await io.mv(dlpath, path.join(tempDirectory, "qpdf.nupkg"));
     await exec.exec(
       "choco",
-      ["install", "autohotkey.portable", "--source", tempDirectory]
-    );
-    await exec.exec(
-      "choco",
-      ["install", "Ghostscript.app", "qpdf", "--source", tempDirectory]
+      ["install", "qpdf", "--source", tempDirectory]
     );
   })
+}
+
+async function acquireGsWindows() {
+  await core.group("Downloading and installing Ghostscript", async() => {
+    const dlpath = await tc.downloadTool("https://github.com/r-lib/actions/releases/download/sysreqs0/ghostscript-10.03.0-win.zip");
+    const extractionPath = await tc.extractZip(dlpath);
+    await io.mv(extractionPath, "c:/program files/gs");
+  });
 }
 
 async function setupRLibrary() {
