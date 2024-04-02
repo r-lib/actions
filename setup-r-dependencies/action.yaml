@@ -112,6 +112,7 @@ runs:
           pak::lockfile_create(
             c(deps, extra_deps),
             lockfile = ".github/pkg.lock",
+            lib = .Library.site,
             upgrade = (${{ inputs.upgrade }}),
             dependencies = c(needs, (${{ inputs.dependencies }}))
           )
