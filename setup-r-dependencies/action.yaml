@@ -118,7 +118,7 @@ runs:
             lockfile = ".github/pkg.lock",
             upgrade = (${{ inputs.upgrade }}),
             dependencies = c(needs, (${{ inputs.dependencies }})),
-            lib = ${{ lockfile-create-lib }}
+            lib = ${{ inputs.lockfile-create-lib }}
           )
           cat("::endgroup::\n")
           cat("::group::Show Lockfile\n")
