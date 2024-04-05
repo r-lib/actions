@@ -29,6 +29,10 @@ inputs:
   upgrade:
     description: 'Whether to install the latest available versions of the dependencies. Must be an R expression. See the README for details if you need quoting.'
     default: 'FALSE'
+  lockfile-create-lib:
+    description: 'The package library to consider when creating the pak lockfile. This is passed to the `lib` argument of `pak::lockfile_create()`. Defaults to an empty library, for reproducibility. Must be an R expression. Note that it often needs to be quoted in YAML, see the README for detail\
+s.'
+    default: 'NULL'
   install-pandoc:
     description: 'Whether to install pandoc. By default it is installed if it is not on the PATH and the local package suggests or depends on the rmarkdown package.'
   pandoc-version:
@@ -113,7 +117,8 @@ runs:
             c(deps, extra_deps),
             lockfile = ".github/pkg.lock",
             upgrade = (${{ inputs.upgrade }}),
-            dependencies = c(needs, (${{ inputs.dependencies }}))
+            dependencies = c(needs, (${{ inputs.dependencies }})),
+            lib = ${{ lockfile-create-lib }}
           )
           cat("::endgroup::\n")
           cat("::group::Show Lockfile\n")
