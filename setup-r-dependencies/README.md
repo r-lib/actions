@@ -34,6 +34,11 @@ Inputs available
   if it is not already on the PATH and the R package depends in rmarkdown.
 - `needs` - `Config/Needs` fields to install from the DESCRIPTION, the
   `Config/Needs/` prefix will be automatically included.
+- `lockfile-create-lib` - The package library to consider when creating
+  the pak lockfile. This is passed to the `lib` argument of
+  `pak::lockfile_create()`. Defaults to an empty library, for
+  reproducibility. Must be an R expression. Note that it often needs
+  to be quoted in YAML, see the README for details.
 - `packages`: - default `deps::., any::sessioninfo`. Which package(s) to
   install. The default installs the dependencies of the package in the
   working directory and the sessioninfo package. Separate multiple packages
