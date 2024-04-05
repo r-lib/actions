@@ -1,7 +1,7 @@
 
 # `v2.8.7` (2024-04-05)
 
-* `[setup-r-dependencies]` now has a 'lockfile-create-lib` input parameter, that is
+* `[setup-r-dependencies]` now has a `lockfile-create-lib` input parameter, that is
   passed to `pak::lockfile_create(lib = ...)` (#814).
 
 # `v2.8.6` (2024-03-30)
