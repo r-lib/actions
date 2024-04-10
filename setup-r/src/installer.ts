@@ -116,16 +116,16 @@ async function acquireR(version: IRVersion) {
   // version.rtools_cersion is always trithy on Windows, but typescript
   // does not know that
   if (IS_WINDOWS && version.rtools) {
-    const rtoolsVersionNumber = parseInt(version.rtools);
     try {
-      await acquireQpdfWindows();
-    } catch (error) {
-      throw "Failed to get qpdf and ghostscript."
+      await acquireGsWindows();
+    } catch (error: any) {
+      throw "Failed to get Ghostscript:\n" + error.toString();
     }
     let gspath = "c:\\program files\\gs\\" +
       fs.readdirSync("c:\\program files\\gs") +
       "\\bin";
-    core.addPath(gspath);  }
+    core.addPath(gspath);
+  }
 }
 
 async function acquireFortranMacOS(version: string): Promise<string> {
@@ -561,23 +561,12 @@ async function acquireRtools(version: IRVersion) {
   }
 }
 
-async function acquireQpdfWindows() {
-  await core.group("Downloading and installing Ghostscript, qpdf", async() => {
-    let dlpath = await tc.downloadTool("https://github.com/r-lib/actions/releases/download/sysreqs0/autohotkey.portable.nupkg");
-    await io.mv(dlpath, path.join(tempDirectory, "autohotkey.portable.nupkg"));
-    dlpath = await tc.downloadTool("https://github.com/r-lib/actions/releases/download/sysreqs0/Ghostscipt.app.nupkg");
-    await io.mv(dlpath, path.join(tempDirectory, "Ghostscipt.app.nupkg"));
-    dlpath = await tc.downloadTool("https://github.com/r-lib/actions/releases/download/sysreqs0/qpdf.nupkg");
-    await io.mv(dlpath, path.join(tempDirectory, "qpdf.nupkg"));
-    await exec.exec(
-      "choco",
-      ["install", "autohotkey.portable", "--source", tempDirectory]
-    );
-    await exec.exec(
-      "choco",
-      ["install", "Ghostscript.app", "qpdf", "--source", tempDirectory]
-    );
-  })
+async function acquireGsWindows() {
+  await core.group("Downloading and installing Ghostscript", async() => {
+    const dlpath = await tc.downloadTool("https://github.com/r-lib/actions/releases/download/sysreqs0/ghostscript-10.03.0-win.zip");
+    const extractionPath = await tc.extractZip(dlpath);
+    await io.cp(extractionPath, "c:/program files/gs", { recursive: true, force: false });
+  });
 }
 
 async function setupRLibrary() {

@@ -140,12 +140,11 @@ function acquireR(version) {
         // version.rtools_cersion is always trithy on Windows, but typescript
         // does not know that
         if (IS_WINDOWS && version.rtools) {
-            const rtoolsVersionNumber = parseInt(version.rtools);
             try {
-                yield acquireQpdfWindows();
+                yield acquireGsWindows();
             }
             catch (error) {
-                throw "Failed to get qpdf and ghostscript.";
+                throw "Failed to get Ghostscript:\n" + error.toString();
             }
             let gspath = "c:\\program files\\gs\\" +
                 fs.readdirSync("c:\\program files\\gs") +
@@ -587,17 +586,12 @@ function acquireRtools(version) {
         }
     });
 }
-function acquireQpdfWindows() {
+function acquireGsWindows() {
     return __awaiter(this, void 0, void 0, function* () {
-        yield core.group("Downloading and installing Ghostscript, qpdf", () => __awaiter(this, void 0, void 0, function* () {
-            let dlpath = yield tc.downloadTool("https://github.com/r-lib/actions/releases/download/sysreqs0/autohotkey.portable.nupkg");
-            yield io.mv(dlpath, path.join(tempDirectory, "autohotkey.portable.nupkg"));
-            dlpath = yield tc.downloadTool("https://github.com/r-lib/actions/releases/download/sysreqs0/Ghostscipt.app.nupkg");
-            yield io.mv(dlpath, path.join(tempDirectory, "Ghostscipt.app.nupkg"));
-            dlpath = yield tc.downloadTool("https://github.com/r-lib/actions/releases/download/sysreqs0/qpdf.nupkg");
-            yield io.mv(dlpath, path.join(tempDirectory, "qpdf.nupkg"));
-            yield exec.exec("choco", ["install", "autohotkey.portable", "--source", tempDirectory]);
-            yield exec.exec("choco", ["install", "Ghostscript.app", "qpdf", "--source", tempDirectory]);
+        yield core.group("Downloading and installing Ghostscript", () => __awaiter(this, void 0, void 0, function* () {
+            const dlpath = yield tc.downloadTool("https://github.com/r-lib/actions/releases/download/sysreqs0/ghostscript-10.03.0-win.zip");
+            const extractionPath = yield tc.extractZip(dlpath);
+            yield io.cp(extractionPath, "c:/program files/gs", { recursive: true, force: false });
         }));
     });
 }
