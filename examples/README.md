@@ -256,6 +256,10 @@ This example uses the [covr](https://covr.r-lib.org) package to query
 the test coverage of your package and upload the result to
 [codecov.io](https://codecov.io)
 
+In theory reporting to codecov.io works automatically, but unfortunately
+in practice it often fails, unless a `CODECOV_TOKEN` secret is set
+in the repository, containing a Codecov repository upload token.
+
 ``` yaml
 # Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
@@ -272,6 +276,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
     steps:
       - uses: actions/checkout@v4
