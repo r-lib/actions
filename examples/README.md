@@ -5,51 +5,48 @@
 
 Package workflows:
 
--   [`check-release`](#quickstart-ci-workflow) - A simple CI workflow to
-    check with the release version of R.
--   [`check-standard`](#standard-ci-workflow) - A standard CI workflow
-    to check with the release version of R on the three major OSs.
--   [`check-full`](#tidyverse-ci-workflow) - A more complex CI workflow
--   [`test-coverage`](#test-coverage-workflow) - Run `covr::codecov()`
-    on an R package.
--   [`lint`](#lint-workflow) - Run `lintr::lint_package()` on an R
-    package.
--   [`pr-commands`](#commands-workflow) - Adds `/document` and `/style`
-    commands for pull requests.
--   [`pkgdown`](#build-pkgdown-site) - Build a
-    [pkgdown](https://pkgdown.r-lib.org/) site for an R package and
-    deploy it to [GitHub Pages](https://pages.github.com/).
--   [`document`](#document-package) - Run `roxygen2::roxygenise()` on an
-    R package.
--   [`style`](#style-package) - Run `styler::style_pkg()` on an R
-    package.
+- [`check-release`](#quickstart-ci-workflow) - A simple CI workflow to
+  check with the release version of R.
+- [`check-standard`](#standard-ci-workflow) - A standard CI workflow to
+  check with the release version of R on the three major OSs.
+- [`check-full`](#tidyverse-ci-workflow) - A more complex CI workflow
+- [`test-coverage`](#test-coverage-workflow) - Run `covr::codecov()` on
+  an R package.
+- [`lint`](#lint-workflow) - Run `lintr::lint_package()` on an R
+  package.
+- [`pr-commands`](#commands-workflow) - Adds `/document` and `/style`
+  commands for pull requests.
+- [`pkgdown`](#build-pkgdown-site) - Build a
+  [pkgdown](https://pkgdown.r-lib.org/) site for an R package and deploy
+  it to [GitHub Pages](https://pages.github.com/).
+- [`document`](#document-package) - Run `roxygen2::roxygenise()` on an R
+  package.
+- [`style`](#style-package) - Run `styler::style_pkg()` on an R package.
 
 RMarkdown workflows:
 
--   [`render-rmarkdown`](#render-rmarkdown) - Render one or more
-    Rmarkdown files when they change and commit the result.
--   [`bookdown`](#build-bookdown-site) - Build a
-    [bookdown](https://bookdown.org) site and deploy it to [GitHub
-    Pages](https://pages.github.com/).
--   [`blogdown`](#build-blogdown-site) - Build a
-    [blogdown](https://bookdown.org/yihui/blogdown/) site and deploy it
-    to [GitHub Pages](https://pages.github.com/).
+- [`render-rmarkdown`](#render-rmarkdown) - Render one or more Rmarkdown
+  files when they change and commit the result.
+- [`bookdown`](#build-bookdown-site) - Build a
+  [bookdown](https://bookdown.org) site and deploy it to [GitHub
+  Pages](https://pages.github.com/).
+- [`blogdown`](#build-blogdown-site) - Build a
+  [blogdown](https://bookdown.org/yihui/blogdown/) site and deploy it to
+  [GitHub Pages](https://pages.github.com/).
 
 Other workflows:
 
--   [`docker`](#docker-based-workflow) - For custom workflows based on
-    docker containers.
--   [Bioconductor](#bioconductor-friendly-workflow) - A CI workflow for
-    packages to be released on Bioconductor.
--   [`lint-project`](#lint-project-workflow) - Run `lintr::lint_dir()`
-    on an R project.
--   [`shiny-deploy`](#shiny-app-deployment) - Deploy a Shiny app to
-    shinyapps.io or RStudio Connect.
+- [Bioconductor](#bioconductor-friendly-workflow) - A CI workflow for
+  packages to be released on Bioconductor.
+- [`lint-project`](#lint-project-workflow) - Run `lintr::lint_dir()` on
+  an R project.
+- [`shiny-deploy`](#shiny-app-deployment) - Deploy a Shiny app to
+  shinyapps.io or RStudio Connect.
 
 Options and advice:
 
--   [Forcing binaries](#forcing-binaries) - An environment variable to
-    always use binary packages.
+- [Forcing binaries](#forcing-binaries) - An environment variable to
+  always use binary packages.
 
 ## Quickstart CI workflow
 
@@ -76,6 +73,8 @@ on:
     branches: [main, master]
 
 name: R-CMD-check
+
+permissions: read-all
 
 jobs:
   R-CMD-check:
@@ -126,6 +125,8 @@ on:
     branches: [main, master]
 
 name: R-CMD-check
+
+permissions: read-all
 
 jobs:
   R-CMD-check:
@@ -202,6 +203,8 @@ on:
 
 name: R-CMD-check
 
+permissions: read-all
+
 jobs:
   R-CMD-check:
     runs-on: ${{ matrix.config.os }}
@@ -260,8 +263,8 @@ the test coverage of your package and upload the result to
 [codecov.io](https://codecov.io)
 
 In theory reporting to codecov.io works automatically, but unfortunately
-in practice it often fails, unless a `CODECOV_TOKEN` secret is set
-in the repository, containing a Codecov repository upload token.
+in practice it often fails, unless a `CODECOV_TOKEN` secret is set in
+the repository, containing a Codecov repository upload token.
 
 ``` yaml
 # Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
@@ -274,12 +277,13 @@ on:
 
 name: test-coverage
 
+permissions: read-all
+
 jobs:
   test-coverage:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
     steps:
       - uses: actions/checkout@v4
@@ -290,19 +294,26 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::covr
+          extra-packages: any::covr, any::xml2
           needs: coverage
 
       - name: Test coverage
         run: |
-          token <- Sys.getenv("CODECOV_TOKEN", "")
-          covr::codecov(
+          cov <- covr::package_coverage(
             quiet = FALSE,
             clean = FALSE,
-            install_path = file.path(normalizePath(Sys.getenv("RUNNER_TEMP"), winslash = "/"), "package"),
-            token = if (token != "") token
+            install_path = file.path(normalizePath(Sys.getenv("RUNNER_TEMP"), winslash = "/"), "package")
           )
+          covr::to_cobertura(cov)
         shell: Rscript {0}
+
+      - uses: codecov/codecov-action@v4
+        with:
+          fail_ci_if_error: true
+          file: ./cobertura.xml
+          plugin: none
+          disable_search: true
+          token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Show testthat output
         if: always()
@@ -336,6 +347,8 @@ on:
     branches: [main, master]
 
 name: lint
+
+permissions: read-all
 
 jobs:
   lint:
@@ -529,6 +542,8 @@ on:
   workflow_dispatch:
 
 name: pkgdown
+
+permissions: read-all
 
 jobs:
   pkgdown:
@@ -848,13 +863,13 @@ This action assumes you have an `renv` lockfile in your repository that
 describes the `R` packages and versions required for your Shiny
 application.
 
--   See here for information on how to obtain the token and secret for
-    configuring `rsconnect`:
-    <https://shiny.rstudio.com/articles/shinyapps.html>
+- See here for information on how to obtain the token and secret for
+  configuring `rsconnect`:
+  <https://shiny.rstudio.com/articles/shinyapps.html>
 
--   See here for information on how to store private tokens in a
-    repository as GitHub Secrets:
-    <https://docs.github.com/en/actions/reference/encrypted-secrets#creating-encrypted-secrets-for-a-repository>
+- See here for information on how to store private tokens in a
+  repository as GitHub Secrets:
+  <https://docs.github.com/en/actions/reference/encrypted-secrets#creating-encrypted-secrets-for-a-repository>
 
 ``` yaml
 # Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
@@ -895,43 +910,6 @@ jobs:
           rsconnect::setAccountInfo("${{ secrets.RSCONNECT_USER }}", "${{ secrets.RSCONNECT_TOKEN }}", "${{ secrets.RSCONNECT_SECRET }}")
           rsconnect::deployApp(appName = "${{ env.APPNAME }}", account = "${{ env.ACCOUNT }}", server = "${{ env.SERVER }}")
         shell: Rscript {0}
-```
-
-## Docker based workflow
-
-`usethis::use_github_action("docker")`
-
-If you develop locally with docker or are used to using other docker
-based CI services and already have a docker container with all of your R
-and system dependencies you can use that in GitHub Actions by adapting
-the following workflow. This example workflow assumes you build some
-model in `fit_model.R` and then have a report in `report.Rmd`. It then
-uploads the rendered html from the report as a build artifact.
-
-``` yaml
-# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
-# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
-on: [push]
-
-name: docker
-
-jobs:
-  docker:
-    runs-on: ubuntu-latest
-    container: rocker/verse
-    steps:
-      - uses: actions/checkout@v4
-
-      - run: |
-          source("fit_model.R")
-          rmarkdown::render("report.Rmd")
-        shell: Rscript {0}
-
-      - name: Upload results
-        uses: actions/upload-artifact@v4
-        with:
-          name: results
-          path: report.html
 ```
 
 ## Bioconductor-friendly workflow
