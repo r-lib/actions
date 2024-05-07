@@ -5,7 +5,7 @@
   "description": "pandoc setup action",
   "main": "src/setup-pandoc.ts",
   "scripts": {
-    "build": "ncc build --source-map --minify",
+    "build": "ncc build --source-map",
     "format": "prettier --write **/*.ts",
     "format-check": "prettier --check **/*.ts"
   },
