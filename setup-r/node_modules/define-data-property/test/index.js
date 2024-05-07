@@ -4,7 +4,7 @@ var test = require('tape');
 var v = require('es-value-fixtures');
 var forEach = require('for-each');
 var inspect = require('object-inspect');
-var has = require('has');
+var hasOwn = require('hasown');
 var hasPropertyDescriptors = require('has-property-descriptors')();
 var getOwnPropertyDescriptors = require('object.getownpropertydescriptors');
 var ownKeys = require('reflect.ownkeys');
@@ -34,21 +34,21 @@ test('defineDataProperty', function (t) {
 		forEach(v.nonBooleans, function (nonBoolean) {
 			if (nonBoolean !== null) {
 				st['throws'](
-				// @ts-expect-error
+					// @ts-expect-error
 					function () { defineDataProperty({}, 'key', 'value', nonBoolean); },
 					TypeError,
 					'throws on non-boolean nonEnumerable: ' + inspect(nonBoolean)
 				);
 
 				st['throws'](
-				// @ts-expect-error
+					// @ts-expect-error
 					function () { defineDataProperty({}, 'key', 'value', false, nonBoolean); },
 					TypeError,
 					'throws on non-boolean nonWritable: ' + inspect(nonBoolean)
 				);
 
 				st['throws'](
-				// @ts-expect-error
+					// @ts-expect-error
 					function () { defineDataProperty({}, 'key', 'value', false, false, nonBoolean); },
 					TypeError,
 					'throws on non-boolean nonConfigurable: ' + inspect(nonBoolean)
@@ -62,28 +62,28 @@ test('defineDataProperty', function (t) {
 	t.test('normal data property', function (st) {
 		/** @type {Record<PropertyKey, string>} */
 		var obj = { existing: 'existing property' };
-		st.ok(has(obj, 'existing'), 'has initial own property');
+		st.ok(hasOwn(obj, 'existing'), 'has initial own property');
 		st.equal(obj.existing, 'existing property', 'has expected initial value');
 
 		var res = defineDataProperty(obj, 'added', 'added property');
 		st.equal(res, void undefined, 'returns `undefined`');
-		st.ok(has(obj, 'added'), 'has expected own property');
+		st.ok(hasOwn(obj, 'added'), 'has expected own property');
 		st.equal(obj.added, 'added property', 'has expected value');
 
 		defineDataProperty(obj, 'existing', 'new value');
-		st.ok(has(obj, 'existing'), 'still has expected own property');
+		st.ok(hasOwn(obj, 'existing'), 'still has expected own property');
 		st.equal(obj.existing, 'new value', 'has new expected value');
 
 		defineDataProperty(obj, 'explicit1', 'new value', false);
-		st.ok(has(obj, 'explicit1'), 'has expected own property (explicit enumerable)');
+		st.ok(hasOwn(obj, 'explicit1'), 'has expected own property (explicit enumerable)');
 		st.equal(obj.explicit1, 'new value', 'has new expected value (explicit enumerable)');
 
 		defineDataProperty(obj, 'explicit2', 'new value', false, false);
-		st.ok(has(obj, 'explicit2'), 'has expected own property (explicit writable)');
+		st.ok(hasOwn(obj, 'explicit2'), 'has expected own property (explicit writable)');
 		st.equal(obj.explicit2, 'new value', 'has new expected value (explicit writable)');
 
 		defineDataProperty(obj, 'explicit3', 'new value', false, false, false);
-		st.ok(has(obj, 'explicit3'), 'has expected own property (explicit configurable)');
+		st.ok(hasOwn(obj, 'explicit3'), 'has expected own property (explicit configurable)');
 		st.equal(obj.explicit3, 'new value', 'has new expected value (explicit configurable)');
 
 		st.end();
