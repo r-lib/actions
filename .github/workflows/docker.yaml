@@ -1,21 +1,25 @@
-name: Test Docker in Docker on self hosted runner
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
+on: [push]
 
-on:
-  workflow_dispatch:
+name: docker
+
+permissions: read-all
 
 jobs:
-  linux-arm64:
-    runs-on: [self-hosted, linux, ARM64]
-    name: arm64 Linux
-    container:
-      image: "ubuntu:22.04"
-
+  docker:
+    runs-on: ubuntu-latest
+    container: rocker/verse
     steps:
+      - uses: actions/checkout@v4
+
       - run: |
-          apt-get update && apt-get install -y docker.io
-      - run: |
-          docker ps
-      - run: |
-          docker run alpine cat /etc/os-release
-      - run: |
-          docker run alpine arch
+          source("fit_model.R")
+          rmarkdown::render("report.Rmd")
+        shell: Rscript {0}
+
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        with:
+          name: results
+          path: report.html
