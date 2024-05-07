@@ -7,7 +7,7 @@ async function run() {
     const token: string = core.getInput("repo-token", { required: true });
     const cli_args: string = core.getInput("args");
 
-    const client: github.GitHub = new github.GitHub(token);
+    const octokit = github.getOctokit(token);
 
     const context = github.context;
 
@@ -16,14 +16,17 @@ async function run() {
 
     console.log(`Collecting information about PR #${issue.number}...`);
 
-    const { status, data: pr } = await client.pulls.get({
+    const { status, data: pr } = await octokit.rest.pulls.get({
       owner: issue.owner,
       repo: issue.repo,
       pull_number: issue.number
     });
 
-    const headBranch: string = pr.head.ref;
-    const headCloneURL: string = pr.head.repo.clone_url.replace(
+    const headBranch = pr.head.ref;
+    if (!pr.head.repo) {
+      throw "Cannot find repo of the PR.";
+    }
+    const headCloneURL = pr.head.repo.clone_url.replace(
       "https://",
       `https://x-access-token:${token}@`
     );

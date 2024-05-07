@@ -3,4 +3,4 @@ description: 'Setup TinyTeX and add it to your PATH'
 author: 'Jim Hester'
 runs:
   using: 'node20'
-  main: 'lib/setup-tinytex.js'
+  main: 'dist/index.js'

@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "description": "R setup action",
-  "main": "dist/index.js",
+  "main": "src/setup-r.ts",
   "scripts": {
     "build": "ncc build --source-map --minify",
     "format": "prettier --write **/*.ts",
@@ -21,7 +21,7 @@
   ],
   "author": "jimhester",
   "license": "MIT",
-  "homepage": "https://github.com/r-lib/actions/setup-r",
+  "homepage": "https://github.com/r-lib/actions",
   "dependencies": {
     "@actions/core": "^1.10.1",
     "@actions/exec": "^1.1.1",
@@ -30,5 +30,10 @@
     "linux-os-info": "^2.0.0",
     "semver": "^7.6.0",
     "typed-rest-client": "^1.8.11"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.10",
+    "prettier": "^3.2.5",
+    "typescript": "^5.4.5"
   }
 }
