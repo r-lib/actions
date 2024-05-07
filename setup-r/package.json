@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "description": "R setup action",
-  "main": "lib/setup-r.js",
+  "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "ncc build --source-map --minify",
     "format": "prettier --write **/*.ts",
     "format-check": "prettier --check **/*.ts"
   },
