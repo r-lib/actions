@@ -3,8 +3,7 @@ WORKFLOWS := .github/workflows/check-full.yaml \
 	.github/workflows/check-standard.yaml \
 	.github/workflows/lint.yaml \
 	.github/workflows/pkgdown.yaml \
-	.github/workflows/test-coverage.yaml \
-	.github/workflows/docker.yaml
+	.github/workflows/test-coverage.yaml
 
 all : $(WORKFLOWS)
 

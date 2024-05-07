@@ -32,7 +32,6 @@ RMarkdown workflows:
 
 Other workflows:
 
-- [`docker`](#docker-based-workflow) - For custom workflows based on docker containers.
 - [Bioconductor](#bioconductor-friendly-workflow) - A CI workflow for packages to be released on Bioconductor.
 - [`lint-project`](#lint-project-workflow) - Run `lintr::lint_dir()` on an R project.
 - [`shiny-deploy`](#shiny-app-deployment) - Deploy a Shiny app to shinyapps.io or RStudio Connect.
@@ -229,21 +228,6 @@ This action assumes you have an `renv` lockfile in your repository that describe
 
 ```{r echo = FALSE, results = "asis"}
 print_yaml("shiny-deploy.yaml")
-```
-
-## Docker based workflow
-
-`usethis::use_github_action("docker")`
-
-If you develop locally with docker or are used to using other docker based CI
-services and already have a docker container with all of your R and system
-dependencies you can use that in GitHub Actions by adapting the following
-workflow. This example workflow assumes you build some model in `fit_model.R`
-and then have a report in `report.Rmd`. It then uploads the rendered html from
-the report as a build artifact.
-
-```{r echo = FALSE, results = "asis"}
-print_yaml("docker.yaml")
 ```
 
 ## Bioconductor-friendly workflow
