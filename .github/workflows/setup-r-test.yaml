@@ -14,6 +14,8 @@ on:
 
 name: setup-r test
 
+permissions: read-all
+
 jobs:
   setup-matrix:
     runs-on: ubuntu-latest

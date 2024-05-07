@@ -12,6 +12,8 @@ on:
 
 name: R-devel test
 
+permissions: read-all
+
 jobs:
   R-CMD-check:
     runs-on: ${{ matrix.config.os }}

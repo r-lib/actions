@@ -3,6 +3,8 @@ on:
 
 name: Rtools test
 
+permissions: read-all
+
 jobs:
   R-CMD-check:
     runs-on: windows-latest

@@ -8,6 +8,8 @@ on:
 
 name: test-coverage
 
+permissions: read-all
+
 jobs:
   test-coverage:
     runs-on: ubuntu-latest

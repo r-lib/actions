@@ -1,5 +1,7 @@
 name: Test setup-pandoc on all OSes
 
+permissions: read-all
+
 on:
   push:
     branches: [main, master, v2-branch]

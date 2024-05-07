@@ -7,6 +7,8 @@ on:
 
 name: "setup-tinytex test"
 
+permissions: read-all
+
 jobs:
   tinytex:
     runs-on: ${{ matrix.config.os }}
@@ -26,7 +28,7 @@ jobs:
       - uses: ./setup-tinytex
         env:
           TINYTEX_INSTALLER: TinyTeX
-          
+
       - run: tlmgr --version
 
       - run: tlmgr update --self

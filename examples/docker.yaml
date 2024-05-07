@@ -4,6 +4,8 @@ on: [push]
 
 name: docker
 
+permissions: read-all
+
 jobs:
   docker:
     runs-on: ubuntu-latest

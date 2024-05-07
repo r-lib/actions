@@ -8,6 +8,8 @@ on:
 
 name: lint
 
+permissions: read-all
+
 jobs:
   lint:
     runs-on: ubuntu-latest
