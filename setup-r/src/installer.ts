@@ -563,7 +563,7 @@ async function acquireRtools(version: IRVersion) {
 
 async function acquireGsWindows() {
   await core.group("Downloading and installing Ghostscript", async() => {
-    const dlpath = await tc.downloadTool("https://github.com/r-lib/actions/releases/download/sysreqs0/ghostscript-10.03.0-win.zip");
+    const dlpath = await tc.downloadTool("https://github.com/r-lib/actions-files/releases/download/v1.0.0/ghostscript-10.03.0-win.zip");
     const extractionPath = await tc.extractZip(dlpath);
     await io.cp(extractionPath, "c:/program files/gs", { recursive: true, force: false });
   });
