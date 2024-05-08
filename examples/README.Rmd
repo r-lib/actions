@@ -20,15 +20,15 @@ Package workflows:
 - [`test-coverage`](#test-coverage-workflow) - Run `covr::codecov()` on an R package.
 - [`lint`](#lint-workflow) - Run `lintr::lint_package()` on an R package.
 - [`pr-commands`](#commands-workflow) - Adds `/document` and `/style` commands for pull requests.
-- [`pkgdown`](#build-pkgdown-site) - Build a [pkgdown] site for an R package and deploy it to [GitHub Pages].
+- [`pkgdown`](#build-pkgdown-site) - Build a [pkgdown] site for an R package and deploy it to [GitHub Pages] or [Cloudflare Pages].
 - [`document`](#document-package) - Run `roxygen2::roxygenise()` on an R package.
 - [`style`](#style-package) - Run `styler::style_pkg()` on an R package.
 
 RMarkdown workflows:
 
 - [`render-rmarkdown`](#render-rmarkdown) - Render one or more Rmarkdown files when they change and commit the result.
-- [`bookdown`](#build-bookdown-site) - Build a [bookdown] site and deploy it to [GitHub Pages].
-- [`blogdown`](#build-blogdown-site) - Build a [blogdown] site and deploy it to [GitHub Pages].
+- [`bookdown`](#build-bookdown-site) - Build a [bookdown] site and deploy it to [GitHub Pages] or [Cloudflare Pages].
+- [`blogdown`](#build-blogdown-site) - Build a [blogdown] site and deploy it to [GitHub Pages] or [Cloudflare Pages].
 
 Other workflows:
 
@@ -167,8 +167,16 @@ print_yaml("render-rmarkdown.yaml")
 `usethis::use_github_action("pkgdown")`
 
 This example builds a [pkgdown] site for a repository and pushes the built package
-to [GitHub Pages].
+to [GitHub Pages] or [Cloudflare Pages].
 The inclusion of [`workflow_dispatch`](https://docs.github.com/en/actions/learn-github-actions/events-that-trigger-workflows#workflow_dispatch) means the workflow can be [run manually, from the browser](https://docs.github.com/en/actions/managing-workflow-runs/manually-running-a-workflow), or [triggered via the GitHub REST API](https://docs.github.com/en/rest/reference/actions/#create-a-workflow-dispatch-event).
+
+You'll need to update your setting on GitHub to deploy the `gh-pages`
+(unless configured otherwise) branch of your repository to GitHub Pages.
+
+Similarly, connect your Cloudflare Pages app to the `gh-pages` branch of
+your repository on your Cloudflare dashboard. You'll need to set
+`exit 0` as the build command for pkgdown sites. See the Cloudflare Pages
+documentation for details.
 
 ```{r echo = FALSE, results = "asis"}
 print_yaml("pkgdown.yaml")
@@ -200,9 +208,18 @@ print_yaml("style.yaml")
 
 `usethis::use_github_action("bookdown")`
 
-This example builds a [bookdown] site for a repository and then deploys the site via [GitHub Pages].
+This example builds a [bookdown] site for a repository and then deploys the site via [GitHub Pages] or Cloudflare Pages.
 It uses [renv] to ensure the package versions remain consistent across builds.
 You will need to run `renv::snapshot()` locally and commit the `renv.lock` file before using this workflow, and after every time you add a new package to `DESCRIPTION`. See [Using renv with Continous Integration](https://rstudio.github.io/renv/articles/ci.html) for additional information.
+
+You'll need to update your setting on GitHub to deploy the `_book`
+folder of the `gh-pages` branch (unless configured otherwise)
+of your repository to GitHub Pages.
+
+Similarly, connect your Cloudflare Pages app to the `gh-pages` branch of
+your repository on your Cloudflare dashboard. You'll need to set
+`exit 0` as the build command for bookdown sites. See the Cloudflare
+Pages documentation for details.
 
 ```{r echo = FALSE, results = "asis"}
 print_yaml("bookdown.yaml")
@@ -212,9 +229,18 @@ print_yaml("bookdown.yaml")
 
 `usethis::use_github_action("blogdown")`
 
-This example builds a [blogdown] site for a repository and then deploys the book via [GitHub Pages].
+This example builds a [blogdown] site for a repository and then deploys the book via [GitHub Pages] or Cloudflare Pages.
 It uses [renv] to ensure the package versions remain consistent across builds.
 You will need to run `renv::snapshot()` locally and commit the `renv.lock` file before using this workflow, see [Using renv with Continous Integration](https://rstudio.github.io/renv/articles/ci.html) for additional information.
+
+You'll need to update your setting on GitHub to deploy the `public`
+folder of the `gh-pages` branch (unless configured otherwise)
+of your repository to GitHub Pages.
+
+Similarly, connect your Cloudflare Pages app to the `gh-pages` branch of
+your repository on your Cloudflare dashboard. You'll need to set
+`exit 0` as the build command for blogdown sites. See the Cloudflare
+Pages documentation for details.
 
 ```{r echo = FALSE, results = "asis"}
 print_yaml("blogdown.yaml")
@@ -298,6 +324,7 @@ This can lead to confusing errors, because while dependency installation will *n
 You can learn more about packages in source and binary form [here](https://r-pkgs.org/package-structure-state.html#binary-package) and [here](https://www.jumpingrivers.com/blog/faster-r-package-installation-rstudio/).
 
 [GitHub Pages]: https://pages.github.com/
+[Cloudflare Pages]: https://pages.cloudflare.com/
 [renv]: https://rstudio.github.io/renv/
 [pkgdown]: https://pkgdown.r-lib.org/
 [bookdown]: https://bookdown.org
