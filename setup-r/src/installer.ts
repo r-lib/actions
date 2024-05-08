@@ -31,16 +31,27 @@ const IS_WINDOWS = process.platform === "win32";
 const IS_MAC = process.platform === "darwin";
 const IS_LINUX = process.platform === "linux";
 
-const OS = !!process.env.SETUP_R_OS ? process.env.SETUP_R_OS :
-    IS_WINDOWS ? "win" : IS_MAC ? "mac" : "linux";
+const OS = !!process.env.SETUP_R_OS
+  ? process.env.SETUP_R_OS
+  : IS_WINDOWS
+    ? "win"
+    : IS_MAC
+      ? "mac"
+      : "linux";
 
 function detect_arch(): string {
-    var a = process.env.SETUP_R_ARCH
-    if (!! a) { return a; }
-    a = process.arch;
-    if (a == "x64") { return "x86_64"; }
-    if (a == "aarch64") { return "arm64"; }
+  var a = process.env.SETUP_R_ARCH;
+  if (!!a) {
     return a;
+  }
+  a = process.arch;
+  if (a == "x64") {
+    return "x86_64";
+  }
+  if (a == "aarch64") {
+    return "arm64";
+  }
+  return a;
 }
 
 const ARCH = detect_arch();
@@ -67,8 +78,8 @@ export async function getR(version: string) {
   if (!!process.env.RUNNER_TOOL_CACHE) {
     let toolPath = tc.find("R", selected.version);
     if (toolPath) {
-        ok = true;
-        core.debug(`Tool found in cache ${toolPath}`);
+      ok = true;
+      core.debug(`Tool found in cache ${toolPath}`);
     }
   }
 
@@ -95,14 +106,22 @@ async function acquireR(version: IRVersion) {
     if (IS_WINDOWS) {
       await Promise.all([
         await acquireRWindows(version),
-        await acquireRtools(version)
+        await acquireRtools(version),
       ]);
     } else if (IS_MAC) {
-      await core.group('Downloading gfortran', async() => { await acquireFortranMacOS(version.version) });
-      await core.group('Downloading macOS utils', async() => { await acquireUtilsMacOS() });
-      await core.group('Downloading R', async() => { await acquireRMacOS(version) });
+      await core.group("Downloading gfortran", async () => {
+        await acquireFortranMacOS(version.version);
+      });
+      await core.group("Downloading macOS utils", async () => {
+        await acquireUtilsMacOS();
+      });
+      await core.group("Downloading R", async () => {
+        await acquireRMacOS(version);
+      });
       if (core.getInput("remove-openmp-macos") === "true") {
-        await core.group('Patching -fopenmp', async() => { await removeOpenmpFlags() });
+        await core.group("Patching -fopenmp", async () => {
+          await removeOpenmpFlags();
+        });
       }
     } else {
       await acquireRUbuntu(version);
@@ -121,7 +140,8 @@ async function acquireR(version: IRVersion) {
     } catch (error: any) {
       throw "Failed to get Ghostscript:\n" + error.toString();
     }
-    let gspath = "c:\\program files\\gs\\" +
+    let gspath =
+      "c:\\program files\\gs\\" +
       fs.readdirSync("c:\\program files\\gs") +
       "\\bin";
     core.addPath(gspath);
@@ -137,7 +157,8 @@ async function acquireFortranMacOS(version: string): Promise<string> {
 }
 
 async function acquireFortranMacOSNew(): Promise<string> {
-  let downloadUrl = "https://github.com/r-hub/mac-tools/releases/download/tools/gfortran-12.2-universal.pkg";
+  let downloadUrl =
+    "https://github.com/r-hub/mac-tools/releases/download/tools/gfortran-12.2-universal.pkg";
   let fileName = path.basename(downloadUrl);
   let downloadPath: string | null = null;
   try {
@@ -156,7 +177,7 @@ async function acquireFortranMacOSNew(): Promise<string> {
       "-pkg",
       path.join(tempDirectory, fileName),
       "-target",
-      "/"
+      "/",
     ]);
   } catch (error) {
     core.debug(`${error}`);
@@ -188,7 +209,7 @@ async function acquireFortranMacOSOld(): Promise<string> {
     await exec.exec("sudo", [
       "hdiutil",
       "attach",
-      path.join(tempDirectory, fileName)
+      path.join(tempDirectory, fileName),
     ]);
   } catch (error) {
     core.debug(`${error}`);
@@ -204,7 +225,7 @@ async function acquireFortranMacOSOld(): Promise<string> {
       "-package",
       path.join(mntPath, gfortran, "gfortran.pkg"),
       "-target",
-      "/"
+      "/",
     ]);
   } catch (error) {
     core.debug(`${error}`);
@@ -221,7 +242,7 @@ async function acquireFortranMacOSOld(): Promise<string> {
   await exec.exec("sudo", [
     "mv",
     "/usr/local/gfortran/bin/gcov",
-    "/usr/local/gfortran/bin/gcov-fortran"
+    "/usr/local/gfortran/bin/gcov-fortran",
   ]);
 
   return "/";
@@ -231,10 +252,13 @@ async function acquireUtilsMacOS() {
   // qpdf is needed by `--as-cran`
   try {
     process.env.HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK = "true";
-    await exec.exec(
-      "brew",
-      ["install", "qpdf", "pkgconfig", "checkbashisms", "ghostscript"]
-    );
+    await exec.exec("brew", [
+      "install",
+      "qpdf",
+      "pkgconfig",
+      "checkbashisms",
+      "ghostscript",
+    ]);
   } catch (error) {
     core.debug(`${error}`);
 
@@ -249,7 +273,7 @@ async function removeOpenmpFlags() {
       ".bak",
       "-e",
       "s/-fopenmp//g",
-      "/Library/Frameworks/R.framework/Resources/etc/Makeconf"
+      "/Library/Frameworks/R.framework/Resources/etc/Makeconf",
     ]);
   } catch (error) {
     core.debug(`${error}`);
@@ -265,7 +289,7 @@ async function acquireRUbuntu(version: IRVersion): Promise<string> {
   let downloadUrl: string = version.url;
   let fileName: string = path.basename(downloadUrl);
   let downloadPath: string | null = null;
-  core.startGroup('Downloading R');
+  core.startGroup("Downloading R");
 
   try {
     downloadPath = await tc.downloadTool(downloadUrl);
@@ -274,7 +298,7 @@ async function acquireRUbuntu(version: IRVersion): Promise<string> {
     core.debug(`${error}`);
     throw `Failed to download version ${version}: ${error}`;
   }
-  core.endGroup()
+  core.endGroup();
 
   //
   // Install
@@ -285,21 +309,21 @@ async function acquireRUbuntu(version: IRVersion): Promise<string> {
   }
 
   try {
-    await core.group('Updating system package data', async() => {
+    await core.group("Updating system package data", async () => {
       await exec.exec(
-        "sudo DEBIAN_FRONTEND=noninteractive apt-get update -y -qq"
+        "sudo DEBIAN_FRONTEND=noninteractive apt-get update -y -qq",
       );
     });
     // install gdbi-core and also qpdf, which is used by `--as-cran`
-    await core.group('Installing R system requirements', async() => {
+    await core.group("Installing R system requirements", async () => {
       await exec.exec(
-        "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y gdebi-core qpdf devscripts ghostscript"
+        "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y gdebi-core qpdf devscripts ghostscript",
       );
     });
-    await core.group("Installing R", async() => {
+    await core.group("Installing R", async () => {
       await exec.exec("sudo gdebi", [
         "--non-interactive",
-        path.join(tempDirectory, fileName)
+        path.join(tempDirectory, fileName),
       ]);
     });
   } catch (error) {
@@ -311,18 +335,20 @@ async function acquireRUbuntu(version: IRVersion): Promise<string> {
   // Add symlinks to the installed R to the path
   //
   //
-  let rdir = (version.type == "next" || version.type == "devel") ?
-        version.type : version.version;
+  let rdir =
+    version.type == "next" || version.type == "devel"
+      ? version.type
+      : version.version;
   try {
     await exec.exec("sudo ln", [
       "-sf",
       path.join("/opt", "R", rdir, "bin", "R"),
-      "/usr/local/bin/R"
+      "/usr/local/bin/R",
     ]);
     await exec.exec("sudo ln", [
       "-sf",
       path.join("/opt", "R", rdir, "bin", "Rscript"),
-      "/usr/local/bin/Rscript"
+      "/usr/local/bin/Rscript",
     ]);
   } catch (error) {
     core.debug(`${error}`);
@@ -363,7 +389,7 @@ async function acquireRMacOS(version: IRVersion): Promise<string> {
       "-pkg",
       path.join(tempDirectory, fileName),
       "-target",
-      "/"
+      "/",
     ]);
   } catch (error) {
     core.debug(`${error}`);
@@ -383,16 +409,16 @@ async function acquireRMacOS(version: IRVersion): Promise<string> {
     await exec.exec("sudo ln", [
       "-sfv",
       "/Library/Frameworks/R.framework/Resources/bin/R",
-      "/usr/local/bin/R"
+      "/usr/local/bin/R",
     ]);
     await exec.exec("sudo ln", [
       "-sfv",
       "/Library/Frameworks/R.framework/Resources/bin/Rscript",
-      "/usr/local/bin/Rscript"
+      "/usr/local/bin/Rscript",
     ]);
   } catch (error) {
     core.debug(`${error}`);
-    core.debug("Marching on despite failed symlink creation.")
+    core.debug("Marching on despite failed symlink creation.");
   }
 
   return "/";
@@ -421,7 +447,7 @@ async function acquireRWindows(version: IRVersion): Promise<string> {
     await exec.exec(path.join(tempDirectory, fileName), [
       "/VERYSILENT",
       "/SUPPRESSMSGBOXES",
-      "/DIR=C:\\R"
+      "/DIR=C:\\R",
     ]);
   } catch (error) {
     core.debug(`${error}`);
@@ -434,36 +460,37 @@ async function acquireRWindows(version: IRVersion): Promise<string> {
 }
 
 function getRtoolsUrl(version: string): string {
-    if (version == "44" && ARCH == "arm64") {
-	return "https://github.com/r-hub/rtools44/releases/download/latest/rtools44-aarch64.exe";
-    } else if (version == "44") {
-	return "https://github.com/r-hub/rtools44/releases/download/latest/rtools44.exe";
-    } else if (version == "43") {
-	return "https://github.com/r-hub/rtools43/releases/download/latest/rtools43.exe";
-    } else if (version == "42") {
-	return "https://github.com/r-hub/rtools42/releases/download/latest/rtools42.exe";
-    } else if (version == "40") {
-	return "https://cran.rstudio.com/bin/windows/Rtools/rtools40-x86_64.exe";
-    } else {
-	return `https://cran.rstudio.com/bin/windows/Rtools/Rtools${version}.exe`;
-    }
+  if (version == "44" && ARCH == "arm64") {
+    return "https://github.com/r-hub/rtools44/releases/download/latest/rtools44-aarch64.exe";
+  } else if (version == "44") {
+    return "https://github.com/r-hub/rtools44/releases/download/latest/rtools44.exe";
+  } else if (version == "43") {
+    return "https://github.com/r-hub/rtools43/releases/download/latest/rtools43.exe";
+  } else if (version == "42") {
+    return "https://github.com/r-hub/rtools42/releases/download/latest/rtools42.exe";
+  } else if (version == "40") {
+    return "https://cran.rstudio.com/bin/windows/Rtools/rtools40-x86_64.exe";
+  } else {
+    return `https://cran.rstudio.com/bin/windows/Rtools/Rtools${version}.exe`;
+  }
 }
 
 async function acquireRtools(version: IRVersion) {
-  var rtoolsVersion: string = "", downloadUrl: string = "";
+  var rtoolsVersion: string = "",
+    downloadUrl: string = "";
   const inpver = core.getInput("rtools-version");
   if (inpver == "none") {
     console.log("Skipping RTools installation, as requested");
     return;
   } else if (inpver == "") {
-    rtoolsVersion = version.rtools || 'error';;
-    downloadUrl = version.rtools_url || 'error';
+    rtoolsVersion = version.rtools || "error";
+    downloadUrl = version.rtools_url || "error";
   } else {
     rtoolsVersion = inpver;
     downloadUrl = getRtoolsUrl(rtoolsVersion);
   }
 
-  const versionNumber = parseInt(rtoolsVersion || 'error');
+  const versionNumber = parseInt(rtoolsVersion || "error");
   const rtools44 = versionNumber >= 44;
   const rtools43 = !rtools44 && versionNumber >= 43;
   const rtools42 = !rtools44 && !rtools43 && versionNumber >= 41;
@@ -473,14 +500,15 @@ async function acquireRtools(version: IRVersion) {
 
   // If Rtools is already installed just return, as there is a message box
   // which hangs the build otherwise.
-  if ((rtools44 && fs.existsSync("C:\\Rtools44")) ||
-      (rtools43 && fs.existsSync("C:\\Rtools43")) ||
-      (rtools42 && fs.existsSync("C:\\Rtools42")) ||
-      (rtools40 && fs.existsSync("C:\\Rtools40")) ||
-      (rtools3x && fs.existsSync("C:\\Rtools"))
+  if (
+    (rtools44 && fs.existsSync("C:\\Rtools44")) ||
+    (rtools43 && fs.existsSync("C:\\Rtools43")) ||
+    (rtools42 && fs.existsSync("C:\\Rtools42")) ||
+    (rtools40 && fs.existsSync("C:\\Rtools40")) ||
+    (rtools3x && fs.existsSync("C:\\Rtools"))
   ) {
     core.debug(
-      "Skipping Rtools installation as a suitable Rtools is already installed"
+      "Skipping Rtools installation as a suitable Rtools is already installed",
     );
   } else {
     console.log(`Downloading ${downloadUrl}...`);
@@ -496,7 +524,7 @@ async function acquireRtools(version: IRVersion) {
     try {
       await exec.exec(path.join(tempDirectory, fileName), [
         "/VERYSILENT",
-        "/SUPPRESSMSGBOXES"
+        "/SUPPRESSMSGBOXES",
       ]);
     } catch (error) {
       core.debug(`${error}`);
@@ -510,14 +538,16 @@ async function acquireRtools(version: IRVersion) {
   if (rtools44) {
     if (addpath) {
       if (ARCH == "arm64") {
-	core.addPath(`C:\\rtools44-aarch64\\usr\\bin`);
-        core.addPath(`C:\\rtools44-aarch64\\aarch64-w64-mingw32.static.posix\\bin`);
+        core.addPath(`C:\\rtools44-aarch64\\usr\\bin`);
+        core.addPath(
+          `C:\\rtools44-aarch64\\aarch64-w64-mingw32.static.posix\\bin`,
+        );
       } else {
-	core.addPath(`C:\\rtools44\\usr\\bin`);
+        core.addPath(`C:\\rtools44\\usr\\bin`);
         core.addPath(`C:\\rtools44\\x86_64-w64-mingw32.static.posix\\bin`);
       }
     }
-  } else  if (rtools43) {
+  } else if (rtools43) {
     if (addpath) {
       core.addPath(`C:\\rtools43\\usr\\bin`);
       core.addPath(`C:\\rtools43\\x86_64-w64-mingw32.static.posix\\bin`);
@@ -544,14 +574,15 @@ async function acquireRtools(version: IRVersion) {
         await exec.exec("c:\\rtools40\\usr\\bin\\bash.exe", [
           "--login",
           "-c",
-          "pacman -Syu --noconfirm"
+          "pacman -Syu --noconfirm",
         ]);
       } catch (error) {
         core.debug(`${error}`);
         throw `Failed to update rtools40 libraries: ${error}`;
       }
     }
-  } else { // rtools3x
+  } else {
+    // rtools3x
     if (addpath) {
       core.addPath(`C:\\Rtools\\bin`);
       if (core.getInput("windows-path-include-mingw") === "true") {
@@ -562,10 +593,15 @@ async function acquireRtools(version: IRVersion) {
 }
 
 async function acquireGsWindows() {
-  await core.group("Downloading and installing Ghostscript", async() => {
-    const dlpath = await tc.downloadTool("https://github.com/r-lib/actions-files/releases/download/v1.0.0/ghostscript-10.03.0-win.zip");
+  await core.group("Downloading and installing Ghostscript", async () => {
+    const dlpath = await tc.downloadTool(
+      "https://github.com/r-lib/actions-files/releases/download/v1.0.0/ghostscript-10.03.0-win.zip",
+    );
     const extractionPath = await tc.extractZip(dlpath);
-    await io.cp(extractionPath, "c:/program files/gs", { recursive: true, force: false });
+    await io.cp(extractionPath, "c:/program files/gs", {
+      recursive: true,
+      force: false,
+    });
   });
 }
 
@@ -575,7 +611,7 @@ async function setupRLibrary() {
     profilePath = path.join(
       process.env["USERPROFILE"] || "C:\\",
       "Documents",
-      ".Rprofile"
+      ".Rprofile",
     );
   } else {
     profilePath = path.join(process.env["HOME"] || "/Users", ".Rprofile");
@@ -593,8 +629,8 @@ async function setupRLibrary() {
       try {
         await exec.exec("lsb_release", ["--short", "--codename"], {
           listeners: {
-            stdout: (data: Buffer): string => (codename += data.toString())
-          }
+            stdout: (data: Buffer): string => (codename += data.toString()),
+          },
         });
       } catch (error) {
         core.debug(`${error}`);
@@ -613,9 +649,9 @@ async function setupRLibrary() {
     core.exportVariable("RENV_CONFIG_REPOS_OVERRIDE", rspm_noq);
   }
 
-  let cran = `'${core.getInput("cran") ||
-    process.env["CRAN"] ||
-    "https://cran.rstudio.com"}'`;
+  let cran = `'${
+    core.getInput("cran") || process.env["CRAN"] || "https://cran.rstudio.com"
+  }'`;
 
   let user_agent;
 
@@ -639,7 +675,7 @@ async function setupRLibrary() {
   if (extra_repositories) {
     extra_repositories = extra_repositories
       .split(/\s+/)
-      .map(x => `"${x}"`)
+      .map((x) => `"${x}"`)
       .join(",");
     extra_repositories = ",\n    " + extra_repositories;
   }
@@ -654,20 +690,20 @@ options(
   ),
   Ncpus = ${core.getInput("Ncpus")},
   HTTPUserAgent = ${user_agent}
-)\n`
+)\n`,
   );
 
   // Make R_LIBS_USER
   io.mkdirP(process.env["R_LIBS_USER"] || path.join(tempDirectory, "Library"));
 }
 
-async function getLinuxPlatform() : Promise<string> {
-    if (process.env.SETUP_R_LINUX_PLATFORM) {
-      return process.env.SETUP_R_LINUX_PLATFORM;
-    } else {
-        const info = await osInfo();
-        return "linux-" + info.id + "-" + info.version_id;
-    }
+async function getLinuxPlatform(): Promise<string> {
+  if (process.env.SETUP_R_LINUX_PLATFORM) {
+    return process.env.SETUP_R_LINUX_PLATFORM;
+  } else {
+    const info = await osInfo();
+    return "linux-" + info.id + "-" + info.version_id;
+  }
 }
 
 function setREnvironmentVariables() {
@@ -683,7 +719,7 @@ async function getReleaseVersion(platform: string): Promise<string> {
   let rest: restm.RestClient = new restm.RestClient("setup-r");
   let tags: IRRef = (
     await rest.get<IRRef>(
-      util.format("https://api.r-hub.io/rversions/r-release-%s", platform)
+      util.format("https://api.r-hub.io/rversions/r-release-%s", platform),
     )
   ).result || { version: "" };
 
@@ -692,12 +728,17 @@ async function getReleaseVersion(platform: string): Promise<string> {
 
 export async function determineVersion(version: string): Promise<IRVersion> {
   // A temporary hack to make these work
-  if (version == "latest" || version == "4" || version == "4.x" || version == "4.x.x") {
-    version = "release"
+  if (
+    version == "latest" ||
+    version == "4" ||
+    version == "4.x" ||
+    version == "4.x.x"
+  ) {
+    version = "release";
   } else if (version == "3" || version == "3.x" || version == "3.x.x") {
-    version = "3.6.3"
+    version = "3.6.3";
   } else if (version.endsWith(".x")) {
-    version = version.replace(/[.]x$/, "")
+    version = version.replace(/[.]x$/, "");
   }
   if (version.startsWith("oldrel-")) {
     version = version.replace(/^oldrel[-]/, "oldrel/");
@@ -705,9 +746,11 @@ export async function determineVersion(version: string): Promise<IRVersion> {
 
   let rest: restm.RestClient = new restm.RestClient("setup-r");
   let os: string = OS != "linux" ? OS : await getLinuxPlatform();
-  let url: string = "https://api.r-hub.io/rversions/resolve/" +
-        version + "/" + os;
-  if (ARCH) { url = url + "/" + ARCH; }
+  let url: string =
+    "https://api.r-hub.io/rversions/resolve/" + version + "/" + os;
+  if (ARCH) {
+    url = url + "/" + ARCH;
+  }
   let tags = (await rest.get<IRVersion>(url)).result;
 
   if (!tags) {
