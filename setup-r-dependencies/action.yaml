@@ -3,7 +3,7 @@ description: 'Action to setup installation tools and install R dependencies'
 author: 'Jim Hester'
 inputs:
   cache:
-    description: 'Whether packages should be cached across runs or not. If `"always"` is provided, the package cache will be saved even if the Action fails.'
+    description: 'Whether packages should be cached across runs or not. If `"always"` is provided, the package cache will be saved even if the workflow fails.'
     required: true
     default: true
   cache-version:
@@ -29,9 +29,6 @@ inputs:
   upgrade:
     description: 'Whether to install the latest available versions of the dependencies. Must be an R expression. See the README for details if you need quoting.'
     default: 'FALSE'
-  prune:
-    description: 'Whether to prune the R packages not found within the lock file used during installation.'
-    default: true
   lockfile-create-lib:
     description: 'The package library to consider when creating the pak lockfile. This is passed to the `lib` argument of `pak::lockfile_create()`. Defaults to an empty library, for reproducibility. Must be an R expression. Note that it often needs to be quoted in YAML, see the README for detail\
 s.'
@@ -143,42 +140,12 @@ runs:
           save-always: ${{ inputs.cache == 'always' }}
 
       - name: Install dependencies
-        id: install-pkgs
         run: |
           # Install/Update packages
           cat("::group::Install/update packages\n")
           Sys.setenv("PKGCACHE_HTTP_VERSION" = "2")
           library(pak, lib.loc = Sys.getenv("R_LIB_FOR_PAK"))
-          pkgs <- pak::lockfile_install(".github/pkg.lock")
-          # Store the installed packages
-          packages <- paste0(pkgs$package, collapse = "|")
-          cat("packages=", packages, "\n", file = Sys.getenv("GITHUB_OUTPUT"), sep = "", append = TRUE)
-          cat("::endgroup::\n")
-        shell: Rscript {0}
-        working-directory: ${{ inputs.working-directory }}
-
-      - name: Prune unused R packages
-        if: inputs.cache == 'always' && inputs.prune == 'true'
-        run: |
-          # Prune packages
-          cat("::group::Prune unnecessary packages\n")
-          installed_df <- as.data.frame(installed.packages(), stringsAsFactors = FALSE)
-          installed_packages <- installed_df$Package
-          core_pkgs <- c(
-            "translations", # Core package on windows
-            installed_packages[!is.na(installed_df$Priority)]
-          )
-          pak_pkgs <- c(
-            "pak", # Never remove pak
-            strsplit("${{ steps.install-pkgs.outputs.packages }}", "|", fixed = TRUE)[[1]]
-          )
-          to_remove_pkgs <- setdiff(installed_packages, c(core_pkgs, pak_pkgs))
-          if (length(to_remove_pkgs) > 0) {
-            cat("Removing unnecessary packages: ", paste0(to_remove_pkgs, collapse = ", "), "\n")
-            remove.packages(to_remove_pkgs)
-          } else {
-            cat("No unnecessary packages to remove\n")
-          }
+          pak::lockfile_install(".github/pkg.lock")
           cat("::endgroup::\n")
         shell: Rscript {0}
         working-directory: ${{ inputs.working-directory }}
