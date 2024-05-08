@@ -18,7 +18,8 @@ Package workflows:
   commands for pull requests.
 - [`pkgdown`](#build-pkgdown-site) - Build a
   [pkgdown](https://pkgdown.r-lib.org/) site for an R package and deploy
-  it to [GitHub Pages](https://pages.github.com/).
+  it to [GitHub Pages](https://pages.github.com/) or [Cloudflare
+  Pages](https://pages.cloudflare.com/).
 - [`document`](#document-package) - Run `roxygen2::roxygenise()` on an R
   package.
 - [`style`](#style-package) - Run `styler::style_pkg()` on an R package.
@@ -29,10 +30,12 @@ RMarkdown workflows:
   files when they change and commit the result.
 - [`bookdown`](#build-bookdown-site) - Build a
   [bookdown](https://bookdown.org) site and deploy it to [GitHub
-  Pages](https://pages.github.com/).
+  Pages](https://pages.github.com/) or [Cloudflare
+  Pages](https://pages.cloudflare.com/).
 - [`blogdown`](#build-blogdown-site) - Build a
   [blogdown](https://bookdown.org/yihui/blogdown/) site and deploy it to
-  [GitHub Pages](https://pages.github.com/).
+  [GitHub Pages](https://pages.github.com/) or [Cloudflare
+  Pages](https://pages.cloudflare.com/).
 
 Other workflows:
 
@@ -315,7 +318,7 @@ jobs:
 
       - uses: codecov/codecov-action@v4
         with:
-          fail_ci_if_error: true
+          fail_ci_if_error: ${{ github.event_name != 'pull_request' && true || false }}
           file: ./cobertura.xml
           plugin: noop
           disable_search: true
@@ -528,12 +531,21 @@ jobs:
 
 This example builds a [pkgdown](https://pkgdown.r-lib.org/) site for a
 repository and pushes the built package to [GitHub
-Pages](https://pages.github.com/). The inclusion of
+Pages](https://pages.github.com/) or [Cloudflare
+Pages](https://pages.cloudflare.com/). The inclusion of
 [`workflow_dispatch`](https://docs.github.com/en/actions/learn-github-actions/events-that-trigger-workflows#workflow_dispatch)
 means the workflow can be [run manually, from the
 browser](https://docs.github.com/en/actions/managing-workflow-runs/manually-running-a-workflow),
 or [triggered via the GitHub REST
 API](https://docs.github.com/en/rest/reference/actions/#create-a-workflow-dispatch-event).
+
+You’ll need to update your setting on GitHub to deploy the `gh-pages`
+(unless configured otherwise) branch of your repository to GitHub Pages.
+
+Similarly, connect your Cloudflare Pages app to the `gh-pages` branch of
+your repository on your Cloudflare dashboard. You’ll need to set
+`exit 0` as the build command for pkgdown sites. See the Cloudflare
+Pages documentation for details.
 
 ``` yaml
 # Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
@@ -732,7 +744,7 @@ jobs:
 
 This example builds a [bookdown](https://bookdown.org) site for a
 repository and then deploys the site via [GitHub
-Pages](https://pages.github.com/). It uses
+Pages](https://pages.github.com/) or Cloudflare Pages. It uses
 [renv](https://rstudio.github.io/renv/) to ensure the package versions
 remain consistent across builds. You will need to run `renv::snapshot()`
 locally and commit the `renv.lock` file before using this workflow, and
@@ -740,6 +752,15 @@ after every time you add a new package to `DESCRIPTION`. See [Using renv
 with Continous
 Integration](https://rstudio.github.io/renv/articles/ci.html) for
 additional information.
+
+You’ll need to update your setting on GitHub to deploy the `_book`
+folder of the `gh-pages` branch (unless configured otherwise) of your
+repository to GitHub Pages.
+
+Similarly, connect your Cloudflare Pages app to the `gh-pages` branch of
+your repository on your Cloudflare dashboard. You’ll need to set
+`exit 0` as the build command for bookdown sites. See the Cloudflare
+Pages documentation for details.
 
 ``` yaml
 # Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
@@ -797,13 +818,22 @@ jobs:
 
 This example builds a [blogdown](https://bookdown.org/yihui/blogdown/)
 site for a repository and then deploys the book via [GitHub
-Pages](https://pages.github.com/). It uses
+Pages](https://pages.github.com/) or Cloudflare Pages. It uses
 [renv](https://rstudio.github.io/renv/) to ensure the package versions
 remain consistent across builds. You will need to run `renv::snapshot()`
 locally and commit the `renv.lock` file before using this workflow, see
 [Using renv with Continous
 Integration](https://rstudio.github.io/renv/articles/ci.html) for
 additional information.
+
+You’ll need to update your setting on GitHub to deploy the `public`
+folder of the `gh-pages` branch (unless configured otherwise) of your
+repository to GitHub Pages.
+
+Similarly, connect your Cloudflare Pages app to the `gh-pages` branch of
+your repository on your Cloudflare dashboard. You’ll need to set
+`exit 0` as the build command for blogdown sites. See the Cloudflare
+Pages documentation for details.
 
 ``` yaml
 # Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
