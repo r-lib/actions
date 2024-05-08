@@ -1,6 +1,7 @@
 # GitHub Actions for the R language
 
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/8907/badge)](https://www.bestpractices.dev/projects/8907)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/r-lib/actions/badge)](https://securityscorecards.dev/viewer/?uri=github.com/r-lib/actions)
 [![R build status](https://github.com/r-lib/actions/workflows/R-CMD-check/badge.svg)](https://github.com/r-lib/actions/actions?workflow=R-CMD-check)
 [![RStudio community](https://img.shields.io/badge/community-github--actions-blue?style=social&logo=rstudio&logoColor=75AADB)](https://community.rstudio.com/new-topic?category=Package%20development&tags=github-actions)
 
@@ -36,7 +37,6 @@ You can refer to these as well in your workflow files if you need to.
 1. [r-lib/actions/check-r-package](https://github.com/r-lib/actions/tree/v2/check-r-package) - Runs `R CMD check` on an R package
 1. [r-lib/actions/pr-fetch](https://github.com/r-lib/actions/tree/v2/pr-fetch) - Fetches changes of a PR associated with an event
 1. [r-lib/actions/pr-push](https://github.com/r-lib/actions/tree/v2/pr-push) - Pushes changes to a PR associated with an event
-1. [r-lib/actions/run-rchk](https://github.com/r-lib/actions/tree/v2/run-rchk) - Runs [rchk](https://github.com/kalibera/rchk) tests to detect memory protection errors in C source code
 
 ## Other GitHub Actions for R projects
 
