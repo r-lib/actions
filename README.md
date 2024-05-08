@@ -86,7 +86,9 @@ When submitting a pull request, please match the coding style of the
 existing code. For any R code, please refer to the
 [Tidyverse style guide](https://style.tidyverse.org/).
 For TypeScript and JavaScript code, you can run `npm run format`
-to standardize the code formatting. Thank You!
+to standardize the code formatting.
+Adding a major feature also needs testing, typically by running a
+GHA workflow on the R package in this repository. Thank You!
 
 ## Common questions
 
