@@ -1,6 +1,7 @@
 # GitHub Actions for the R language
 
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/8907/badge)](https://www.bestpractices.dev/projects/8907)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/r-lib/actions/badge)](https://securityscorecards.dev/viewer/?uri=github.com/r-lib/actions)
 [![R build status](https://github.com/r-lib/actions/workflows/R-CMD-check/badge.svg)](https://github.com/r-lib/actions/actions?workflow=R-CMD-check)
 [![RStudio community](https://img.shields.io/badge/community-github--actions-blue?style=social&logo=rstudio&logoColor=75AADB)](https://community.rstudio.com/new-topic?category=Package%20development&tags=github-actions)
 
