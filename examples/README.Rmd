@@ -28,7 +28,9 @@ RMarkdown workflows:
 
 - [`render-rmarkdown`](#render-rmarkdown) - Render one or more Rmarkdown files when they change and commit the result.
 - [`bookdown`](#build-bookdown-site) - Build a [bookdown] site and deploy it to [GitHub Pages] or [Cloudflare Pages].
+- [`bookdown-gh-pages`](#build-bookdown-site-alternative-workflow) - Alternative workflow to build a [bookdown] site and deploy it to [GitHub Pages].
 - [`blogdown`](#build-blogdown-site) - Build a [blogdown] site and deploy it to [GitHub Pages] or [Cloudflare Pages].
+- [`blogdown-gh-pages`](#build-blogdown-site-alternative-workflow) - Alternative workflow to build a [blogdown] site and deploy it to [GitHub Pages].
 
 Other workflows:
 
@@ -225,6 +227,17 @@ Pages documentation for details.
 print_yaml("bookdown.yaml")
 ```
 
+## Build bookdown site, alternative workflow
+
+`usethis::use_github_action("bookdown-gh-pages")`
+
+This is an alternative workflow that builds and publishes a bookdown book,
+without creating a separate branch in the repository for the built book.
+
+```{r echo = FALSE, results = "asis"}
+print_yaml("bookdown-gh-pages.yaml")
+```
+
 ## Build blogdown site
 
 `usethis::use_github_action("blogdown")`
@@ -244,6 +257,16 @@ Pages documentation for details.
 
 ```{r echo = FALSE, results = "asis"}
 print_yaml("blogdown.yaml")
+```
+## Build blogdown site, alternative workflow
+
+`usethis::use_github_action("blogdown-gh-pages")`
+
+This is an alternative workflow that builds and publishes a blogdown site,
+without creating a separate branch in the repository for the built site.
+
+```{r echo = FALSE, results = "asis"}
+print_yaml("blogdown-gh-pages.yaml")
 ```
 
 ## Shiny App Deployment

@@ -32,10 +32,17 @@ RMarkdown workflows:
   [bookdown](https://bookdown.org) site and deploy it to [GitHub
   Pages](https://pages.github.com/) or [Cloudflare
   Pages](https://pages.cloudflare.com/).
+- [`bookdown-gh-pages`](#build-bookdown-site-alternative-workflow) -
+  Alternative workflow to build a [bookdown](https://bookdown.org) site
+  and deploy it to [GitHub Pages](https://pages.github.com/).
 - [`blogdown`](#build-blogdown-site) - Build a
   [blogdown](https://bookdown.org/yihui/blogdown/) site and deploy it to
   [GitHub Pages](https://pages.github.com/) or [Cloudflare
   Pages](https://pages.cloudflare.com/).
+- [`blogdown-gh-pages`](#build-blogdown-site-alternative-workflow) -
+  Alternative workflow to build a
+  [blogdown](https://bookdown.org/yihui/blogdown/) site and deploy it to
+  [GitHub Pages](https://pages.github.com/).
 
 Other workflows:
 
@@ -812,6 +819,82 @@ jobs:
           folder: _book
 ```
 
+## Build bookdown site, alternative workflow
+
+`usethis::use_github_action("bookdown-gh-pages")`
+
+This is an alternative workflow that builds and publishes a bookdown
+book, without creating a separate branch in the repository for the built
+book.
+
+``` yaml
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+name: Deploy bookdown to GH Pages
+
+permissions: read-all
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # Only restrict concurrency for non-PR jobs
+    concurrency:
+      group: pkgdown-${{ github.event_name != 'pull_request' || github.run_id }}
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-pandoc@v2
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-renv@v2
+
+      - name: Cache bookdown results
+        uses: actions/cache@v4
+        with:
+          path: _bookdown_files
+          key: bookdown-${{ hashFiles('**/*Rmd') }}
+          restore-keys: bookdown-
+
+      - name: Build site
+        run: bookdown::render_book("index.Rmd", quiet = TRUE)
+        shell: Rscript {0}
+
+      - name: Upload website artifact
+        if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' }}
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "_book"
+
+  deploy:
+    needs: build
+
+    permissions:
+      pages: write      # to deploy to Pages
+      id-token: write   # to verify the deployment originates from an appropriate source
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+```
+
 ## Build blogdown site
 
 `usethis::use_github_action("blogdown")`
@@ -880,6 +963,79 @@ jobs:
         with:
           branch: gh-pages
           folder: public
+```
+
+## Build blogdown site, alternative workflow
+
+`usethis::use_github_action("blogdown-gh-pages")`
+
+This is an alternative workflow that builds and publishes a blogdown
+site, without creating a separate branch in the repository for the built
+site.
+
+``` yaml
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+name: Deploy blogdown to GH Pages
+
+permissions: read-all
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # Only restrict concurrency for non-PR jobs
+    concurrency:
+      group: pkgdown-${{ github.event_name != 'pull_request' || github.run_id }}
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-pandoc@v2
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-renv@v2
+
+      - name: Install hugo
+        run: blogdown::install_hugo()
+        shell: Rscript {0}
+
+      - name: Build site
+        run: blogdown::build_site(TRUE)
+        shell: Rscript {0}
+
+      - name: Upload website artifact
+        if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' }}
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "public"
+
+  deploy:
+    needs: build
+
+    permissions:
+      pages: write      # to deploy to Pages
+      id-token: write   # to verify the deployment originates from an appropriate source
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
 ```
 
 ## Shiny App Deployment
