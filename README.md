@@ -83,7 +83,10 @@ If your build fails, and you are unsure of why, here are some useful strategies 
 Your contributions are welcome! For new features, or if you are unsure
 about a bug fix, please open issue before submitting a pull request.
 When submitting a pull request, please match the coding style of the
-existsing code. Thank You!
+existing code. For any R code, please refer to the
+[Tidyverse style guide](https://style.tidyverse.org/).
+For TypeScript and JavaScript code, you can run `npm run format`
+to standardize the code formatting. Thank You!
 
 ## Common questions
 
