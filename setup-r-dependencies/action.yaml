@@ -146,14 +146,7 @@ runs:
           Sys.setenv("PKGCACHE_HTTP_VERSION" = "2")
           library(pak, lib.loc = Sys.getenv("R_LIB_FOR_PAK"))
           pak::lockfile_install(".github/pkg.lock")
-          cat("::endgroup::\n")
-        shell: Rscript {0}
-        working-directory: ${{ inputs.working-directory }}
-
-      - name: Clean up lock file
-        run: |
-          # Clean up lock file
-          cat("::group::Clean up lock file\n")
+          ## Clean up lock file
           unlink(".github/pkg.lock")
           cat("::endgroup::\n")
         shell: Rscript {0}
