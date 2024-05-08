@@ -6,6 +6,8 @@ on:
   push:
     branches:
       - v2-branch
+    paths:
+      - 'src/**'
   workflow_dispatch:
 
 permissions: read-all
