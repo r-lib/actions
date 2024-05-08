@@ -2,7 +2,7 @@ name: ClusterFuzzLite PR fuzzing
 on:
   pull_request:
     paths:
-      - '**'
+      - 'src/**'
   push:
     branches:
       - v2-branch
