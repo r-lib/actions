@@ -6,9 +6,9 @@ import * as fs from "fs";
 async function run() {
   try {
     core.debug(`started action`);
-   
-    var version: string
-    version = core.getInput("r-version")
+
+    var version: string;
+    version = core.getInput("r-version");
 
     if (version === "renv") {
       let renv_lock_path = "./renv.lock";
@@ -20,7 +20,7 @@ async function run() {
         core.setFailed("./renv.lock does not exist.");
       }
     } else {
-      version = version
+      version = version;
       core.debug(`got version ${version} from input`);
     }
 
