@@ -18,13 +18,13 @@ async function run() {
     const { status, data: pr } = await client.rest.pulls.get({
       owner: issue.owner,
       repo: issue.repo,
-      pull_number: issue.number
+      pull_number: issue.number,
     });
 
     const headBranch: string = pr.head.ref;
     const headCloneURL: string | undefined = pr.head.repo?.clone_url.replace(
       "https://",
-      `https://x-access-token:${token}@`
+      `https://x-access-token:${token}@`,
     );
     const headRepoOwnerLogin: string | undefined = pr.head.repo?.owner.login;
 
@@ -35,7 +35,7 @@ async function run() {
         "checkout",
         "-b",
         `${headRepoOwnerLogin}-${headBranch}`,
-        `pr/${headBranch}`
+        `pr/${headBranch}`,
       ]);
     } else {
       throw new Error("Could not find repository, this should not happen");

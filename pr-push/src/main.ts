@@ -19,7 +19,7 @@ async function run() {
     const { status, data: pr } = await octokit.rest.pulls.get({
       owner: issue.owner,
       repo: issue.repo,
-      pull_number: issue.number
+      pull_number: issue.number,
     });
 
     const headBranch = pr.head.ref;
@@ -28,10 +28,15 @@ async function run() {
     }
     const headCloneURL = pr.head.repo.clone_url.replace(
       "https://",
-      `https://x-access-token:${token}@`
+      `https://x-access-token:${token}@`,
     );
 
-    await exec.exec("git", ["push", headCloneURL, cli_args, `HEAD:${headBranch}`]);
+    await exec.exec("git", [
+      "push",
+      headCloneURL,
+      cli_args,
+      `HEAD:${headBranch}`,
+    ]);
   } catch (error: any) {
     core.setFailed(error.message);
   }
