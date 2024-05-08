@@ -11,3 +11,7 @@
 ^\.Rproj\.user$
 ^Makefile$
 ^CITATION.cff$
+^\.clusterfuzzlite$
+^check-r-package$
+^setup-r-dependencies$
+^setup-renv$
