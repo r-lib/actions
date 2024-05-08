@@ -266,6 +266,12 @@ In theory reporting to codecov.io works automatically, but unfortunately
 in practice it often fails, unless a `CODECOV_TOKEN` secret is set in
 the repository, containing a Codecov repository upload token.
 
+If you use the `codecov/codecov-action` action to upload your test
+results to GitHub, like the example here, then you can also use a global
+organization token in an organization secret called `CODECOV_TOKEN`.
+This way you can avoid having to add a secret to each repository of your
+organization.
+
 ``` yaml
 # Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
@@ -311,7 +317,7 @@ jobs:
         with:
           fail_ci_if_error: true
           file: ./cobertura.xml
-          plugin: none
+          plugin: noop
           disable_search: true
           token: ${{ secrets.CODECOV_TOKEN }}
 
