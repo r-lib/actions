@@ -23,4 +23,4 @@ inputs:
       It is not needed for other pandoc versions.
 runs:
   using: 'node20'
-  main: 'lib/setup-pandoc.js'
+  main: 'dist/index.js'

@@ -1,0 +1,29 @@
+name: ClusterFuzzLite continuous builds
+on:
+  push:
+    branches:
+      - v2-branch
+    paths:
+      - 'src/**'
+  workflow_dispatch:
+
+permissions: read-all
+jobs:
+  Build:
+   runs-on: ubuntu-latest
+   concurrency:
+     group: ${{ github.workflow }}-${{ matrix.sanitizer }}-${{ github.ref }}
+     cancel-in-progress: true
+   strategy:
+     fail-fast: false
+     matrix:
+        sanitizer:
+        - address
+   steps:
+   - name: Build Fuzzers (${{ matrix.sanitizer }})
+     id: build
+     uses: google/clusterfuzzlite/actions/build_fuzzers@82652fb49e77bc29c35da1167bb286e93c6bcc05
+     with:
+        language: c # Change this to the language you are fuzzing.
+        sanitizer: ${{ matrix.sanitizer }}
+        upload-build: true

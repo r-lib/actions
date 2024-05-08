@@ -7,6 +7,8 @@ on:
 
 name: "setup-tinytex test"
 
+permissions: read-all
+
 jobs:
   tinytex:
     runs-on: ${{ matrix.config.os }}
@@ -21,12 +23,12 @@ jobs:
           - { os: ubuntu-latest  }
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b
 
       - uses: ./setup-tinytex
         env:
           TINYTEX_INSTALLER: TinyTeX
-          
+
       - run: tlmgr --version
 
       - run: tlmgr update --self

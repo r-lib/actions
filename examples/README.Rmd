@@ -32,14 +32,13 @@ RMarkdown workflows:
 
 Other workflows:
 
-- [`docker`](#docker-based-workflow) - For custom workflows based on docker containers.
 - [Bioconductor](#bioconductor-friendly-workflow) - A CI workflow for packages to be released on Bioconductor.
 - [`lint-project`](#lint-project-workflow) - Run `lintr::lint_dir()` on an R project.
 - [`shiny-deploy`](#shiny-app-deployment) - Deploy a Shiny app to shinyapps.io or RStudio Connect.
 
-Options and advice: 
+Options and advice:
 
-- [Forcing binaries](#forcing-binaries) - An environment variable to always use binary packages. 
+- [Forcing binaries](#forcing-binaries) - An environment variable to always use binary packages.
 
 ## Quickstart CI workflow
 
@@ -66,7 +65,7 @@ print_yaml("check-release.yaml")
 
 This workflow runs R CMD check via the
 [rcmdcheck](https://github.com/r-lib/rcmdcheck) package on the three major OSs
-(linux, macOS and Windows) with the current, development, and previous versions 
+(linux, macOS and Windows) with the current, development, and previous versions
 of R. If you plan to someday submit your package to CRAN or Bioconductor this is
 likely the workflow you want to use.
 
@@ -108,6 +107,16 @@ print_yaml("check-full.yaml")
 This example uses the [covr](https://covr.r-lib.org) package to query the test
 coverage of your package and upload the result to
 [codecov.io](https://codecov.io)
+
+In theory reporting to codecov.io works automatically, but unfortunately
+in practice it often fails, unless a `CODECOV_TOKEN` secret is set
+in the repository, containing a Codecov repository upload token.
+
+If you use the `codecov/codecov-action` action to upload your test results
+to GitHub, like the example here, then you can also use a global
+organization token in an organization secret called `CODECOV_TOKEN`.
+This way you can avoid having to add a secret to each repository of your
+organization.
 
 ```{r echo = FALSE, results = "asis"}
 print_yaml("test-coverage.yaml")
@@ -225,21 +234,6 @@ This action assumes you have an `renv` lockfile in your repository that describe
 
 ```{r echo = FALSE, results = "asis"}
 print_yaml("shiny-deploy.yaml")
-```
-
-## Docker based workflow
-
-`usethis::use_github_action("docker")`
-
-If you develop locally with docker or are used to using other docker based CI
-services and already have a docker container with all of your R and system
-dependencies you can use that in GitHub Actions by adapting the following
-workflow. This example workflow assumes you build some model in `fit_model.R`
-and then have a report in `report.Rmd`. It then uploads the rendered html from
-the report as a build artifact.
-
-```{r echo = FALSE, results = "asis"}
-print_yaml("docker.yaml")
 ```
 
 ## Bioconductor-friendly workflow

@@ -60,4 +60,4 @@ outputs:
     description: 'The full R version installed'
 runs:
   using: 'node20'
-  main: 'lib/setup-r.js'
+  main: 'dist/index.js'
