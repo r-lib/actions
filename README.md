@@ -1,5 +1,6 @@
 # GitHub Actions for the R language
 
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/8907/badge)](https://www.bestpractices.dev/projects/8907)
 [![R build status](https://github.com/r-lib/actions/workflows/R-CMD-check/badge.svg)](https://github.com/r-lib/actions/actions?workflow=R-CMD-check)
 [![RStudio community](https://img.shields.io/badge/community-github--actions-blue?style=social&logo=rstudio&logoColor=75AADB)](https://community.rstudio.com/new-topic?category=Package%20development&tags=github-actions)
 
@@ -86,7 +87,9 @@ When submitting a pull request, please match the coding style of the
 existing code. For any R code, please refer to the
 [Tidyverse style guide](https://style.tidyverse.org/).
 For TypeScript and JavaScript code, you can run `npm run format`
-to standardize the code formatting. Thank You!
+to standardize the code formatting.
+Adding a major feature also needs testing, typically by running a
+GHA workflow on the R package in this repository. Thank You!
 
 ## Common questions
 
