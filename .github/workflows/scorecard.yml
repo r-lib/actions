@@ -41,6 +41,7 @@ jobs:
         with:
           results_file: results.sarif
           results_format: sarif
+          repo_token: ${{ secrets.SCORECARD_TOKEN }}
           # (Optional) "write" PAT token. Uncomment the `repo_token` line below if:
           # - you want to enable the Branch-Protection check on a *public* repository, or
           # - you are installing Scorecard on a *private* repository
