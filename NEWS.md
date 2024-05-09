@@ -1,3 +1,22 @@
+# `v2.9.0` (2024-05-09)
+
+* The `test-coverage.yaml` example workflow now handles global Codecov
+  tokens for test coverage uploads to codecov.io
+  (@ALanguillaume, @gaborcsardi, #823).
+
+* The `check-full.yaml` example does not test on R 3.6.x any more.
+
+* All example workflows set the default permissions now to read-only.
+
+* We deleted the (long broken) `run-rchk` action.
+  [R-hub](https://r-hub.github.io/rhub/) will have an `rchk` container and builder soon: https://github.com/r-hub/containers/issues/29.
+
+* [setup-r-dependencies]: new option to save the R package cache for
+  unsuccessful workflow runs as well (@schloerke, #695).
+
+* New example workflows `bookdown-gh-pages` and `blogdown-gh-pages` to
+  deploy bookdown books and blogdown sites to GH Pages without commiting
+  them into the repository (#856).
 
 # `v2.8.7` (2024-04-05)
 
@@ -7,7 +26,7 @@
 # `v2.8.6` (2024-03-30)
 
 * `[setup-r]` now does not install qpdf on Windows, because it is part of all Rtools
-  versions that we use. Also, it installs Ghostscript from a `.zip` file instead of a 
+  versions that we use. Also, it installs Ghostscript from a `.zip` file instead of a
   `choco` package, because `choco install` can sometimes freeze (#812).
 
 # `v2.8.5` (2024-03-26)
@@ -18,7 +37,7 @@
 # `v2.8.4` (2024-03-25)
 
 * `[setup-r]`: Ghostscript and QPDF installation is now more robust on Windows.
-  We download and install manually, instead of installing from the Chocolatey 
+  We download and install manually, instead of installing from the Chocolatey
   repository (#812).
 
 # `v2.8.3` (2024-03-20)
@@ -31,7 +50,7 @@
 # `v2.8.2` (2024-03-18)
 
 * `[setup-r]` now supports Rtools44, and installs Rtools44 for R 4.4.x (currently R-devel).
-* `[check-r-package]` now supports `upload-results: never` to never upload 
+* `[check-r-package]` now supports `upload-results: never` to never upload
    check results as artifacts. This is useful if you want to handle artifact uploads
    yourself.
 
@@ -146,7 +165,7 @@
 # `v2.2.8` (2022-08-31)
 
 * Examples now use `ubuntu-latest` instead of `ubuntu-20.04`. This avoid having to update your workflows every two years.
-  It does not change anything right now, however, as `ubuntu-latest` is the same as `ubuntu-20.04` currently. 
+  It does not change anything right now, however, as `ubuntu-latest` is the same as `ubuntu-20.04` currently.
 
 # `v2.2.7` (2022-08-23)
 
@@ -222,7 +241,7 @@
 * `[setup-r]`: the `windows-path-include-mingw` parameter is now defunct with Rtools40 and later, as it is not needed and possibly causes confusion.
 * `[check-r-package]` has a new parameter: `upload-snapshots`, to upload testthat snapshots as artifacts (#473).
 * The pkgdown, bookdown and blogdown examples now use concurrency groups to avoid race conditions when deploying the site (#476).
-* The test-coverage example now keeps the output from covr, to make debugging easier (#481). 
+* The test-coverage example now keeps the output from covr, to make debugging easier (#481).
 * Two new examples are included, to run `roxygen2::roxygenise()` and `styler::style_pkg()` on a repo and commit the results (#434).
 
 # `v2.0.11` (2022-01-16)
@@ -257,8 +276,8 @@
 # `v2.0.5` (2021-12-17)
 
 * `[setup-r-dependencies]` now works with older versions of the sessioninfo package.
-  (This typically happens on older R versions and Windows or macOS, where pak prefers 
-  to install an older binary package to a newer source package, unless the newer package 
+  (This typically happens on older R versions and Windows or macOS, where pak prefers
+  to install an older binary package to a newer source package, unless the newer package
   is needed.)
 
 # `v2.0.4` (2021-12-16)
@@ -286,7 +305,7 @@
 
 ## Breaking changes from `v1`
 
-* `[check-r-package]`: many parameters have a new format now, and they need 
+* `[check-r-package]`: many parameters have a new format now, and they need
   to be legal R expressions.
 * `[setup-r]` does not have a `crayon.enabled` parameter now. You can update
   `.Rprofile` manually to set options if you like, see example in the README.
