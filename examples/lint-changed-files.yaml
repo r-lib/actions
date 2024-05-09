@@ -6,6 +6,8 @@ on:
 
 name: lint-changed-files
 
+permissions: read-all
+
 jobs:
   lint-changed-files:
     runs-on: ubuntu-latest

@@ -9,6 +9,8 @@ on:
 
 name: bookdown
 
+permissions: read-all
+
 jobs:
   bookdown:
     runs-on: ubuntu-latest

@@ -6,6 +6,8 @@ on:
 
 name: shiny-deploy
 
+permissions: read-all
+
 jobs:
   shiny-deploy:
     runs-on: ubuntu-latest

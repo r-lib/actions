@@ -9,6 +9,8 @@ on:
 
 name: blogdown
 
+permissions: read-all
+
 jobs:
   blogdown:
     runs-on: ubuntu-latest

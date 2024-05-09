@@ -6,6 +6,8 @@ on:
 
 name: Style
 
+permissions: read-all
+
 jobs:
   style:
     runs-on: ubuntu-latest

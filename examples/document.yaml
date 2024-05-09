@@ -6,6 +6,8 @@ on:
 
 name: Document
 
+permissions: read-all
+
 jobs:
   document:
     runs-on: ubuntu-latest

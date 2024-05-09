@@ -6,6 +6,8 @@ on:
 
 name: render-rmarkdown
 
+permissions: read-all
+
 jobs:
   render-rmarkdown:
     runs-on: ubuntu-latest

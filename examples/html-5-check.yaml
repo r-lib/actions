@@ -8,6 +8,8 @@ on:
 
 name: HTML5 check
 
+permissions: read-all
+
 jobs:
   HTML5-check:
     runs-on: ubuntu-latest
