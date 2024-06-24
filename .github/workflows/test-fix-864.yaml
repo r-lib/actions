@@ -1,0 +1,18 @@
+name: test-fix-864
+
+on:
+  push:
+
+jobs:
+  test-fix-864:
+    runs-on: macos-latest
+    steps:
+      -
+        name: checkout
+        uses: actions/checkout@v4
+      -
+        name: setup-r
+        uses: the-mad-statter/actions/setup-r@fix-864
+      -
+        name: rscript
+        run: Rscript -e 'print("hello")'
