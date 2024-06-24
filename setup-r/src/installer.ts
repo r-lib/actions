@@ -398,8 +398,6 @@ async function acquireRMacOS(version: IRVersion): Promise<string> {
 
   // Remove homebrew R from the PATH if installed
   try {
-	await exec.exec("brew", ["install", "r"]);
-	  
 	const {stdout: brewInfo} = await exec.getExecOutput("brew", ["info", "--json", "r"]);
 	const brewRVersion = JSON.parse(brewInfo)[0].installed[0].version;
 	if (brewRVersion) {
