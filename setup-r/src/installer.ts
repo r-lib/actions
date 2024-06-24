@@ -396,9 +396,14 @@ async function acquireRMacOS(version: IRVersion): Promise<string> {
     throw `Failed to install R: ${error}`;
   }
 
-  // Remove homebrew R from the PATH
+  // Remove homebrew R from the PATH if installed
   try {
-    await exec.exec("brew", ["unlink", "r"]);
+    await exec.exec("brew", ["install", "r"]);
+	  
+    const {stdout: brewList} = await exec.getExecOutput("brew", ["list"]);
+	if (brewList.search(/^r$/m) != -1) {
+	  await exec.exec("brew", ["unlink", "r"]);
+	}
   } catch (error) {
     core.debug(`${error}`);
   }
