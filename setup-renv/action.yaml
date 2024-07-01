@@ -9,7 +9,7 @@ inputs:
     required: true
     default: 1
   bypass-cache:
-    description: 'Whether attempts to cache should be completely skipped (for non GitHub testing). Set to `true` to skip.'
+    description: 'Whether attempts to cache should be completely skipped (for non GitHub testing). Set to `true` to skip. If `"always"` is provided, the package cache will be saved even if the workflow fails.'
     default: "false"
   working-directory:
     description: 'Using the working-directory keyword, you can specify a subdirectory of the repo where `renv` should be run.'
@@ -43,6 +43,7 @@ runs:
           path: ${{ env.RENV_PATHS_ROOT }}
           key: ${{ steps.get-version.outputs.os-version }}-${{ steps.get-version.outputs.r-version }}-${{inputs.cache-version }}-${{ hashFiles(format('{0}/renv.lock', inputs.working-directory)) }}
           restore-keys: ${{ steps.get-version.outputs.os-version }}-${{ steps.get-version.outputs.r-version }}-${{inputs.cache-version }}-
+          save-always: ${{ inputs.cache == 'never' }}
 
       - name: Install renv dependencies
         run: renv::restore()
