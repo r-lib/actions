@@ -415,6 +415,8 @@ on:
 
 name: Commands
 
+permissions: read-all
+
 jobs:
   document:
     if: ${{ github.event.issue.pull_request && (github.event.comment.author_association == 'MEMBER' || github.event.comment.author_association == 'OWNER') && startsWith(github.event.comment.body, '/document') }}
@@ -422,6 +424,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
@@ -459,6 +463,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
@@ -505,11 +511,15 @@ on:
 
 name: render-rmarkdown
 
+permissions: read-all
+
 jobs:
   render-rmarkdown:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    permissions:
+      contents: write
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -624,11 +634,15 @@ on:
 
 name: Document
 
+permissions: read-all
+
 jobs:
   document:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    permissions:
+      contents: write
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -675,6 +689,8 @@ on:
     paths: ["**.[rR]", "**.[qrR]md", "**.[rR]markdown", "**.[rR]nw", "**.[rR]profile"]
 
 name: Style
+
+permissions: read-all
 
 jobs:
   style:
@@ -781,6 +797,8 @@ on:
 
 name: bookdown
 
+permissions: read-all
+
 jobs:
   bookdown:
     runs-on: ubuntu-latest
@@ -789,6 +807,8 @@ jobs:
       group: pkgdown-${{ github.event_name != 'pull_request' || github.run_id }}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
@@ -930,6 +950,8 @@ on:
 
 name: blogdown
 
+permissions: read-all
+
 jobs:
   blogdown:
     runs-on: ubuntu-latest
@@ -938,6 +960,8 @@ jobs:
       group: pkgdown-${{ github.event_name != 'pull_request' || github.run_id }}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
@@ -1072,6 +1096,8 @@ on:
 
 name: shiny-deploy
 
+permissions: read-all
+
 jobs:
   shiny-deploy:
     runs-on: ubuntu-latest
@@ -1147,6 +1173,8 @@ on:
     branches: [main, master]
 
 name: lint-project
+
+permissions: read-all
 
 jobs:
   lint-project:
