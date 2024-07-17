@@ -93,7 +93,7 @@ export async function getR(version: string) {
   }
 
   setREnvironmentVariables();
-  setupRLibrary();
+  setupRLibrary(selected);
   core.setOutput("installed-r-version", selected.version);
 }
 
@@ -605,7 +605,7 @@ async function acquireGsWindows() {
   });
 }
 
-async function setupRLibrary() {
+async function setupRLibrary(version: IRVersion) {
   let profilePath: fs.PathLike | fs.promises.FileHandle;
   if (IS_WINDOWS) {
     profilePath = path.join(
@@ -621,8 +621,13 @@ async function setupRLibrary() {
   let rspm = process.env["RSPM"] ? `'${process.env["RSPM"]}'` : "NULL";
 
   if (rspm === "NULL" && core.getInput("use-public-rspm") === "true") {
+    // if we are on R 3.6.x, we use an RSPM snapshot
+    const pin36: boolean =
+      !process.env['RSPM_PIN_3.6'] && !!version.version.match(/^3[.]6[.]/);
+    const snapshot: string = pin36 ? "2024-06-01" : "latest";
+
     if (IS_WINDOWS) {
-      rspm = "'https://packagemanager.posit.co/cran/latest'";
+      rspm = `'https://packagemanager.posit.co/cran/${snapshot}'`;
     }
     if (IS_LINUX) {
       let codename = "";
@@ -639,7 +644,7 @@ async function setupRLibrary() {
       }
       codename = codename.trim();
 
-      rspm = `'https://packagemanager.posit.co/cran/__linux__/${codename}/latest'`;
+      rspm = `'https://packagemanager.posit.co/cran/__linux__/${codename}/${snapshot}'`;
     }
   }
 
