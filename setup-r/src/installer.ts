@@ -623,7 +623,7 @@ async function setupRLibrary(version: IRVersion) {
   if (rspm === "NULL" && core.getInput("use-public-rspm") === "true") {
     // if we are on R 3.6.x, we use an RSPM snapshot
     const pin36: boolean =
-      !process.env['RSPM_PIN_3.6'] && !!version.version.match(/^3[.]6[.]/);
+      !process.env['RSPM_PIN_3_6'] && !!version.version.match(/^3[.]6[.]/);
     const snapshot: string = pin36 ? "2024-06-01" : "latest";
 
     if (IS_WINDOWS) {

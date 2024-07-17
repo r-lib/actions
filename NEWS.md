@@ -7,11 +7,12 @@
   the binary packages from P3M.
 
   Note that this only happens if you opt in to use P3M with the
-  `use-public-rspm: true` input parameter.
+  `use-public-rspm: true` input parameter. This is the default in all
+  example workflows.
 
   If the `RSPM` environment variable is already set, then it is used
   unchanged, on all R versions. To avoid using a P3M snapshot on R 3.6.x,
-  set the `RSPM_PIN_3.6` environment variable to a non-empty value.
+  set the `RSPM_PIN_3_6` environment variable to `false`.
 
 # `v2.9.0` (2024-05-09)
 
