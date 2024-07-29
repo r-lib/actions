@@ -624,7 +624,7 @@ async function setupRLibrary(version: IRVersion) {
     // if we are on R 3.6.x, we use an RSPM snapshot
     const pin36: boolean =
       !process.env['RSPM_PIN_3_6'] && !!version.version.match(/^3[.]6[.]/);
-    const snapshot: string = pin36 ? "2024-06-01" : "latest";
+    const snapshot: string = pin36 ? "2024-05-25" : "latest";
 
     if (IS_WINDOWS) {
       rspm = `'https://packagemanager.posit.co/cran/${snapshot}'`;
