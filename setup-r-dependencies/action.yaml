@@ -64,7 +64,7 @@ runs:
         shell: Rscript {0}
 
       - name: Install pak (Windows)
-        if: runner.os == 'Windows'
+        if: ${{ runner.os == 'Windows' && inputs.pak-version != 'none' }}
         run: |
           # Install pak
           cat("::group::Install pak\n")
@@ -81,7 +81,7 @@ runs:
         shell: Rscript {0}
 
       - name: Install pak (Unix)
-        if: runner.os != 'Windows'
+        if: ${{ runner.os != 'Windows' && inputs.pak-version != 'none' }}
         run: |
           # Install pak
           echo "::group::Install pak"
