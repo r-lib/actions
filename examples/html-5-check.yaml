@@ -6,12 +6,12 @@ on:
   pull_request:
     branches: [main, master]
 
-name: HTML5 check
+name: html-5-check.yaml
 
 permissions: read-all
 
 jobs:
-  HTML5-check:
+  html-5-check:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
