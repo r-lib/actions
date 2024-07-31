@@ -1,3 +1,19 @@
+# Development version (unreleased)
+
+* `[setup-r]`: on R 3.6.x we now use the P3M snapshot from 2024-06-01 by
+  default. This is because many newer CRAN packages do not work on R 3.6.x
+  any more. The default CRAN mirror is still added, so newer packages may
+  be used if they are required, but `setup-r-dependencies@v2` will prefer
+  the binary packages from P3M.
+
+  Note that this only happens if you opt in to use P3M with the
+  `use-public-rspm: true` input parameter. This is the default in all
+  example workflows.
+
+  If the `RSPM` environment variable is already set, then it is used
+  unchanged, on all R versions. To avoid using a P3M snapshot on R 3.6.x,
+  set the `RSPM_PIN_3_6` environment variable to `false`.
+
 # `v2.9.0` (2024-05-09)
 
 * The `test-coverage.yaml` example workflow now handles global Codecov
