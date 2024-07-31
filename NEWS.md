@@ -14,6 +14,10 @@
   unchanged, on all R versions. To avoid using a P3M snapshot on R 3.6.x,
   set the `RSPM_PIN_3_6` environment variable to `false`.
 
+* Example blogdown, bookdown, document, pr-commands and render-markdown
+  workflows now correctly have write permission to repository contents
+  (#874, @remlapmot).
+
 # `v2.9.0` (2024-05-09)
 
 * The `test-coverage.yaml` example workflow now handles global Codecov
