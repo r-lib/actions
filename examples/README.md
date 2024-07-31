@@ -82,7 +82,7 @@ on:
   pull_request:
     branches: [main, master]
 
-name: R-CMD-check
+name: R-CMD-check.yaml
 
 permissions: read-all
 
@@ -134,7 +134,7 @@ on:
   pull_request:
     branches: [main, master]
 
-name: R-CMD-check
+name: R-CMD-check.yaml
 
 permissions: read-all
 
@@ -211,7 +211,7 @@ on:
   pull_request:
     branches: [main, master]
 
-name: R-CMD-check
+name: R-CMD-check.yaml
 
 permissions: read-all
 
@@ -291,7 +291,7 @@ on:
   pull_request:
     branches: [main, master]
 
-name: test-coverage
+name: test-coverage.yaml
 
 permissions: read-all
 
@@ -362,7 +362,7 @@ on:
   pull_request:
     branches: [main, master]
 
-name: lint
+name: lint.yaml
 
 permissions: read-all
 
@@ -413,7 +413,9 @@ on:
   issue_comment:
     types: [created]
 
-name: Commands
+name: pr-commands.yaml
+
+permissions: read-all
 
 jobs:
   document:
@@ -503,7 +505,9 @@ on:
   push:
     paths: ['**.Rmd']
 
-name: render-rmarkdown
+name: render-rmarkdown.yaml
+
+permissions: read-all
 
 jobs:
   render-rmarkdown:
@@ -566,7 +570,7 @@ on:
     types: [published]
   workflow_dispatch:
 
-name: pkgdown
+name: pkgdown.yaml
 
 permissions: read-all
 
@@ -622,7 +626,9 @@ on:
   push:
     paths: ["R/**"]
 
-name: Document
+name: document.yaml
+
+permissions: read-all
 
 jobs:
   document:
@@ -674,7 +680,9 @@ on:
   push:
     paths: ["**.[rR]", "**.[qrR]md", "**.[rR]markdown", "**.[rR]nw", "**.[rR]profile"]
 
-name: Style
+name: style.yaml
+
+permissions: read-all
 
 jobs:
   style:
@@ -779,7 +787,9 @@ on:
     branches: [main, master]
   workflow_dispatch:
 
-name: bookdown
+name: bookdown.yaml
+
+permissions: read-all
 
 jobs:
   bookdown:
@@ -837,7 +847,7 @@ on:
     branches: [main, master]
   workflow_dispatch:
 
-name: Deploy bookdown to GH Pages
+name: bookdown-gh-pages.yaml
 
 permissions: read-all
 
@@ -928,7 +938,9 @@ on:
     branches: [main, master]
   workflow_dispatch:
 
-name: blogdown
+name: blogdown.yaml
+
+permissions: read-all
 
 jobs:
   blogdown:
@@ -983,7 +995,7 @@ on:
     branches: [main, master]
   workflow_dispatch:
 
-name: Deploy blogdown to GH Pages
+name: blogdown-gh-pages.yaml
 
 permissions: read-all
 
@@ -1070,7 +1082,9 @@ on:
   push:
     branches: [main, master]
 
-name: shiny-deploy
+name: shiny-deploy.yaml
+
+permissions: read-all
 
 jobs:
   shiny-deploy:
@@ -1146,7 +1160,9 @@ on:
   pull_request:
     branches: [main, master]
 
-name: lint-project
+name: lint-project.yaml
+
+permissions: read-all
 
 jobs:
   lint-project:
