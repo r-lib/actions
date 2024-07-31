@@ -14,6 +14,9 @@
   unchanged, on all R versions. To avoid using a P3M snapshot on R 3.6.x,
   set the `RSPM_PIN_3_6` environment variable to `false`.
 
+* `[check-r-package]`: you can now set`upload-snapshots` to `always`, to
+  upload snapshots even after failures (#871).
+
 # `v2.9.0` (2024-05-09)
 
 * The `test-coverage.yaml` example workflow now handles global Codecov
