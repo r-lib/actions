@@ -1,9 +1,11 @@
 ---
-title: "Test vignette for GH Actions"
-output: rmarkdown::html_vignette
+title: "Test Quarto vignette for GH Actions"
+format: 
+  html:
+    theme: none
 vignette: >
   %\VignetteIndexEntry{Test vignette for GH Actopns}
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEngine{quarto::html}
   %\VignetteEncoding{UTF-8}
 ---
 
