@@ -4,7 +4,7 @@ format:
   html:
     theme: none
 vignette: >
-  %\VignetteIndexEntry{Test vignette for GH Actopns}
+  %\VignetteIndexEntry{Test Quarto vignette for GH Actions}
   %\VignetteEngine{quarto::html}
   %\VignetteEncoding{UTF-8}
 ---
