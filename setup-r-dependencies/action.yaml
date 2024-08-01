@@ -169,20 +169,25 @@ runs:
       - name: Check whether pandoc needs to be installed
         id: check-pandoc
         run: |
+          # Pandoc check
           cat("::group::Check if package needs pandoc\n")
           o <- '${{ inputs.install-pandoc }}'
           if (! o %in% c('true', 'false')) {
             if (Sys.which("pandoc") != "") {
+              cat("Pandoc is already installed at", Sys.which("pandoc"), "\n")
               o <- 'false'
             } else if (file.exists("DESCRIPTION")) {
               deptypes <- list(direct = "all", indirect = character())
               deps <- pak::pkg_deps(".", dependencies = deptypes)
               if ("rmarkdown" %in% deps$package) {
+                cat("Pandoc is needed for rmarkdown\n")
                 o <- 'true'
               } else {
+                cat("Pandoc is not needed\n")
                 o <- 'false'
               }
             } else {
+              cat("Pandoc is not needed, no R package found\n")
               o <- 'false'
             }
           }
@@ -200,11 +205,23 @@ runs:
       - name: Check whether quarto if needed
         id: check-quarto
         run: |
+          # Quarto check
           cat("::group::Check if package needs quarto\n")
-          if (length(dir(recursive = TRUE, pattern = "[.]qmd$")) > 0) {
-            o <- "true"
-          } else {
-            o <- "false"
+          o <- '${{ inputs.install-quarto }}'
+          if (! o %in% c('true', 'false')) {
+            if (Sys.which("quarto") != "") {
+              cat("Quarto is already installed at", Sys.which("quarto"), "\n")
+              o <- "false"
+            } else {
+              qmd <- dir(recursive = TRUE, pattern = "[.]qmd$")
+              if (length(qmd) > 0) {
+                cat("Quarto is needed for qmd file(s):", qmd[1], "...\n")
+                o <- "true"
+              } else {
+                cat("No qmd files found, Quarto is not needed.\n")
+                o <- "false"
+              }
+            }
           }
           cat("install=", o, "\n", file = Sys.getenv("GITHUB_OUTPUT"), sep = "", append = TRUE)
           cat("::endgroup::\n")
