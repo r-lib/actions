@@ -38,6 +38,20 @@ s.'
   pandoc-version:
     description: 'Pandoc version to install.'
     default: '3.1.11'
+  install-quarto:
+    description: |
+      Whether to install quarto. If it is 'auto' (the default), it is
+      installed if there is at least one `.qmd` file in the repository,
+      inside `working-directory`. Set to 'true' to always install it.
+      Set to 'false' to never install it.
+    default: 'auto'
+  quarto-version:
+    description: |
+      Version of quarto to install, if quarto is installed. It is passed
+      to the `quarto-dev/quarto-actions/setup@v2` action. The default is
+      'release' to install the latest release. Other possible values are
+      a version number number (without the `v` prefix), and 'pre-release'.
+    default: 'release'
 runs:
   using: "composite"
   steps:
@@ -182,6 +196,26 @@ runs:
         uses: r-lib/actions/setup-pandoc@v2
         with:
           pandoc-version: ${{ inputs.pandoc-version }}
+
+      - name: Check whether quarto if needed
+        id: check-quarto
+        run: |
+          cat("::group::Check if package needs quarto\n")
+          if (length(dir(recursive = TRUE, pattern = "[.]qmd$")) > 0) {
+            o <- "true"
+          } else {
+            o <- "false"
+          }
+          cat("install=", o, "\n", file = Sys.getenv("GITHUB_OUTPUT"), sep = "", append = TRUE)
+          cat("::endgroup::\n")
+        shell: Rscript {0}
+        working-directory: ${{ inputs.working-directory }}
+
+      - name: Install quarto if needed
+        if: ${{ steps.check-quarto.outputs.install == 'true' }}
+        uses: quarto-dev/quarto-actions/setup@v2
+        with:
+          version: ${{ inputs.quarto-version }}
 
       - name: Session info
         run: |
