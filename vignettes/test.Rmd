@@ -2,7 +2,7 @@
 title: "Test vignette for GH Actions"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Test vignette for GH Actopns}
+  %\VignetteIndexEntry{Test vignette for GH Actions}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -19,4 +19,3 @@ Irure ad excepteur aliqua esse id sint ex aliquip laborum. Officia laborum ex cu
 ```{r}
 summary(mtcars)
 ```
-

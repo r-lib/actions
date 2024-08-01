@@ -1,24 +1,19 @@
 ---
-title: "Test Quarto vignette for GH Actions"
-format: 
-  html:
-    theme: none
+title: "Quarto HTML Vignettes"
 vignette: >
-  %\VignetteIndexEntry{Test Quarto vignette for GH Actions}
+  %\VignetteIndexEntry{Quarto HTML Vignettes}
   %\VignetteEngine{quarto::html}
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
-```
+## HTML Vignette Engines
+
+The **quarto** R package registers vignette engines that can be used in `%\VignetteEngine{}` directives in vignette headers.
+
+To learn more about how vignettes engine works, and how to write vignette engines, see the [Writing R Extensions](https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Non_002dSweave-vignettes) manual and the [R Packages (2e)](https://r-pkgs.org/vignettes.html) book.
 
 Irure ad excepteur aliqua esse id sint ex aliquip laborum. Officia laborum ex cupidatat exercitation velit. Nisi elit incididunt nisi ullamco. Ut Lorem eiusmod anim ipsum dolore cupidatat officia non. Culpa voluptate consectetur in ullamco minim sit sunt. Ad aute laborum laborum cillum qui consequat proident sit ad incididunt. Enim nisi nulla aliquip anim fugiat deserunt aliqua aliqua sunt nisi commodo magna reprehenderit. Reprehenderit dolor sunt nulla mollit est magna exercitation dolore magna. Mollit qui labore tempor commodo veniam cupidatat esse irure nisi eiusmod qui dolore nisi.
 
 ```{r}
 summary(mtcars)
 ```
-
