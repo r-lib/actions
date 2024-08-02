@@ -17,6 +17,10 @@
 * `[setup-r]` now installs the x86_64 build of R on arm64 macOS, if there
   is no arm64 build available for this R version (#883).
 
+* Example blogdown, bookdown, document, pr-commands and render-markdown
+  workflows now correctly have write permission to repository contents
+  (#874, @remlapmot).
+
 * `[check-r-package]`: you can now set`upload-snapshots` to `always`, to
   upload snapshots even after failures (#871).
 
