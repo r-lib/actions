@@ -58541,13 +58541,24 @@ const http_client_1 = __nccwpck_require__(4812);
 const action_1 = __nccwpck_require__(161);
 const IS_WINDOWS = process.platform === "win32";
 const IS_MAC = process.platform === "darwin";
-const OS = !!process.env.SETUP_R_OS ? process.env.SETUP_R_OS :
-    IS_WINDOWS ? "win" : IS_MAC ? "mac" : "linux";
-const ARCH = !!process.env.SETUP_R_ARCH ? process.env.SETUP_R_ARCH :
-    OS == "win" ? undefined :
-        (OS == "mac" && process.arch == "arm64") ? "arm64" :
-            (OS == "mac" && process.arch == "x64") ? "x86_64" :
-                process.arch == "x64" ? "amd64" : process.arch;
+const OS = !!process.env.SETUP_R_OS
+    ? process.env.SETUP_R_OS
+    : IS_WINDOWS
+        ? "win"
+        : IS_MAC
+            ? "mac"
+            : "linux";
+const ARCH = !!process.env.SETUP_R_ARCH
+    ? process.env.SETUP_R_ARCH
+    : OS == "win"
+        ? undefined
+        : OS == "mac" && process.arch == "arm64"
+            ? "arm64"
+            : OS == "mac" && process.arch == "x64"
+                ? "x86_64"
+                : process.arch == "x64"
+                    ? "amd64"
+                    : process.arch;
 const api_url = process.env.GITHUB_API_URL || "https://api.github.com";
 if (!tempDirectory) {
     let baseLocation;
@@ -58631,12 +58642,12 @@ function getNightlyPandoc() {
         const octokit = new action_1.Octokit();
         const owner = "jgm";
         const repo = "pandoc";
-        const res = yield octokit.paginate('GET /repos/{owner}/{repo}/actions/runs', {
+        const res = yield octokit.paginate("GET /repos/{owner}/{repo}/actions/runs", {
             owner,
             repo,
-            status: "success"
+            status: "success",
         }, (response, done) => {
-            var bld = response.data.find(x => x.name == "Nightly");
+            var bld = response.data.find((x) => x.name == "Nightly");
             if (!!bld) {
                 done();
                 return [bld.id];
@@ -58644,16 +58655,20 @@ function getNightlyPandoc() {
             return [];
         });
         const run_id = res[0];
-        const res2 = yield octokit.request('GET /repos/{owner}/{repo}/actions/runs/{run_id}/artifacts', {
+        const res2 = yield octokit.request("GET /repos/{owner}/{repo}/actions/runs/{run_id}/artifacts", {
             owner,
             repo,
-            run_id
+            run_id,
         });
         var arts = {};
         for (var i in res2.data.artifacts) {
             arts[res2.data.artifacts[i].name] = res2.data.artifacts[i].id;
         }
-        const which = IS_WINDOWS ? 'nightly-windows' : (IS_MAC ? 'nightly-macos' : 'nightly-linux');
+        const which = IS_WINDOWS
+            ? "nightly-windows"
+            : IS_MAC
+                ? "nightly-macos"
+                : "nightly-linux";
         const artifact_id = arts[which];
         let { url } = yield octokit.request("HEAD /repos/{owner}/{repo}/actions/artifacts/{artifact_id}/{archive_format}", {
             owner,
@@ -58666,18 +58681,18 @@ function getNightlyPandoc() {
         });
         let downloadPath;
         try {
-            downloadPath = yield tc.downloadTool(url);
+            downloadPath = yield tc.downloadTool(url, undefined, getAuthHeaderValue());
         }
         catch (error) {
-            throw new Error('Failed to download Pandoc nightly build: ' + error);
+            throw new Error("Failed to download Pandoc nightly build: " + error);
         }
-        const fileName = which + '.zip';
+        const fileName = which + ".zip";
         const extractionPath = yield tc.extractZip(downloadPath);
         const subdir = yield fs.promises.readdir(extractionPath);
-        const pandocPath = extractionPath + '/' + subdir[0];
+        const pandocPath = extractionPath + "/" + subdir[0];
         if (!IS_WINDOWS) {
-            const pandoc = pandocPath + '/pandoc';
-            yield fs.promises.chmod(pandoc, '755');
+            const pandoc = pandocPath + "/pandoc";
+            yield fs.promises.chmod(pandoc, "755");
         }
         core.debug(`Adding '${pandocPath}' to PATH.`);
         core.addPath(pandocPath);
@@ -58688,9 +58703,9 @@ function installPandocMac(version) {
         var _a;
         // Since 3.1.2, Pandoc uses cabal instead of stack to build the macOS binary.
         const is_new_macos_installer = (0, compare_versions_1.compare)(version, "3.1.2", ">=") ? true : false;
-        const fileName = is_new_macos_installer ?
-            util.format("pandoc-%s-%s-macOS.pkg", version, ARCH) :
-            util.format("pandoc-%s-macOS.pkg", version);
+        const fileName = is_new_macos_installer
+            ? util.format("pandoc-%s-%s-macOS.pkg", version, ARCH)
+            : util.format("pandoc-%s-macOS.pkg", version);
         const downloadUrl = util.format("https://github.com/jgm/pandoc/releases/download/%s/%s", version, fileName);
         let downloadPath;
         try {
@@ -58706,7 +58721,7 @@ function installPandocMac(version) {
             "-pkg",
             path.join(tempDirectory, fileName),
             "-target",
-            "/"
+            "/",
         ]);
     });
 }
@@ -58749,9 +58764,9 @@ function installPandocLinux(version) {
     return __awaiter(this, void 0, void 0, function* () {
         var _a;
         const is_new_linux_installer = (0, compare_versions_1.compare)(version, "2.8", ">=") ? true : false;
-        const fileName = is_new_linux_installer ?
-            util.format("pandoc-%s-linux-%s.tar.gz", version, ARCH) :
-            util.format("pandoc-%s-linux.tar.gz", version);
+        const fileName = is_new_linux_installer
+            ? util.format("pandoc-%s-linux-%s.tar.gz", version, ARCH)
+            : util.format("pandoc-%s-linux.tar.gz", version);
         const downloadUrl = util.format("https://github.com/jgm/pandoc/releases/download/%s/%s", version, fileName);
         let downloadPath;
         try {
