@@ -78,7 +78,7 @@ runs:
         shell: Rscript {0}
 
       - name: Install pak (Windows)
-        if: runner.os == 'Windows'
+        if: ${{ runner.os == 'Windows' && inputs.pak-version != 'none' }}
         run: |
           # Install pak
           cat("::group::Install pak\n")
@@ -95,7 +95,7 @@ runs:
         shell: Rscript {0}
 
       - name: Install pak (Unix)
-        if: runner.os != 'Windows'
+        if: ${{ runner.os != 'Windows' && inputs.pak-version != 'none' }}
         run: |
           # Install pak
           echo "::group::Install pak"
@@ -148,6 +148,7 @@ runs:
           path: |
             ${{ env.R_LIBS_USER }}/*
             !${{ env.R_LIBS_USER }}/pak
+            !${{ env.R_LIBS_USER }}/_cache
           key: ${{ format('{0}-{1}-{2}-{3}', steps.install.outputs.os-version, steps.install.outputs.r-version, inputs.cache-version, hashFiles(format('{0}/.github/pkg.lock', inputs.working-directory ))) }}
           restore-keys: ${{ format('{0}-{1}-{2}-', steps.install.outputs.os-version, steps.install.outputs.r-version, inputs.cache-version) }}
           # Used to save package installation on troublesome Actions
