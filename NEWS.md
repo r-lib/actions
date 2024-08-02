@@ -14,6 +14,8 @@
   unchanged, on all R versions. To avoid using a P3M snapshot on R 3.6.x,
   set the `RSPM_PIN_3_6` environment variable to `false`.
 
+* `[setup-r]` now avoids spurious warnings from Homebrew (#864).
+
 * `[setup-r-dependencies]` now accepts `pak-version: none` to skip pak
   installation. pak should be already installed on the system in this
   case, otherwise the dependencies resolution and installation will fail.
