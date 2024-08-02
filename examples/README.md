@@ -417,6 +417,8 @@ name: pr-commands.yaml
 
 permissions: read-all
 
+permissions: read-all
+
 jobs:
   document:
     if: ${{ github.event.issue.pull_request && (github.event.comment.author_association == 'MEMBER' || github.event.comment.author_association == 'OWNER') && startsWith(github.event.comment.body, '/document') }}
@@ -424,6 +426,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
@@ -461,6 +465,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
@@ -509,11 +515,15 @@ name: render-rmarkdown.yaml
 
 permissions: read-all
 
+permissions: read-all
+
 jobs:
   render-rmarkdown:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    permissions:
+      contents: write
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -630,11 +640,15 @@ name: document.yaml
 
 permissions: read-all
 
+permissions: read-all
+
 jobs:
   document:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    permissions:
+      contents: write
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -681,6 +695,8 @@ on:
     paths: ["**.[rR]", "**.[qrR]md", "**.[rR]markdown", "**.[rR]nw", "**.[rR]profile"]
 
 name: style.yaml
+
+permissions: read-all
 
 permissions: read-all
 
@@ -791,6 +807,8 @@ name: bookdown.yaml
 
 permissions: read-all
 
+permissions: read-all
+
 jobs:
   bookdown:
     runs-on: ubuntu-latest
@@ -799,6 +817,8 @@ jobs:
       group: pkgdown-${{ github.event_name != 'pull_request' || github.run_id }}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
@@ -942,6 +962,8 @@ name: blogdown.yaml
 
 permissions: read-all
 
+permissions: read-all
+
 jobs:
   blogdown:
     runs-on: ubuntu-latest
@@ -950,6 +972,8 @@ jobs:
       group: pkgdown-${{ github.event_name != 'pull_request' || github.run_id }}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
@@ -1086,6 +1110,8 @@ name: shiny-deploy.yaml
 
 permissions: read-all
 
+permissions: read-all
+
 jobs:
   shiny-deploy:
     runs-on: ubuntu-latest
@@ -1161,6 +1187,8 @@ on:
     branches: [main, master]
 
 name: lint-project.yaml
+
+permissions: read-all
 
 permissions: read-all
 

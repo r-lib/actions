@@ -14,6 +14,10 @@
   unchanged, on all R versions. To avoid using a P3M snapshot on R 3.6.x,
   set the `RSPM_PIN_3_6` environment variable to `false`.
 
+* Example blogdown, bookdown, document, pr-commands and render-markdown
+  workflows now correctly have write permission to repository contents
+  (#874, @remlapmot).
+
 * `[check-r-package]`: you can now set`upload-snapshots` to `always`, to
   upload snapshots even after failures (#871).
 
