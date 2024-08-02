@@ -60,6 +60,10 @@ runs:
             message("R_LIBS_SITE is already set to ", lib)
             cat(sprintf("R_LIB_FOR_PAK=%s\n", strsplit(lib, .Platform$path.sep)[[1]][[1]]), file = Sys.getenv("GITHUB_ENV"), append = TRUE)
           }
+          if (nchar("${{ env.R_LIBS_USER }}") == 0) {
+            message("R_LIBS_USER is unset, setting now.")
+            cat(sprintf("R_LIBS_USER=%s\n", Sys.getenv("R_LIBS_USER")), file = Sys.getenv("GITHUB_ENV"), append = TRUE)
+          }
           cat("::endgroup::\n")
         shell: Rscript {0}
 
