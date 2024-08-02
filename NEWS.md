@@ -14,6 +14,10 @@
   unchanged, on all R versions. To avoid using a P3M snapshot on R 3.6.x,
   set the `RSPM_PIN_3_6` environment variable to `false`.
 
+* `[setup-r-dependencies]` now always sets the `R_LIBS_USER` GitHub
+  environment variable, so it can be used without `[setup-r]` or without
+  setting it manually (#881).
+
 * The example workflows now use their file names as workflow names.
   This is to make it easier to match worflow runs to workflow files.
   Most of the the `check-*` workflows use `R-CMD-check.yaml`, however,
