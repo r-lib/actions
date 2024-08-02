@@ -14,6 +14,8 @@
   unchanged, on all R versions. To avoid using a P3M snapshot on R 3.6.x,
   set the `RSPM_PIN_3_6` environment variable to `false`.
 
+* `[setup-pandoc]`: installing nightly Pandoc works again now (#889).
+
 * `[setup-r-dependencies]` now automatically installs Quarto if the repo
   has a qmd file, and it isn't installed. See the `install-quarto` and
   `quarto-version` input parameters (#866).
