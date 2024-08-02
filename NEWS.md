@@ -14,6 +14,9 @@
   unchanged, on all R versions. To avoid using a P3M snapshot on R 3.6.x,
   set the `RSPM_PIN_3_6` environment variable to `false`.
 
+* `[setup-renv]`: you can now set `bypass-cache` to `never`, to save the
+  cache even if the workflow fails (#873, @jaradkohl-mfj).
+
 # `v2.9.0` (2024-05-09)
 
 * The `test-coverage.yaml` example workflow now handles global Codecov
