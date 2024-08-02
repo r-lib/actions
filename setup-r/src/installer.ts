@@ -756,9 +756,18 @@ export async function determineVersion(version: string): Promise<IRVersion> {
   if (ARCH) {
     url = url + "/" + ARCH;
   }
-  let tags = (await rest.get<IRVersion>(url)).result;
+  var tags = (await rest.get<IRVersion>(url)).result;
 
   if (!tags) {
+    // if arm mac, try intel as well
+    if (OS == "mac" && ARCH == "arm64") {
+      let url2: string =
+	"https://api.r-hub.io/rversions/resolve/" + version + "/" + OS;
+      tags = (await rest.get<IRVersion>(url2)).result;
+      if (!tags) {
+        throw new Error(`Failed to resolve R version ${version} at ${url} and ${url2}`);
+      }
+    }
     throw new Error(`Failed to resolve R version ${version} at ${url}.`);
   }
 
