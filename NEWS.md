@@ -14,6 +14,9 @@
   unchanged, on all R versions. To avoid using a P3M snapshot on R 3.6.x,
   set the `RSPM_PIN_3_6` environment variable to `false`.
 
+* `[setup-renv]`: you can now set `bypass-cache` to `never`, to save the
+  cache even if the workflow fails (#873, @jaradkohl-mfj).
+
 * `[setup-pandoc]`: installing nightly Pandoc works again now (#889).
 
 * `[setup-r-dependencies]` now automatically installs Quarto if the repo
