@@ -2,5 +2,6 @@ pandoc: 3.1.11
 pkgdown: 2.1.0
 pkgdown_sha: ~
 articles:
+  quarto-test: quarto-test.html
   test: test.html
-last_built: 2024-08-02T07:41Z
+last_built: 2024-08-02T07:54Z
