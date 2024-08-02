@@ -258,7 +258,7 @@ async function acquireUtilsMacOS() {
       "pkgconfig",
       "checkbashisms",
       "ghostscript",
-    ]);
+    ], { silent: true });
   } catch (error) {
     core.debug(`${error}`);
 
@@ -398,7 +398,7 @@ async function acquireRMacOS(version: IRVersion): Promise<string> {
 
   // Remove homebrew R from the PATH
   try {
-    await exec.exec("brew", ["unlink", "r"]);
+    await exec.exec("brew", ["unlink", "r"] , { silent: true });
   } catch (error) {
     core.debug(`${error}`);
   }
