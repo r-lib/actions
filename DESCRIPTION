@@ -1,13 +1,13 @@
 Package: testpackage
 Title: A Simple Test Description File to Test Packages
 Version: 1.0.0
-Authors@R: 
+Authors@R:
     c(person(given = "Jim",
              family = "Hester",
              role = c("aut", "cre"),
              email = "james.hester@rstudio.com"))
 Description: This is a simple package used to test the workflow files.
 Imports: xml2, curl
-Suggests: covr, knitr, rmarkdown, testthat
+Suggests: covr, knitr, rmarkdown, testthat, quarto
 License: GPL (>= 2)
-VignetteBuilder: knitr, rmarkdown
+VignetteBuilder: knitr, rmarkdown, quarto
