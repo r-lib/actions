@@ -32,7 +32,11 @@ Inputs available
 - `extra-packages` - One or more extra package references to install.
   Separate each reference by newlines or commas for more than one package.
 - `install-pandoc` - Whether to install pandoc. By default it is installed
-  if it is not already on the PATH and the R package depends in rmarkdown.
+  if it is not already on the PATH and the R package depends on rmarkdown.
+- `install-quarto` - Whether to install quarto. If it is 'auto' (the
+  default), it is installed if there is at least one `.qmd` file in the
+  repository, inside `working-directory`. Set to 'true' to always install
+  it. Set to 'false' to never install it.
 - `needs` - `Config/Needs` fields to install from the DESCRIPTION, the
   `Config/Needs/` prefix will be automatically included.
 - `lockfile-create-lib` - The package library to consider when creating
@@ -44,11 +48,15 @@ Inputs available
   install. The default installs the dependencies of the package in the
   working directory and the sessioninfo package. Separate multiple packages
   by newlines or commas.
-- `pak-version`: Which pak version to use. Possible values are
+- `pak-version` - Which pak version to use. Possible values are
   `stable`, `rc` and `devel`. Defaults to `stable`.
-- `pandoc-version`: Which pandoc version to install (see the
+- `pandoc-version` - Which pandoc version to install (see the
   `r-lib/actions/setup-pandoc` action), if pandoc is installed.
-- `upgrade`: Whether to install the latest available versions of the
+- `quarto-version` - Version of quarto to install, if quarto is installed.
+  It is passed to the `quarto-dev/quarto-actions/setup@v2` action. The
+  default is 'release' to install the latest release. Other possible values
+  are a version number number (without the `v` prefix), and 'pre-release'.
+- `upgrade` - Whether to install the latest available versions of the
   dependencies. Must be an R expression. See the README for details if
   you need quoting. Defaults to `FALSE`.
 - `working-directory` - default `'.'`. If the DESCRIPTION file is not in the

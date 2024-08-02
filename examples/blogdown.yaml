@@ -7,7 +7,7 @@ on:
     branches: [main, master]
   workflow_dispatch:
 
-name: blogdown
+name: blogdown.yaml
 
 permissions: read-all
 

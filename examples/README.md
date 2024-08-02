@@ -62,7 +62,7 @@ Options and advice:
 
 `usethis::use_github_action("check-release")`
 
-This workflow installs latest release R version on macOS and runs R CMD
+This workflow installs latest release R version on linux and runs R CMD
 check via the [rcmdcheck](https://github.com/r-lib/rcmdcheck) package.
 If this is the first time you have used CI for a project this is
 probably what you want to use.
@@ -82,7 +82,7 @@ on:
   pull_request:
     branches: [main, master]
 
-name: R-CMD-check
+name: R-CMD-check.yaml
 
 permissions: read-all
 
@@ -134,7 +134,7 @@ on:
   pull_request:
     branches: [main, master]
 
-name: R-CMD-check
+name: R-CMD-check.yaml
 
 permissions: read-all
 
@@ -211,7 +211,7 @@ on:
   pull_request:
     branches: [main, master]
 
-name: R-CMD-check
+name: R-CMD-check.yaml
 
 permissions: read-all
 
@@ -291,7 +291,7 @@ on:
   pull_request:
     branches: [main, master]
 
-name: test-coverage
+name: test-coverage.yaml
 
 permissions: read-all
 
@@ -362,7 +362,7 @@ on:
   pull_request:
     branches: [main, master]
 
-name: lint
+name: lint.yaml
 
 permissions: read-all
 
@@ -413,7 +413,9 @@ on:
   issue_comment:
     types: [created]
 
-name: Commands
+name: pr-commands.yaml
+
+permissions: read-all
 
 permissions: read-all
 
@@ -509,7 +511,9 @@ on:
   push:
     paths: ['**.Rmd']
 
-name: render-rmarkdown
+name: render-rmarkdown.yaml
+
+permissions: read-all
 
 permissions: read-all
 
@@ -576,7 +580,7 @@ on:
     types: [published]
   workflow_dispatch:
 
-name: pkgdown
+name: pkgdown.yaml
 
 permissions: read-all
 
@@ -632,7 +636,9 @@ on:
   push:
     paths: ["R/**"]
 
-name: Document
+name: document.yaml
+
+permissions: read-all
 
 permissions: read-all
 
@@ -688,7 +694,9 @@ on:
   push:
     paths: ["**.[rR]", "**.[qrR]md", "**.[rR]markdown", "**.[rR]nw", "**.[rR]profile"]
 
-name: Style
+name: style.yaml
+
+permissions: read-all
 
 permissions: read-all
 
@@ -795,7 +803,9 @@ on:
     branches: [main, master]
   workflow_dispatch:
 
-name: bookdown
+name: bookdown.yaml
+
+permissions: read-all
 
 permissions: read-all
 
@@ -857,7 +867,7 @@ on:
     branches: [main, master]
   workflow_dispatch:
 
-name: Deploy bookdown to GH Pages
+name: bookdown-gh-pages.yaml
 
 permissions: read-all
 
@@ -948,7 +958,9 @@ on:
     branches: [main, master]
   workflow_dispatch:
 
-name: blogdown
+name: blogdown.yaml
+
+permissions: read-all
 
 permissions: read-all
 
@@ -1007,7 +1019,7 @@ on:
     branches: [main, master]
   workflow_dispatch:
 
-name: Deploy blogdown to GH Pages
+name: blogdown-gh-pages.yaml
 
 permissions: read-all
 
@@ -1094,7 +1106,9 @@ on:
   push:
     branches: [main, master]
 
-name: shiny-deploy
+name: shiny-deploy.yaml
+
+permissions: read-all
 
 permissions: read-all
 
@@ -1172,7 +1186,9 @@ on:
   pull_request:
     branches: [main, master]
 
-name: lint-project
+name: lint-project.yaml
+
+permissions: read-all
 
 permissions: read-all
 

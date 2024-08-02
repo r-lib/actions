@@ -4,7 +4,7 @@ on:
   issue_comment:
     types: [created]
 
-name: Commands
+name: pr-commands.yaml
 
 permissions: read-all
 

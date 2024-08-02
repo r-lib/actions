@@ -12,12 +12,12 @@ on:
   pull_request:
     branches: [main, master]
 
-name: R-CMD-check-hard
+name: check-no-suggests.yaml
 
 permissions: read-all
 
 jobs:
-  R-CMD-check:
+  check-no-suggests:
     runs-on: ${{ matrix.config.os }}
 
     name: ${{ matrix.config.os }} (${{ matrix.config.r }})

@@ -46,7 +46,7 @@ Options and advice:
 
 `usethis::use_github_action("check-release")`
 
-This workflow installs latest release R version on macOS
+This workflow installs latest release R version on linux
 and runs R CMD check via the [rcmdcheck](https://github.com/r-lib/rcmdcheck)
 package. If this is the first time you have used CI for a project this is
 probably what you want to use.

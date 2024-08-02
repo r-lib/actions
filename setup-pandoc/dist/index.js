@@ -5794,7 +5794,8 @@ module.exports.RedirectHandler = RedirectHandler
 module.exports.createRedirectInterceptor = createRedirectInterceptor
 module.exports.interceptors = {
   redirect: __nccwpck_require__(9313),
-  retry: __nccwpck_require__(5061)
+  retry: __nccwpck_require__(5061),
+  dump: __nccwpck_require__(3770)
 }
 
 module.exports.buildConnector = buildConnector
@@ -5862,7 +5863,7 @@ module.exports.fetch = async function fetch (init, options = undefined) {
     return await fetchImpl(init, options)
   } catch (err) {
     if (err && typeof err === 'object') {
-      Error.captureStackTrace(err, this)
+      Error.captureStackTrace(err)
     }
 
     throw err
@@ -6370,11 +6371,10 @@ module.exports = pipeline
 
 const assert = __nccwpck_require__(8061)
 const { Readable } = __nccwpck_require__(7145)
-const { InvalidArgumentError } = __nccwpck_require__(2460)
+const { InvalidArgumentError, RequestAbortedError } = __nccwpck_require__(2460)
 const util = __nccwpck_require__(7618)
 const { getResolveErrorBodyCallback } = __nccwpck_require__(687)
 const { AsyncResource } = __nccwpck_require__(2761)
-const { addSignal, removeSignal } = __nccwpck_require__(650)
 
 class RequestHandler extends AsyncResource {
   constructor (opts, callback) {
@@ -6413,6 +6413,7 @@ class RequestHandler extends AsyncResource {
       throw err
     }
 
+    this.method = method
     this.responseHeaders = responseHeaders || null
     this.opaque = opaque || null
     this.callback = callback
@@ -6424,6 +6425,9 @@ class RequestHandler extends AsyncResource {
     this.onInfo = onInfo || null
     this.throwOnError = throwOnError
     this.highWaterMark = highWaterMark
+    this.signal = signal
+    this.reason = null
+    this.removeAbortListener = null
 
     if (util.isStream(body)) {
       body.on('error', (err) => {
@@ -6431,7 +6435,26 @@ class RequestHandler extends AsyncResource {
       })
     }
 
-    addSignal(this, signal)
+    if (this.signal) {
+      if (this.signal.aborted) {
+        this.reason = this.signal.reason ?? new RequestAbortedError()
+      } else {
+        this.removeAbortListener = util.addAbortListener(this.signal, () => {
+          this.reason = this.signal.reason ?? new RequestAbortedError()
+          if (this.res) {
+            util.destroy(this.res, this.reason)
+          } else if (this.abort) {
+            this.abort(this.reason)
+          }
+
+          if (this.removeAbortListener) {
+            this.res?.off('close', this.removeAbortListener)
+            this.removeAbortListener()
+            this.removeAbortListener = null
+          }
+        })
+      }
+    }
   }
 
   onConnect (abort, context) {
@@ -6461,14 +6484,26 @@ class RequestHandler extends AsyncResource {
     const parsedHeaders = responseHeaders === 'raw' ? util.parseHeaders(rawHeaders) : headers
     const contentType = parsedHeaders['content-type']
     const contentLength = parsedHeaders['content-length']
-    const body = new Readable({ resume, abort, contentType, contentLength, highWaterMark })
+    const res = new Readable({
+      resume,
+      abort,
+      contentType,
+      contentLength: this.method !== 'HEAD' && contentLength
+        ? Number(contentLength)
+        : null,
+      highWaterMark
+    })
+
+    if (this.removeAbortListener) {
+      res.on('close', this.removeAbortListener)
+    }
 
     this.callback = null
-    this.res = body
+    this.res = res
     if (callback !== null) {
       if (this.throwOnError && statusCode >= 400) {
         this.runInAsyncScope(getResolveErrorBodyCallback, null,
-          { callback, body, contentType, statusCode, statusMessage, headers }
+          { callback, body: res, contentType, statusCode, statusMessage, headers }
         )
       } else {
         this.runInAsyncScope(callback, null, null, {
@@ -6476,7 +6511,7 @@ class RequestHandler extends AsyncResource {
           headers,
           trailers: this.trailers,
           opaque,
-          body,
+          body: res,
           context
         })
       }
@@ -6484,24 +6519,16 @@ class RequestHandler extends AsyncResource {
   }
 
   onData (chunk) {
-    const { res } = this
-    return res.push(chunk)
+    return this.res.push(chunk)
   }
 
   onComplete (trailers) {
-    const { res } = this
-
-    removeSignal(this)
-
     util.parseHeaders(trailers, this.trailers)
-
-    res.push(null)
+    this.res.push(null)
   }
 
   onError (err) {
     const { res, callback, body, opaque } = this
-
-    removeSignal(this)
 
     if (callback) {
       // TODO: Does this need queueMicrotask?
@@ -6522,6 +6549,12 @@ class RequestHandler extends AsyncResource {
     if (body) {
       this.body = null
       util.destroy(body, err)
+    }
+
+    if (this.removeAbortListener) {
+      res?.off('close', this.removeAbortListener)
+      this.removeAbortListener()
+      this.removeAbortListener = null
     }
   }
 }
@@ -6980,9 +7013,13 @@ class BodyReadable extends Readable {
     // tick as it is created, then a user who is waiting for a
     // promise (i.e micro tick) for installing a 'error' listener will
     // never get a chance and will always encounter an unhandled exception.
-    setImmediate(() => {
+    if (!this[kReading]) {
+      setImmediate(() => {
+        callback(err)
+      })
+    } else {
       callback(err)
-    })
+    }
   }
 
   on (ev, ...args) {
@@ -7455,7 +7492,7 @@ if (global.FinalizationRegistry && !(process.env.NODE_V8_COVERAGE || process.env
   }
 }
 
-function buildConnector ({ allowH2, maxCachedSessions, socketPath, timeout, ...opts }) {
+function buildConnector ({ allowH2, maxCachedSessions, socketPath, timeout, session: customSession, ...opts }) {
   if (maxCachedSessions != null && (!Number.isInteger(maxCachedSessions) || maxCachedSessions < 0)) {
     throw new InvalidArgumentError('maxCachedSessions must be a positive integer or zero')
   }
@@ -7473,7 +7510,7 @@ function buildConnector ({ allowH2, maxCachedSessions, socketPath, timeout, ...o
       servername = servername || options.servername || util.getServerName(host) || null
 
       const sessionKey = servername || hostname
-      const session = sessionCache.get(sessionKey) || null
+      const session = customSession || sessionCache.get(sessionKey) || null
 
       assert(sessionKey)
 
@@ -7547,7 +7584,7 @@ function setupTimeout (onConnectTimeout, timeout) {
   let s1 = null
   let s2 = null
   const timeoutId = setTimeout(() => {
-    // setImmediate is added to make sure that we priotorise socket error events over timeouts
+    // setImmediate is added to make sure that we prioritize socket error events over timeouts
     s1 = setImmediate(() => {
       if (process.platform === 'win32') {
         // Windows needs an extra setImmediate probably due to implementation differences in the socket logic
@@ -8174,7 +8211,8 @@ const {
   isBlobLike,
   buildURL,
   validateHandler,
-  getServerName
+  getServerName,
+  normalizedMethodRecords
 } = __nccwpck_require__(7618)
 const { channels } = __nccwpck_require__(495)
 const { headerNameLowerCasedRecord } = __nccwpck_require__(2572)
@@ -8209,13 +8247,13 @@ class Request {
       method !== 'CONNECT'
     ) {
       throw new InvalidArgumentError('path must be an absolute URL or start with a slash')
-    } else if (invalidPathRegex.exec(path) !== null) {
+    } else if (invalidPathRegex.test(path)) {
       throw new InvalidArgumentError('invalid request path')
     }
 
     if (typeof method !== 'string') {
       throw new InvalidArgumentError('method must be a string')
-    } else if (!isValidHTTPToken(method)) {
+    } else if (normalizedMethodRecords[method] === undefined && !isValidHTTPToken(method)) {
       throw new InvalidArgumentError('invalid request method')
     }
 
@@ -8567,7 +8605,6 @@ module.exports = {
   kQueue: Symbol('queue'),
   kConnect: Symbol('connect'),
   kConnecting: Symbol('connecting'),
-  kHeadersList: Symbol('headers list'),
   kKeepAliveDefaultTimeout: Symbol('default keep alive timeout'),
   kKeepAliveMaxTimeout: Symbol('max keep alive timeout'),
   kKeepAliveTimeoutThreshold: Symbol('keep alive timeout threshold'),
@@ -8580,6 +8617,7 @@ module.exports = {
   kHost: Symbol('host'),
   kNoRef: Symbol('no ref'),
   kBodyUsed: Symbol('used'),
+  kBody: Symbol('abstracted request body'),
   kRunning: Symbol('running'),
   kBlocking: Symbol('blocking'),
   kPending: Symbol('pending'),
@@ -8795,18 +8833,71 @@ module.exports = {
 
 
 const assert = __nccwpck_require__(8061)
-const { kDestroyed, kBodyUsed, kListeners } = __nccwpck_require__(7490)
+const { kDestroyed, kBodyUsed, kListeners, kBody } = __nccwpck_require__(7490)
 const { IncomingMessage } = __nccwpck_require__(8849)
 const stream = __nccwpck_require__(4492)
 const net = __nccwpck_require__(7503)
-const { InvalidArgumentError } = __nccwpck_require__(2460)
 const { Blob } = __nccwpck_require__(2254)
 const nodeUtil = __nccwpck_require__(7261)
 const { stringify } = __nccwpck_require__(9630)
+const { EventEmitter: EE } = __nccwpck_require__(5673)
+const { InvalidArgumentError } = __nccwpck_require__(2460)
 const { headerNameLowerCasedRecord } = __nccwpck_require__(2572)
 const { tree } = __nccwpck_require__(9054)
 
 const [nodeMajor, nodeMinor] = process.versions.node.split('.').map(v => Number(v))
+
+class BodyAsyncIterable {
+  constructor (body) {
+    this[kBody] = body
+    this[kBodyUsed] = false
+  }
+
+  async * [Symbol.asyncIterator] () {
+    assert(!this[kBodyUsed], 'disturbed')
+    this[kBodyUsed] = true
+    yield * this[kBody]
+  }
+}
+
+function wrapRequestBody (body) {
+  if (isStream(body)) {
+    // TODO (fix): Provide some way for the user to cache the file to e.g. /tmp
+    // so that it can be dispatched again?
+    // TODO (fix): Do we need 100-expect support to provide a way to do this properly?
+    if (bodyLength(body) === 0) {
+      body
+        .on('data', function () {
+          assert(false)
+        })
+    }
+
+    if (typeof body.readableDidRead !== 'boolean') {
+      body[kBodyUsed] = false
+      EE.prototype.on.call(body, 'data', function () {
+        this[kBodyUsed] = true
+      })
+    }
+
+    return body
+  } else if (body && typeof body.pipeTo === 'function') {
+    // TODO (fix): We can't access ReadableStream internal state
+    // to determine whether or not it has been disturbed. This is just
+    // a workaround.
+    return new BodyAsyncIterable(body)
+  } else if (
+    body &&
+    typeof body !== 'string' &&
+    !ArrayBuffer.isView(body) &&
+    isIterable(body)
+  ) {
+    // TODO: Should we allow re-using iterable if !this.opts.idempotent
+    // or through some other flag?
+    return new BodyAsyncIterable(body)
+  } else {
+    return body
+  }
+}
 
 function nop () {}
 
@@ -9386,6 +9477,31 @@ function errorRequest (client, request, err) {
 const kEnumerableProperty = Object.create(null)
 kEnumerableProperty.enumerable = true
 
+const normalizedMethodRecordsBase = {
+  delete: 'DELETE',
+  DELETE: 'DELETE',
+  get: 'GET',
+  GET: 'GET',
+  head: 'HEAD',
+  HEAD: 'HEAD',
+  options: 'OPTIONS',
+  OPTIONS: 'OPTIONS',
+  post: 'POST',
+  POST: 'POST',
+  put: 'PUT',
+  PUT: 'PUT'
+}
+
+const normalizedMethodRecords = {
+  ...normalizedMethodRecordsBase,
+  patch: 'patch',
+  PATCH: 'PATCH'
+}
+
+// Note: object prototypes should not be able to be referenced. e.g. `Object#hasOwnProperty`.
+Object.setPrototypeOf(normalizedMethodRecordsBase, null)
+Object.setPrototypeOf(normalizedMethodRecords, null)
+
 module.exports = {
   kEnumerableProperty,
   nop,
@@ -9424,11 +9540,14 @@ module.exports = {
   isValidHeaderValue,
   isTokenCharCode,
   parseRangeHeader,
+  normalizedMethodRecordsBase,
+  normalizedMethodRecords,
   isValidPort,
   isHttpOrHttpsPrefixed,
   nodeMajor,
   nodeMinor,
-  safeHTTPMethods: ['GET', 'HEAD', 'OPTIONS', 'TRACE']
+  safeHTTPMethods: ['GET', 'HEAD', 'OPTIONS', 'TRACE'],
+  wrapRequestBody
 }
 
 
@@ -10753,19 +10872,19 @@ function writeH1 (client, request) {
 
   /* istanbul ignore else: assertion */
   if (!body || bodyLength === 0) {
-    writeBuffer({ abort, body: null, client, request, socket, contentLength, header, expectsPayload })
+    writeBuffer(abort, null, client, request, socket, contentLength, header, expectsPayload)
   } else if (util.isBuffer(body)) {
-    writeBuffer({ abort, body, client, request, socket, contentLength, header, expectsPayload })
+    writeBuffer(abort, body, client, request, socket, contentLength, header, expectsPayload)
   } else if (util.isBlobLike(body)) {
     if (typeof body.stream === 'function') {
-      writeIterable({ abort, body: body.stream(), client, request, socket, contentLength, header, expectsPayload })
+      writeIterable(abort, body.stream(), client, request, socket, contentLength, header, expectsPayload)
     } else {
-      writeBlob({ abort, body, client, request, socket, contentLength, header, expectsPayload })
+      writeBlob(abort, body, client, request, socket, contentLength, header, expectsPayload)
     }
   } else if (util.isStream(body)) {
-    writeStream({ abort, body, client, request, socket, contentLength, header, expectsPayload })
+    writeStream(abort, body, client, request, socket, contentLength, header, expectsPayload)
   } else if (util.isIterable(body)) {
-    writeIterable({ abort, body, client, request, socket, contentLength, header, expectsPayload })
+    writeIterable(abort, body, client, request, socket, contentLength, header, expectsPayload)
   } else {
     assert(false)
   }
@@ -10773,7 +10892,7 @@ function writeH1 (client, request) {
   return true
 }
 
-function writeStream ({ abort, body, client, request, socket, contentLength, header, expectsPayload }) {
+function writeStream (abort, body, client, request, socket, contentLength, header, expectsPayload) {
   assert(contentLength !== 0 || client[kRunning] === 0, 'stream body cannot be pipelined')
 
   let finished = false
@@ -10876,7 +10995,7 @@ function writeStream ({ abort, body, client, request, socket, contentLength, hea
   }
 }
 
-async function writeBuffer ({ abort, body, client, request, socket, contentLength, header, expectsPayload }) {
+function writeBuffer (abort, body, client, request, socket, contentLength, header, expectsPayload) {
   try {
     if (!body) {
       if (contentLength === 0) {
@@ -10906,7 +11025,7 @@ async function writeBuffer ({ abort, body, client, request, socket, contentLengt
   }
 }
 
-async function writeBlob ({ abort, body, client, request, socket, contentLength, header, expectsPayload }) {
+async function writeBlob (abort, body, client, request, socket, contentLength, header, expectsPayload) {
   assert(contentLength === body.size, 'blob body must have content length')
 
   try {
@@ -10934,7 +11053,7 @@ async function writeBlob ({ abort, body, client, request, socket, contentLength,
   }
 }
 
-async function writeIterable ({ abort, body, client, request, socket, contentLength, header, expectsPayload }) {
+async function writeIterable (abort, body, client, request, socket, contentLength, header, expectsPayload) {
   assert(contentLength !== 0 || client[kRunning] === 0, 'iterator body cannot be pipelined')
 
   let callback = null
@@ -11607,80 +11726,80 @@ function writeH2 (client, request) {
   function writeBodyH2 () {
     /* istanbul ignore else: assertion */
     if (!body || contentLength === 0) {
-      writeBuffer({
+      writeBuffer(
         abort,
+        stream,
+        null,
         client,
         request,
+        client[kSocket],
         contentLength,
-        expectsPayload,
-        h2stream: stream,
-        body: null,
-        socket: client[kSocket]
-      })
+        expectsPayload
+      )
     } else if (util.isBuffer(body)) {
-      writeBuffer({
+      writeBuffer(
         abort,
+        stream,
+        body,
         client,
         request,
+        client[kSocket],
         contentLength,
-        body,
-        expectsPayload,
-        h2stream: stream,
-        socket: client[kSocket]
-      })
+        expectsPayload
+      )
     } else if (util.isBlobLike(body)) {
       if (typeof body.stream === 'function') {
-        writeIterable({
+        writeIterable(
           abort,
+          stream,
+          body.stream(),
           client,
           request,
+          client[kSocket],
           contentLength,
-          expectsPayload,
-          h2stream: stream,
-          body: body.stream(),
-          socket: client[kSocket]
-        })
+          expectsPayload
+        )
       } else {
-        writeBlob({
+        writeBlob(
           abort,
+          stream,
           body,
           client,
           request,
+          client[kSocket],
           contentLength,
-          expectsPayload,
-          h2stream: stream,
-          socket: client[kSocket]
-        })
+          expectsPayload
+        )
       }
     } else if (util.isStream(body)) {
-      writeStream({
+      writeStream(
+        abort,
+        client[kSocket],
+        expectsPayload,
+        stream,
         body,
         client,
         request,
-        contentLength,
-        expectsPayload,
-        socket: client[kSocket],
-        h2stream: stream,
-        header: ''
-      })
+        contentLength
+      )
     } else if (util.isIterable(body)) {
-      writeIterable({
+      writeIterable(
+        abort,
+        stream,
         body,
         client,
         request,
+        client[kSocket],
         contentLength,
-        expectsPayload,
-        header: '',
-        h2stream: stream,
-        socket: client[kSocket]
-      })
+        expectsPayload
+      )
     } else {
       assert(false)
     }
   }
 }
 
-function writeBuffer ({ abort, h2stream, body, client, request, socket, contentLength, expectsPayload }) {
+function writeBuffer (abort, h2stream, body, client, request, socket, contentLength, expectsPayload) {
   try {
     if (body != null && util.isBuffer(body)) {
       assert(contentLength === body.byteLength, 'buffer body must have content length')
@@ -11703,7 +11822,7 @@ function writeBuffer ({ abort, h2stream, body, client, request, socket, contentL
   }
 }
 
-function writeStream ({ abort, socket, expectsPayload, h2stream, body, client, request, contentLength }) {
+function writeStream (abort, socket, expectsPayload, h2stream, body, client, request, contentLength) {
   assert(contentLength !== 0 || client[kRunning] === 0, 'stream body cannot be pipelined')
 
   // For HTTP/2, is enough to pipe the stream
@@ -11734,7 +11853,7 @@ function writeStream ({ abort, socket, expectsPayload, h2stream, body, client, r
   }
 }
 
-async function writeBlob ({ abort, h2stream, body, client, request, socket, contentLength, expectsPayload }) {
+async function writeBlob (abort, h2stream, body, client, request, socket, contentLength, expectsPayload) {
   assert(contentLength === body.size, 'blob body must have content length')
 
   try {
@@ -11762,7 +11881,7 @@ async function writeBlob ({ abort, h2stream, body, client, request, socket, cont
   }
 }
 
-async function writeIterable ({ abort, h2stream, body, client, request, socket, contentLength, expectsPayload }) {
+async function writeIterable (abort, h2stream, body, client, request, socket, contentLength, expectsPayload) {
   assert(contentLength !== 0 || client[kRunning] === 0, 'iterator body cannot be pipelined')
 
   let callback = null
@@ -13939,13 +14058,16 @@ const assert = __nccwpck_require__(8061)
 
 const { kRetryHandlerDefaultRetry } = __nccwpck_require__(7490)
 const { RequestRetryError } = __nccwpck_require__(2460)
-const { isDisturbed, parseHeaders, parseRangeHeader } = __nccwpck_require__(7618)
+const {
+  isDisturbed,
+  parseHeaders,
+  parseRangeHeader,
+  wrapRequestBody
+} = __nccwpck_require__(7618)
 
 function calculateRetryAfterHeader (retryAfter) {
   const current = Date.now()
-  const diff = new Date(retryAfter).getTime() - current
-
-  return diff
+  return new Date(retryAfter).getTime() - current
 }
 
 class RetryHandler {
@@ -13967,7 +14089,7 @@ class RetryHandler {
 
     this.dispatch = handlers.dispatch
     this.handler = handlers.handler
-    this.opts = dispatchOpts
+    this.opts = { ...dispatchOpts, body: wrapRequestBody(opts.body) }
     this.abort = null
     this.aborted = false
     this.retryOpts = {
@@ -14052,11 +14174,7 @@ class RetryHandler {
     const { counter } = state
 
     // Any code that is not a Undici's originated and allowed to retry
-    if (
-      code &&
-      code !== 'UND_ERR_REQ_RETRY' &&
-      !errorCodes.includes(code)
-    ) {
+    if (code && code !== 'UND_ERR_REQ_RETRY' && !errorCodes.includes(code)) {
       cb(err)
       return
     }
@@ -14116,7 +14234,9 @@ class RetryHandler {
         this.abort(
           new RequestRetryError('Request failed', statusCode, {
             headers,
-            count: this.retryCount
+            data: {
+              count: this.retryCount
+            }
           })
         )
         return false
@@ -14137,7 +14257,7 @@ class RetryHandler {
         this.abort(
           new RequestRetryError('Content-Range mismatch', statusCode, {
             headers,
-            count: this.retryCount
+            data: { count: this.retryCount }
           })
         )
         return false
@@ -14148,7 +14268,7 @@ class RetryHandler {
         this.abort(
           new RequestRetryError('ETag mismatch', statusCode, {
             headers,
-            count: this.retryCount
+            data: { count: this.retryCount }
           })
         )
         return false
@@ -14182,10 +14302,7 @@ class RetryHandler {
           start != null && Number.isFinite(start),
           'content-range mismatch'
         )
-        assert(
-          end != null && Number.isFinite(end),
-          'invalid content-length'
-        )
+        assert(end != null && Number.isFinite(end), 'invalid content-length')
 
         this.start = start
         this.end = end
@@ -14206,6 +14323,13 @@ class RetryHandler {
       this.resume = resume
       this.etag = headers.etag != null ? headers.etag : null
 
+      // Weak etags are not useful for comparison nor cache
+      // for instance not safe to assume if the response is byte-per-byte
+      // equal
+      if (this.etag != null && this.etag.startsWith('W/')) {
+        this.etag = null
+      }
+
       return this.handler.onHeaders(
         statusCode,
         rawHeaders,
@@ -14216,7 +14340,7 @@ class RetryHandler {
 
     const err = new RequestRetryError('Request failed', statusCode, {
       headers,
-      count: this.retryCount
+      data: { count: this.retryCount }
     })
 
     this.abort(err)
@@ -14244,7 +14368,9 @@ class RetryHandler {
     // and server error response
     if (this.retryCount - this.retryCountCheckpoint > 0) {
       // We count the difference between the last checkpoint and the current retry count
-      this.retryCount = this.retryCountCheckpoint + (this.retryCount - this.retryCountCheckpoint)
+      this.retryCount =
+        this.retryCountCheckpoint +
+        (this.retryCount - this.retryCountCheckpoint)
     } else {
       this.retryCount += 1
     }
@@ -14264,11 +14390,18 @@ class RetryHandler {
       }
 
       if (this.start !== 0) {
+        const headers = { range: `bytes=${this.start}-${this.end ?? ''}` }
+
+        // Weak etag check - weak etags will make comparison algorithms never match
+        if (this.etag != null) {
+          headers['if-match'] = this.etag
+        }
+
         this.opts = {
           ...this.opts,
           headers: {
             ...this.opts.headers,
-            range: `bytes=${this.start}-${this.end ?? ''}`
+            ...headers
           }
         }
       }
@@ -14284,6 +14417,137 @@ class RetryHandler {
 }
 
 module.exports = RetryHandler
+
+
+/***/ }),
+
+/***/ 3770:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+const util = __nccwpck_require__(7618)
+const { InvalidArgumentError, RequestAbortedError } = __nccwpck_require__(2460)
+const DecoratorHandler = __nccwpck_require__(4935)
+
+class DumpHandler extends DecoratorHandler {
+  #maxSize = 1024 * 1024
+  #abort = null
+  #dumped = false
+  #aborted = false
+  #size = 0
+  #reason = null
+  #handler = null
+
+  constructor ({ maxSize }, handler) {
+    super(handler)
+
+    if (maxSize != null && (!Number.isFinite(maxSize) || maxSize < 1)) {
+      throw new InvalidArgumentError('maxSize must be a number greater than 0')
+    }
+
+    this.#maxSize = maxSize ?? this.#maxSize
+    this.#handler = handler
+  }
+
+  onConnect (abort) {
+    this.#abort = abort
+
+    this.#handler.onConnect(this.#customAbort.bind(this))
+  }
+
+  #customAbort (reason) {
+    this.#aborted = true
+    this.#reason = reason
+  }
+
+  // TODO: will require adjustment after new hooks are out
+  onHeaders (statusCode, rawHeaders, resume, statusMessage) {
+    const headers = util.parseHeaders(rawHeaders)
+    const contentLength = headers['content-length']
+
+    if (contentLength != null && contentLength > this.#maxSize) {
+      throw new RequestAbortedError(
+        `Response size (${contentLength}) larger than maxSize (${
+          this.#maxSize
+        })`
+      )
+    }
+
+    if (this.#aborted) {
+      return true
+    }
+
+    return this.#handler.onHeaders(
+      statusCode,
+      rawHeaders,
+      resume,
+      statusMessage
+    )
+  }
+
+  onError (err) {
+    if (this.#dumped) {
+      return
+    }
+
+    err = this.#reason ?? err
+
+    this.#handler.onError(err)
+  }
+
+  onData (chunk) {
+    this.#size = this.#size + chunk.length
+
+    if (this.#size >= this.#maxSize) {
+      this.#dumped = true
+
+      if (this.#aborted) {
+        this.#handler.onError(this.#reason)
+      } else {
+        this.#handler.onComplete([])
+      }
+    }
+
+    return true
+  }
+
+  onComplete (trailers) {
+    if (this.#dumped) {
+      return
+    }
+
+    if (this.#aborted) {
+      this.#handler.onError(this.reason)
+      return
+    }
+
+    this.#handler.onComplete(trailers)
+  }
+}
+
+function createDumpInterceptor (
+  { maxSize: defaultMaxSize } = {
+    maxSize: 1024 * 1024
+  }
+) {
+  return dispatch => {
+    return function Intercept (opts, handler) {
+      const { dumpMaxSize = defaultMaxSize } =
+        opts
+
+      const dumpHandler = new DumpHandler(
+        { maxSize: dumpMaxSize },
+        handler
+      )
+
+      return dispatch(opts, dumpHandler)
+    }
+  }
+}
+
+module.exports = createDumpInterceptor
 
 
 /***/ }),
@@ -15896,10 +16160,12 @@ class Cache {
 
   async match (request, options = {}) {
     webidl.brandCheck(this, Cache)
-    webidl.argumentLengthCheck(arguments, 1, { header: 'Cache.match' })
 
-    request = webidl.converters.RequestInfo(request)
-    options = webidl.converters.CacheQueryOptions(options)
+    const prefix = 'Cache.match'
+    webidl.argumentLengthCheck(arguments, 1, prefix)
+
+    request = webidl.converters.RequestInfo(request, prefix, 'request')
+    options = webidl.converters.CacheQueryOptions(options, prefix, 'options')
 
     const p = this.#internalMatchAll(request, options, 1)
 
@@ -15913,17 +16179,20 @@ class Cache {
   async matchAll (request = undefined, options = {}) {
     webidl.brandCheck(this, Cache)
 
-    if (request !== undefined) request = webidl.converters.RequestInfo(request)
-    options = webidl.converters.CacheQueryOptions(options)
+    const prefix = 'Cache.matchAll'
+    if (request !== undefined) request = webidl.converters.RequestInfo(request, prefix, 'request')
+    options = webidl.converters.CacheQueryOptions(options, prefix, 'options')
 
     return this.#internalMatchAll(request, options)
   }
 
   async add (request) {
     webidl.brandCheck(this, Cache)
-    webidl.argumentLengthCheck(arguments, 1, { header: 'Cache.add' })
 
-    request = webidl.converters.RequestInfo(request)
+    const prefix = 'Cache.add'
+    webidl.argumentLengthCheck(arguments, 1, prefix)
+
+    request = webidl.converters.RequestInfo(request, prefix, 'request')
 
     // 1.
     const requests = [request]
@@ -15937,7 +16206,9 @@ class Cache {
 
   async addAll (requests) {
     webidl.brandCheck(this, Cache)
-    webidl.argumentLengthCheck(arguments, 1, { header: 'Cache.addAll' })
+
+    const prefix = 'Cache.addAll'
+    webidl.argumentLengthCheck(arguments, 1, prefix)
 
     // 1.
     const responsePromises = []
@@ -15949,7 +16220,7 @@ class Cache {
     for (let request of requests) {
       if (request === undefined) {
         throw webidl.errors.conversionFailed({
-          prefix: 'Cache.addAll',
+          prefix,
           argument: 'Argument 1',
           types: ['undefined is not allowed']
         })
@@ -15967,7 +16238,7 @@ class Cache {
       // 3.2
       if (!urlIsHttpHttpsScheme(r.url) || r.method !== 'GET') {
         throw webidl.errors.exception({
-          header: 'Cache.addAll',
+          header: prefix,
           message: 'Expected http/s scheme when method is not GET.'
         })
       }
@@ -15985,7 +16256,7 @@ class Cache {
       // 5.2
       if (!urlIsHttpHttpsScheme(r.url)) {
         throw webidl.errors.exception({
-          header: 'Cache.addAll',
+          header: prefix,
           message: 'Expected http/s scheme.'
         })
       }
@@ -16105,10 +16376,12 @@ class Cache {
 
   async put (request, response) {
     webidl.brandCheck(this, Cache)
-    webidl.argumentLengthCheck(arguments, 2, { header: 'Cache.put' })
 
-    request = webidl.converters.RequestInfo(request)
-    response = webidl.converters.Response(response)
+    const prefix = 'Cache.put'
+    webidl.argumentLengthCheck(arguments, 2, prefix)
+
+    request = webidl.converters.RequestInfo(request, prefix, 'request')
+    response = webidl.converters.Response(response, prefix, 'response')
 
     // 1.
     let innerRequest = null
@@ -16123,7 +16396,7 @@ class Cache {
     // 4.
     if (!urlIsHttpHttpsScheme(innerRequest.url) || innerRequest.method !== 'GET') {
       throw webidl.errors.exception({
-        header: 'Cache.put',
+        header: prefix,
         message: 'Expected an http/s scheme when method is not GET'
       })
     }
@@ -16134,7 +16407,7 @@ class Cache {
     // 6.
     if (innerResponse.status === 206) {
       throw webidl.errors.exception({
-        header: 'Cache.put',
+        header: prefix,
         message: 'Got 206 status'
       })
     }
@@ -16149,7 +16422,7 @@ class Cache {
         // 7.2.1
         if (fieldValue === '*') {
           throw webidl.errors.exception({
-            header: 'Cache.put',
+            header: prefix,
             message: 'Got * vary field value'
           })
         }
@@ -16159,7 +16432,7 @@ class Cache {
     // 8.
     if (innerResponse.body && (isDisturbed(innerResponse.body.stream) || innerResponse.body.stream.locked)) {
       throw webidl.errors.exception({
-        header: 'Cache.put',
+        header: prefix,
         message: 'Response body is locked or disturbed'
       })
     }
@@ -16234,10 +16507,12 @@ class Cache {
 
   async delete (request, options = {}) {
     webidl.brandCheck(this, Cache)
-    webidl.argumentLengthCheck(arguments, 1, { header: 'Cache.delete' })
 
-    request = webidl.converters.RequestInfo(request)
-    options = webidl.converters.CacheQueryOptions(options)
+    const prefix = 'Cache.delete'
+    webidl.argumentLengthCheck(arguments, 1, prefix)
+
+    request = webidl.converters.RequestInfo(request, prefix, 'request')
+    options = webidl.converters.CacheQueryOptions(options, prefix, 'options')
 
     /**
      * @type {Request}
@@ -16299,8 +16574,10 @@ class Cache {
   async keys (request = undefined, options = {}) {
     webidl.brandCheck(this, Cache)
 
-    if (request !== undefined) request = webidl.converters.RequestInfo(request)
-    options = webidl.converters.CacheQueryOptions(options)
+    const prefix = 'Cache.keys'
+
+    if (request !== undefined) request = webidl.converters.RequestInfo(request, prefix, 'request')
+    options = webidl.converters.CacheQueryOptions(options, prefix, 'options')
 
     // 1.
     let r = null
@@ -16664,17 +16941,17 @@ const cacheQueryOptionConverters = [
   {
     key: 'ignoreSearch',
     converter: webidl.converters.boolean,
-    defaultValue: false
+    defaultValue: () => false
   },
   {
     key: 'ignoreMethod',
     converter: webidl.converters.boolean,
-    defaultValue: false
+    defaultValue: () => false
   },
   {
     key: 'ignoreVary',
     converter: webidl.converters.boolean,
-    defaultValue: false
+    defaultValue: () => false
   }
 ]
 
@@ -16727,7 +17004,7 @@ class CacheStorage {
 
   async match (request, options = {}) {
     webidl.brandCheck(this, CacheStorage)
-    webidl.argumentLengthCheck(arguments, 1, { header: 'CacheStorage.match' })
+    webidl.argumentLengthCheck(arguments, 1, 'CacheStorage.match')
 
     request = webidl.converters.RequestInfo(request)
     options = webidl.converters.MultiCacheQueryOptions(options)
@@ -16764,9 +17041,11 @@ class CacheStorage {
    */
   async has (cacheName) {
     webidl.brandCheck(this, CacheStorage)
-    webidl.argumentLengthCheck(arguments, 1, { header: 'CacheStorage.has' })
 
-    cacheName = webidl.converters.DOMString(cacheName)
+    const prefix = 'CacheStorage.has'
+    webidl.argumentLengthCheck(arguments, 1, prefix)
+
+    cacheName = webidl.converters.DOMString(cacheName, prefix, 'cacheName')
 
     // 2.1.1
     // 2.2
@@ -16780,9 +17059,11 @@ class CacheStorage {
    */
   async open (cacheName) {
     webidl.brandCheck(this, CacheStorage)
-    webidl.argumentLengthCheck(arguments, 1, { header: 'CacheStorage.open' })
 
-    cacheName = webidl.converters.DOMString(cacheName)
+    const prefix = 'CacheStorage.open'
+    webidl.argumentLengthCheck(arguments, 1, prefix)
+
+    cacheName = webidl.converters.DOMString(cacheName, prefix, 'cacheName')
 
     // 2.1
     if (this.#caches.has(cacheName)) {
@@ -16812,9 +17093,11 @@ class CacheStorage {
    */
   async delete (cacheName) {
     webidl.brandCheck(this, CacheStorage)
-    webidl.argumentLengthCheck(arguments, 1, { header: 'CacheStorage.delete' })
 
-    cacheName = webidl.converters.DOMString(cacheName)
+    const prefix = 'CacheStorage.delete'
+    webidl.argumentLengthCheck(arguments, 1, prefix)
+
+    cacheName = webidl.converters.DOMString(cacheName, prefix, 'cacheName')
 
     return this.#caches.delete(cacheName)
   }
@@ -16946,7 +17229,7 @@ module.exports = {
 
 
 const { parseSetCookie } = __nccwpck_require__(9176)
-const { stringify, getHeadersList } = __nccwpck_require__(1045)
+const { stringify } = __nccwpck_require__(1045)
 const { webidl } = __nccwpck_require__(583)
 const { Headers } = __nccwpck_require__(9108)
 
@@ -16969,7 +17252,7 @@ const { Headers } = __nccwpck_require__(9108)
  * @returns {Record<string, string>}
  */
 function getCookies (headers) {
-  webidl.argumentLengthCheck(arguments, 1, { header: 'getCookies' })
+  webidl.argumentLengthCheck(arguments, 1, 'getCookies')
 
   webidl.brandCheck(headers, Headers, { strict: false })
 
@@ -16996,11 +17279,12 @@ function getCookies (headers) {
  * @returns {void}
  */
 function deleteCookie (headers, name, attributes) {
-  webidl.argumentLengthCheck(arguments, 2, { header: 'deleteCookie' })
-
   webidl.brandCheck(headers, Headers, { strict: false })
 
-  name = webidl.converters.DOMString(name)
+  const prefix = 'deleteCookie'
+  webidl.argumentLengthCheck(arguments, 2, prefix)
+
+  name = webidl.converters.DOMString(name, prefix, 'name')
   attributes = webidl.converters.DeleteCookieAttributes(attributes)
 
   // Matches behavior of
@@ -17018,18 +17302,17 @@ function deleteCookie (headers, name, attributes) {
  * @returns {Cookie[]}
  */
 function getSetCookies (headers) {
-  webidl.argumentLengthCheck(arguments, 1, { header: 'getSetCookies' })
+  webidl.argumentLengthCheck(arguments, 1, 'getSetCookies')
 
   webidl.brandCheck(headers, Headers, { strict: false })
 
-  const cookies = getHeadersList(headers).cookies
+  const cookies = headers.getSetCookie()
 
   if (!cookies) {
     return []
   }
 
-  // In older versions of undici, cookies is a list of name:value.
-  return cookies.map((pair) => parseSetCookie(Array.isArray(pair) ? pair[1] : pair))
+  return cookies.map((pair) => parseSetCookie(pair))
 }
 
 /**
@@ -17038,7 +17321,7 @@ function getSetCookies (headers) {
  * @returns {void}
  */
 function setCookie (headers, cookie) {
-  webidl.argumentLengthCheck(arguments, 2, { header: 'setCookie' })
+  webidl.argumentLengthCheck(arguments, 2, 'setCookie')
 
   webidl.brandCheck(headers, Headers, { strict: false })
 
@@ -17055,12 +17338,12 @@ webidl.converters.DeleteCookieAttributes = webidl.dictionaryConverter([
   {
     converter: webidl.nullableConverter(webidl.converters.DOMString),
     key: 'path',
-    defaultValue: null
+    defaultValue: () => null
   },
   {
     converter: webidl.nullableConverter(webidl.converters.DOMString),
     key: 'domain',
-    defaultValue: null
+    defaultValue: () => null
   }
 ])
 
@@ -17082,32 +17365,32 @@ webidl.converters.Cookie = webidl.dictionaryConverter([
       return new Date(value)
     }),
     key: 'expires',
-    defaultValue: null
+    defaultValue: () => null
   },
   {
     converter: webidl.nullableConverter(webidl.converters['long long']),
     key: 'maxAge',
-    defaultValue: null
+    defaultValue: () => null
   },
   {
     converter: webidl.nullableConverter(webidl.converters.DOMString),
     key: 'domain',
-    defaultValue: null
+    defaultValue: () => null
   },
   {
     converter: webidl.nullableConverter(webidl.converters.DOMString),
     key: 'path',
-    defaultValue: null
+    defaultValue: () => null
   },
   {
     converter: webidl.nullableConverter(webidl.converters.boolean),
     key: 'secure',
-    defaultValue: null
+    defaultValue: () => null
   },
   {
     converter: webidl.nullableConverter(webidl.converters.boolean),
     key: 'httpOnly',
-    defaultValue: null
+    defaultValue: () => null
   },
   {
     converter: webidl.converters.USVString,
@@ -17117,7 +17400,7 @@ webidl.converters.Cookie = webidl.dictionaryConverter([
   {
     converter: webidl.sequenceConverter(webidl.converters.DOMString),
     key: 'unparsed',
-    defaultValue: []
+    defaultValue: () => new Array(0)
   }
 ])
 
@@ -17457,13 +17740,10 @@ module.exports = {
 /***/ }),
 
 /***/ 1045:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+/***/ ((module) => {
 
 "use strict";
 
-
-const assert = __nccwpck_require__(8061)
-const { kHeadersList } = __nccwpck_require__(7490)
 
 /**
  * @param {string} value
@@ -17737,35 +18017,13 @@ function stringify (cookie) {
   return out.join('; ')
 }
 
-let kHeadersListNode
-
-function getHeadersList (headers) {
-  if (headers[kHeadersList]) {
-    return headers[kHeadersList]
-  }
-
-  if (!kHeadersListNode) {
-    kHeadersListNode = Object.getOwnPropertySymbols(headers).find(
-      (symbol) => symbol.description === 'headers list'
-    )
-
-    assert(kHeadersListNode, 'Headers cannot be parsed')
-  }
-
-  const headersList = headers[kHeadersListNode]
-  assert(headersList)
-
-  return headersList
-}
-
 module.exports = {
   isCTLExcludingHtab,
   validateCookieName,
   validateCookiePath,
   validateCookieValue,
   toIMFDate,
-  stringify,
-  getHeadersList
+  stringify
 }
 
 
@@ -18189,7 +18447,7 @@ const { makeRequest } = __nccwpck_require__(5573)
 const { webidl } = __nccwpck_require__(583)
 const { EventSourceStream } = __nccwpck_require__(7334)
 const { parseMIMEType } = __nccwpck_require__(2322)
-const { MessageEvent } = __nccwpck_require__(2591)
+const { createFastMessageEvent } = __nccwpck_require__(2591)
 const { isNetworkError } = __nccwpck_require__(6092)
 const { delay } = __nccwpck_require__(9444)
 const { kEnumerableProperty } = __nccwpck_require__(7618)
@@ -18288,7 +18546,8 @@ class EventSource extends EventTarget {
     // 1. Let ev be a new EventSource object.
     super()
 
-    webidl.argumentLengthCheck(arguments, 1, { header: 'EventSource constructor' })
+    const prefix = 'EventSource constructor'
+    webidl.argumentLengthCheck(arguments, 1, prefix)
 
     if (!experimentalWarned) {
       experimentalWarned = true
@@ -18297,8 +18556,8 @@ class EventSource extends EventTarget {
       })
     }
 
-    url = webidl.converters.USVString(url)
-    eventSourceInitDict = webidl.converters.EventSourceInitDict(eventSourceInitDict)
+    url = webidl.converters.USVString(url, prefix, 'url')
+    eventSourceInitDict = webidl.converters.EventSourceInitDict(eventSourceInitDict, prefix, 'eventSourceInitDict')
 
     this.#dispatcher = eventSourceInitDict.dispatcher
     this.#state = {
@@ -18473,7 +18732,7 @@ class EventSource extends EventTarget {
       const eventSourceStream = new EventSourceStream({
         eventSourceSettings: this.#state,
         push: (event) => {
-          this.dispatchEvent(new MessageEvent(
+          this.dispatchEvent(createFastMessageEvent(
             event.type,
             event.options
           ))
@@ -18646,7 +18905,7 @@ webidl.converters.EventSourceInitDict = webidl.dictionaryConverter([
   {
     key: 'withCredentials',
     converter: webidl.converters.boolean,
-    defaultValue: false
+    defaultValue: () => false
   },
   {
     key: 'dispatcher', // undici only
@@ -19022,7 +19281,7 @@ function bodyMixinMethods (instance) {
         // Return a Blob whose contents are bytes and type attribute
         // is mimeType.
         return new Blob([bytes], { type: mimeType })
-      }, instance, false)
+      }, instance)
     },
 
     arrayBuffer () {
@@ -19031,21 +19290,20 @@ function bodyMixinMethods (instance) {
       // given a byte sequence bytes: return a new ArrayBuffer
       // whose contents are bytes.
       return consumeBody(this, (bytes) => {
-        // Note: arrayBuffer already cloned.
-        return bytes.buffer
-      }, instance, true)
+        return new Uint8Array(bytes).buffer
+      }, instance)
     },
 
     text () {
       // The text() method steps are to return the result of running
       // consume body with this and UTF-8 decode.
-      return consumeBody(this, utf8DecodeBytes, instance, false)
+      return consumeBody(this, utf8DecodeBytes, instance)
     },
 
     json () {
       // The json() method steps are to return the result of running
       // consume body with this and parse JSON from bytes.
-      return consumeBody(this, parseJSONFromBytes, instance, false)
+      return consumeBody(this, parseJSONFromBytes, instance)
     },
 
     formData () {
@@ -19097,7 +19355,16 @@ function bodyMixinMethods (instance) {
         throw new TypeError(
           'Content-Type was not one of "multipart/form-data" or "application/x-www-form-urlencoded".'
         )
-      }, instance, false)
+      }, instance)
+    },
+
+    bytes () {
+      // The bytes() method steps are to return the result of running consume body
+      // with this and the following step given a byte sequence bytes: return the
+      // result of creating a Uint8Array from bytes in this’s relevant realm.
+      return consumeBody(this, (bytes) => {
+        return new Uint8Array(bytes)
+      }, instance)
     }
   }
 
@@ -19113,9 +19380,8 @@ function mixinBody (prototype) {
  * @param {Response|Request} object
  * @param {(value: unknown) => unknown} convertBytesToJSValue
  * @param {Response|Request} instance
- * @param {boolean} [shouldClone]
  */
-async function consumeBody (object, convertBytesToJSValue, instance, shouldClone) {
+async function consumeBody (object, convertBytesToJSValue, instance) {
   webidl.brandCheck(object, instance)
 
   // 1. If object is unusable, then return a promise rejected
@@ -19153,7 +19419,7 @@ async function consumeBody (object, convertBytesToJSValue, instance, shouldClone
 
   // 6. Otherwise, fully read object’s body given successSteps,
   //    errorSteps, and object’s relevant global object.
-  await fullyReadBody(object[kState].body, successSteps, errorSteps, shouldClone)
+  await fullyReadBody(object[kState].body, successSteps, errorSteps)
 
   // 7. Return promise.
   return promise.promise
@@ -19344,13 +19610,13 @@ const encoder = new TextEncoder()
 /**
  * @see https://mimesniff.spec.whatwg.org/#http-token-code-point
  */
-const HTTP_TOKEN_CODEPOINTS = /^[!#$%&'*+-.^_|~A-Za-z0-9]+$/
+const HTTP_TOKEN_CODEPOINTS = /^[!#$%&'*+\-.^_|~A-Za-z0-9]+$/
 const HTTP_WHITESPACE_REGEX = /[\u000A\u000D\u0009\u0020]/ // eslint-disable-line
 const ASCII_WHITESPACE_REPLACE_REGEX = /[\u0009\u000A\u000C\u000D\u0020]/g // eslint-disable-line
 /**
  * @see https://mimesniff.spec.whatwg.org/#http-quoted-string-token-code-point
  */
-const HTTP_QUOTED_STRING_TOKENS = /[\u0009\u0020-\u007E\u0080-\u00FF]/ // eslint-disable-line
+const HTTP_QUOTED_STRING_TOKENS = /^[\u0009\u0020-\u007E\u0080-\u00FF]+$/ // eslint-disable-line
 
 // https://fetch.spec.whatwg.org/#data-url-processor
 /** @param {URL} dataURL */
@@ -20074,6 +20340,7 @@ module.exports = {
   collectAnHTTPQuotedString,
   serializeAMimeType,
   removeChars,
+  removeHTTPWhitespace,
   minimizeSupportedMimeType,
   HTTP_TOKEN_CODEPOINTS,
   isomorphicDecode
@@ -20121,9 +20388,10 @@ class CompatFinalizer {
 }
 
 module.exports = function () {
-  // FIXME: remove workaround when the Node bug is fixed
+  // FIXME: remove workaround when the Node bug is backported to v18
   // https://github.com/nodejs/node/issues/49344#issuecomment-1741776308
-  if (process.env.NODE_V8_COVERAGE) {
+  if (process.env.NODE_V8_COVERAGE && process.version.startsWith('v18')) {
+    process._rawDebug('Using compatibility WeakRef and FinalizationRegistry')
     return {
       WeakRef: CompatWeakRef,
       FinalizationRegistry: CompatFinalizer
@@ -20775,7 +21043,8 @@ class FormData {
   append (name, value, filename = undefined) {
     webidl.brandCheck(this, FormData)
 
-    webidl.argumentLengthCheck(arguments, 2, { header: 'FormData.append' })
+    const prefix = 'FormData.append'
+    webidl.argumentLengthCheck(arguments, 2, prefix)
 
     if (arguments.length === 3 && !isBlobLike(value)) {
       throw new TypeError(
@@ -20785,12 +21054,12 @@ class FormData {
 
     // 1. Let value be value if given; otherwise blobValue.
 
-    name = webidl.converters.USVString(name)
+    name = webidl.converters.USVString(name, prefix, 'name')
     value = isBlobLike(value)
-      ? webidl.converters.Blob(value, { strict: false })
-      : webidl.converters.USVString(value)
+      ? webidl.converters.Blob(value, prefix, 'value', { strict: false })
+      : webidl.converters.USVString(value, prefix, 'value')
     filename = arguments.length === 3
-      ? webidl.converters.USVString(filename)
+      ? webidl.converters.USVString(filename, prefix, 'filename')
       : undefined
 
     // 2. Let entry be the result of creating an entry with
@@ -20804,9 +21073,10 @@ class FormData {
   delete (name) {
     webidl.brandCheck(this, FormData)
 
-    webidl.argumentLengthCheck(arguments, 1, { header: 'FormData.delete' })
+    const prefix = 'FormData.delete'
+    webidl.argumentLengthCheck(arguments, 1, prefix)
 
-    name = webidl.converters.USVString(name)
+    name = webidl.converters.USVString(name, prefix, 'name')
 
     // The delete(name) method steps are to remove all entries whose name
     // is name from this’s entry list.
@@ -20816,9 +21086,10 @@ class FormData {
   get (name) {
     webidl.brandCheck(this, FormData)
 
-    webidl.argumentLengthCheck(arguments, 1, { header: 'FormData.get' })
+    const prefix = 'FormData.get'
+    webidl.argumentLengthCheck(arguments, 1, prefix)
 
-    name = webidl.converters.USVString(name)
+    name = webidl.converters.USVString(name, prefix, 'name')
 
     // 1. If there is no entry whose name is name in this’s entry list,
     // then return null.
@@ -20835,9 +21106,10 @@ class FormData {
   getAll (name) {
     webidl.brandCheck(this, FormData)
 
-    webidl.argumentLengthCheck(arguments, 1, { header: 'FormData.getAll' })
+    const prefix = 'FormData.getAll'
+    webidl.argumentLengthCheck(arguments, 1, prefix)
 
-    name = webidl.converters.USVString(name)
+    name = webidl.converters.USVString(name, prefix, 'name')
 
     // 1. If there is no entry whose name is name in this’s entry list,
     // then return the empty list.
@@ -20851,9 +21123,10 @@ class FormData {
   has (name) {
     webidl.brandCheck(this, FormData)
 
-    webidl.argumentLengthCheck(arguments, 1, { header: 'FormData.has' })
+    const prefix = 'FormData.has'
+    webidl.argumentLengthCheck(arguments, 1, prefix)
 
-    name = webidl.converters.USVString(name)
+    name = webidl.converters.USVString(name, prefix, 'name')
 
     // The has(name) method steps are to return true if there is an entry
     // whose name is name in this’s entry list; otherwise false.
@@ -20863,7 +21136,8 @@ class FormData {
   set (name, value, filename = undefined) {
     webidl.brandCheck(this, FormData)
 
-    webidl.argumentLengthCheck(arguments, 2, { header: 'FormData.set' })
+    const prefix = 'FormData.set'
+    webidl.argumentLengthCheck(arguments, 2, prefix)
 
     if (arguments.length === 3 && !isBlobLike(value)) {
       throw new TypeError(
@@ -20876,12 +21150,12 @@ class FormData {
 
     // 1. Let value be value if given; otherwise blobValue.
 
-    name = webidl.converters.USVString(name)
+    name = webidl.converters.USVString(name, prefix, 'name')
     value = isBlobLike(value)
-      ? webidl.converters.Blob(value, { strict: false })
-      : webidl.converters.USVString(value)
+      ? webidl.converters.Blob(value, prefix, 'name', { strict: false })
+      : webidl.converters.USVString(value, prefix, 'name')
     filename = arguments.length === 3
-      ? webidl.converters.USVString(filename)
+      ? webidl.converters.USVString(filename, prefix, 'name')
       : undefined
 
     // 2. Let entry be the result of creating an entry with name, value, and
@@ -21049,8 +21323,7 @@ module.exports = {
 
 
 
-const { kHeadersList, kConstruct } = __nccwpck_require__(7490)
-const { kGuard } = __nccwpck_require__(5746)
+const { kConstruct } = __nccwpck_require__(7490)
 const { kEnumerableProperty } = __nccwpck_require__(7618)
 const {
   iteratorMixin,
@@ -21150,19 +21423,18 @@ function appendHeader (headers, name, value) {
   // 3. If headers’s guard is "immutable", then throw a TypeError.
   // 4. Otherwise, if headers’s guard is "request" and name is a
   //    forbidden header name, return.
+  // 5. Otherwise, if headers’s guard is "request-no-cors":
+  //    TODO
   // Note: undici does not implement forbidden header names
-  if (headers[kGuard] === 'immutable') {
+  if (getHeadersGuard(headers) === 'immutable') {
     throw new TypeError('immutable')
-  } else if (headers[kGuard] === 'request-no-cors') {
-    // 5. Otherwise, if headers’s guard is "request-no-cors":
-    // TODO
   }
 
   // 6. Otherwise, if headers’s guard is "response" and name is a
   //    forbidden response-header name, return.
 
   // 7. Append (name, value) to headers’s header list.
-  return headers[kHeadersList].append(name, value, false)
+  return getHeadersList(headers).append(name, value, false)
 
   // 8. If headers’s guard is "request-no-cors", then remove
   //    privileged no-CORS request headers from headers
@@ -21297,9 +21569,31 @@ class HeadersList {
   get entries () {
     const headers = {}
 
-    if (this[kHeadersMap].size) {
+    if (this[kHeadersMap].size !== 0) {
       for (const { name, value } of this[kHeadersMap].values()) {
         headers[name] = value
+      }
+    }
+
+    return headers
+  }
+
+  rawValues () {
+    return this[kHeadersMap].values()
+  }
+
+  get entriesList () {
+    const headers = []
+
+    if (this[kHeadersMap].size !== 0) {
+      for (const { 0: lowerName, 1: { name, value } } of this[kHeadersMap]) {
+        if (lowerName === 'set-cookie') {
+          for (const cookie of this.cookies) {
+            headers.push([name, cookie])
+          }
+        } else {
+          headers.push([name, value])
+        }
       }
     }
 
@@ -21382,20 +21676,24 @@ class HeadersList {
 
 // https://fetch.spec.whatwg.org/#headers-class
 class Headers {
+  #guard
+  #headersList
+
   constructor (init = undefined) {
     if (init === kConstruct) {
       return
     }
-    this[kHeadersList] = new HeadersList()
+
+    this.#headersList = new HeadersList()
 
     // The new Headers(init) constructor steps are:
 
     // 1. Set this’s guard to "none".
-    this[kGuard] = 'none'
+    this.#guard = 'none'
 
     // 2. If init is given, then fill this with init.
     if (init !== undefined) {
-      init = webidl.converters.HeadersInit(init)
+      init = webidl.converters.HeadersInit(init, 'Headers contructor', 'init')
       fill(this, init)
     }
   }
@@ -21404,10 +21702,11 @@ class Headers {
   append (name, value) {
     webidl.brandCheck(this, Headers)
 
-    webidl.argumentLengthCheck(arguments, 2, { header: 'Headers.append' })
+    webidl.argumentLengthCheck(arguments, 2, 'Headers.append')
 
-    name = webidl.converters.ByteString(name)
-    value = webidl.converters.ByteString(value)
+    const prefix = 'Headers.append'
+    name = webidl.converters.ByteString(name, prefix, 'name')
+    value = webidl.converters.ByteString(value, prefix, 'value')
 
     return appendHeader(this, name, value)
   }
@@ -21416,9 +21715,10 @@ class Headers {
   delete (name) {
     webidl.brandCheck(this, Headers)
 
-    webidl.argumentLengthCheck(arguments, 1, { header: 'Headers.delete' })
+    webidl.argumentLengthCheck(arguments, 1, 'Headers.delete')
 
-    name = webidl.converters.ByteString(name)
+    const prefix = 'Headers.delete'
+    name = webidl.converters.ByteString(name, prefix, 'name')
 
     // 1. If name is not a header name, then throw a TypeError.
     if (!isValidHeaderName(name)) {
@@ -21439,36 +21739,35 @@ class Headers {
     // 5. Otherwise, if this’s guard is "response" and name is
     //    a forbidden response-header name, return.
     // Note: undici does not implement forbidden header names
-    if (this[kGuard] === 'immutable') {
+    if (this.#guard === 'immutable') {
       throw new TypeError('immutable')
-    } else if (this[kGuard] === 'request-no-cors') {
-      // TODO
     }
 
     // 6. If this’s header list does not contain name, then
     //    return.
-    if (!this[kHeadersList].contains(name, false)) {
+    if (!this.#headersList.contains(name, false)) {
       return
     }
 
     // 7. Delete name from this’s header list.
     // 8. If this’s guard is "request-no-cors", then remove
     //    privileged no-CORS request headers from this.
-    this[kHeadersList].delete(name, false)
+    this.#headersList.delete(name, false)
   }
 
   // https://fetch.spec.whatwg.org/#dom-headers-get
   get (name) {
     webidl.brandCheck(this, Headers)
 
-    webidl.argumentLengthCheck(arguments, 1, { header: 'Headers.get' })
+    webidl.argumentLengthCheck(arguments, 1, 'Headers.get')
 
-    name = webidl.converters.ByteString(name)
+    const prefix = 'Headers.get'
+    name = webidl.converters.ByteString(name, prefix, 'name')
 
     // 1. If name is not a header name, then throw a TypeError.
     if (!isValidHeaderName(name)) {
       throw webidl.errors.invalidArgument({
-        prefix: 'Headers.get',
+        prefix,
         value: name,
         type: 'header name'
       })
@@ -21476,21 +21775,22 @@ class Headers {
 
     // 2. Return the result of getting name from this’s header
     //    list.
-    return this[kHeadersList].get(name, false)
+    return this.#headersList.get(name, false)
   }
 
   // https://fetch.spec.whatwg.org/#dom-headers-has
   has (name) {
     webidl.brandCheck(this, Headers)
 
-    webidl.argumentLengthCheck(arguments, 1, { header: 'Headers.has' })
+    webidl.argumentLengthCheck(arguments, 1, 'Headers.has')
 
-    name = webidl.converters.ByteString(name)
+    const prefix = 'Headers.has'
+    name = webidl.converters.ByteString(name, prefix, 'name')
 
     // 1. If name is not a header name, then throw a TypeError.
     if (!isValidHeaderName(name)) {
       throw webidl.errors.invalidArgument({
-        prefix: 'Headers.has',
+        prefix,
         value: name,
         type: 'header name'
       })
@@ -21498,17 +21798,18 @@ class Headers {
 
     // 2. Return true if this’s header list contains name;
     //    otherwise false.
-    return this[kHeadersList].contains(name, false)
+    return this.#headersList.contains(name, false)
   }
 
   // https://fetch.spec.whatwg.org/#dom-headers-set
   set (name, value) {
     webidl.brandCheck(this, Headers)
 
-    webidl.argumentLengthCheck(arguments, 2, { header: 'Headers.set' })
+    webidl.argumentLengthCheck(arguments, 2, 'Headers.set')
 
-    name = webidl.converters.ByteString(name)
-    value = webidl.converters.ByteString(value)
+    const prefix = 'Headers.set'
+    name = webidl.converters.ByteString(name, prefix, 'name')
+    value = webidl.converters.ByteString(value, prefix, 'value')
 
     // 1. Normalize value.
     value = headerValueNormalize(value)
@@ -21517,13 +21818,13 @@ class Headers {
     //    header value, then throw a TypeError.
     if (!isValidHeaderName(name)) {
       throw webidl.errors.invalidArgument({
-        prefix: 'Headers.set',
+        prefix,
         value: name,
         type: 'header name'
       })
     } else if (!isValidHeaderValue(value)) {
       throw webidl.errors.invalidArgument({
-        prefix: 'Headers.set',
+        prefix,
         value,
         type: 'header value'
       })
@@ -21538,16 +21839,14 @@ class Headers {
     // 6. Otherwise, if this’s guard is "response" and name is a
     //    forbidden response-header name, return.
     // Note: undici does not implement forbidden header names
-    if (this[kGuard] === 'immutable') {
+    if (this.#guard === 'immutable') {
       throw new TypeError('immutable')
-    } else if (this[kGuard] === 'request-no-cors') {
-      // TODO
     }
 
     // 7. Set (name, value) in this’s header list.
     // 8. If this’s guard is "request-no-cors", then remove
     //    privileged no-CORS request headers from this
-    this[kHeadersList].set(name, value, false)
+    this.#headersList.set(name, value, false)
   }
 
   // https://fetch.spec.whatwg.org/#dom-headers-getsetcookie
@@ -21558,7 +21857,7 @@ class Headers {
     // 2. Return the values of all headers in this’s header list whose name is
     //    a byte-case-insensitive match for `Set-Cookie`, in order.
 
-    const list = this[kHeadersList].cookies
+    const list = this.#headersList.cookies
 
     if (list) {
       return [...list]
@@ -21569,8 +21868,8 @@ class Headers {
 
   // https://fetch.spec.whatwg.org/#concept-header-list-sort-and-combine
   get [kHeadersSortedMap] () {
-    if (this[kHeadersList][kHeadersSortedMap]) {
-      return this[kHeadersList][kHeadersSortedMap]
+    if (this.#headersList[kHeadersSortedMap]) {
+      return this.#headersList[kHeadersSortedMap]
     }
 
     // 1. Let headers be an empty list of headers with the key being the name
@@ -21579,14 +21878,14 @@ class Headers {
 
     // 2. Let names be the result of convert header names to a sorted-lowercase
     //    set with all the names of the headers in list.
-    const names = this[kHeadersList].toSortedArray()
+    const names = this.#headersList.toSortedArray()
 
-    const cookies = this[kHeadersList].cookies
+    const cookies = this.#headersList.cookies
 
     // fast-path
     if (cookies === null || cookies.length === 1) {
       // Note: The non-null assertion of value has already been done by `HeadersList#toSortedArray`
-      return (this[kHeadersList][kHeadersSortedMap] = names)
+      return (this.#headersList[kHeadersSortedMap] = names)
     }
 
     // 3. For each name of names:
@@ -21616,19 +21915,37 @@ class Headers {
     }
 
     // 4. Return headers.
-    return (this[kHeadersList][kHeadersSortedMap] = headers)
+    return (this.#headersList[kHeadersSortedMap] = headers)
   }
 
   [util.inspect.custom] (depth, options) {
     options.depth ??= depth
 
-    return `Headers ${util.formatWithOptions(options, this[kHeadersList].entries)}`
+    return `Headers ${util.formatWithOptions(options, this.#headersList.entries)}`
+  }
+
+  static getHeadersGuard (o) {
+    return o.#guard
+  }
+
+  static setHeadersGuard (o, guard) {
+    o.#guard = guard
+  }
+
+  static getHeadersList (o) {
+    return o.#headersList
+  }
+
+  static setHeadersList (o, list) {
+    o.#headersList = list
   }
 }
 
-Object.defineProperty(Headers.prototype, util.inspect.custom, {
-  enumerable: false
-})
+const { getHeadersGuard, setHeadersGuard, getHeadersList, setHeadersList } = Headers
+Reflect.deleteProperty(Headers, 'getHeadersGuard')
+Reflect.deleteProperty(Headers, 'setHeadersGuard')
+Reflect.deleteProperty(Headers, 'getHeadersList')
+Reflect.deleteProperty(Headers, 'setHeadersList')
 
 iteratorMixin('Headers', Headers, kHeadersSortedMap, 0, 1)
 
@@ -21642,18 +21959,31 @@ Object.defineProperties(Headers.prototype, {
   [Symbol.toStringTag]: {
     value: 'Headers',
     configurable: true
+  },
+  [util.inspect.custom]: {
+    enumerable: false
   }
 })
 
-webidl.converters.HeadersInit = function (V) {
+webidl.converters.HeadersInit = function (V, prefix, argument) {
   if (webidl.util.Type(V) === 'Object') {
     const iterator = Reflect.get(V, Symbol.iterator)
 
-    if (typeof iterator === 'function') {
-      return webidl.converters['sequence<sequence<ByteString>>'](V, iterator.bind(V))
+    // A work-around to ensure we send the properly-cased Headers when V is a Headers object.
+    // Read https://github.com/nodejs/undici/pull/3159#issuecomment-2075537226 before touching, please.
+    if (!util.types.isProxy(V) && iterator === Headers.prototype.entries) { // Headers object
+      try {
+        return getHeadersList(V).entriesList
+      } catch {
+        // fall-through
+      }
     }
 
-    return webidl.converters['record<ByteString, ByteString>'](V)
+    if (typeof iterator === 'function') {
+      return webidl.converters['sequence<sequence<ByteString>>'](V, prefix, argument, iterator.bind(V))
+    }
+
+    return webidl.converters['record<ByteString, ByteString>'](V, prefix, argument)
   }
 
   throw webidl.errors.conversionFailed({
@@ -21668,7 +21998,11 @@ module.exports = {
   // for test.
   compareHeaderName,
   Headers,
-  HeadersList
+  HeadersList,
+  getHeadersGuard,
+  setHeadersGuard,
+  setHeadersList,
+  getHeadersList
 }
 
 
@@ -21800,12 +22134,16 @@ class Fetch extends EE {
   }
 }
 
+function handleFetchDone (response) {
+  finalizeAndReportTiming(response, 'fetch')
+}
+
 // https://fetch.spec.whatwg.org/#fetch-method
 function fetch (input, init = undefined) {
-  webidl.argumentLengthCheck(arguments, 1, { header: 'globalThis.fetch' })
+  webidl.argumentLengthCheck(arguments, 1, 'globalThis.fetch')
 
   // 1. Let p be a new promise.
-  const p = createDeferredPromise()
+  let p = createDeferredPromise()
 
   // 2. Let requestObject be the result of invoking the initial value of
   // Request as constructor with input and init as arguments. If this throws
@@ -21865,16 +22203,17 @@ function fetch (input, init = undefined) {
       // 3. Abort controller with requestObject’s signal’s abort reason.
       controller.abort(requestObject.signal.reason)
 
+      const realResponse = responseObject?.deref()
+
       // 4. Abort the fetch() call with p, request, responseObject,
       //    and requestObject’s signal’s abort reason.
-      abortFetch(p, request, responseObject, requestObject.signal.reason)
+      abortFetch(p, request, realResponse, requestObject.signal.reason)
     }
   )
 
   // 12. Let handleFetchDone given response response be to finalize and
   // report timing with response, globalObject, and "fetch".
-  const handleFetchDone = (response) =>
-    finalizeAndReportTiming(response, 'fetch')
+  // see function handleFetchDone
 
   // 13. Set controller to the result of calling fetch given request,
   // with processResponseEndOfBody set to handleFetchDone, and processResponse
@@ -21908,10 +22247,11 @@ function fetch (input, init = undefined) {
 
     // 4. Set responseObject to the result of creating a Response object,
     // given response, "immutable", and relevantRealm.
-    responseObject = fromInnerResponse(response, 'immutable')
+    responseObject = new WeakRef(fromInnerResponse(response, 'immutable'))
 
     // 5. Resolve p with responseObject.
-    p.resolve(responseObject)
+    p.resolve(responseObject.deref())
+    p = null
   }
 
   controller = fetching({
@@ -21994,7 +22334,10 @@ const markResourceTiming = performance.markResourceTiming
 // https://fetch.spec.whatwg.org/#abort-fetch
 function abortFetch (p, request, responseObject, error) {
   // 1. Reject promise with error.
-  p.reject(error)
+  if (p) {
+    // We might have already resolved the promise at this stage
+    p.reject(error)
+  }
 
   // 2. If request’s body is not null and is readable, then cancel request’s
   // body with error.
@@ -22115,8 +22458,7 @@ function fetching ({
   // 9. If request’s origin is "client", then set request’s origin to request’s
   // client’s origin.
   if (request.origin === 'client') {
-    // TODO: What if request.client is null?
-    request.origin = request.client?.origin
+    request.origin = request.client.origin
   }
 
   // 10. If all of the following conditions are true:
@@ -22746,7 +23088,10 @@ function fetchFinale (fetchParams, response) {
   // 4. If fetchParams’s process response is non-null, then queue a fetch task to run fetchParams’s
   //    process response given response, with fetchParams’s task destination.
   if (fetchParams.processResponse != null) {
-    queueMicrotask(() => fetchParams.processResponse(response))
+    queueMicrotask(() => {
+      fetchParams.processResponse(response)
+      fetchParams.processResponse = null
+    })
   }
 
   // 5. Let internalResponse be response, if response is a network error; otherwise response’s internal response.
@@ -23217,7 +23562,7 @@ async function httpNetworkOrCacheFetch (
 
   //    24. If httpRequest’s cache mode is neither "no-store" nor "reload",
   //    then:
-  if (httpRequest.mode !== 'no-store' && httpRequest.mode !== 'reload') {
+  if (httpRequest.cache !== 'no-store' && httpRequest.cache !== 'reload') {
     // TODO: cache
   }
 
@@ -23228,7 +23573,7 @@ async function httpNetworkOrCacheFetch (
   if (response == null) {
     // 1. If httpRequest’s cache mode is "only-if-cached", then return a
     // network error.
-    if (httpRequest.mode === 'only-if-cached') {
+    if (httpRequest.cache === 'only-if-cached') {
       return makeNetworkError('only if cached')
     }
 
@@ -23564,7 +23909,11 @@ async function httpNetworkFetch (
   // 12. Let cancelAlgorithm be an algorithm that aborts fetchParams’s
   // controller with reason, given reason.
   const cancelAlgorithm = (reason) => {
-    fetchParams.controller.abort(reason)
+    // If the aborted fetch was already terminated, then we do not
+    // need to do anything.
+    if (!isCancelled(fetchParams)) {
+      fetchParams.controller.abort(reason)
+    }
   }
 
   // 13. Let highWaterMark be a non-negative, non-NaN number, chosen by
@@ -23782,20 +24131,16 @@ async function httpNetworkFetch (
 
           const headersList = new HeadersList()
 
-          // For H2, the rawHeaders are a plain JS object
-          // We distinguish between them and iterate accordingly
-          if (Array.isArray(rawHeaders)) {
-            for (let i = 0; i < rawHeaders.length; i += 2) {
-              headersList.append(bufferToLowerCasedHeaderName(rawHeaders[i]), rawHeaders[i + 1].toString('latin1'), true)
-            }
-            const contentEncoding = headersList.get('content-encoding', true)
-            if (contentEncoding) {
-              // https://www.rfc-editor.org/rfc/rfc7231#section-3.1.2.1
-              // "All content-coding values are case-insensitive..."
-              codings = contentEncoding.toLowerCase().split(',').map((x) => x.trim())
-            }
-            location = headersList.get('location', true)
+          for (let i = 0; i < rawHeaders.length; i += 2) {
+            headersList.append(bufferToLowerCasedHeaderName(rawHeaders[i]), rawHeaders[i + 1].toString('latin1'), true)
           }
+          const contentEncoding = headersList.get('content-encoding', true)
+          if (contentEncoding) {
+            // https://www.rfc-editor.org/rfc/rfc7231#section-3.1.2.1
+            // "All content-coding values are case-insensitive..."
+            codings = contentEncoding.toLowerCase().split(',').map((x) => x.trim())
+          }
+          location = headersList.get('location', true)
 
           this.body = new Readable({ read: resume })
 
@@ -23805,7 +24150,7 @@ async function httpNetworkFetch (
             redirectStatusSet.has(status)
 
           // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Encoding
-          if (request.method !== 'HEAD' && request.method !== 'CONNECT' && !nullBodyStatus.includes(status) && !willFollow) {
+          if (codings.length !== 0 && request.method !== 'HEAD' && request.method !== 'CONNECT' && !nullBodyStatus.includes(status) && !willFollow) {
             for (let i = 0; i < codings.length; ++i) {
               const coding = codings[i]
               // https://www.rfc-editor.org/rfc/rfc9112.html#section-7.2
@@ -23934,16 +24279,14 @@ module.exports = {
 
 
 const { extractBody, mixinBody, cloneBody } = __nccwpck_require__(3067)
-const { Headers, fill: fillHeaders, HeadersList } = __nccwpck_require__(9108)
+const { Headers, fill: fillHeaders, HeadersList, setHeadersGuard, getHeadersGuard, setHeadersList, getHeadersList } = __nccwpck_require__(9108)
 const { FinalizationRegistry } = __nccwpck_require__(8785)()
 const util = __nccwpck_require__(7618)
 const nodeUtil = __nccwpck_require__(7261)
 const {
   isValidHTTPToken,
   sameOrigin,
-  normalizeMethod,
-  environmentSettingsObject,
-  normalizeMethodRecord
+  environmentSettingsObject
 } = __nccwpck_require__(1344)
 const {
   forbiddenMethodsSet,
@@ -23955,11 +24298,11 @@ const {
   requestCache,
   requestDuplex
 } = __nccwpck_require__(4318)
-const { kEnumerableProperty } = util
-const { kHeaders, kSignal, kState, kGuard, kDispatcher } = __nccwpck_require__(5746)
+const { kEnumerableProperty, normalizedMethodRecordsBase, normalizedMethodRecords } = util
+const { kHeaders, kSignal, kState, kDispatcher } = __nccwpck_require__(5746)
 const { webidl } = __nccwpck_require__(583)
 const { URLSerializer } = __nccwpck_require__(2322)
-const { kHeadersList, kConstruct } = __nccwpck_require__(7490)
+const { kConstruct } = __nccwpck_require__(7490)
 const assert = __nccwpck_require__(8061)
 const { getMaxListeners, setMaxListeners, getEventListeners, defaultMaxListeners } = __nccwpck_require__(5673)
 
@@ -23968,6 +24311,46 @@ const kAbortController = Symbol('abortController')
 const requestFinalizer = new FinalizationRegistry(({ signal, abort }) => {
   signal.removeEventListener('abort', abort)
 })
+
+const dependentControllerMap = new WeakMap()
+
+function buildAbort (acRef) {
+  return abort
+
+  function abort () {
+    const ac = acRef.deref()
+    if (ac !== undefined) {
+      // Currently, there is a problem with FinalizationRegistry.
+      // https://github.com/nodejs/node/issues/49344
+      // https://github.com/nodejs/node/issues/47748
+      // In the case of abort, the first step is to unregister from it.
+      // If the controller can refer to it, it is still registered.
+      // It will be removed in the future.
+      requestFinalizer.unregister(abort)
+
+      // Unsubscribe a listener.
+      // FinalizationRegistry will no longer be called, so this must be done.
+      this.removeEventListener('abort', abort)
+
+      ac.abort(this.reason)
+
+      const controllerList = dependentControllerMap.get(ac.signal)
+
+      if (controllerList !== undefined) {
+        if (controllerList.size !== 0) {
+          for (const ref of controllerList) {
+            const ctrl = ref.deref()
+            if (ctrl !== undefined) {
+              ctrl.abort(this.reason)
+            }
+          }
+          controllerList.clear()
+        }
+        dependentControllerMap.delete(ac.signal)
+      }
+    }
+  }
+}
 
 let patchMethodWarning = false
 
@@ -23979,10 +24362,11 @@ class Request {
       return
     }
 
-    webidl.argumentLengthCheck(arguments, 1, { header: 'Request constructor' })
+    const prefix = 'Request constructor'
+    webidl.argumentLengthCheck(arguments, 1, prefix)
 
-    input = webidl.converters.RequestInfo(input)
-    init = webidl.converters.RequestInit(init)
+    input = webidl.converters.RequestInfo(input, prefix, 'input')
+    init = webidl.converters.RequestInit(init, prefix, 'init')
 
     // 1. Let request be null.
     let request = null
@@ -24239,7 +24623,7 @@ class Request {
       // 1. Let method be init["method"].
       let method = init.method
 
-      const mayBeNormalized = normalizeMethodRecord[method]
+      const mayBeNormalized = normalizedMethodRecords[method]
 
       if (mayBeNormalized !== undefined) {
         // Note: Bypass validation DELETE, GET, HEAD, OPTIONS, POST, PUT, PATCH and these lowercase ones
@@ -24251,12 +24635,16 @@ class Request {
           throw new TypeError(`'${method}' is not a valid HTTP method.`)
         }
 
-        if (forbiddenMethodsSet.has(method.toUpperCase())) {
+        const upperCase = method.toUpperCase()
+
+        if (forbiddenMethodsSet.has(upperCase)) {
           throw new TypeError(`'${method}' HTTP method is unsupported.`)
         }
 
         // 3. Normalize method.
-        method = normalizeMethod(method)
+        // https://fetch.spec.whatwg.org/#concept-method-normalize
+        // Note: must be in uppercase
+        method = normalizedMethodRecordsBase[upperCase] ?? method
 
         // 4. Set request’s method to method.
         request.method = method
@@ -24308,24 +24696,7 @@ class Request {
         this[kAbortController] = ac
 
         const acRef = new WeakRef(ac)
-        const abort = function () {
-          const ac = acRef.deref()
-          if (ac !== undefined) {
-            // Currently, there is a problem with FinalizationRegistry.
-            // https://github.com/nodejs/node/issues/49344
-            // https://github.com/nodejs/node/issues/47748
-            // In the case of abort, the first step is to unregister from it.
-            // If the controller can refer to it, it is still registered.
-            // It will be removed in the future.
-            requestFinalizer.unregister(abort)
-
-            // Unsubscribe a listener.
-            // FinalizationRegistry will no longer be called, so this must be done.
-            this.removeEventListener('abort', abort)
-
-            ac.abort(this.reason)
-          }
-        }
+        const abort = buildAbort(acRef)
 
         // Third-party AbortControllers may not work with these.
         // See, https://github.com/nodejs/undici/pull/1910#issuecomment-1464495619.
@@ -24333,9 +24704,9 @@ class Request {
           // If the max amount of listeners is equal to the default, increase it
           // This is only available in node >= v19.9.0
           if (typeof getMaxListeners === 'function' && getMaxListeners(signal) === defaultMaxListeners) {
-            setMaxListeners(100, signal)
+            setMaxListeners(1500, signal)
           } else if (getEventListeners(signal, 'abort').length >= defaultMaxListeners) {
-            setMaxListeners(100, signal)
+            setMaxListeners(1500, signal)
           }
         } catch {}
 
@@ -24352,8 +24723,8 @@ class Request {
     // Realm, whose header list is request’s header list and guard is
     // "request".
     this[kHeaders] = new Headers(kConstruct)
-    this[kHeaders][kHeadersList] = request.headersList
-    this[kHeaders][kGuard] = 'request'
+    setHeadersList(this[kHeaders], request.headersList)
+    setHeadersGuard(this[kHeaders], 'request')
 
     // 31. If this’s request’s mode is "no-cors", then:
     if (mode === 'no-cors') {
@@ -24366,13 +24737,13 @@ class Request {
       }
 
       // 2. Set this’s headers’s guard to "request-no-cors".
-      this[kHeaders][kGuard] = 'request-no-cors'
+      setHeadersGuard(this[kHeaders], 'request-no-cors')
     }
 
     // 32. If init is not empty, then:
     if (initHasKey) {
       /** @type {HeadersList} */
-      const headersList = this[kHeaders][kHeadersList]
+      const headersList = getHeadersList(this[kHeaders])
       // 1. Let headers be a copy of this’s headers and its associated header
       // list.
       // 2. If init["headers"] exists, then set headers to init["headers"].
@@ -24384,8 +24755,8 @@ class Request {
       // 4. If headers is a Headers object, then for each header in its header
       // list, append header’s name/header’s value to this’s headers.
       if (headers instanceof HeadersList) {
-        for (const [key, val] of headers) {
-          headersList.append(key, val)
+        for (const { name, value } of headers.rawValues()) {
+          headersList.append(name, value, false)
         }
         // Note: Copy the `set-cookie` meta-data.
         headersList.cookies = headers.cookies
@@ -24426,7 +24797,7 @@ class Request {
       // 3, If Content-Type is non-null and this’s headers’s header list does
       // not contain `Content-Type`, then append `Content-Type`/Content-Type to
       // this’s headers.
-      if (contentType && !this[kHeaders][kHeadersList].contains('content-type', true)) {
+      if (contentType && !getHeadersList(this[kHeaders]).contains('content-type', true)) {
         this[kHeaders].append('content-type', contentType)
       }
     }
@@ -24678,16 +25049,21 @@ class Request {
     if (this.signal.aborted) {
       ac.abort(this.signal.reason)
     } else {
+      let list = dependentControllerMap.get(this.signal)
+      if (list === undefined) {
+        list = new Set()
+        dependentControllerMap.set(this.signal, list)
+      }
+      const acRef = new WeakRef(ac)
+      list.add(acRef)
       util.addAbortListener(
-        this.signal,
-        () => {
-          ac.abort(this.signal.reason)
-        }
+        ac.signal,
+        buildAbort(acRef)
       )
     }
 
     // 4. Return clonedRequestObject.
-    return fromInnerRequest(clonedRequest, ac.signal, this[kHeaders][kGuard])
+    return fromInnerRequest(clonedRequest, ac.signal, getHeadersGuard(this[kHeaders]))
   }
 
   [nodeUtil.inspect.custom] (depth, options) {
@@ -24721,51 +25097,50 @@ class Request {
 
 mixinBody(Request)
 
+// https://fetch.spec.whatwg.org/#requests
 function makeRequest (init) {
-  // https://fetch.spec.whatwg.org/#requests
-  const request = {
-    method: 'GET',
-    localURLsOnly: false,
-    unsafeRequest: false,
-    body: null,
-    client: null,
-    reservedClient: null,
-    replacesClientId: '',
-    window: 'client',
-    keepalive: false,
-    serviceWorkers: 'all',
-    initiator: '',
-    destination: '',
-    priority: null,
-    origin: 'client',
-    policyContainer: 'client',
-    referrer: 'client',
-    referrerPolicy: '',
-    mode: 'no-cors',
-    useCORSPreflightFlag: false,
-    credentials: 'same-origin',
-    useCredentials: false,
-    cache: 'default',
-    redirect: 'follow',
-    integrity: '',
-    cryptoGraphicsNonceMetadata: '',
-    parserMetadata: '',
-    reloadNavigation: false,
-    historyNavigation: false,
-    userActivation: false,
-    taintedOrigin: false,
-    redirectCount: 0,
-    responseTainting: 'basic',
-    preventNoCacheCacheControlHeaderModification: false,
-    done: false,
-    timingAllowFailed: false,
-    ...init,
+  return {
+    method: init.method ?? 'GET',
+    localURLsOnly: init.localURLsOnly ?? false,
+    unsafeRequest: init.unsafeRequest ?? false,
+    body: init.body ?? null,
+    client: init.client ?? null,
+    reservedClient: init.reservedClient ?? null,
+    replacesClientId: init.replacesClientId ?? '',
+    window: init.window ?? 'client',
+    keepalive: init.keepalive ?? false,
+    serviceWorkers: init.serviceWorkers ?? 'all',
+    initiator: init.initiator ?? '',
+    destination: init.destination ?? '',
+    priority: init.priority ?? null,
+    origin: init.origin ?? 'client',
+    policyContainer: init.policyContainer ?? 'client',
+    referrer: init.referrer ?? 'client',
+    referrerPolicy: init.referrerPolicy ?? '',
+    mode: init.mode ?? 'no-cors',
+    useCORSPreflightFlag: init.useCORSPreflightFlag ?? false,
+    credentials: init.credentials ?? 'same-origin',
+    useCredentials: init.useCredentials ?? false,
+    cache: init.cache ?? 'default',
+    redirect: init.redirect ?? 'follow',
+    integrity: init.integrity ?? '',
+    cryptoGraphicsNonceMetadata: init.cryptoGraphicsNonceMetadata ?? '',
+    parserMetadata: init.parserMetadata ?? '',
+    reloadNavigation: init.reloadNavigation ?? false,
+    historyNavigation: init.historyNavigation ?? false,
+    userActivation: init.userActivation ?? false,
+    taintedOrigin: init.taintedOrigin ?? false,
+    redirectCount: init.redirectCount ?? 0,
+    responseTainting: init.responseTainting ?? 'basic',
+    preventNoCacheCacheControlHeaderModification: init.preventNoCacheCacheControlHeaderModification ?? false,
+    done: init.done ?? false,
+    timingAllowFailed: init.timingAllowFailed ?? false,
+    urlList: init.urlList,
+    url: init.urlList[0],
     headersList: init.headersList
       ? new HeadersList(init.headersList)
       : new HeadersList()
   }
-  request.url = request.urlList[0]
-  return request
 }
 
 // https://fetch.spec.whatwg.org/#concept-request-clone
@@ -24797,8 +25172,8 @@ function fromInnerRequest (innerRequest, signal, guard) {
   request[kState] = innerRequest
   request[kSignal] = signal
   request[kHeaders] = new Headers(kConstruct)
-  request[kHeaders][kHeadersList] = innerRequest.headersList
-  request[kHeaders][kGuard] = guard
+  setHeadersList(request[kHeaders], innerRequest.headersList)
+  setHeadersGuard(request[kHeaders], guard)
   return request
 }
 
@@ -24834,16 +25209,16 @@ webidl.converters.Request = webidl.interfaceConverter(
 )
 
 // https://fetch.spec.whatwg.org/#requestinfo
-webidl.converters.RequestInfo = function (V) {
+webidl.converters.RequestInfo = function (V, prefix, argument) {
   if (typeof V === 'string') {
-    return webidl.converters.USVString(V)
+    return webidl.converters.USVString(V, prefix, argument)
   }
 
   if (V instanceof Request) {
-    return webidl.converters.Request(V)
+    return webidl.converters.Request(V, prefix, argument)
   }
 
-  return webidl.converters.USVString(V)
+  return webidl.converters.USVString(V, prefix, argument)
 }
 
 webidl.converters.AbortSignal = webidl.interfaceConverter(
@@ -24913,6 +25288,8 @@ webidl.converters.RequestInit = webidl.dictionaryConverter([
     converter: webidl.nullableConverter(
       (signal) => webidl.converters.AbortSignal(
         signal,
+        'RequestInit',
+        'signal',
         { strict: false }
       )
     )
@@ -24943,7 +25320,7 @@ module.exports = { Request, makeRequest, fromInnerRequest, cloneRequest }
 "use strict";
 
 
-const { Headers, HeadersList, fill } = __nccwpck_require__(9108)
+const { Headers, HeadersList, fill, getHeadersGuard, setHeadersGuard, setHeadersList } = __nccwpck_require__(9108)
 const { extractBody, cloneBody, mixinBody } = __nccwpck_require__(3067)
 const util = __nccwpck_require__(7618)
 const nodeUtil = __nccwpck_require__(7261)
@@ -24962,15 +25339,29 @@ const {
   redirectStatusSet,
   nullBodyStatus
 } = __nccwpck_require__(4318)
-const { kState, kHeaders, kGuard } = __nccwpck_require__(5746)
+const { kState, kHeaders } = __nccwpck_require__(5746)
 const { webidl } = __nccwpck_require__(583)
 const { FormData } = __nccwpck_require__(5229)
 const { URLSerializer } = __nccwpck_require__(2322)
-const { kHeadersList, kConstruct } = __nccwpck_require__(7490)
+const { kConstruct } = __nccwpck_require__(7490)
 const assert = __nccwpck_require__(8061)
 const { types } = __nccwpck_require__(7261)
+const { isDisturbed, isErrored } = __nccwpck_require__(4492)
 
 const textEncoder = new TextEncoder('utf-8')
+
+const hasFinalizationRegistry = globalThis.FinalizationRegistry && process.version.indexOf('v18') !== 0
+let registry
+
+if (hasFinalizationRegistry) {
+  registry = new FinalizationRegistry((stream) => {
+    if (!stream.locked && !isDisturbed(stream) && !isErrored(stream)) {
+      stream.cancel('Response object has been garbage collected').catch(noop)
+    }
+  })
+}
+
+function noop () {}
 
 // https://fetch.spec.whatwg.org/#response-class
 class Response {
@@ -24986,7 +25377,7 @@ class Response {
 
   // https://fetch.spec.whatwg.org/#dom-response-json
   static json (data, init = {}) {
-    webidl.argumentLengthCheck(arguments, 1, { header: 'Response.json' })
+    webidl.argumentLengthCheck(arguments, 1, 'Response.json')
 
     if (init !== null) {
       init = webidl.converters.ResponseInit(init)
@@ -25013,7 +25404,7 @@ class Response {
 
   // Creates a redirect Response that redirects to url with status status.
   static redirect (url, status = 302) {
-    webidl.argumentLengthCheck(arguments, 1, { header: 'Response.redirect' })
+    webidl.argumentLengthCheck(arguments, 1, 'Response.redirect')
 
     url = webidl.converters.USVString(url)
     status = webidl.converters['unsigned short'](status)
@@ -25070,8 +25461,8 @@ class Response {
     // Realm, whose header list is this’s response’s header list and guard
     // is "response".
     this[kHeaders] = new Headers(kConstruct)
-    this[kHeaders][kGuard] = 'response'
-    this[kHeaders][kHeadersList] = this[kState].headersList
+    setHeadersGuard(this[kHeaders], 'response')
+    setHeadersList(this[kHeaders], this[kState].headersList)
 
     // 3. Let bodyWithType be null.
     let bodyWithType = null
@@ -25184,7 +25575,7 @@ class Response {
 
     // 3. Return the result of creating a Response object, given
     // clonedResponse, this’s headers’s guard, and this’s relevant Realm.
-    return fromInnerResponse(clonedResponse, this[kHeaders][kGuard])
+    return fromInnerResponse(clonedResponse, getHeadersGuard(this[kHeaders]))
   }
 
   [nodeUtil.inspect.custom] (depth, options) {
@@ -25451,8 +25842,13 @@ function fromInnerResponse (innerResponse, guard) {
   const response = new Response(kConstruct)
   response[kState] = innerResponse
   response[kHeaders] = new Headers(kConstruct)
-  response[kHeaders][kHeadersList] = innerResponse.headersList
-  response[kHeaders][kGuard] = guard
+  setHeadersList(response[kHeaders], innerResponse.headersList)
+  setHeadersGuard(response[kHeaders], guard)
+
+  if (hasFinalizationRegistry && innerResponse.body?.stream) {
+    registry.register(response, innerResponse.body.stream)
+  }
+
   return response
 }
 
@@ -25469,34 +25865,34 @@ webidl.converters.URLSearchParams = webidl.interfaceConverter(
 )
 
 // https://fetch.spec.whatwg.org/#typedefdef-xmlhttprequestbodyinit
-webidl.converters.XMLHttpRequestBodyInit = function (V) {
+webidl.converters.XMLHttpRequestBodyInit = function (V, prefix, name) {
   if (typeof V === 'string') {
-    return webidl.converters.USVString(V)
+    return webidl.converters.USVString(V, prefix, name)
   }
 
   if (isBlobLike(V)) {
-    return webidl.converters.Blob(V, { strict: false })
+    return webidl.converters.Blob(V, prefix, name, { strict: false })
   }
 
   if (ArrayBuffer.isView(V) || types.isArrayBuffer(V)) {
-    return webidl.converters.BufferSource(V)
+    return webidl.converters.BufferSource(V, prefix, name)
   }
 
   if (util.isFormDataLike(V)) {
-    return webidl.converters.FormData(V, { strict: false })
+    return webidl.converters.FormData(V, prefix, name, { strict: false })
   }
 
   if (V instanceof URLSearchParams) {
-    return webidl.converters.URLSearchParams(V)
+    return webidl.converters.URLSearchParams(V, prefix, name)
   }
 
-  return webidl.converters.DOMString(V)
+  return webidl.converters.DOMString(V, prefix, name)
 }
 
 // https://fetch.spec.whatwg.org/#bodyinit
-webidl.converters.BodyInit = function (V) {
+webidl.converters.BodyInit = function (V, prefix, argument) {
   if (V instanceof ReadableStream) {
-    return webidl.converters.ReadableStream(V)
+    return webidl.converters.ReadableStream(V, prefix, argument)
   }
 
   // Note: the spec doesn't include async iterables,
@@ -25505,19 +25901,19 @@ webidl.converters.BodyInit = function (V) {
     return V
   }
 
-  return webidl.converters.XMLHttpRequestBodyInit(V)
+  return webidl.converters.XMLHttpRequestBodyInit(V, prefix, argument)
 }
 
 webidl.converters.ResponseInit = webidl.dictionaryConverter([
   {
     key: 'status',
     converter: webidl.converters['unsigned short'],
-    defaultValue: 200
+    defaultValue: () => 200
   },
   {
     key: 'statusText',
     converter: webidl.converters.ByteString,
-    defaultValue: ''
+    defaultValue: () => ''
   },
   {
     key: 'headers',
@@ -25550,7 +25946,6 @@ module.exports = {
   kHeaders: Symbol('headers'),
   kSignal: Symbol('signal'),
   kState: Symbol('state'),
-  kGuard: Symbol('guard'),
   kDispatcher: Symbol('dispatcher')
 }
 
@@ -25569,7 +25964,7 @@ const { redirectStatusSet, referrerPolicySet: referrerPolicyTokens, badPortsSet 
 const { getGlobalOrigin } = __nccwpck_require__(5592)
 const { collectASequenceOfCodePoints, collectAnHTTPQuotedString, removeChars, parseMIMEType } = __nccwpck_require__(2322)
 const { performance } = __nccwpck_require__(8846)
-const { isBlobLike, ReadableStreamFrom, isValidHTTPToken } = __nccwpck_require__(7618)
+const { isBlobLike, ReadableStreamFrom, isValidHTTPToken, normalizedMethodRecordsBase } = __nccwpck_require__(7618)
 const assert = __nccwpck_require__(8061)
 const { isUint8Array } = __nccwpck_require__(3746)
 const { webidl } = __nccwpck_require__(583)
@@ -25818,16 +26213,26 @@ function appendFetchMetadata (httpRequest) {
 
 // https://fetch.spec.whatwg.org/#append-a-request-origin-header
 function appendRequestOriginHeader (request) {
-  // 1. Let serializedOrigin be the result of byte-serializing a request origin with request.
+  // 1. Let serializedOrigin be the result of byte-serializing a request origin
+  //    with request.
+  // TODO: implement "byte-serializing a request origin"
   let serializedOrigin = request.origin
 
-  // 2. If request’s response tainting is "cors" or request’s mode is "websocket", then append (`Origin`, serializedOrigin) to request’s header list.
-  if (request.responseTainting === 'cors' || request.mode === 'websocket') {
-    if (serializedOrigin) {
-      request.headersList.append('origin', serializedOrigin, true)
-    }
+  // - "'client' is changed to an origin during fetching."
+  //   This doesn't happen in undici (in most cases) because undici, by default,
+  //   has no concept of origin.
+  // - request.origin can also be set to request.client.origin (client being
+  //   an environment settings object), which is undefined without using
+  //   setGlobalOrigin.
+  if (serializedOrigin === 'client' || serializedOrigin === undefined) {
+    return
+  }
 
+  // 2. If request’s response tainting is "cors" or request’s mode is "websocket",
+  //    then append (`Origin`, serializedOrigin) to request’s header list.
   // 3. Otherwise, if request’s method is neither `GET` nor `HEAD`, then:
+  if (request.responseTainting === 'cors' || request.mode === 'websocket') {
+    request.headersList.append('origin', serializedOrigin, true)
   } else if (request.method !== 'GET' && request.method !== 'HEAD') {
     // 1. Switch on request’s referrer policy:
     switch (request.referrerPolicy) {
@@ -25838,13 +26243,16 @@ function appendRequestOriginHeader (request) {
       case 'no-referrer-when-downgrade':
       case 'strict-origin':
       case 'strict-origin-when-cross-origin':
-        // If request’s origin is a tuple origin, its scheme is "https", and request’s current URL’s scheme is not "https", then set serializedOrigin to `null`.
+        // If request’s origin is a tuple origin, its scheme is "https", and
+        // request’s current URL’s scheme is not "https", then set
+        // serializedOrigin to `null`.
         if (request.origin && urlHasHttpsScheme(request.origin) && !urlHasHttpsScheme(requestCurrentURL(request))) {
           serializedOrigin = null
         }
         break
       case 'same-origin':
-        // If request’s origin is not same origin with request’s current URL’s origin, then set serializedOrigin to `null`.
+        // If request’s origin is not same origin with request’s current URL’s
+        // origin, then set serializedOrigin to `null`.
         if (!sameOrigin(request, requestCurrentURL(request))) {
           serializedOrigin = null
         }
@@ -25853,10 +26261,8 @@ function appendRequestOriginHeader (request) {
         // Do nothing.
     }
 
-    if (serializedOrigin) {
-      // 2. Append (`Origin`, serializedOrigin) to request’s header list.
-      request.headersList.append('origin', serializedOrigin, true)
-    }
+    // 2. Append (`Origin`, serializedOrigin) to request’s header list.
+    request.headersList.append('origin', serializedOrigin, true)
   }
 }
 
@@ -26346,37 +26752,12 @@ function isCancelled (fetchParams) {
     fetchParams.controller.state === 'terminated'
 }
 
-const normalizeMethodRecordBase = {
-  delete: 'DELETE',
-  DELETE: 'DELETE',
-  get: 'GET',
-  GET: 'GET',
-  head: 'HEAD',
-  HEAD: 'HEAD',
-  options: 'OPTIONS',
-  OPTIONS: 'OPTIONS',
-  post: 'POST',
-  POST: 'POST',
-  put: 'PUT',
-  PUT: 'PUT'
-}
-
-const normalizeMethodRecord = {
-  ...normalizeMethodRecordBase,
-  patch: 'patch',
-  PATCH: 'PATCH'
-}
-
-// Note: object prototypes should not be able to be referenced. e.g. `Object#hasOwnProperty`.
-Object.setPrototypeOf(normalizeMethodRecordBase, null)
-Object.setPrototypeOf(normalizeMethodRecord, null)
-
 /**
  * @see https://fetch.spec.whatwg.org/#concept-method-normalize
  * @param {string} method
  */
 function normalizeMethod (method) {
-  return normalizeMethodRecordBase[method.toLowerCase()] ?? method
+  return normalizedMethodRecordsBase[method.toLowerCase()] ?? method
 }
 
 // https://infra.spec.whatwg.org/#serialize-a-javascript-value-to-a-json-string
@@ -26579,7 +26960,7 @@ function iteratorMixin (name, object, kInternalIterator, keyIndex = 0, valueInde
       configurable: true,
       value: function forEach (callbackfn, thisArg = globalThis) {
         webidl.brandCheck(this, object)
-        webidl.argumentLengthCheck(arguments, 1, { header: `${name}.forEach` })
+        webidl.argumentLengthCheck(arguments, 1, `${name}.forEach`)
         if (typeof callbackfn !== 'function') {
           throw new TypeError(
             `Failed to execute 'forEach' on '${name}': parameter 1 is not of type 'Function'.`
@@ -26606,7 +26987,7 @@ function iteratorMixin (name, object, kInternalIterator, keyIndex = 0, valueInde
 /**
  * @see https://fetch.spec.whatwg.org/#body-fully-read
  */
-async function fullyReadBody (body, processBody, processBodyError, shouldClone) {
+async function fullyReadBody (body, processBody, processBodyError) {
   // 1. If taskDestination is null, then set taskDestination to
   //    the result of starting a new parallel queue.
 
@@ -26632,7 +27013,7 @@ async function fullyReadBody (body, processBody, processBodyError, shouldClone) 
 
   // 5. Read all bytes from reader, given successSteps and errorSteps.
   try {
-    successSteps(await readAllBytes(reader, shouldClone))
+    successSteps(await readAllBytes(reader))
   } catch (e) {
     errorSteps(e)
   }
@@ -26680,9 +27061,8 @@ function isomorphicEncode (input) {
  * @see https://streams.spec.whatwg.org/#readablestreamdefaultreader-read-all-bytes
  * @see https://streams.spec.whatwg.org/#read-loop
  * @param {ReadableStreamDefaultReader} reader
- * @param {boolean} [shouldClone]
  */
-async function readAllBytes (reader, shouldClone) {
+async function readAllBytes (reader) {
   const bytes = []
   let byteLength = 0
 
@@ -26691,13 +27071,6 @@ async function readAllBytes (reader, shouldClone) {
 
     if (done) {
       // 1. Call successSteps with bytes.
-      if (bytes.length === 1) {
-        const { buffer, byteOffset, byteLength } = bytes[0]
-        if (shouldClone === false) {
-          return Buffer.from(buffer, byteOffset, byteLength)
-        }
-        return Buffer.from(buffer.slice(byteOffset, byteOffset + byteLength), 0, byteLength)
-      }
       return Buffer.concat(bytes, byteLength)
     }
 
@@ -27194,7 +27567,6 @@ module.exports = {
   urlHasHttpsScheme,
   urlIsHttpHttpsScheme,
   readAllBytes,
-  normalizeMethodRecord,
   simpleRangeHeaderValue,
   buildContentRange,
   parseMetadata,
@@ -27247,14 +27619,18 @@ webidl.errors.invalidArgument = function (context) {
 }
 
 // https://webidl.spec.whatwg.org/#implements
-webidl.brandCheck = function (V, I, opts = undefined) {
+webidl.brandCheck = function (V, I, opts) {
   if (opts?.strict !== false) {
     if (!(V instanceof I)) {
-      throw new TypeError('Illegal invocation')
+      const err = new TypeError('Illegal invocation')
+      err.code = 'ERR_INVALID_THIS' // node compat.
+      throw err
     }
   } else {
     if (V?.[Symbol.toStringTag] !== I.prototype[Symbol.toStringTag]) {
-      throw new TypeError('Illegal invocation')
+      const err = new TypeError('Illegal invocation')
+      err.code = 'ERR_INVALID_THIS' // node compat.
+      throw err
     }
   }
 }
@@ -27264,7 +27640,7 @@ webidl.argumentLengthCheck = function ({ length }, min, ctx) {
     throw webidl.errors.exception({
       message: `${min} argument${min !== 1 ? 's' : ''} required, ` +
                `but${length ? ' only' : ''} ${length} found.`,
-      ...ctx
+      header: ctx
     })
   }
 }
@@ -27297,7 +27673,7 @@ webidl.util.Type = function (V) {
 }
 
 // https://webidl.spec.whatwg.org/#abstract-opdef-converttoint
-webidl.util.ConvertToInt = function (V, bitLength, signedness, opts = {}) {
+webidl.util.ConvertToInt = function (V, bitLength, signedness, opts) {
   let upperBound
   let lowerBound
 
@@ -27341,7 +27717,7 @@ webidl.util.ConvertToInt = function (V, bitLength, signedness, opts = {}) {
 
   // 6. If the conversion is to an IDL type associated
   //    with the [EnforceRange] extended attribute, then:
-  if (opts.enforceRange === true) {
+  if (opts?.enforceRange === true) {
     // 1. If x is NaN, +∞, or −∞, then throw a TypeError.
     if (
       Number.isNaN(x) ||
@@ -27373,7 +27749,7 @@ webidl.util.ConvertToInt = function (V, bitLength, signedness, opts = {}) {
   // 7. If x is not NaN and the conversion is to an IDL
   //    type associated with the [Clamp] extended
   //    attribute, then:
-  if (!Number.isNaN(x) && opts.clamp === true) {
+  if (!Number.isNaN(x) && opts?.clamp === true) {
     // 1. Set x to min(max(x, lowerBound), upperBound).
     x = Math.min(Math.max(x, lowerBound), upperBound)
 
@@ -27447,12 +27823,12 @@ webidl.util.Stringify = function (V) {
 
 // https://webidl.spec.whatwg.org/#es-sequence
 webidl.sequenceConverter = function (converter) {
-  return (V, Iterable) => {
+  return (V, prefix, argument, Iterable) => {
     // 1. If Type(V) is not Object, throw a TypeError.
     if (webidl.util.Type(V) !== 'Object') {
       throw webidl.errors.exception({
-        header: 'Sequence',
-        message: `Value of type ${webidl.util.Type(V)} is not an Object.`
+        header: prefix,
+        message: `${argument} (${webidl.util.Stringify(V)}) is not iterable.`
       })
     }
 
@@ -27460,6 +27836,7 @@ webidl.sequenceConverter = function (converter) {
     /** @type {Generator} */
     const method = typeof Iterable === 'function' ? Iterable() : V?.[Symbol.iterator]?.()
     const seq = []
+    let index = 0
 
     // 3. If method is undefined, throw a TypeError.
     if (
@@ -27467,8 +27844,8 @@ webidl.sequenceConverter = function (converter) {
       typeof method.next !== 'function'
     ) {
       throw webidl.errors.exception({
-        header: 'Sequence',
-        message: 'Object is not an iterator.'
+        header: prefix,
+        message: `${argument} is not iterable.`
       })
     }
 
@@ -27480,7 +27857,7 @@ webidl.sequenceConverter = function (converter) {
         break
       }
 
-      seq.push(converter(value))
+      seq.push(converter(value, prefix, `${argument}[${index++}]`))
     }
 
     return seq
@@ -27489,12 +27866,12 @@ webidl.sequenceConverter = function (converter) {
 
 // https://webidl.spec.whatwg.org/#es-to-record
 webidl.recordConverter = function (keyConverter, valueConverter) {
-  return (O) => {
+  return (O, prefix, argument) => {
     // 1. If Type(O) is not Object, throw a TypeError.
     if (webidl.util.Type(O) !== 'Object') {
       throw webidl.errors.exception({
-        header: 'Record',
-        message: `Value of type ${webidl.util.Type(O)} is not an Object.`
+        header: prefix,
+        message: `${argument} ("${webidl.util.Type(O)}") is not an Object.`
       })
     }
 
@@ -27507,11 +27884,11 @@ webidl.recordConverter = function (keyConverter, valueConverter) {
 
       for (const key of keys) {
         // 1. Let typedKey be key converted to an IDL value of type K.
-        const typedKey = keyConverter(key)
+        const typedKey = keyConverter(key, prefix, argument)
 
         // 2. Let value be ? Get(O, key).
         // 3. Let typedValue be value converted to an IDL value of type V.
-        const typedValue = valueConverter(O[key])
+        const typedValue = valueConverter(O[key], prefix, argument)
 
         // 4. Set result[typedKey] to typedValue.
         result[typedKey] = typedValue
@@ -27532,11 +27909,11 @@ webidl.recordConverter = function (keyConverter, valueConverter) {
       // 2. If desc is not undefined and desc.[[Enumerable]] is true:
       if (desc?.enumerable) {
         // 1. Let typedKey be key converted to an IDL value of type K.
-        const typedKey = keyConverter(key)
+        const typedKey = keyConverter(key, prefix, argument)
 
         // 2. Let value be ? Get(O, key).
         // 3. Let typedValue be value converted to an IDL value of type V.
-        const typedValue = valueConverter(O[key])
+        const typedValue = valueConverter(O[key], prefix, argument)
 
         // 4. Set result[typedKey] to typedValue.
         result[typedKey] = typedValue
@@ -27549,11 +27926,11 @@ webidl.recordConverter = function (keyConverter, valueConverter) {
 }
 
 webidl.interfaceConverter = function (i) {
-  return (V, opts = {}) => {
-    if (opts.strict !== false && !(V instanceof i)) {
+  return (V, prefix, argument, opts) => {
+    if (opts?.strict !== false && !(V instanceof i)) {
       throw webidl.errors.exception({
-        header: i.name,
-        message: `Expected ${webidl.util.Stringify(V)} to be an instance of ${i.name}.`
+        header: prefix,
+        message: `Expected ${argument} ("${webidl.util.Stringify(V)}") to be an instance of ${i.name}.`
       })
     }
 
@@ -27562,7 +27939,7 @@ webidl.interfaceConverter = function (i) {
 }
 
 webidl.dictionaryConverter = function (converters) {
-  return (dictionary) => {
+  return (dictionary, prefix, argument) => {
     const type = webidl.util.Type(dictionary)
     const dict = {}
 
@@ -27570,7 +27947,7 @@ webidl.dictionaryConverter = function (converters) {
       return dict
     } else if (type !== 'Object') {
       throw webidl.errors.exception({
-        header: 'Dictionary',
+        header: prefix,
         message: `Expected ${dictionary} to be one of: Null, Undefined, Object.`
       })
     }
@@ -27581,7 +27958,7 @@ webidl.dictionaryConverter = function (converters) {
       if (required === true) {
         if (!Object.hasOwn(dictionary, key)) {
           throw webidl.errors.exception({
-            header: 'Dictionary',
+            header: prefix,
             message: `Missing required key "${key}".`
           })
         }
@@ -27593,21 +27970,21 @@ webidl.dictionaryConverter = function (converters) {
       // Only use defaultValue if value is undefined and
       // a defaultValue options was provided.
       if (hasDefault && value !== null) {
-        value = value ?? defaultValue
+        value ??= defaultValue()
       }
 
       // A key can be optional and have no default value.
       // When this happens, do not perform a conversion,
       // and do not assign the key a value.
       if (required || hasDefault || value !== undefined) {
-        value = converter(value)
+        value = converter(value, prefix, `${argument}.${key}`)
 
         if (
           options.allowedValues &&
           !options.allowedValues.includes(value)
         ) {
           throw webidl.errors.exception({
-            header: 'Dictionary',
+            header: prefix,
             message: `${value} is not an accepted type. Expected one of ${options.allowedValues.join(', ')}.`
           })
         }
@@ -27621,28 +27998,31 @@ webidl.dictionaryConverter = function (converters) {
 }
 
 webidl.nullableConverter = function (converter) {
-  return (V) => {
+  return (V, prefix, argument) => {
     if (V === null) {
       return V
     }
 
-    return converter(V)
+    return converter(V, prefix, argument)
   }
 }
 
 // https://webidl.spec.whatwg.org/#es-DOMString
-webidl.converters.DOMString = function (V, opts = {}) {
+webidl.converters.DOMString = function (V, prefix, argument, opts) {
   // 1. If V is null and the conversion is to an IDL type
   //    associated with the [LegacyNullToEmptyString]
   //    extended attribute, then return the DOMString value
   //    that represents the empty string.
-  if (V === null && opts.legacyNullToEmptyString) {
+  if (V === null && opts?.legacyNullToEmptyString) {
     return ''
   }
 
   // 2. Let x be ? ToString(V).
   if (typeof V === 'symbol') {
-    throw new TypeError('Could not convert argument of type symbol to string.')
+    throw webidl.errors.exception({
+      header: prefix,
+      message: `${argument} is a symbol, which cannot be converted to a DOMString.`
+    })
   }
 
   // 3. Return the IDL DOMString value that represents the
@@ -27652,10 +28032,10 @@ webidl.converters.DOMString = function (V, opts = {}) {
 }
 
 // https://webidl.spec.whatwg.org/#es-ByteString
-webidl.converters.ByteString = function (V) {
+webidl.converters.ByteString = function (V, prefix, argument) {
   // 1. Let x be ? ToString(V).
   // Note: DOMString converter perform ? ToString(V)
-  const x = webidl.converters.DOMString(V)
+  const x = webidl.converters.DOMString(V, prefix, argument)
 
   // 2. If the value of any element of x is greater than
   //    255, then throw a TypeError.
@@ -27675,6 +28055,7 @@ webidl.converters.ByteString = function (V) {
 }
 
 // https://webidl.spec.whatwg.org/#es-USVString
+// TODO: rewrite this so we can control the errors thrown
 webidl.converters.USVString = toUSVString
 
 // https://webidl.spec.whatwg.org/#es-boolean
@@ -27693,9 +28074,9 @@ webidl.converters.any = function (V) {
 }
 
 // https://webidl.spec.whatwg.org/#es-long-long
-webidl.converters['long long'] = function (V) {
+webidl.converters['long long'] = function (V, prefix, argument) {
   // 1. Let x be ? ConvertToInt(V, 64, "signed").
-  const x = webidl.util.ConvertToInt(V, 64, 'signed')
+  const x = webidl.util.ConvertToInt(V, 64, 'signed', undefined, prefix, argument)
 
   // 2. Return the IDL long long value that represents
   //    the same numeric value as x.
@@ -27703,9 +28084,9 @@ webidl.converters['long long'] = function (V) {
 }
 
 // https://webidl.spec.whatwg.org/#es-unsigned-long-long
-webidl.converters['unsigned long long'] = function (V) {
+webidl.converters['unsigned long long'] = function (V, prefix, argument) {
   // 1. Let x be ? ConvertToInt(V, 64, "unsigned").
-  const x = webidl.util.ConvertToInt(V, 64, 'unsigned')
+  const x = webidl.util.ConvertToInt(V, 64, 'unsigned', undefined, prefix, argument)
 
   // 2. Return the IDL unsigned long long value that
   //    represents the same numeric value as x.
@@ -27713,9 +28094,9 @@ webidl.converters['unsigned long long'] = function (V) {
 }
 
 // https://webidl.spec.whatwg.org/#es-unsigned-long
-webidl.converters['unsigned long'] = function (V) {
+webidl.converters['unsigned long'] = function (V, prefix, argument) {
   // 1. Let x be ? ConvertToInt(V, 32, "unsigned").
-  const x = webidl.util.ConvertToInt(V, 32, 'unsigned')
+  const x = webidl.util.ConvertToInt(V, 32, 'unsigned', undefined, prefix, argument)
 
   // 2. Return the IDL unsigned long value that
   //    represents the same numeric value as x.
@@ -27723,9 +28104,9 @@ webidl.converters['unsigned long'] = function (V) {
 }
 
 // https://webidl.spec.whatwg.org/#es-unsigned-short
-webidl.converters['unsigned short'] = function (V, opts) {
+webidl.converters['unsigned short'] = function (V, prefix, argument, opts) {
   // 1. Let x be ? ConvertToInt(V, 16, "unsigned").
-  const x = webidl.util.ConvertToInt(V, 16, 'unsigned', opts)
+  const x = webidl.util.ConvertToInt(V, 16, 'unsigned', opts, prefix, argument)
 
   // 2. Return the IDL unsigned short value that represents
   //    the same numeric value as x.
@@ -27733,7 +28114,7 @@ webidl.converters['unsigned short'] = function (V, opts) {
 }
 
 // https://webidl.spec.whatwg.org/#idl-ArrayBuffer
-webidl.converters.ArrayBuffer = function (V, opts = {}) {
+webidl.converters.ArrayBuffer = function (V, prefix, argument, opts) {
   // 1. If Type(V) is not Object, or V does not have an
   //    [[ArrayBufferData]] internal slot, then throw a
   //    TypeError.
@@ -27744,8 +28125,8 @@ webidl.converters.ArrayBuffer = function (V, opts = {}) {
     !types.isAnyArrayBuffer(V)
   ) {
     throw webidl.errors.conversionFailed({
-      prefix: webidl.util.Stringify(V),
-      argument: webidl.util.Stringify(V),
+      prefix,
+      argument: `${argument} ("${webidl.util.Stringify(V)}")`,
       types: ['ArrayBuffer']
     })
   }
@@ -27754,7 +28135,7 @@ webidl.converters.ArrayBuffer = function (V, opts = {}) {
   //    with the [AllowShared] extended attribute, and
   //    IsSharedArrayBuffer(V) is true, then throw a
   //    TypeError.
-  if (opts.allowShared === false && types.isSharedArrayBuffer(V)) {
+  if (opts?.allowShared === false && types.isSharedArrayBuffer(V)) {
     throw webidl.errors.exception({
       header: 'ArrayBuffer',
       message: 'SharedArrayBuffer is not allowed.'
@@ -27777,7 +28158,7 @@ webidl.converters.ArrayBuffer = function (V, opts = {}) {
   return V
 }
 
-webidl.converters.TypedArray = function (V, T, opts = {}) {
+webidl.converters.TypedArray = function (V, T, prefix, name, opts) {
   // 1. Let T be the IDL type V is being converted to.
 
   // 2. If Type(V) is not Object, or V does not have a
@@ -27789,8 +28170,8 @@ webidl.converters.TypedArray = function (V, T, opts = {}) {
     V.constructor.name !== T.name
   ) {
     throw webidl.errors.conversionFailed({
-      prefix: `${T.name}`,
-      argument: webidl.util.Stringify(V),
+      prefix,
+      argument: `${name} ("${webidl.util.Stringify(V)}")`,
       types: [T.name]
     })
   }
@@ -27799,7 +28180,7 @@ webidl.converters.TypedArray = function (V, T, opts = {}) {
   //    with the [AllowShared] extended attribute, and
   //    IsSharedArrayBuffer(V.[[ViewedArrayBuffer]]) is
   //    true, then throw a TypeError.
-  if (opts.allowShared === false && types.isSharedArrayBuffer(V.buffer)) {
+  if (opts?.allowShared === false && types.isSharedArrayBuffer(V.buffer)) {
     throw webidl.errors.exception({
       header: 'ArrayBuffer',
       message: 'SharedArrayBuffer is not allowed.'
@@ -27822,13 +28203,13 @@ webidl.converters.TypedArray = function (V, T, opts = {}) {
   return V
 }
 
-webidl.converters.DataView = function (V, opts = {}) {
+webidl.converters.DataView = function (V, prefix, name, opts) {
   // 1. If Type(V) is not Object, or V does not have a
   //    [[DataView]] internal slot, then throw a TypeError.
   if (webidl.util.Type(V) !== 'Object' || !types.isDataView(V)) {
     throw webidl.errors.exception({
-      header: 'DataView',
-      message: 'Object is not a DataView.'
+      header: prefix,
+      message: `${name} is not a DataView.`
     })
   }
 
@@ -27836,7 +28217,7 @@ webidl.converters.DataView = function (V, opts = {}) {
   //    with the [AllowShared] extended attribute, and
   //    IsSharedArrayBuffer(V.[[ViewedArrayBuffer]]) is true,
   //    then throw a TypeError.
-  if (opts.allowShared === false && types.isSharedArrayBuffer(V.buffer)) {
+  if (opts?.allowShared === false && types.isSharedArrayBuffer(V.buffer)) {
     throw webidl.errors.exception({
       header: 'ArrayBuffer',
       message: 'SharedArrayBuffer is not allowed.'
@@ -27860,20 +28241,24 @@ webidl.converters.DataView = function (V, opts = {}) {
 }
 
 // https://webidl.spec.whatwg.org/#BufferSource
-webidl.converters.BufferSource = function (V, opts = {}) {
+webidl.converters.BufferSource = function (V, prefix, name, opts) {
   if (types.isAnyArrayBuffer(V)) {
-    return webidl.converters.ArrayBuffer(V, { ...opts, allowShared: false })
+    return webidl.converters.ArrayBuffer(V, prefix, name, { ...opts, allowShared: false })
   }
 
   if (types.isTypedArray(V)) {
-    return webidl.converters.TypedArray(V, V.constructor, { ...opts, allowShared: false })
+    return webidl.converters.TypedArray(V, V.constructor, prefix, name, { ...opts, allowShared: false })
   }
 
   if (types.isDataView(V)) {
-    return webidl.converters.DataView(V, opts, { ...opts, allowShared: false })
+    return webidl.converters.DataView(V, prefix, name, { ...opts, allowShared: false })
   }
 
-  throw new TypeError(`Could not convert ${webidl.util.Stringify(V)} to a BufferSource.`)
+  throw webidl.errors.conversionFailed({
+    prefix,
+    argument: `${name} ("${webidl.util.Stringify(V)}")`,
+    types: ['BufferSource']
+  })
 }
 
 webidl.converters['sequence<ByteString>'] = webidl.sequenceConverter(
@@ -28239,7 +28624,7 @@ class FileReader extends EventTarget {
   readAsArrayBuffer (blob) {
     webidl.brandCheck(this, FileReader)
 
-    webidl.argumentLengthCheck(arguments, 1, { header: 'FileReader.readAsArrayBuffer' })
+    webidl.argumentLengthCheck(arguments, 1, 'FileReader.readAsArrayBuffer')
 
     blob = webidl.converters.Blob(blob, { strict: false })
 
@@ -28255,7 +28640,7 @@ class FileReader extends EventTarget {
   readAsBinaryString (blob) {
     webidl.brandCheck(this, FileReader)
 
-    webidl.argumentLengthCheck(arguments, 1, { header: 'FileReader.readAsBinaryString' })
+    webidl.argumentLengthCheck(arguments, 1, 'FileReader.readAsBinaryString')
 
     blob = webidl.converters.Blob(blob, { strict: false })
 
@@ -28272,12 +28657,12 @@ class FileReader extends EventTarget {
   readAsText (blob, encoding = undefined) {
     webidl.brandCheck(this, FileReader)
 
-    webidl.argumentLengthCheck(arguments, 1, { header: 'FileReader.readAsText' })
+    webidl.argumentLengthCheck(arguments, 1, 'FileReader.readAsText')
 
     blob = webidl.converters.Blob(blob, { strict: false })
 
     if (encoding !== undefined) {
-      encoding = webidl.converters.DOMString(encoding)
+      encoding = webidl.converters.DOMString(encoding, 'FileReader.readAsText', 'encoding')
     }
 
     // The readAsText(blob, encoding) method, when invoked,
@@ -28292,7 +28677,7 @@ class FileReader extends EventTarget {
   readAsDataURL (blob) {
     webidl.brandCheck(this, FileReader)
 
-    webidl.argumentLengthCheck(arguments, 1, { header: 'FileReader.readAsDataURL' })
+    webidl.argumentLengthCheck(arguments, 1, 'FileReader.readAsDataURL')
 
     blob = webidl.converters.Blob(blob, { strict: false })
 
@@ -28561,7 +28946,7 @@ const kState = Symbol('ProgressEvent state')
  */
 class ProgressEvent extends Event {
   constructor (type, eventInitDict = {}) {
-    type = webidl.converters.DOMString(type)
+    type = webidl.converters.DOMString(type, 'ProgressEvent constructor', 'type')
     eventInitDict = webidl.converters.ProgressEventInit(eventInitDict ?? {})
 
     super(type, eventInitDict)
@@ -28596,32 +28981,32 @@ webidl.converters.ProgressEventInit = webidl.dictionaryConverter([
   {
     key: 'lengthComputable',
     converter: webidl.converters.boolean,
-    defaultValue: false
+    defaultValue: () => false
   },
   {
     key: 'loaded',
     converter: webidl.converters['unsigned long long'],
-    defaultValue: 0
+    defaultValue: () => 0
   },
   {
     key: 'total',
     converter: webidl.converters['unsigned long long'],
-    defaultValue: 0
+    defaultValue: () => 0
   },
   {
     key: 'bubbles',
     converter: webidl.converters.boolean,
-    defaultValue: false
+    defaultValue: () => false
   },
   {
     key: 'cancelable',
     converter: webidl.converters.boolean,
-    defaultValue: false
+    defaultValue: () => false
   },
   {
     key: 'composed',
     converter: webidl.converters.boolean,
-    defaultValue: false
+    defaultValue: () => false
   }
 ])
 
@@ -29055,21 +29440,22 @@ module.exports = {
 "use strict";
 
 
-const { uid, states, sentCloseFrameState } = __nccwpck_require__(7881)
+const { uid, states, sentCloseFrameState, emptyBuffer, opcodes } = __nccwpck_require__(7881)
 const {
   kReadyState,
   kSentClose,
   kByteParser,
-  kReceivedClose
+  kReceivedClose,
+  kResponse
 } = __nccwpck_require__(8692)
-const { fireEvent, failWebsocketConnection } = __nccwpck_require__(8948)
+const { fireEvent, failWebsocketConnection, isClosing, isClosed, isEstablished, parseExtensions } = __nccwpck_require__(8948)
 const { channels } = __nccwpck_require__(495)
 const { CloseEvent } = __nccwpck_require__(2591)
 const { makeRequest } = __nccwpck_require__(5573)
 const { fetching } = __nccwpck_require__(1631)
-const { Headers } = __nccwpck_require__(9108)
+const { Headers, getHeadersList } = __nccwpck_require__(9108)
 const { getDecodeSplit } = __nccwpck_require__(1344)
-const { kHeadersList } = __nccwpck_require__(7490)
+const { WebsocketFrameSend } = __nccwpck_require__(1897)
 
 /** @type {import('crypto')} */
 let crypto
@@ -29085,10 +29471,10 @@ try {
  * @param {URL} url
  * @param {string|string[]} protocols
  * @param {import('./websocket').WebSocket} ws
- * @param {(response: any) => void} onEstablish
+ * @param {(response: any, extensions: string[] | undefined) => void} onEstablish
  * @param {Partial<import('../../types/websocket').WebSocketInit>} options
  */
-function establishWebSocketConnection (url, protocols, ws, onEstablish, options) {
+function establishWebSocketConnection (url, protocols, client, ws, onEstablish, options) {
   // 1. Let requestURL be a copy of url, with its scheme set to "http", if url’s
   //    scheme is "ws", and to "https" otherwise.
   const requestURL = url
@@ -29101,6 +29487,7 @@ function establishWebSocketConnection (url, protocols, ws, onEstablish, options)
   //    and redirect mode is "error".
   const request = makeRequest({
     urlList: [requestURL],
+    client,
     serviceWorkers: 'none',
     referrer: 'no-referrer',
     mode: 'websocket',
@@ -29111,7 +29498,7 @@ function establishWebSocketConnection (url, protocols, ws, onEstablish, options)
 
   // Note: undici extension, allow setting custom headers.
   if (options.headers) {
-    const headersList = new Headers(options.headers)[kHeadersList]
+    const headersList = getHeadersList(new Headers(options.headers))
 
     request.headersList = headersList
   }
@@ -29144,12 +29531,11 @@ function establishWebSocketConnection (url, protocols, ws, onEstablish, options)
   // 9. Let permessageDeflate be a user-agent defined
   //    "permessage-deflate" extension header value.
   // https://github.com/mozilla/gecko-dev/blob/ce78234f5e653a5d3916813ff990f053510227bc/netwerk/protocol/websocket/WebSocketChannel.cpp#L2673
-  // TODO: enable once permessage-deflate is supported
-  const permessageDeflate = '' // 'permessage-deflate; 15'
+  const permessageDeflate = 'permessage-deflate; client_max_window_bits'
 
   // 10. Append (`Sec-WebSocket-Extensions`, permessageDeflate) to
   //     request’s header list.
-  // request.headersList.append('sec-websocket-extensions', permessageDeflate)
+  request.headersList.append('sec-websocket-extensions', permessageDeflate)
 
   // 11. Fetch request with useParallelQueue set to true, and
   //     processResponse given response being these steps:
@@ -29220,10 +29606,15 @@ function establishWebSocketConnection (url, protocols, ws, onEstablish, options)
       //    header field to determine which extensions are requested is
       //    discussed in Section 9.1.)
       const secExtension = response.headersList.get('Sec-WebSocket-Extensions')
+      let extensions
 
-      if (secExtension !== null && secExtension !== permessageDeflate) {
-        failWebsocketConnection(ws, 'Received different permessage-deflate than the one set.')
-        return
+      if (secExtension !== null) {
+        extensions = parseExtensions(secExtension)
+
+        if (!extensions.has('permessage-deflate')) {
+          failWebsocketConnection(ws, 'Sec-WebSocket-Extensions header does not match.')
+          return
+        }
       }
 
       // 6. If the response includes a |Sec-WebSocket-Protocol| header field
@@ -29259,11 +29650,73 @@ function establishWebSocketConnection (url, protocols, ws, onEstablish, options)
         })
       }
 
-      onEstablish(response)
+      onEstablish(response, extensions)
     }
   })
 
   return controller
+}
+
+function closeWebSocketConnection (ws, code, reason, reasonByteLength) {
+  if (isClosing(ws) || isClosed(ws)) {
+    // If this's ready state is CLOSING (2) or CLOSED (3)
+    // Do nothing.
+  } else if (!isEstablished(ws)) {
+    // If the WebSocket connection is not yet established
+    // Fail the WebSocket connection and set this's ready state
+    // to CLOSING (2).
+    failWebsocketConnection(ws, 'Connection was closed before it was established.')
+    ws[kReadyState] = states.CLOSING
+  } else if (ws[kSentClose] === sentCloseFrameState.NOT_SENT) {
+    // If the WebSocket closing handshake has not yet been started
+    // Start the WebSocket closing handshake and set this's ready
+    // state to CLOSING (2).
+    // - If neither code nor reason is present, the WebSocket Close
+    //   message must not have a body.
+    // - If code is present, then the status code to use in the
+    //   WebSocket Close message must be the integer given by code.
+    // - If reason is also present, then reasonBytes must be
+    //   provided in the Close message after the status code.
+
+    ws[kSentClose] = sentCloseFrameState.PROCESSING
+
+    const frame = new WebsocketFrameSend()
+
+    // If neither code nor reason is present, the WebSocket Close
+    // message must not have a body.
+
+    // If code is present, then the status code to use in the
+    // WebSocket Close message must be the integer given by code.
+    if (code !== undefined && reason === undefined) {
+      frame.frameData = Buffer.allocUnsafe(2)
+      frame.frameData.writeUInt16BE(code, 0)
+    } else if (code !== undefined && reason !== undefined) {
+      // If reason is also present, then reasonBytes must be
+      // provided in the Close message after the status code.
+      frame.frameData = Buffer.allocUnsafe(2 + reasonByteLength)
+      frame.frameData.writeUInt16BE(code, 0)
+      // the body MAY contain UTF-8-encoded data with value /reason/
+      frame.frameData.write(reason, 2, 'utf-8')
+    } else {
+      frame.frameData = emptyBuffer
+    }
+
+    /** @type {import('stream').Duplex} */
+    const socket = ws[kResponse].socket
+
+    socket.write(frame.createFrame(opcodes.CLOSE))
+
+    ws[kSentClose] = sentCloseFrameState.SENT
+
+    // Upon either sending or receiving a Close control frame, it is said
+    // that _The WebSocket Closing Handshake is Started_ and that the
+    // WebSocket connection is in the CLOSING state.
+    ws[kReadyState] = states.CLOSING
+  } else {
+    // Otherwise
+    // Set this's ready state to CLOSING (2).
+    ws[kReadyState] = states.CLOSING
+  }
 }
 
 /**
@@ -29281,6 +29734,11 @@ function onSocketData (chunk) {
  */
 function onSocketClose () {
   const { ws } = this
+  const { [kResponse]: response } = ws
+
+  response.socket.off('data', onSocketData)
+  response.socket.off('close', onSocketClose)
+  response.socket.off('error', onSocketError)
 
   // If the TCP connection was closed after the
   // WebSocket closing handshake was completed, the WebSocket connection
@@ -29292,10 +29750,10 @@ function onSocketClose () {
 
   const result = ws[kByteParser].closingInfo
 
-  if (result) {
+  if (result && !result.error) {
     code = result.code ?? 1005
     reason = result.reason
-  } else if (ws[kSentClose] !== sentCloseFrameState.SENT) {
+  } else if (!ws[kReceivedClose]) {
     // If _The WebSocket
     // Connection is Closed_ and no Close control frame was received by the
     // endpoint (such as could occur if the underlying transport connection
@@ -29322,7 +29780,7 @@ function onSocketClose () {
   //    decode without BOM to the WebSocket connection close
   //    reason.
   // TODO: process.nextTick
-  fireEvent('close', ws, CloseEvent, {
+  fireEvent('close', ws, (type, init) => new CloseEvent(type, init), {
     wasClean, code, reason
   })
 
@@ -29348,7 +29806,8 @@ function onSocketError (error) {
 }
 
 module.exports = {
-  establishWebSocketConnection
+  establishWebSocketConnection,
+  closeWebSocketConnection
 }
 
 
@@ -29406,6 +29865,13 @@ const parserStates = {
 
 const emptyBuffer = Buffer.allocUnsafe(0)
 
+const sendHints = {
+  string: 1,
+  typedArray: 2,
+  arrayBuffer: 3,
+  blob: 4
+}
+
 module.exports = {
   uid,
   sentCloseFrameState,
@@ -29414,7 +29880,8 @@ module.exports = {
   opcodes,
   maxUnsigned16Bit,
   parserStates,
-  emptyBuffer
+  emptyBuffer,
+  sendHints
 }
 
 
@@ -29428,6 +29895,7 @@ module.exports = {
 
 const { webidl } = __nccwpck_require__(583)
 const { kEnumerableProperty } = __nccwpck_require__(7618)
+const { kConstruct } = __nccwpck_require__(7490)
 const { MessagePort } = __nccwpck_require__(4086)
 
 /**
@@ -29437,10 +29905,16 @@ class MessageEvent extends Event {
   #eventInit
 
   constructor (type, eventInitDict = {}) {
-    webidl.argumentLengthCheck(arguments, 1, { header: 'MessageEvent constructor' })
+    if (type === kConstruct) {
+      super(arguments[1], arguments[2])
+      return
+    }
 
-    type = webidl.converters.DOMString(type)
-    eventInitDict = webidl.converters.MessageEventInit(eventInitDict)
+    const prefix = 'MessageEvent constructor'
+    webidl.argumentLengthCheck(arguments, 1, prefix)
+
+    type = webidl.converters.DOMString(type, prefix, 'type')
+    eventInitDict = webidl.converters.MessageEventInit(eventInitDict, prefix, 'eventInitDict')
 
     super(type, eventInitDict)
 
@@ -29493,13 +29967,27 @@ class MessageEvent extends Event {
   ) {
     webidl.brandCheck(this, MessageEvent)
 
-    webidl.argumentLengthCheck(arguments, 1, { header: 'MessageEvent.initMessageEvent' })
+    webidl.argumentLengthCheck(arguments, 1, 'MessageEvent.initMessageEvent')
 
     return new MessageEvent(type, {
       bubbles, cancelable, data, origin, lastEventId, source, ports
     })
   }
+
+  static createFastMessageEvent (type, init) {
+    const messageEvent = new MessageEvent(kConstruct, type, init)
+    messageEvent.#eventInit = init
+    messageEvent.#eventInit.data ??= null
+    messageEvent.#eventInit.origin ??= ''
+    messageEvent.#eventInit.lastEventId ??= ''
+    messageEvent.#eventInit.source ??= null
+    messageEvent.#eventInit.ports ??= []
+    return messageEvent
+  }
 }
+
+const { createFastMessageEvent } = MessageEvent
+delete MessageEvent.createFastMessageEvent
 
 /**
  * @see https://websockets.spec.whatwg.org/#the-closeevent-interface
@@ -29508,9 +29996,10 @@ class CloseEvent extends Event {
   #eventInit
 
   constructor (type, eventInitDict = {}) {
-    webidl.argumentLengthCheck(arguments, 1, { header: 'CloseEvent constructor' })
+    const prefix = 'CloseEvent constructor'
+    webidl.argumentLengthCheck(arguments, 1, prefix)
 
-    type = webidl.converters.DOMString(type)
+    type = webidl.converters.DOMString(type, prefix, 'type')
     eventInitDict = webidl.converters.CloseEventInit(eventInitDict)
 
     super(type, eventInitDict)
@@ -29542,11 +30031,12 @@ class ErrorEvent extends Event {
   #eventInit
 
   constructor (type, eventInitDict) {
-    webidl.argumentLengthCheck(arguments, 1, { header: 'ErrorEvent constructor' })
+    const prefix = 'ErrorEvent constructor'
+    webidl.argumentLengthCheck(arguments, 1, prefix)
 
     super(type, eventInitDict)
 
-    type = webidl.converters.DOMString(type)
+    type = webidl.converters.DOMString(type, prefix, 'type')
     eventInitDict = webidl.converters.ErrorEventInit(eventInitDict ?? {})
 
     this.#eventInit = eventInitDict
@@ -29628,17 +30118,17 @@ const eventInit = [
   {
     key: 'bubbles',
     converter: webidl.converters.boolean,
-    defaultValue: false
+    defaultValue: () => false
   },
   {
     key: 'cancelable',
     converter: webidl.converters.boolean,
-    defaultValue: false
+    defaultValue: () => false
   },
   {
     key: 'composed',
     converter: webidl.converters.boolean,
-    defaultValue: false
+    defaultValue: () => false
   }
 ]
 
@@ -29647,31 +30137,29 @@ webidl.converters.MessageEventInit = webidl.dictionaryConverter([
   {
     key: 'data',
     converter: webidl.converters.any,
-    defaultValue: null
+    defaultValue: () => null
   },
   {
     key: 'origin',
     converter: webidl.converters.USVString,
-    defaultValue: ''
+    defaultValue: () => ''
   },
   {
     key: 'lastEventId',
     converter: webidl.converters.DOMString,
-    defaultValue: ''
+    defaultValue: () => ''
   },
   {
     key: 'source',
     // Node doesn't implement WindowProxy or ServiceWorker, so the only
     // valid value for source is a MessagePort.
     converter: webidl.nullableConverter(webidl.converters.MessagePort),
-    defaultValue: null
+    defaultValue: () => null
   },
   {
     key: 'ports',
     converter: webidl.converters['sequence<MessagePort>'],
-    get defaultValue () {
-      return []
-    }
+    defaultValue: () => new Array(0)
   }
 ])
 
@@ -29680,17 +30168,17 @@ webidl.converters.CloseEventInit = webidl.dictionaryConverter([
   {
     key: 'wasClean',
     converter: webidl.converters.boolean,
-    defaultValue: false
+    defaultValue: () => false
   },
   {
     key: 'code',
     converter: webidl.converters['unsigned short'],
-    defaultValue: 0
+    defaultValue: () => 0
   },
   {
     key: 'reason',
     converter: webidl.converters.USVString,
-    defaultValue: ''
+    defaultValue: () => ''
   }
 ])
 
@@ -29699,22 +30187,22 @@ webidl.converters.ErrorEventInit = webidl.dictionaryConverter([
   {
     key: 'message',
     converter: webidl.converters.DOMString,
-    defaultValue: ''
+    defaultValue: () => ''
   },
   {
     key: 'filename',
     converter: webidl.converters.USVString,
-    defaultValue: ''
+    defaultValue: () => ''
   },
   {
     key: 'lineno',
     converter: webidl.converters['unsigned long'],
-    defaultValue: 0
+    defaultValue: () => 0
   },
   {
     key: 'colno',
     converter: webidl.converters['unsigned long'],
-    defaultValue: 0
+    defaultValue: () => 0
   },
   {
     key: 'error',
@@ -29725,7 +30213,8 @@ webidl.converters.ErrorEventInit = webidl.dictionaryConverter([
 module.exports = {
   MessageEvent,
   CloseEvent,
-  ErrorEvent
+  ErrorEvent,
+  createFastMessageEvent
 }
 
 
@@ -29739,13 +30228,34 @@ module.exports = {
 
 const { maxUnsigned16Bit } = __nccwpck_require__(7881)
 
+const BUFFER_SIZE = 16386
+
 /** @type {import('crypto')} */
 let crypto
+let buffer = null
+let bufIdx = BUFFER_SIZE
+
 try {
   crypto = __nccwpck_require__(6005)
 /* c8 ignore next 3 */
 } catch {
+  crypto = {
+    // not full compatibility, but minimum.
+    randomFillSync: function randomFillSync (buffer, _offset, _size) {
+      for (let i = 0; i < buffer.length; ++i) {
+        buffer[i] = Math.random() * 255 | 0
+      }
+      return buffer
+    }
+  }
+}
 
+function generateMask () {
+  if (bufIdx === BUFFER_SIZE) {
+    bufIdx = 0
+    crypto.randomFillSync((buffer ??= Buffer.allocUnsafe(BUFFER_SIZE)), 0, BUFFER_SIZE)
+  }
+  return [buffer[bufIdx++], buffer[bufIdx++], buffer[bufIdx++], buffer[bufIdx++]]
 }
 
 class WebsocketFrameSend {
@@ -29754,11 +30264,12 @@ class WebsocketFrameSend {
    */
   constructor (data) {
     this.frameData = data
-    this.maskKey = crypto.randomBytes(4)
   }
 
   createFrame (opcode) {
-    const bodyLength = this.frameData?.byteLength ?? 0
+    const frameData = this.frameData
+    const maskKey = generateMask()
+    const bodyLength = frameData?.byteLength ?? 0
 
     /** @type {number} */
     let payloadLength = bodyLength // 0-125
@@ -29780,10 +30291,10 @@ class WebsocketFrameSend {
     buffer[0] = (buffer[0] & 0xF0) + opcode // opcode
 
     /*! ws. MIT License. Einar Otto Stangvik <einaros@gmail.com> */
-    buffer[offset - 4] = this.maskKey[0]
-    buffer[offset - 3] = this.maskKey[1]
-    buffer[offset - 2] = this.maskKey[2]
-    buffer[offset - 1] = this.maskKey[3]
+    buffer[offset - 4] = maskKey[0]
+    buffer[offset - 3] = maskKey[1]
+    buffer[offset - 2] = maskKey[2]
+    buffer[offset - 1] = maskKey[3]
 
     buffer[1] = payloadLength
 
@@ -29798,8 +30309,8 @@ class WebsocketFrameSend {
     buffer[1] |= 0x80 // MASK
 
     // mask body
-    for (let i = 0; i < bodyLength; i++) {
-      buffer[offset + i] = this.frameData[i] ^ this.maskKey[i % 4]
+    for (let i = 0; i < bodyLength; ++i) {
+      buffer[offset + i] = frameData[i] ^ maskKey[i & 3]
     }
 
     return buffer
@@ -29813,6 +30324,84 @@ module.exports = {
 
 /***/ }),
 
+/***/ 4320:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+const { createInflateRaw, Z_DEFAULT_WINDOWBITS } = __nccwpck_require__(5628)
+const { isValidClientWindowBits } = __nccwpck_require__(8948)
+
+const tail = Buffer.from([0x00, 0x00, 0xff, 0xff])
+const kBuffer = Symbol('kBuffer')
+const kLength = Symbol('kLength')
+
+class PerMessageDeflate {
+  /** @type {import('node:zlib').InflateRaw} */
+  #inflate
+
+  #options = {}
+
+  constructor (extensions) {
+    this.#options.serverNoContextTakeover = extensions.has('server_no_context_takeover')
+    this.#options.serverMaxWindowBits = extensions.get('server_max_window_bits')
+  }
+
+  decompress (chunk, fin, callback) {
+    // An endpoint uses the following algorithm to decompress a message.
+    // 1.  Append 4 octets of 0x00 0x00 0xff 0xff to the tail end of the
+    //     payload of the message.
+    // 2.  Decompress the resulting data using DEFLATE.
+
+    if (!this.#inflate) {
+      let windowBits = Z_DEFAULT_WINDOWBITS
+
+      if (this.#options.serverMaxWindowBits) { // empty values default to Z_DEFAULT_WINDOWBITS
+        if (!isValidClientWindowBits(this.#options.serverMaxWindowBits)) {
+          callback(new Error('Invalid server_max_window_bits'))
+          return
+        }
+
+        windowBits = Number.parseInt(this.#options.serverMaxWindowBits)
+      }
+
+      this.#inflate = createInflateRaw({ windowBits })
+      this.#inflate[kBuffer] = []
+      this.#inflate[kLength] = 0
+
+      this.#inflate.on('data', (data) => {
+        this.#inflate[kBuffer].push(data)
+        this.#inflate[kLength] += data.length
+      })
+
+      this.#inflate.on('error', (err) => {
+        this.#inflate = null
+        callback(err)
+      })
+    }
+
+    this.#inflate.write(chunk)
+    if (fin) {
+      this.#inflate.write(tail)
+    }
+
+    this.#inflate.flush(() => {
+      const full = Buffer.concat(this.#inflate[kBuffer], this.#inflate[kLength])
+
+      this.#inflate[kBuffer].length = 0
+      this.#inflate[kLength] = 0
+
+      callback(null, full)
+    })
+  }
+}
+
+module.exports = { PerMessageDeflate }
+
+
+/***/ }),
+
 /***/ 3803:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
@@ -29820,11 +30409,23 @@ module.exports = {
 
 
 const { Writable } = __nccwpck_require__(4492)
+const assert = __nccwpck_require__(8061)
 const { parserStates, opcodes, states, emptyBuffer, sentCloseFrameState } = __nccwpck_require__(7881)
 const { kReadyState, kSentClose, kResponse, kReceivedClose } = __nccwpck_require__(8692)
 const { channels } = __nccwpck_require__(495)
-const { isValidStatusCode, failWebsocketConnection, websocketMessageReceived, utf8Decode } = __nccwpck_require__(8948)
+const {
+  isValidStatusCode,
+  isValidOpcode,
+  failWebsocketConnection,
+  websocketMessageReceived,
+  utf8Decode,
+  isControlFrame,
+  isTextBinaryFrame,
+  isContinuationFrame
+} = __nccwpck_require__(8948)
 const { WebsocketFrameSend } = __nccwpck_require__(1897)
+const { closeWebSocketConnection } = __nccwpck_require__(7272)
+const { PerMessageDeflate } = __nccwpck_require__(4320)
 
 // This code was influenced by ws released under the MIT license.
 // Copyright (c) 2011 Einar Otto Stangvik <einaros@gmail.com>
@@ -29834,16 +30435,25 @@ const { WebsocketFrameSend } = __nccwpck_require__(1897)
 class ByteParser extends Writable {
   #buffers = []
   #byteOffset = 0
+  #loop = false
 
   #state = parserStates.INFO
 
   #info = {}
   #fragments = []
 
-  constructor (ws) {
+  /** @type {Map<string, PerMessageDeflate>} */
+  #extensions
+
+  constructor (ws, extensions) {
     super()
 
     this.ws = ws
+    this.#extensions = extensions == null ? new Map() : extensions
+
+    if (this.#extensions.has('permessage-deflate')) {
+      this.#extensions.set('permessage-deflate', new PerMessageDeflate(extensions))
+    }
   }
 
   /**
@@ -29853,6 +30463,7 @@ class ByteParser extends Writable {
   _write (chunk, _, callback) {
     this.#buffers.push(chunk)
     this.#byteOffset += chunk.length
+    this.#loop = true
 
     this.run(callback)
   }
@@ -29863,7 +30474,7 @@ class ByteParser extends Writable {
    * or not enough bytes are buffered to parse.
    */
   run (callback) {
-    while (true) {
+    while (this.#loop) {
       if (this.#state === parserStates.INFO) {
         // If there aren't enough bytes to parse the payload length, etc.
         if (this.#byteOffset < 2) {
@@ -29871,23 +30482,76 @@ class ByteParser extends Writable {
         }
 
         const buffer = this.consume(2)
+        const fin = (buffer[0] & 0x80) !== 0
+        const opcode = buffer[0] & 0x0F
+        const masked = (buffer[1] & 0x80) === 0x80
 
-        this.#info.fin = (buffer[0] & 0x80) !== 0
-        this.#info.opcode = buffer[0] & 0x0F
+        const fragmented = !fin && opcode !== opcodes.CONTINUATION
+        const payloadLength = buffer[1] & 0x7F
 
-        // If we receive a fragmented message, we use the type of the first
-        // frame to parse the full message as binary/text, when it's terminated
-        this.#info.originalOpcode ??= this.#info.opcode
+        const rsv1 = buffer[0] & 0x40
+        const rsv2 = buffer[0] & 0x20
+        const rsv3 = buffer[0] & 0x10
 
-        this.#info.fragmented = !this.#info.fin && this.#info.opcode !== opcodes.CONTINUATION
+        if (!isValidOpcode(opcode)) {
+          failWebsocketConnection(this.ws, 'Invalid opcode received')
+          return callback()
+        }
 
-        if (this.#info.fragmented && this.#info.opcode !== opcodes.BINARY && this.#info.opcode !== opcodes.TEXT) {
+        if (masked) {
+          failWebsocketConnection(this.ws, 'Frame cannot be masked')
+          return callback()
+        }
+
+        // MUST be 0 unless an extension is negotiated that defines meanings
+        // for non-zero values.  If a nonzero value is received and none of
+        // the negotiated extensions defines the meaning of such a nonzero
+        // value, the receiving endpoint MUST _Fail the WebSocket
+        // Connection_.
+        // This document allocates the RSV1 bit of the WebSocket header for
+        // PMCEs and calls the bit the "Per-Message Compressed" bit.  On a
+        // WebSocket connection where a PMCE is in use, this bit indicates
+        // whether a message is compressed or not.
+        if (rsv1 !== 0 && !this.#extensions.has('permessage-deflate')) {
+          failWebsocketConnection(this.ws, 'Expected RSV1 to be clear.')
+          return
+        }
+
+        if (rsv2 !== 0 || rsv3 !== 0) {
+          failWebsocketConnection(this.ws, 'RSV1, RSV2, RSV3 must be clear')
+          return
+        }
+
+        if (fragmented && !isTextBinaryFrame(opcode)) {
           // Only text and binary frames can be fragmented
           failWebsocketConnection(this.ws, 'Invalid frame type was fragmented.')
           return
         }
 
-        const payloadLength = buffer[1] & 0x7F
+        // If we are already parsing a text/binary frame and do not receive either
+        // a continuation frame or close frame, fail the connection.
+        if (isTextBinaryFrame(opcode) && this.#fragments.length > 0) {
+          failWebsocketConnection(this.ws, 'Expected continuation frame')
+          return
+        }
+
+        if (this.#info.fragmented && fragmented) {
+          // A fragmented frame can't be fragmented itself
+          failWebsocketConnection(this.ws, 'Fragmented frame exceeded 125 bytes.')
+          return
+        }
+
+        // "All control frames MUST have a payload length of 125 bytes or less
+        // and MUST NOT be fragmented."
+        if ((payloadLength > 125 || fragmented) && isControlFrame(opcode)) {
+          failWebsocketConnection(this.ws, 'Control frame either too large or fragmented')
+          return
+        }
+
+        if (isContinuationFrame(opcode) && this.#fragments.length === 0 && !this.#info.compressed) {
+          failWebsocketConnection(this.ws, 'Unexpected continuation frame')
+          return
+        }
 
         if (payloadLength <= 125) {
           this.#info.payloadLength = payloadLength
@@ -29898,108 +30562,15 @@ class ByteParser extends Writable {
           this.#state = parserStates.PAYLOADLENGTH_64
         }
 
-        if (this.#info.fragmented && payloadLength > 125) {
-          // A fragmented frame can't be fragmented itself
-          failWebsocketConnection(this.ws, 'Fragmented frame exceeded 125 bytes.')
-          return
-        } else if (
-          (this.#info.opcode === opcodes.PING ||
-            this.#info.opcode === opcodes.PONG ||
-            this.#info.opcode === opcodes.CLOSE) &&
-          payloadLength > 125
-        ) {
-          // Control frames can have a payload length of 125 bytes MAX
-          failWebsocketConnection(this.ws, 'Payload length for control frame exceeded 125 bytes.')
-          return
-        } else if (this.#info.opcode === opcodes.CLOSE) {
-          if (payloadLength === 1) {
-            failWebsocketConnection(this.ws, 'Received close frame with a 1-byte body.')
-            return
-          }
-
-          const body = this.consume(payloadLength)
-
-          this.#info.closeInfo = this.parseCloseBody(body)
-
-          if (this.ws[kSentClose] !== sentCloseFrameState.SENT) {
-            // If an endpoint receives a Close frame and did not previously send a
-            // Close frame, the endpoint MUST send a Close frame in response.  (When
-            // sending a Close frame in response, the endpoint typically echos the
-            // status code it received.)
-            let body = emptyBuffer
-            if (this.#info.closeInfo.code) {
-              body = Buffer.allocUnsafe(2)
-              body.writeUInt16BE(this.#info.closeInfo.code, 0)
-            }
-            const closeFrame = new WebsocketFrameSend(body)
-
-            this.ws[kResponse].socket.write(
-              closeFrame.createFrame(opcodes.CLOSE),
-              (err) => {
-                if (!err) {
-                  this.ws[kSentClose] = sentCloseFrameState.SENT
-                }
-              }
-            )
-          }
-
-          // Upon either sending or receiving a Close control frame, it is said
-          // that _The WebSocket Closing Handshake is Started_ and that the
-          // WebSocket connection is in the CLOSING state.
-          this.ws[kReadyState] = states.CLOSING
-          this.ws[kReceivedClose] = true
-
-          this.end()
-
-          return
-        } else if (this.#info.opcode === opcodes.PING) {
-          // Upon receipt of a Ping frame, an endpoint MUST send a Pong frame in
-          // response, unless it already received a Close frame.
-          // A Pong frame sent in response to a Ping frame must have identical
-          // "Application data"
-
-          const body = this.consume(payloadLength)
-
-          if (!this.ws[kReceivedClose]) {
-            const frame = new WebsocketFrameSend(body)
-
-            this.ws[kResponse].socket.write(frame.createFrame(opcodes.PONG))
-
-            if (channels.ping.hasSubscribers) {
-              channels.ping.publish({
-                payload: body
-              })
-            }
-          }
-
-          this.#state = parserStates.INFO
-
-          if (this.#byteOffset > 0) {
-            continue
-          } else {
-            callback()
-            return
-          }
-        } else if (this.#info.opcode === opcodes.PONG) {
-          // A Pong frame MAY be sent unsolicited.  This serves as a
-          // unidirectional heartbeat.  A response to an unsolicited Pong frame is
-          // not expected.
-
-          const body = this.consume(payloadLength)
-
-          if (channels.pong.hasSubscribers) {
-            channels.pong.publish({
-              payload: body
-            })
-          }
-
-          if (this.#byteOffset > 0) {
-            continue
-          } else {
-            callback()
-            return
-          }
+        if (isTextBinaryFrame(opcode)) {
+          this.#info.binaryType = opcode
+          this.#info.compressed = rsv1 !== 0
         }
+
+        this.#info.opcode = opcode
+        this.#info.masked = masked
+        this.#info.fin = fin
+        this.#info.fragmented = fragmented
       } else if (this.#state === parserStates.PAYLOADLENGTH_16) {
         if (this.#byteOffset < 2) {
           return callback()
@@ -30017,7 +30588,7 @@ class ByteParser extends Writable {
         const buffer = this.consume(8)
         const upper = buffer.readUInt32BE(0)
 
-        // 2^31 is the maxinimum bytes an arraybuffer can contain
+        // 2^31 is the maximum bytes an arraybuffer can contain
         // on 32-bit systems. Although, on 64-bit systems, this is
         // 2^53-1 bytes.
         // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Errors/Invalid_array_length
@@ -30034,33 +30605,57 @@ class ByteParser extends Writable {
         this.#state = parserStates.READ_DATA
       } else if (this.#state === parserStates.READ_DATA) {
         if (this.#byteOffset < this.#info.payloadLength) {
-          // If there is still more data in this chunk that needs to be read
           return callback()
-        } else if (this.#byteOffset >= this.#info.payloadLength) {
-          // If the server sent multiple frames in a single chunk
-
-          const body = this.consume(this.#info.payloadLength)
-
-          this.#fragments.push(body)
-
-          // If the frame is unfragmented, or a fragmented frame was terminated,
-          // a message was received
-          if (!this.#info.fragmented || (this.#info.fin && this.#info.opcode === opcodes.CONTINUATION)) {
-            const fullMessage = Buffer.concat(this.#fragments)
-
-            websocketMessageReceived(this.ws, this.#info.originalOpcode, fullMessage)
-
-            this.#info = {}
-            this.#fragments.length = 0
-          }
-
-          this.#state = parserStates.INFO
         }
-      }
 
-      if (this.#byteOffset === 0) {
-        callback()
-        break
+        const body = this.consume(this.#info.payloadLength)
+
+        if (isControlFrame(this.#info.opcode)) {
+          this.#loop = this.parseControlFrame(body)
+          this.#state = parserStates.INFO
+        } else {
+          if (!this.#info.compressed) {
+            this.#fragments.push(body)
+
+            // If the frame is not fragmented, a message has been received.
+            // If the frame is fragmented, it will terminate with a fin bit set
+            // and an opcode of 0 (continuation), therefore we handle that when
+            // parsing continuation frames, not here.
+            if (!this.#info.fragmented && this.#info.fin) {
+              const fullMessage = Buffer.concat(this.#fragments)
+              websocketMessageReceived(this.ws, this.#info.binaryType, fullMessage)
+              this.#fragments.length = 0
+            }
+
+            this.#state = parserStates.INFO
+          } else {
+            this.#extensions.get('permessage-deflate').decompress(body, this.#info.fin, (error, data) => {
+              if (error) {
+                closeWebSocketConnection(this.ws, 1007, error.message, error.message.length)
+                return
+              }
+
+              this.#fragments.push(data)
+
+              if (!this.#info.fin) {
+                this.#state = parserStates.INFO
+                this.#loop = true
+                this.run(callback)
+                return
+              }
+
+              websocketMessageReceived(this.ws, this.#info.binaryType, Buffer.concat(this.#fragments))
+
+              this.#loop = true
+              this.#state = parserStates.INFO
+              this.#fragments.length = 0
+              this.run(callback)
+            })
+
+            this.#loop = false
+            break
+          }
+        }
       }
     }
   }
@@ -30068,11 +30663,11 @@ class ByteParser extends Writable {
   /**
    * Take n bytes from the buffered Buffers
    * @param {number} n
-   * @returns {Buffer|null}
+   * @returns {Buffer}
    */
   consume (n) {
     if (n > this.#byteOffset) {
-      return null
+      throw new Error('Called consume() before buffers satiated.')
     } else if (n === 0) {
       return emptyBuffer
     }
@@ -30108,6 +30703,8 @@ class ByteParser extends Writable {
   }
 
   parseCloseBody (data) {
+    assert(data.length !== 1)
+
     // https://datatracker.ietf.org/doc/html/rfc6455#section-7.1.5
     /** @type {number|undefined} */
     let code
@@ -30119,6 +30716,10 @@ class ByteParser extends Writable {
       code = data.readUInt16BE(0)
     }
 
+    if (code !== undefined && !isValidStatusCode(code)) {
+      return { code: 1002, reason: 'Invalid status code', error: true }
+    }
+
     // https://datatracker.ietf.org/doc/html/rfc6455#section-7.1.6
     /** @type {Buffer} */
     let reason = data.subarray(2)
@@ -30128,17 +30729,97 @@ class ByteParser extends Writable {
       reason = reason.subarray(3)
     }
 
-    if (code !== undefined && !isValidStatusCode(code)) {
-      return null
-    }
-
     try {
       reason = utf8Decode(reason)
     } catch {
-      return null
+      return { code: 1007, reason: 'Invalid UTF-8', error: true }
     }
 
-    return { code, reason }
+    return { code, reason, error: false }
+  }
+
+  /**
+   * Parses control frames.
+   * @param {Buffer} body
+   */
+  parseControlFrame (body) {
+    const { opcode, payloadLength } = this.#info
+
+    if (opcode === opcodes.CLOSE) {
+      if (payloadLength === 1) {
+        failWebsocketConnection(this.ws, 'Received close frame with a 1-byte body.')
+        return false
+      }
+
+      this.#info.closeInfo = this.parseCloseBody(body)
+
+      if (this.#info.closeInfo.error) {
+        const { code, reason } = this.#info.closeInfo
+
+        closeWebSocketConnection(this.ws, code, reason, reason.length)
+        failWebsocketConnection(this.ws, reason)
+        return false
+      }
+
+      if (this.ws[kSentClose] !== sentCloseFrameState.SENT) {
+        // If an endpoint receives a Close frame and did not previously send a
+        // Close frame, the endpoint MUST send a Close frame in response.  (When
+        // sending a Close frame in response, the endpoint typically echos the
+        // status code it received.)
+        let body = emptyBuffer
+        if (this.#info.closeInfo.code) {
+          body = Buffer.allocUnsafe(2)
+          body.writeUInt16BE(this.#info.closeInfo.code, 0)
+        }
+        const closeFrame = new WebsocketFrameSend(body)
+
+        this.ws[kResponse].socket.write(
+          closeFrame.createFrame(opcodes.CLOSE),
+          (err) => {
+            if (!err) {
+              this.ws[kSentClose] = sentCloseFrameState.SENT
+            }
+          }
+        )
+      }
+
+      // Upon either sending or receiving a Close control frame, it is said
+      // that _The WebSocket Closing Handshake is Started_ and that the
+      // WebSocket connection is in the CLOSING state.
+      this.ws[kReadyState] = states.CLOSING
+      this.ws[kReceivedClose] = true
+
+      return false
+    } else if (opcode === opcodes.PING) {
+      // Upon receipt of a Ping frame, an endpoint MUST send a Pong frame in
+      // response, unless it already received a Close frame.
+      // A Pong frame sent in response to a Ping frame must have identical
+      // "Application data"
+
+      if (!this.ws[kReceivedClose]) {
+        const frame = new WebsocketFrameSend(body)
+
+        this.ws[kResponse].socket.write(frame.createFrame(opcodes.PONG))
+
+        if (channels.ping.hasSubscribers) {
+          channels.ping.publish({
+            payload: body
+          })
+        }
+      }
+    } else if (opcode === opcodes.PONG) {
+      // A Pong frame MAY be sent unsolicited.  This serves as a
+      // unidirectional heartbeat.  A response to an unsolicited Pong frame is
+      // not expected.
+
+      if (channels.pong.hasSubscribers) {
+        channels.pong.publish({
+          payload: body
+        })
+      }
+    }
+
+    return true
   }
 
   get closingInfo () {
@@ -30149,6 +30830,118 @@ class ByteParser extends Writable {
 module.exports = {
   ByteParser
 }
+
+
+/***/ }),
+
+/***/ 167:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+const { WebsocketFrameSend } = __nccwpck_require__(1897)
+const { opcodes, sendHints } = __nccwpck_require__(7881)
+const FixedQueue = __nccwpck_require__(5509)
+
+/** @type {typeof Uint8Array} */
+const FastBuffer = Buffer[Symbol.species]
+
+/**
+ * @typedef {object} SendQueueNode
+ * @property {Promise<void> | null} promise
+ * @property {((...args: any[]) => any)} callback
+ * @property {Buffer | null} frame
+ */
+
+class SendQueue {
+  /**
+   * @type {FixedQueue}
+   */
+  #queue = new FixedQueue()
+
+  /**
+   * @type {boolean}
+   */
+  #running = false
+
+  /** @type {import('node:net').Socket} */
+  #socket
+
+  constructor (socket) {
+    this.#socket = socket
+  }
+
+  add (item, cb, hint) {
+    if (hint !== sendHints.blob) {
+      const frame = createFrame(item, hint)
+      if (!this.#running) {
+        // fast-path
+        this.#socket.write(frame, cb)
+      } else {
+        /** @type {SendQueueNode} */
+        const node = {
+          promise: null,
+          callback: cb,
+          frame
+        }
+        this.#queue.push(node)
+      }
+      return
+    }
+
+    /** @type {SendQueueNode} */
+    const node = {
+      promise: item.arrayBuffer().then((ab) => {
+        node.promise = null
+        node.frame = createFrame(ab, hint)
+      }),
+      callback: cb,
+      frame: null
+    }
+
+    this.#queue.push(node)
+
+    if (!this.#running) {
+      this.#run()
+    }
+  }
+
+  async #run () {
+    this.#running = true
+    const queue = this.#queue
+    while (!queue.isEmpty()) {
+      const node = queue.shift()
+      // wait pending promise
+      if (node.promise !== null) {
+        await node.promise
+      }
+      // write
+      this.#socket.write(node.frame, node.callback)
+      // cleanup
+      node.callback = node.frame = null
+    }
+    this.#running = false
+  }
+}
+
+function createFrame (data, hint) {
+  return new WebsocketFrameSend(toBuffer(data, hint)).createFrame(hint === sendHints.string ? opcodes.TEXT : opcodes.BINARY)
+}
+
+function toBuffer (data, hint) {
+  switch (hint) {
+    case sendHints.string:
+      return Buffer.from(data)
+    case sendHints.arrayBuffer:
+    case sendHints.blob:
+      return new FastBuffer(data)
+    case sendHints.typedArray:
+      return new FastBuffer(data.buffer, data.byteOffset, data.byteLength)
+  }
+}
+
+module.exports = { SendQueue }
 
 
 /***/ }),
@@ -30181,8 +30974,9 @@ module.exports = {
 
 const { kReadyState, kController, kResponse, kBinaryType, kWebSocketURL } = __nccwpck_require__(8692)
 const { states, opcodes } = __nccwpck_require__(7881)
-const { MessageEvent, ErrorEvent } = __nccwpck_require__(2591)
+const { ErrorEvent, createFastMessageEvent } = __nccwpck_require__(2591)
 const { isUtf8 } = __nccwpck_require__(2254)
+const { collectASequenceOfCodePointsFast, removeHTTPWhitespace } = __nccwpck_require__(2322)
 
 /* globals Blob */
 
@@ -30230,15 +31024,16 @@ function isClosed (ws) {
  * @see https://dom.spec.whatwg.org/#concept-event-fire
  * @param {string} e
  * @param {EventTarget} target
+ * @param {(...args: ConstructorParameters<typeof Event>) => Event} eventFactory
  * @param {EventInit | undefined} eventInitDict
  */
-function fireEvent (e, target, eventConstructor = Event, eventInitDict = {}) {
+function fireEvent (e, target, eventFactory = (type, init) => new Event(type, init), eventInitDict = {}) {
   // 1. If eventConstructor is not given, then let eventConstructor be Event.
 
   // 2. Let event be the result of creating an event given eventConstructor,
   //    in the relevant realm of target.
   // 3. Initialize event’s type attribute to e.
-  const event = new eventConstructor(e, eventInitDict) // eslint-disable-line new-cap
+  const event = eventFactory(e, eventInitDict)
 
   // 4. Initialize any other IDL attributes of event as described in the
   //    invocation of this algorithm.
@@ -30282,17 +31077,24 @@ function websocketMessageReceived (ws, type, data) {
       // -> type indicates that the data is Binary and binary type is "arraybuffer"
       //      a new ArrayBuffer object, created in the relevant Realm of the
       //      WebSocket object, whose contents are data
-      dataForEvent = new Uint8Array(data).buffer
+      dataForEvent = toArrayBuffer(data)
     }
   }
 
   // 3. Fire an event named message at the WebSocket object, using MessageEvent,
   //    with the origin attribute initialized to the serialization of the WebSocket
   //    object’s url's origin, and the data attribute initialized to dataForEvent.
-  fireEvent('message', ws, MessageEvent, {
+  fireEvent('message', ws, createFastMessageEvent, {
     origin: ws[kWebSocketURL].origin,
     data: dataForEvent
   })
+}
+
+function toArrayBuffer (buffer) {
+  if (buffer.byteLength === buffer.buffer.byteLength) {
+    return buffer.buffer
+  }
+  return buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength)
 }
 
 /**
@@ -30374,10 +31176,77 @@ function failWebsocketConnection (ws, reason) {
 
   if (reason) {
     // TODO: process.nextTick
-    fireEvent('error', ws, ErrorEvent, {
-      error: new Error(reason)
+    fireEvent('error', ws, (type, init) => new ErrorEvent(type, init), {
+      error: new Error(reason),
+      message: reason
     })
   }
+}
+
+/**
+ * @see https://datatracker.ietf.org/doc/html/rfc6455#section-5.5
+ * @param {number} opcode
+ */
+function isControlFrame (opcode) {
+  return (
+    opcode === opcodes.CLOSE ||
+    opcode === opcodes.PING ||
+    opcode === opcodes.PONG
+  )
+}
+
+function isContinuationFrame (opcode) {
+  return opcode === opcodes.CONTINUATION
+}
+
+function isTextBinaryFrame (opcode) {
+  return opcode === opcodes.TEXT || opcode === opcodes.BINARY
+}
+
+function isValidOpcode (opcode) {
+  return isTextBinaryFrame(opcode) || isContinuationFrame(opcode) || isControlFrame(opcode)
+}
+
+/**
+ * Parses a Sec-WebSocket-Extensions header value.
+ * @param {string} extensions
+ * @returns {Map<string, string>}
+ */
+// TODO(@Uzlopak, @KhafraDev): make compliant https://datatracker.ietf.org/doc/html/rfc6455#section-9.1
+function parseExtensions (extensions) {
+  const position = { position: 0 }
+  const extensionList = new Map()
+
+  while (position.position < extensions.length) {
+    const pair = collectASequenceOfCodePointsFast(';', extensions, position)
+    const [name, value = ''] = pair.split('=')
+
+    extensionList.set(
+      removeHTTPWhitespace(name, true, false),
+      removeHTTPWhitespace(value, false, true)
+    )
+
+    position.position++
+  }
+
+  return extensionList
+}
+
+/**
+ * @see https://www.rfc-editor.org/rfc/rfc7692#section-7.1.2.2
+ * @description "client-max-window-bits = 1*DIGIT"
+ * @param {string} value
+ */
+function isValidClientWindowBits (value) {
+  for (let i = 0; i < value.length; i++) {
+    const byte = value.charCodeAt(i)
+
+    if (byte < 0x30 || byte > 0x39) {
+      return false
+    }
+  }
+
+  return true
 }
 
 // https://nodejs.org/api/intl.html#detecting-internationalization-support
@@ -30407,7 +31276,13 @@ module.exports = {
   isValidStatusCode,
   failWebsocketConnection,
   websocketMessageReceived,
-  utf8Decode
+  utf8Decode,
+  isControlFrame,
+  isContinuationFrame,
+  isTextBinaryFrame,
+  isValidOpcode,
+  parseExtensions,
+  isValidClientWindowBits
 }
 
 
@@ -30421,8 +31296,8 @@ module.exports = {
 
 const { webidl } = __nccwpck_require__(583)
 const { URLSerializer } = __nccwpck_require__(2322)
-const { getGlobalOrigin } = __nccwpck_require__(5592)
-const { staticPropertyDescriptors, states, sentCloseFrameState, opcodes, emptyBuffer } = __nccwpck_require__(7881)
+const { environmentSettingsObject } = __nccwpck_require__(1344)
+const { staticPropertyDescriptors, states, sentCloseFrameState, sendHints } = __nccwpck_require__(7881)
 const {
   kWebSocketURL,
   kReadyState,
@@ -30435,20 +31310,17 @@ const {
 const {
   isConnecting,
   isEstablished,
-  isClosed,
   isClosing,
   isValidSubprotocol,
-  failWebsocketConnection,
   fireEvent
 } = __nccwpck_require__(8948)
-const { establishWebSocketConnection } = __nccwpck_require__(7272)
-const { WebsocketFrameSend } = __nccwpck_require__(1897)
+const { establishWebSocketConnection, closeWebSocketConnection } = __nccwpck_require__(7272)
 const { ByteParser } = __nccwpck_require__(3803)
 const { kEnumerableProperty, isBlobLike } = __nccwpck_require__(7618)
 const { getGlobalDispatcher } = __nccwpck_require__(5605)
 const { types } = __nccwpck_require__(7261)
-
-let experimentalWarned = false
+const { ErrorEvent, CloseEvent } = __nccwpck_require__(2591)
+const { SendQueue } = __nccwpck_require__(167)
 
 // https://websockets.spec.whatwg.org/#interface-definition
 class WebSocket extends EventTarget {
@@ -30463,6 +31335,9 @@ class WebSocket extends EventTarget {
   #protocol = ''
   #extensions = ''
 
+  /** @type {SendQueue} */
+  #sendQueue
+
   /**
    * @param {string} url
    * @param {string|string[]} protocols
@@ -30470,22 +31345,16 @@ class WebSocket extends EventTarget {
   constructor (url, protocols = []) {
     super()
 
-    webidl.argumentLengthCheck(arguments, 1, { header: 'WebSocket constructor' })
+    const prefix = 'WebSocket constructor'
+    webidl.argumentLengthCheck(arguments, 1, prefix)
 
-    if (!experimentalWarned) {
-      experimentalWarned = true
-      process.emitWarning('WebSockets are experimental, expect them to change at any time.', {
-        code: 'UNDICI-WS'
-      })
-    }
+    const options = webidl.converters['DOMString or sequence<DOMString> or WebSocketInit'](protocols, prefix, 'options')
 
-    const options = webidl.converters['DOMString or sequence<DOMString> or WebSocketInit'](protocols)
-
-    url = webidl.converters.USVString(url)
+    url = webidl.converters.USVString(url, prefix, 'url')
     protocols = options.protocols
 
     // 1. Let baseURL be this's relevant settings object's API base URL.
-    const baseURL = getGlobalOrigin()
+    const baseURL = environmentSettingsObject.settingsObject.baseUrl
 
     // 1. Let urlRecord be the result of applying the URL parser to url with baseURL.
     let urlRecord
@@ -30541,6 +31410,7 @@ class WebSocket extends EventTarget {
     this[kWebSocketURL] = new URL(urlRecord.href)
 
     // 11. Let client be this's relevant settings object.
+    const client = environmentSettingsObject.settingsObject
 
     // 12. Run this step in parallel:
 
@@ -30549,8 +31419,9 @@ class WebSocket extends EventTarget {
     this[kController] = establishWebSocketConnection(
       urlRecord,
       protocols,
+      client,
       this,
-      (response) => this.#onConnectionEstablished(response),
+      (response, extensions) => this.#onConnectionEstablished(response, extensions),
       options
     )
 
@@ -30578,12 +31449,14 @@ class WebSocket extends EventTarget {
   close (code = undefined, reason = undefined) {
     webidl.brandCheck(this, WebSocket)
 
+    const prefix = 'WebSocket.close'
+
     if (code !== undefined) {
-      code = webidl.converters['unsigned short'](code, { clamp: true })
+      code = webidl.converters['unsigned short'](code, prefix, 'code', { clamp: true })
     }
 
     if (reason !== undefined) {
-      reason = webidl.converters.USVString(reason)
+      reason = webidl.converters.USVString(reason, prefix, 'reason')
     }
 
     // 1. If code is present, but is neither an integer equal to 1000 nor an
@@ -30613,67 +31486,7 @@ class WebSocket extends EventTarget {
     }
 
     // 3. Run the first matching steps from the following list:
-    if (isClosing(this) || isClosed(this)) {
-      // If this's ready state is CLOSING (2) or CLOSED (3)
-      // Do nothing.
-    } else if (!isEstablished(this)) {
-      // If the WebSocket connection is not yet established
-      // Fail the WebSocket connection and set this's ready state
-      // to CLOSING (2).
-      failWebsocketConnection(this, 'Connection was closed before it was established.')
-      this[kReadyState] = WebSocket.CLOSING
-    } else if (this[kSentClose] === sentCloseFrameState.NOT_SENT) {
-      // If the WebSocket closing handshake has not yet been started
-      // Start the WebSocket closing handshake and set this's ready
-      // state to CLOSING (2).
-      // - If neither code nor reason is present, the WebSocket Close
-      //   message must not have a body.
-      // - If code is present, then the status code to use in the
-      //   WebSocket Close message must be the integer given by code.
-      // - If reason is also present, then reasonBytes must be
-      //   provided in the Close message after the status code.
-
-      this[kSentClose] = sentCloseFrameState.PROCESSING
-
-      const frame = new WebsocketFrameSend()
-
-      // If neither code nor reason is present, the WebSocket Close
-      // message must not have a body.
-
-      // If code is present, then the status code to use in the
-      // WebSocket Close message must be the integer given by code.
-      if (code !== undefined && reason === undefined) {
-        frame.frameData = Buffer.allocUnsafe(2)
-        frame.frameData.writeUInt16BE(code, 0)
-      } else if (code !== undefined && reason !== undefined) {
-        // If reason is also present, then reasonBytes must be
-        // provided in the Close message after the status code.
-        frame.frameData = Buffer.allocUnsafe(2 + reasonByteLength)
-        frame.frameData.writeUInt16BE(code, 0)
-        // the body MAY contain UTF-8-encoded data with value /reason/
-        frame.frameData.write(reason, 2, 'utf-8')
-      } else {
-        frame.frameData = emptyBuffer
-      }
-
-      /** @type {import('stream').Duplex} */
-      const socket = this[kResponse].socket
-
-      socket.write(frame.createFrame(opcodes.CLOSE), (err) => {
-        if (!err) {
-          this[kSentClose] = sentCloseFrameState.SENT
-        }
-      })
-
-      // Upon either sending or receiving a Close control frame, it is said
-      // that _The WebSocket Closing Handshake is Started_ and that the
-      // WebSocket connection is in the CLOSING state.
-      this[kReadyState] = states.CLOSING
-    } else {
-      // Otherwise
-      // Set this's ready state to CLOSING (2).
-      this[kReadyState] = WebSocket.CLOSING
-    }
+    closeWebSocketConnection(this, code, reason, reasonByteLength)
   }
 
   /**
@@ -30683,9 +31496,10 @@ class WebSocket extends EventTarget {
   send (data) {
     webidl.brandCheck(this, WebSocket)
 
-    webidl.argumentLengthCheck(arguments, 1, { header: 'WebSocket.send' })
+    const prefix = 'WebSocket.send'
+    webidl.argumentLengthCheck(arguments, 1, prefix)
 
-    data = webidl.converters.WebSocketSendData(data)
+    data = webidl.converters.WebSocketSendData(data, prefix, 'data')
 
     // 1. If this's ready state is CONNECTING, then throw an
     //    "InvalidStateError" DOMException.
@@ -30701,9 +31515,6 @@ class WebSocket extends EventTarget {
       return
     }
 
-    /** @type {import('stream').Duplex} */
-    const socket = this[kResponse].socket
-
     // If data is a string
     if (typeof data === 'string') {
       // If the WebSocket connection is established and the WebSocket
@@ -30717,14 +31528,12 @@ class WebSocket extends EventTarget {
       // the bufferedAmount attribute by the number of bytes needed to
       // express the argument as UTF-8.
 
-      const value = Buffer.from(data)
-      const frame = new WebsocketFrameSend(value)
-      const buffer = frame.createFrame(opcodes.TEXT)
+      const length = Buffer.byteLength(data)
 
-      this.#bufferedAmount += value.byteLength
-      socket.write(buffer, () => {
-        this.#bufferedAmount -= value.byteLength
-      })
+      this.#bufferedAmount += length
+      this.#sendQueue.add(data, () => {
+        this.#bufferedAmount -= length
+      }, sendHints.string)
     } else if (types.isArrayBuffer(data)) {
       // If the WebSocket connection is established, and the WebSocket
       // closing handshake has not yet started, then the user agent must
@@ -30738,14 +31547,10 @@ class WebSocket extends EventTarget {
       // increase the bufferedAmount attribute by the length of the
       // ArrayBuffer in bytes.
 
-      const value = Buffer.from(data)
-      const frame = new WebsocketFrameSend(value)
-      const buffer = frame.createFrame(opcodes.BINARY)
-
-      this.#bufferedAmount += value.byteLength
-      socket.write(buffer, () => {
-        this.#bufferedAmount -= value.byteLength
-      })
+      this.#bufferedAmount += data.byteLength
+      this.#sendQueue.add(data, () => {
+        this.#bufferedAmount -= data.byteLength
+      }, sendHints.arrayBuffer)
     } else if (ArrayBuffer.isView(data)) {
       // If the WebSocket connection is established, and the WebSocket
       // closing handshake has not yet started, then the user agent must
@@ -30759,15 +31564,10 @@ class WebSocket extends EventTarget {
       // not throw an exception must increase the bufferedAmount attribute
       // by the length of data’s buffer in bytes.
 
-      const ab = Buffer.from(data, data.byteOffset, data.byteLength)
-
-      const frame = new WebsocketFrameSend(ab)
-      const buffer = frame.createFrame(opcodes.BINARY)
-
-      this.#bufferedAmount += ab.byteLength
-      socket.write(buffer, () => {
-        this.#bufferedAmount -= ab.byteLength
-      })
+      this.#bufferedAmount += data.byteLength
+      this.#sendQueue.add(data, () => {
+        this.#bufferedAmount -= data.byteLength
+      }, sendHints.typedArray)
     } else if (isBlobLike(data)) {
       // If the WebSocket connection is established, and the WebSocket
       // closing handshake has not yet started, then the user agent must
@@ -30780,18 +31580,10 @@ class WebSocket extends EventTarget {
       // an exception must increase the bufferedAmount attribute by the size
       // of the Blob object’s raw data, in bytes.
 
-      const frame = new WebsocketFrameSend()
-
-      data.arrayBuffer().then((ab) => {
-        const value = Buffer.from(ab)
-        frame.frameData = value
-        const buffer = frame.createFrame(opcodes.BINARY)
-
-        this.#bufferedAmount += value.byteLength
-        socket.write(buffer, () => {
-          this.#bufferedAmount -= value.byteLength
-        })
-      })
+      this.#bufferedAmount += data.size
+      this.#sendQueue.add(data, () => {
+        this.#bufferedAmount -= data.size
+      }, sendHints.blob)
     }
   }
 
@@ -30930,18 +31722,19 @@ class WebSocket extends EventTarget {
   /**
    * @see https://websockets.spec.whatwg.org/#feedback-from-the-protocol
    */
-  #onConnectionEstablished (response) {
+  #onConnectionEstablished (response, parsedExtensions) {
     // processResponse is called when the "response’s header list has been received and initialized."
     // once this happens, the connection is open
     this[kResponse] = response
 
-    const parser = new ByteParser(this)
-    parser.on('drain', function onParserDrain () {
-      this.ws[kResponse].socket.resume()
-    })
+    const parser = new ByteParser(this, parsedExtensions)
+    parser.on('drain', onParserDrain)
+    parser.on('error', onParserError.bind(this))
 
     response.socket.ws = this
     this[kByteParser] = parser
+
+    this.#sendQueue = new SendQueue(response.socket)
 
     // 1. Change the ready state to OPEN (1).
     this[kReadyState] = states.OPEN
@@ -31014,29 +31807,25 @@ webidl.converters['sequence<DOMString>'] = webidl.sequenceConverter(
   webidl.converters.DOMString
 )
 
-webidl.converters['DOMString or sequence<DOMString>'] = function (V) {
+webidl.converters['DOMString or sequence<DOMString>'] = function (V, prefix, argument) {
   if (webidl.util.Type(V) === 'Object' && Symbol.iterator in V) {
     return webidl.converters['sequence<DOMString>'](V)
   }
 
-  return webidl.converters.DOMString(V)
+  return webidl.converters.DOMString(V, prefix, argument)
 }
 
-// This implements the propsal made in https://github.com/whatwg/websockets/issues/42
+// This implements the proposal made in https://github.com/whatwg/websockets/issues/42
 webidl.converters.WebSocketInit = webidl.dictionaryConverter([
   {
     key: 'protocols',
     converter: webidl.converters['DOMString or sequence<DOMString>'],
-    get defaultValue () {
-      return []
-    }
+    defaultValue: () => new Array(0)
   },
   {
     key: 'dispatcher',
-    converter: (V) => V,
-    get defaultValue () {
-      return getGlobalDispatcher()
-    }
+    converter: webidl.converters.any,
+    defaultValue: () => getGlobalDispatcher()
   },
   {
     key: 'headers',
@@ -31064,6 +31853,26 @@ webidl.converters.WebSocketSendData = function (V) {
   }
 
   return webidl.converters.USVString(V)
+}
+
+function onParserDrain () {
+  this.ws[kResponse].socket.resume()
+}
+
+function onParserError (err) {
+  let message
+  let code
+
+  if (err instanceof CloseEvent) {
+    message = err.reason
+    code = err.code
+  } else {
+    message = err.message
+  }
+
+  fireEvent('error', this, () => new ErrorEvent('error', { error: err, message }))
+
+  closeWebSocketConnection(this, code)
 }
 
 module.exports = {
@@ -58541,13 +59350,24 @@ const http_client_1 = __nccwpck_require__(4812);
 const action_1 = __nccwpck_require__(161);
 const IS_WINDOWS = process.platform === "win32";
 const IS_MAC = process.platform === "darwin";
-const OS = !!process.env.SETUP_R_OS ? process.env.SETUP_R_OS :
-    IS_WINDOWS ? "win" : IS_MAC ? "mac" : "linux";
-const ARCH = !!process.env.SETUP_R_ARCH ? process.env.SETUP_R_ARCH :
-    OS == "win" ? undefined :
-        (OS == "mac" && process.arch == "arm64") ? "arm64" :
-            (OS == "mac" && process.arch == "x64") ? "x86_64" :
-                process.arch == "x64" ? "amd64" : process.arch;
+const OS = !!process.env.SETUP_R_OS
+    ? process.env.SETUP_R_OS
+    : IS_WINDOWS
+        ? "win"
+        : IS_MAC
+            ? "mac"
+            : "linux";
+const ARCH = !!process.env.SETUP_R_ARCH
+    ? process.env.SETUP_R_ARCH
+    : OS == "win"
+        ? undefined
+        : OS == "mac" && process.arch == "arm64"
+            ? "arm64"
+            : OS == "mac" && process.arch == "x64"
+                ? "x86_64"
+                : process.arch == "x64"
+                    ? "amd64"
+                    : process.arch;
 const api_url = process.env.GITHUB_API_URL || "https://api.github.com";
 if (!tempDirectory) {
     let baseLocation;
@@ -58631,12 +59451,12 @@ function getNightlyPandoc() {
         const octokit = new action_1.Octokit();
         const owner = "jgm";
         const repo = "pandoc";
-        const res = yield octokit.paginate('GET /repos/{owner}/{repo}/actions/runs', {
+        const res = yield octokit.paginate("GET /repos/{owner}/{repo}/actions/runs", {
             owner,
             repo,
-            status: "success"
+            status: "success",
         }, (response, done) => {
-            var bld = response.data.find(x => x.name == "Nightly");
+            var bld = response.data.find((x) => x.name == "Nightly");
             if (!!bld) {
                 done();
                 return [bld.id];
@@ -58644,16 +59464,20 @@ function getNightlyPandoc() {
             return [];
         });
         const run_id = res[0];
-        const res2 = yield octokit.request('GET /repos/{owner}/{repo}/actions/runs/{run_id}/artifacts', {
+        const res2 = yield octokit.request("GET /repos/{owner}/{repo}/actions/runs/{run_id}/artifacts", {
             owner,
             repo,
-            run_id
+            run_id,
         });
         var arts = {};
         for (var i in res2.data.artifacts) {
             arts[res2.data.artifacts[i].name] = res2.data.artifacts[i].id;
         }
-        const which = IS_WINDOWS ? 'nightly-windows' : (IS_MAC ? 'nightly-macos' : 'nightly-linux');
+        const which = IS_WINDOWS
+            ? "nightly-windows"
+            : IS_MAC
+                ? "nightly-macos"
+                : "nightly-linux";
         const artifact_id = arts[which];
         let { url } = yield octokit.request("HEAD /repos/{owner}/{repo}/actions/artifacts/{artifact_id}/{archive_format}", {
             owner,
@@ -58666,18 +59490,18 @@ function getNightlyPandoc() {
         });
         let downloadPath;
         try {
-            downloadPath = yield tc.downloadTool(url);
+            downloadPath = yield tc.downloadTool(url, undefined, getAuthHeaderValue());
         }
         catch (error) {
-            throw new Error('Failed to download Pandoc nightly build: ' + error);
+            throw new Error("Failed to download Pandoc nightly build: " + error);
         }
-        const fileName = which + '.zip';
+        const fileName = which + ".zip";
         const extractionPath = yield tc.extractZip(downloadPath);
         const subdir = yield fs.promises.readdir(extractionPath);
-        const pandocPath = extractionPath + '/' + subdir[0];
+        const pandocPath = extractionPath + "/" + subdir[0];
         if (!IS_WINDOWS) {
-            const pandoc = pandocPath + '/pandoc';
-            yield fs.promises.chmod(pandoc, '755');
+            const pandoc = pandocPath + "/pandoc";
+            yield fs.promises.chmod(pandoc, "755");
         }
         core.debug(`Adding '${pandocPath}' to PATH.`);
         core.addPath(pandocPath);
@@ -58688,9 +59512,9 @@ function installPandocMac(version) {
         var _a;
         // Since 3.1.2, Pandoc uses cabal instead of stack to build the macOS binary.
         const is_new_macos_installer = (0, compare_versions_1.compare)(version, "3.1.2", ">=") ? true : false;
-        const fileName = is_new_macos_installer ?
-            util.format("pandoc-%s-%s-macOS.pkg", version, ARCH) :
-            util.format("pandoc-%s-macOS.pkg", version);
+        const fileName = is_new_macos_installer
+            ? util.format("pandoc-%s-%s-macOS.pkg", version, ARCH)
+            : util.format("pandoc-%s-macOS.pkg", version);
         const downloadUrl = util.format("https://github.com/jgm/pandoc/releases/download/%s/%s", version, fileName);
         let downloadPath;
         try {
@@ -58706,7 +59530,7 @@ function installPandocMac(version) {
             "-pkg",
             path.join(tempDirectory, fileName),
             "-target",
-            "/"
+            "/",
         ]);
     });
 }
@@ -58749,9 +59573,9 @@ function installPandocLinux(version) {
     return __awaiter(this, void 0, void 0, function* () {
         var _a;
         const is_new_linux_installer = (0, compare_versions_1.compare)(version, "2.8", ">=") ? true : false;
-        const fileName = is_new_linux_installer ?
-            util.format("pandoc-%s-linux-%s.tar.gz", version, ARCH) :
-            util.format("pandoc-%s-linux.tar.gz", version);
+        const fileName = is_new_linux_installer
+            ? util.format("pandoc-%s-linux-%s.tar.gz", version, ARCH)
+            : util.format("pandoc-%s-linux.tar.gz", version);
         const downloadUrl = util.format("https://github.com/jgm/pandoc/releases/download/%s/%s", version, fileName);
         let downloadPath;
         try {
