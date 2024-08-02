@@ -16,6 +16,18 @@
 
 * `[setup-pandoc]`: installing nightly Pandoc works again now (#889).
 
+* `[setup-r-dependencies]` now automatically installs Quarto if the repo
+  has a qmd file, and it isn't installed. See the `install-quarto` and
+  `quarto-version` input parameters (#866).
+
+* `[setup-r]` now avoids spurious warnings from Homebrew (#864).
+
+* `[setup-r-dependencies]` now accepts `pak-version: none` to skip pak
+  installation. pak should be already installed on the system in this
+  case, otherwise the dependencies resolution and installation will fail.
+  You probably also need to set the `R_LIB_FOR_PAK` env var to the library
+  where it is installed.
+
 # `v2.9.0` (2024-05-09)
 
 * The `test-coverage.yaml` example workflow now handles global Codecov
