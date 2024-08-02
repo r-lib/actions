@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main, master]
 
-name: lint-changed-files
+name: lint-changed-files.yaml
 
 permissions: read-all
 

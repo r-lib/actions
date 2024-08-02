@@ -38,6 +38,20 @@ s.'
   pandoc-version:
     description: 'Pandoc version to install.'
     default: '3.1.11'
+  install-quarto:
+    description: |
+      Whether to install quarto. If it is 'auto' (the default), it is
+      installed if there is at least one `.qmd` file in the repository,
+      inside `working-directory`. Set to 'true' to always install it.
+      Set to 'false' to never install it.
+    default: 'auto'
+  quarto-version:
+    description: |
+      Version of quarto to install, if quarto is installed. It is passed
+      to the `quarto-dev/quarto-actions/setup@v2` action. The default is
+      'release' to install the latest release. Other possible values are
+      a version number number (without the `v` prefix), and 'pre-release'.
+    default: 'release'
 runs:
   using: "composite"
   steps:
@@ -70,7 +84,7 @@ runs:
         shell: Rscript {0}
 
       - name: Install pak (Windows)
-        if: runner.os == 'Windows'
+        if: ${{ runner.os == 'Windows' && inputs.pak-version != 'none' }}
         run: |
           # Install pak
           cat("::group::Install pak\n")
@@ -87,7 +101,7 @@ runs:
         shell: Rscript {0}
 
       - name: Install pak (Unix)
-        if: runner.os != 'Windows'
+        if: ${{ runner.os != 'Windows' && inputs.pak-version != 'none' }}
         run: |
           # Install pak
           echo "::group::Install pak"
@@ -140,6 +154,7 @@ runs:
           path: |
             ${{ env.R_LIBS_USER }}/*
             !${{ env.R_LIBS_USER }}/pak
+            !${{ env.R_LIBS_USER }}/_cache
           key: ${{ format('{0}-{1}-{2}-{3}', steps.install.outputs.os-version, steps.install.outputs.r-version, inputs.cache-version, hashFiles(format('{0}/.github/pkg.lock', inputs.working-directory ))) }}
           restore-keys: ${{ format('{0}-{1}-{2}-', steps.install.outputs.os-version, steps.install.outputs.r-version, inputs.cache-version) }}
           # Used to save package installation on troublesome Actions
@@ -161,20 +176,25 @@ runs:
       - name: Check whether pandoc needs to be installed
         id: check-pandoc
         run: |
+          # Pandoc check
           cat("::group::Check if package needs pandoc\n")
           o <- '${{ inputs.install-pandoc }}'
           if (! o %in% c('true', 'false')) {
             if (Sys.which("pandoc") != "") {
+              cat("Pandoc is already installed at", Sys.which("pandoc"), "\n")
               o <- 'false'
             } else if (file.exists("DESCRIPTION")) {
               deptypes <- list(direct = "all", indirect = character())
               deps <- pak::pkg_deps(".", dependencies = deptypes)
               if ("rmarkdown" %in% deps$package) {
+                cat("Pandoc is needed for rmarkdown\n")
                 o <- 'true'
               } else {
+                cat("Pandoc is not needed\n")
                 o <- 'false'
               }
             } else {
+              cat("Pandoc is not needed, no R package found\n")
               o <- 'false'
             }
           }
@@ -188,6 +208,38 @@ runs:
         uses: r-lib/actions/setup-pandoc@v2
         with:
           pandoc-version: ${{ inputs.pandoc-version }}
+
+      - name: Check whether quarto if needed
+        id: check-quarto
+        run: |
+          # Quarto check
+          cat("::group::Check if package needs quarto\n")
+          o <- '${{ inputs.install-quarto }}'
+          if (! o %in% c('true', 'false')) {
+            if (Sys.which("quarto") != "") {
+              cat("Quarto is already installed at", Sys.which("quarto"), "\n")
+              o <- "false"
+            } else {
+              qmd <- dir(recursive = TRUE, pattern = "[.]qmd$")
+              if (length(qmd) > 0) {
+                cat("Quarto is needed for qmd file(s):", qmd[1], "...\n")
+                o <- "true"
+              } else {
+                cat("No qmd files found, Quarto is not needed.\n")
+                o <- "false"
+              }
+            }
+          }
+          cat("install=", o, "\n", file = Sys.getenv("GITHUB_OUTPUT"), sep = "", append = TRUE)
+          cat("::endgroup::\n")
+        shell: Rscript {0}
+        working-directory: ${{ inputs.working-directory }}
+
+      - name: Install quarto if needed
+        if: ${{ steps.check-quarto.outputs.install == 'true' }}
+        uses: quarto-dev/quarto-actions/setup@v2
+        with:
+          version: ${{ inputs.quarto-version }}
 
       - name: Session info
         run: |

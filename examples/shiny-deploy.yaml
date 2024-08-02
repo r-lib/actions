@@ -4,7 +4,7 @@ on:
   push:
     branches: [main, master]
 
-name: shiny-deploy
+name: shiny-deploy.yaml
 
 permissions: read-all
 
