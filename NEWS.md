@@ -14,6 +14,11 @@
   unchanged, on all R versions. To avoid using a P3M snapshot on R 3.6.x,
   set the `RSPM_PIN_3_6` environment variable to `false`.
 
+* The example workflows now use their file names as workflow names.
+  This is to make it easier to match worflow runs to workflow files.
+  Most of the the `check-*` workflows use `R-CMD-check.yaml`, however,
+  to anticipate the usethis package renaming them by default (#888).
+
 * `[setup-renv]`: you can now set `bypass-cache` to `never`, to save the
   cache even if the workflow fails (#873, @jaradkohl-mfj).
 

@@ -4,7 +4,7 @@ on:
   push:
     paths: ["R/**"]
 
-name: Document
+name: document.yaml
 
 permissions: read-all
 
