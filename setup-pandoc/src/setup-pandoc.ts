@@ -164,7 +164,7 @@ async function getNightlyPandoc(): Promise<void> {
 
   let downloadPath: string;
   try {
-    downloadPath = await tc.downloadTool(url);
+      downloadPath = await tc.downloadTool(url, undefined, getAuthHeaderValue());
   } catch (error) {
     throw new Error("Failed to download Pandoc nightly build: " + error);
   }
