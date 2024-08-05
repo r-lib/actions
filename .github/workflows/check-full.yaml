@@ -56,7 +56,6 @@ jobs:
         with:
           extra-packages: any::rcmdcheck
           needs: check
-          install-quarto: false
 
       - uses: ./check-r-package
         with:
