@@ -240,7 +240,6 @@ runs:
         uses: quarto-dev/quarto-actions/setup@v2
         with:
           version: ${{ inputs.quarto-version }}
-        working-directory: ${{ runner.temp }}
 
       - name: Session info
         run: |
