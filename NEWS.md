@@ -1,5 +1,9 @@
 # Development version (unreleased)
 
+* `[setup-r-dependencies]` now pins `quarto-dev/quarto-actions/setup`
+  version to a constant tag, to be compatible with organizations where
+  this is a requirement (#901).
+
 * `[setup-renv]` now also caches R packages in `renv/library`, used when
   `RENV_CONFIG_PAK_ENABLED: true` (#900).
 
