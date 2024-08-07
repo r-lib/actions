@@ -1,5 +1,10 @@
 # Development version (unreleased)
 
+* `[setup-renv]` now also caches R packages in `renv/library`, used when
+  `RENV_CONFIG_PAK_ENABLED: true` (#900).
+
+# `v2.10.0` (2024-08-02)
+
 * `[setup-r]`: on R 3.6.x we now use the P3M snapshot from 2024-06-01 by
   default. This is because many newer CRAN packages do not work on R 3.6.x
   any more. The default CRAN mirror is still added, so newer packages may
