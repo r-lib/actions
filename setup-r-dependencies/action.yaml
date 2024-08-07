@@ -153,6 +153,7 @@ runs:
         with:
           path: |
             ${{ env.R_LIBS_USER }}/*
+            renv/library
             !${{ env.R_LIBS_USER }}/pak
             !${{ env.R_LIBS_USER }}/_cache
           key: ${{ format('{0}-{1}-{2}-{3}', steps.install.outputs.os-version, steps.install.outputs.r-version, inputs.cache-version, hashFiles(format('{0}/.github/pkg.lock', inputs.working-directory ))) }}
