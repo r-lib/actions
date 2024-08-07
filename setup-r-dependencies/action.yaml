@@ -238,7 +238,7 @@ runs:
 
       - name: Install quarto if needed
         if: ${{ steps.check-quarto.outputs.install == 'true' }}
-        uses: quarto-dev/quarto-actions/setup@v2
+        uses: quarto-dev/quarto-actions/setup@v2.1.4
         with:
           version: ${{ inputs.quarto-version }}
 
