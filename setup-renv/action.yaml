@@ -40,7 +40,9 @@ runs:
         if: ${{ inputs.bypass-cache != 'true' }}
         uses: actions/cache@v4
         with:
-          path: ${{ env.RENV_PATHS_ROOT }}
+          path: |
+            ${{ env.RENV_PATHS_ROOT }}
+            renv/library
           key: ${{ steps.get-version.outputs.os-version }}-${{ steps.get-version.outputs.r-version }}-${{inputs.cache-version }}-${{ hashFiles(format('{0}/renv.lock', inputs.working-directory)) }}
           restore-keys: ${{ steps.get-version.outputs.os-version }}-${{ steps.get-version.outputs.r-version }}-${{inputs.cache-version }}-
           save-always: ${{ inputs.bypass-cache == 'never' }}
