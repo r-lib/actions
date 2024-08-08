@@ -7,6 +7,9 @@
 * `[setup-renv]` now also caches R packages in `renv/library`, used when
   `RENV_CONFIG_PAK_ENABLED: true` (#900).
 
+* `[setup-manifest]`: new action to set up an R project with a Posit
+  Connect `manifest.json` file (#880).
+
 # `v2.10.0` (2024-08-02)
 
 * `[setup-r]`: on R 3.6.x we now use the P3M snapshot from 2024-06-01 by
