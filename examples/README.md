@@ -228,8 +228,8 @@ jobs:
           - {os: macos-latest,   r: 'release'}
 
           - {os: windows-latest, r: 'release'}
-          # use 4.1 to check with rtools40's older compiler
-          - {os: windows-latest, r: '4.1'}
+          # use 4.0 or 4.1 to check with rtools40's older compiler
+          - {os: windows-latest, r: 'oldrel-4'}
 
           - {os: ubuntu-latest,  r: 'devel', http-user-agent: 'release'}
           - {os: ubuntu-latest,  r: 'release'}
@@ -417,8 +417,6 @@ name: pr-commands.yaml
 
 permissions: read-all
 
-permissions: read-all
-
 jobs:
   document:
     if: ${{ github.event.issue.pull_request && (github.event.comment.author_association == 'MEMBER' || github.event.comment.author_association == 'OWNER') && startsWith(github.event.comment.body, '/document') }}
@@ -512,8 +510,6 @@ on:
     paths: ['**.Rmd']
 
 name: render-rmarkdown.yaml
-
-permissions: read-all
 
 permissions: read-all
 
@@ -640,8 +636,6 @@ name: document.yaml
 
 permissions: read-all
 
-permissions: read-all
-
 jobs:
   document:
     runs-on: ubuntu-latest
@@ -695,8 +689,6 @@ on:
     paths: ["**.[rR]", "**.[qrR]md", "**.[rR]markdown", "**.[rR]nw", "**.[rR]profile"]
 
 name: style.yaml
-
-permissions: read-all
 
 permissions: read-all
 
@@ -804,8 +796,6 @@ on:
   workflow_dispatch:
 
 name: bookdown.yaml
-
-permissions: read-all
 
 permissions: read-all
 
@@ -962,8 +952,6 @@ name: blogdown.yaml
 
 permissions: read-all
 
-permissions: read-all
-
 jobs:
   blogdown:
     runs-on: ubuntu-latest
@@ -1110,8 +1098,6 @@ name: shiny-deploy.yaml
 
 permissions: read-all
 
-permissions: read-all
-
 jobs:
   shiny-deploy:
     runs-on: ubuntu-latest
@@ -1187,8 +1173,6 @@ on:
     branches: [main, master]
 
 name: lint-project.yaml
-
-permissions: read-all
 
 permissions: read-all
 
