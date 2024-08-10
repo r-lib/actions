@@ -40,7 +40,8 @@ jobs:
 
       - uses: codecov/codecov-action@f1b7348826d750ac29741abc9d1623d8da5dcd4f
         with:
-          fail_ci_if_error: ${{ github.event_name != 'pull_request' && true || false }}
+          # Fail if error if not on PR, or if on PR and token is given
+          fail_ci_if_error: ${{ github.event_name != 'pull_request' || secrets.CODECOV_TOKEN }}
           file: ./cobertura.xml
           plugin: noop
           disable_search: true

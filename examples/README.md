@@ -228,8 +228,8 @@ jobs:
           - {os: macos-latest,   r: 'release'}
 
           - {os: windows-latest, r: 'release'}
-          # use 4.1 to check with rtools40's older compiler
-          - {os: windows-latest, r: '4.1'}
+          # use 4.0 or 4.1 to check with rtools40's older compiler
+          - {os: windows-latest, r: 'oldrel-4'}
 
           - {os: ubuntu-latest,  r: 'devel', http-user-agent: 'release'}
           - {os: ubuntu-latest,  r: 'release'}
@@ -325,7 +325,8 @@ jobs:
 
       - uses: codecov/codecov-action@v4
         with:
-          fail_ci_if_error: ${{ github.event_name != 'pull_request' && true || false }}
+          # Fail if error if not on PR, or if on PR and token is given
+          fail_ci_if_error: ${{ github.event_name != 'pull_request' || secrets.CODECOV_TOKEN }}
           file: ./cobertura.xml
           plugin: noop
           disable_search: true
@@ -414,8 +415,6 @@ on:
     types: [created]
 
 name: pr-commands.yaml
-
-permissions: read-all
 
 permissions: read-all
 
@@ -512,8 +511,6 @@ on:
     paths: ['**.Rmd']
 
 name: render-rmarkdown.yaml
-
-permissions: read-all
 
 permissions: read-all
 
@@ -640,8 +637,6 @@ name: document.yaml
 
 permissions: read-all
 
-permissions: read-all
-
 jobs:
   document:
     runs-on: ubuntu-latest
@@ -695,8 +690,6 @@ on:
     paths: ["**.[rR]", "**.[qrR]md", "**.[rR]markdown", "**.[rR]nw", "**.[rR]profile"]
 
 name: style.yaml
-
-permissions: read-all
 
 permissions: read-all
 
@@ -804,8 +797,6 @@ on:
   workflow_dispatch:
 
 name: bookdown.yaml
-
-permissions: read-all
 
 permissions: read-all
 
@@ -962,8 +953,6 @@ name: blogdown.yaml
 
 permissions: read-all
 
-permissions: read-all
-
 jobs:
   blogdown:
     runs-on: ubuntu-latest
@@ -1110,8 +1099,6 @@ name: shiny-deploy.yaml
 
 permissions: read-all
 
-permissions: read-all
-
 jobs:
   shiny-deploy:
     runs-on: ubuntu-latest
@@ -1187,8 +1174,6 @@ on:
     branches: [main, master]
 
 name: lint-project.yaml
-
-permissions: read-all
 
 permissions: read-all
 
