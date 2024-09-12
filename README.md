@@ -37,7 +37,7 @@ You can refer to these as well in your workflow files if you need to.
 1. [r-lib/actions/check-r-package](https://github.com/r-lib/actions/tree/v2/check-r-package) - Runs `R CMD check` on an R package
 1. [r-lib/actions/pr-fetch](https://github.com/r-lib/actions/tree/v2/pr-fetch) - Fetches changes of a PR associated with an event
 1. [r-lib/actions/pr-push](https://github.com/r-lib/actions/tree/v2/pr-push) - Pushes changes to a PR associated with an event
-1. [r-lib/actions/setup-manufest](https://github.com/r-lib/actions/tree/v2/setup-manifest) - Sets up an R project with a Posit Connect `manifest.json` file
+1. [r-lib/actions/setup-manifest](https://github.com/r-lib/actions/tree/v2/setup-manifest) - Sets up an R project with a Posit Connect `manifest.json` file
 
 ## Other GitHub Actions for R projects
 
