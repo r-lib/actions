@@ -74,6 +74,10 @@ This action sets up an R environment for use in actions by:
 - **extra-repositories** (`''`) - One or more extra CRAN-like
   repositories to include in the `repos` global option
 
+- **working-directory** (`'.'`) - Using the working-directory keyword,
+  you can specify a subdirectory of the repo where some relevant file,
+  such as “renv.lock”, should be found.
+
 ## Outputs
 
 - **installed-r-version** - The full R version installed by the action
