@@ -9,6 +9,9 @@
   `R_LIB_FOR_PAK` environment variable to point to the library where pak
   is installed.
 
+* `[setup-r]` now has a `working-directory` parameter, to be able to
+  specify the location of the `renv.lock` file (#922, @calderonsamuel).
+
 # `v2.10.1` (2024-08-08)
 
 * `[setup-r-dependencies]` now pins `quarto-dev/quarto-actions/setup`

@@ -9,15 +9,18 @@ async function run() {
 
     var version: string;
     version = core.getInput("r-version");
+    const workingDirectory: string = core.getInput("working-directory");
 
     if (version === "renv") {
-      let renv_lock_path = "./renv.lock";
+      let renv_lock_path = path.join(workingDirectory, "renv.lock");
       if (fs.existsSync(renv_lock_path)) {
         let renv_lock = fs.readFileSync(renv_lock_path).toString();
         version = JSON.parse(renv_lock).R.Version;
-        core.debug(`got version ${version} from renv.lock`);
+        core.debug(
+          `got version ${version} from renv.lock in ${workingDirectory}`,
+        );
       } else {
-        core.setFailed("./renv.lock does not exist.");
+        core.setFailed(`renv.lock does not exist in ${workingDirectory}.`);
       }
     } else {
       version = version;
