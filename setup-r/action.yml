@@ -55,6 +55,11 @@ inputs:
   extra-repositories:
     description: 'One or more extra CRAN-like repositories to include in the `repos` global option'
     default: ''
+  working-directory:
+    description: >
+      Using the working-directory keyword, you can specify a subdirectory of the repo where some
+      relevant file, such as "renv.lock", should be found.
+    default: '.'
 outputs:
   installed-r-version:
     description: 'The full R version installed'
