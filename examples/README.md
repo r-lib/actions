@@ -80,7 +80,6 @@ on:
   push:
     branches: [main, master]
   pull_request:
-    branches: [main, master]
 
 name: R-CMD-check.yaml
 
@@ -132,7 +131,6 @@ on:
   push:
     branches: [main, master]
   pull_request:
-    branches: [main, master]
 
 name: R-CMD-check.yaml
 
@@ -209,7 +207,6 @@ on:
   push:
     branches: [main, master]
   pull_request:
-    branches: [main, master]
 
 name: R-CMD-check.yaml
 
@@ -289,7 +286,6 @@ on:
   push:
     branches: [main, master]
   pull_request:
-    branches: [main, master]
 
 name: test-coverage.yaml
 
@@ -361,7 +357,6 @@ on:
   push:
     branches: [main, master]
   pull_request:
-    branches: [main, master]
 
 name: lint.yaml
 
@@ -572,7 +567,6 @@ on:
   push:
     branches: [main, master]
   pull_request:
-    branches: [main, master]
   release:
     types: [published]
   workflow_dispatch:
@@ -793,7 +787,6 @@ on:
   push:
     branches: [main, master]
   pull_request:
-    branches: [main, master]
   workflow_dispatch:
 
 name: bookdown.yaml
@@ -855,7 +848,6 @@ on:
   push:
     branches: [main, master]
   pull_request:
-    branches: [main, master]
   workflow_dispatch:
 
 name: bookdown-gh-pages.yaml
@@ -946,7 +938,6 @@ on:
   push:
     branches: [main, master]
   pull_request:
-    branches: [main, master]
   workflow_dispatch:
 
 name: blogdown.yaml
@@ -1005,7 +996,6 @@ on:
   push:
     branches: [main, master]
   pull_request:
-    branches: [main, master]
   workflow_dispatch:
 
 name: blogdown-gh-pages.yaml
@@ -1171,7 +1161,6 @@ on:
   push:
     branches: [main, master]
   pull_request:
-    branches: [main, master]
 
 name: lint-project.yaml
 

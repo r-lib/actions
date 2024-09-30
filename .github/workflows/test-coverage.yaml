@@ -4,7 +4,6 @@ on:
   push:
     branches: [main, master, v2-branch]
   pull_request:
-    branches: [main, master, v2-branch]
 
 name: test-coverage.yaml
 
