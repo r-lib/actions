@@ -6,7 +6,7 @@ inputs:
     description: 'Version range or exact version of an R version to use. "devel" is
     the current development version, and "next" is the next version of R, either
     R-patched, or R-alpha, R-beta, R-rc or R-prerelease. Use "renv" to retrieve R
-    version recorded in renv.lock file.'
+    version recorded in renv.lock file. See r-hub rversions/resolve API for more details.'
     default: 'release'
   rtools-version:
     description: |
