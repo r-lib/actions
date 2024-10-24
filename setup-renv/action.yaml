@@ -37,15 +37,15 @@ runs:
         shell: Rscript {0}
 
       - name: Restore Renv package cache
+        id: cache-packages-restore
         if: ${{ inputs.bypass-cache != 'true' }}
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: |
             ${{ env.RENV_PATHS_ROOT }}
             renv/library
           key: ${{ steps.get-version.outputs.os-version }}-${{ steps.get-version.outputs.r-version }}-${{inputs.cache-version }}-${{ hashFiles(format('{0}/renv.lock', inputs.working-directory)) }}
           restore-keys: ${{ steps.get-version.outputs.os-version }}-${{ steps.get-version.outputs.r-version }}-${{inputs.cache-version }}-
-          save-always: ${{ inputs.bypass-cache == 'never' }}
 
       - name: Install renv dependencies
         run: renv::restore()
@@ -58,3 +58,12 @@ runs:
           if command -v /c/Rtools/bin/tar && /c/Rtools/bin/tar --version | grep -q 'tar (GNU tar) 1.30'
             then echo 'C:/Program Files/Git/usr/bin' >> $GITHUB_PATH
           fi
+
+      - name: Save Renv package cache
+        if: ${{ steps.cache-packages-restore.outputs.cache-hit != 'true' && ((always() && inputs.bypass-cache == 'never') || inputs.bypass-cache == 'false') }}
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            ${{ env.RENV_PATHS_ROOT }}
+            renv/library
+          key: ${{ steps.cache-packages-restore.outputs.cache-primary-key }}

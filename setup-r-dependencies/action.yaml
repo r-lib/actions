@@ -147,9 +147,10 @@ runs:
         shell: Rscript {0}
         working-directory: ${{ inputs.working-directory }}
 
-      - name: R package cache
+      - name: R package cache restore
+        id: cache-packages-restore
         if: inputs.cache != 'false'
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: |
             ${{ env.R_LIBS_USER }}/*
@@ -158,8 +159,6 @@ runs:
             !${{ env.R_LIBS_USER }}/_cache
           key: ${{ format('{0}-{1}-{2}-{3}', steps.install.outputs.os-version, steps.install.outputs.r-version, inputs.cache-version, hashFiles(format('{0}/.github/pkg.lock', inputs.working-directory ))) }}
           restore-keys: ${{ format('{0}-{1}-{2}-', steps.install.outputs.os-version, steps.install.outputs.r-version, inputs.cache-version) }}
-          # Used to save package installation on troublesome Actions
-          save-always: ${{ inputs.cache == 'always' }}
 
       - name: Install dependencies
         run: |
@@ -267,3 +266,14 @@ runs:
           if command -v /c/Rtools/bin/tar && /c/Rtools/bin/tar --version | grep -q 'tar (GNU tar) 1.30'
             then echo 'C:/Program Files/Git/usr/bin' >> $GITHUB_PATH
           fi
+
+      - name: R package cache save
+        if: ${{ steps.cache-packages-restore.outputs.cache-hit != 'true' && ((always() && inputs.cache == 'always') || inputs.cache == 'true') }}
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            ${{ env.R_LIBS_USER }}/*
+            renv/library
+            !${{ env.R_LIBS_USER }}/pak
+            !${{ env.R_LIBS_USER }}/_cache
+          key: ${{ steps.cache-packages-restore.outputs.cache-primary-key }}
