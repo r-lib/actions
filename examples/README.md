@@ -80,7 +80,6 @@ on:
   push:
     branches: [main, master]
   pull_request:
-    branches: [main, master]
 
 name: R-CMD-check.yaml
 
@@ -132,7 +131,6 @@ on:
   push:
     branches: [main, master]
   pull_request:
-    branches: [main, master]
 
 name: R-CMD-check.yaml
 
@@ -209,7 +207,6 @@ on:
   push:
     branches: [main, master]
   pull_request:
-    branches: [main, master]
 
 name: R-CMD-check.yaml
 
@@ -280,7 +277,13 @@ If you use the `codecov/codecov-action` action to upload your test
 results to GitHub, like the example here, then you can also use a global
 organization token in an organization secret called `CODECOV_TOKEN`.
 This way you can avoid having to add a secret to each repository of your
-organization.
+organization. You can find this token at
+`https://app.codecov.io/account/gh/<org>/org-upload-token` where `<org>` is
+your GitHub organization. E.g. for `r-lib` it is at
+https://app.codecov.io/account/gh/r-lib/org-upload-token.
+To see it, you'll need log in to Codecov, and you need to be a Codecov
+admin for the organization.
+
 
 ``` yaml
 # Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
@@ -289,7 +292,6 @@ on:
   push:
     branches: [main, master]
   pull_request:
-    branches: [main, master]
 
 name: test-coverage.yaml
 
@@ -361,7 +363,6 @@ on:
   push:
     branches: [main, master]
   pull_request:
-    branches: [main, master]
 
 name: lint.yaml
 
@@ -572,7 +573,6 @@ on:
   push:
     branches: [main, master]
   pull_request:
-    branches: [main, master]
   release:
     types: [published]
   workflow_dispatch:
@@ -793,7 +793,6 @@ on:
   push:
     branches: [main, master]
   pull_request:
-    branches: [main, master]
   workflow_dispatch:
 
 name: bookdown.yaml
@@ -855,7 +854,6 @@ on:
   push:
     branches: [main, master]
   pull_request:
-    branches: [main, master]
   workflow_dispatch:
 
 name: bookdown-gh-pages.yaml
@@ -946,7 +944,6 @@ on:
   push:
     branches: [main, master]
   pull_request:
-    branches: [main, master]
   workflow_dispatch:
 
 name: blogdown.yaml
@@ -1005,7 +1002,6 @@ on:
   push:
     branches: [main, master]
   pull_request:
-    branches: [main, master]
   workflow_dispatch:
 
 name: blogdown-gh-pages.yaml
@@ -1171,7 +1167,6 @@ on:
   push:
     branches: [main, master]
   pull_request:
-    branches: [main, master]
 
 name: lint-project.yaml
 

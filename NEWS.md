@@ -3,6 +3,9 @@
 * `[setup-r]` now has a `working-directory` parameter, to be able to
   specify the location of the `renv.lock` file (#922, @calderonsamuel).
 
+* Example check-like workflows now run on all pull requests, not only
+  on pull requests against the `main` branch.
+
 # `v2.10.1` (2024-08-08)
 
 * `[setup-r-dependencies]` now pins `quarto-dev/quarto-actions/setup`

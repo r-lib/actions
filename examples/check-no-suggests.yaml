@@ -10,7 +10,6 @@ on:
   push:
     branches: [main, master]
   pull_request:
-    branches: [main, master]
 
 name: check-no-suggests.yaml
 
