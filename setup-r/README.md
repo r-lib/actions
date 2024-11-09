@@ -26,11 +26,25 @@ This action sets up an R environment for use in actions by:
 
 ## Inputs
 
-- **r-version** (`'release'`) - Version range or exact version of an R
-  version to use. “devel” is the current development version, and “next”
-  is the next version of R, either R-patched, or R-alpha, R-beta, R-rc
-  or R-prerelease. Use “renv” to retrieve R version recorded in
-  renv.lock file.
+- **r-version** (`'release'`) - R version to use. Possible values are:
+
+  - ‘release’: the last released version available for the current
+    platform. ‘latest’ is the same.
+  - ‘devel’: the last daily development snapshot available.
+  - ‘next’: the next version of R, either R-patched, or R-alpha, R-beta,
+    R-rc or R-prerelease depending on the current stage of the R release
+    process.
+  - ‘renv’: retrieve the R version recorded in `renv.lock` file.
+  - exact R version, e.g. ‘4.4.2’.
+  - minor R version, e.g. ‘4.4’. Chooses the last release from this
+    minor version. (Equivalent to using ‘x’ as the patch version,
+    e.g. ‘4.4.x’.)
+  - major R version, e.g. ‘4’. Chooses the last release from this major
+    version. (Equivalent to using ‘x’ as the minor and patch versions,
+    e.g. ‘4.x.x’.)
+  - ‘oldrel’, the previous version of R, not counting patch versions.
+  - ‘oldrel/n’ (or ‘oldrel-n’): the n-th previous version of R, not
+    counting patch versions.
 
 - **rtools-version** (`''`) - Exact version of Rtools to use. Default
   uses latest suitable rtools for the given version of R. Set it to “42”
