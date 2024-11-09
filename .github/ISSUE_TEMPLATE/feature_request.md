@@ -2,7 +2,7 @@
 name: Feature request
 about: Add additional functionality to the R specific actions
 title: ''
-labels: ''
+labels: 'feature'
 assignees: ''
 
 ---

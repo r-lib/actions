@@ -92,6 +92,9 @@ This action sets up an R environment for use in actions by:
   you can specify a subdirectory of the repo where some relevant file,
   such as “renv.lock”, should be found.
 
+- **cran** (`NA`) - The CRAN mirror to use. If not specified, the CRAN
+  environment variable is used, or finally the default CRAN mirror.
+
 ## Outputs
 
 - **installed-r-version** - The full R version installed by the action

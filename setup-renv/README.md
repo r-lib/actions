@@ -17,9 +17,11 @@ Forwarded to
 must be an R expression. Note that you often need to quote it, see details
 below.
 - `cache-version` - default `1`. If you need to invalidate the existing cache pass any other number and a new cache will be used.
-- `bypass-cache` - default `false`. To skip the use of the GitHub cache completely (such as for local testing), set to `true`. 
-  If `"never"` is provided, the package cache will be saved even if the
-  workflow fails.
+- `bypass-cache` - default `false`. Whether attempts to cache should be
+completely skipped (for non GitHub testing). Set to `true` to skip. If
+`"never"` is provided, the package cache will be saved even if the workflow
+fails. (For historical reasons the `"always"` value is equivalent to
+`"never"`.)
 - `working-directory` - default `'.'`. If the `renv.lock` file is not in the root directory of your repository.
 
 Example:

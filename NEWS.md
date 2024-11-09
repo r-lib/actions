@@ -1,10 +1,25 @@
 # development version
 
+* `[setup-r-dependencies]` parameter `pak-version` can now be `repo` or
+  `none` as well. `repo` means that the action will install pak from
+  the configured repositories, using `install.packages()`. `repo` is
+  appropriate on systems that do not have access to our pak reporitory
+  on GitHUb. `none` means that the action does not install pak at all.
+  Use this if you want to install pak yourself manually. Set the
+  `R_LIB_FOR_PAK` environment variable to point to the library where pak
+  is installed.
+
 * `[setup-r]` now has a `working-directory` parameter, to be able to
   specify the location of the `renv.lock` file (#922, @calderonsamuel).
 
 * Example check-like workflows now run on all pull requests, not only
   on pull requests against the `main` branch.
+
+* `[setup-r-dependencies]` and `[setup-renv]` now do not use the
+  deprecated `save-always` parameter of `actions/cache`.
+
+* `[setup-renv]` now correctly accepts `bypass-cache: never`, as stated
+  in the documentation.
 
 # `v2.10.1` (2024-08-08)
 
