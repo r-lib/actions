@@ -250,6 +250,17 @@ async function acquireFortranMacOSOld(): Promise<string> {
 
 async function acquireUtilsMacOS() {
   // qpdf is needed by `--as-cran`
+  // https://github.com/r-lib/actions/issues/948
+  try {
+    process.env.HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK = "true";
+    await exec.exec(
+      "brew",
+	[ "unlink", "pkg-config@0.29.2" ],
+	{ silent: false }
+    );
+  } catch (error) {
+    // ignore error, in case it is not pre-installed in the future
+  }
   try {
     process.env.HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK = "true";
     await exec.exec("brew", [
