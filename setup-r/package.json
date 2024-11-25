@@ -5,7 +5,7 @@
   "description": "R setup action",
   "main": "src/setup-r.ts",
   "scripts": {
-    "build": "ncc build --source-map --minify",
+    "build": "ncc build --minify",
     "format": "prettier --write **/*.ts",
     "format-check": "prettier --check **/*.ts"
   },
@@ -34,7 +34,7 @@
   "devDependencies": {
     "@types/node": "^20.12.10",
     "prettier": "^3.2.5",
-    "@vercel/ncc": "^0.38.1",
+    "@vercel/ncc": "^0.37.x",
     "typescript": "^5.4.5"
   }
 }
