@@ -1,3 +1,8 @@
+# `v2.11.1` (2024-11-25)
+
+* `[setup-r]` now unlinks the pre-installed pkg-config brew package
+  to fix a clash with the new pkgconf package (#948).
+
 # `v2.11.0` (2024-11-09)
 
 * `[setup-r-dependencies]` parameter `pak-version` can now be `repo` or
