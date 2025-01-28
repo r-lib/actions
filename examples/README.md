@@ -326,6 +326,7 @@ jobs:
         shell: Rscript {0}
 
       - uses: codecov/codecov-action@v4
+        if: github.event.repository.fork == false
         with:
           # Fail if error if not on PR, or if on PR and token is given
           fail_ci_if_error: ${{ github.event_name != 'pull_request' || secrets.CODECOV_TOKEN }}
