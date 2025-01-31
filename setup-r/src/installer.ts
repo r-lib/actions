@@ -152,13 +152,14 @@ async function acquireFortranMacOS(version: string): Promise<string> {
   if (semver.lt(version, "4.3.0")) {
     return acquireFortranMacOSOld();
   } else {
-    return acquireFortranMacOSNew();
+    return acquireFortranMacOSNew(version);
   }
 }
 
-async function acquireFortranMacOSNew(): Promise<string> {
-  let downloadUrl =
-    "https://github.com/r-hub/mac-tools/releases/download/tools/gfortran-12.2-universal.pkg";
+async function acquireFortranMacOSNew(version: string): Promise<string> {
+  let downloadUrl = semver.lt(version, "4.5.0") ?
+	"https://github.com/r-hub/mac-tools/releases/download/tools/gfortran-12.2-universal.pkg" :
+	"https://github.com/R-macos/gcc-14-branch/releases/download/gcc-14.2-darwin-r2.1/gfortran-14.2-universal.pkg";
   let fileName = path.basename(downloadUrl);
   let downloadPath: string | null = null;
   try {
