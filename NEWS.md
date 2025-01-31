@@ -1,3 +1,7 @@
+# Development version
+
+* `[setup-r]` now installs gfortan 14.2 for R 4.5.0 and later (#965).
+
 # `v2.11.1` (2024-11-25)
 
 * `[setup-r]` now unlinks the pre-installed pkg-config brew package
