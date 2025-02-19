@@ -217,6 +217,33 @@ to install an embedded test package you can write:
 ...
 ```
 
+## Installing specific versions of dependencies
+
+If you want to run a workflow with specific versions of R package
+dependencies, one good way to do that is adding these package versions
+to `extra-packages`. If you regularly do this, you could modify your
+workflow file to add an `extra-packages` input to `workflow_dispatch`:
+
+```yaml
+  workflow_dispatch:
+    inputs:
+      extra-packages:
+        description: 'extra package to install for the runs (like a dev version of one of the deps) - comma separated'
+        required: false
+        type: string
+```
+
+```yaml
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: >
+            any::rcmdcheck,
+            ${{ github.event.inputs.extra-packages }}
+          needs: check
+```
+
+(Cf. https://github.com/r-lib/actions/issues/958#issue-2775898508.)
+
 ## System dependencies
 
 pak automatically install the system dependencies of all installed R
