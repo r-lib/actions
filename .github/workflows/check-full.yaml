@@ -36,6 +36,9 @@ jobs:
           - {os: ubuntu-latest,  r: 'oldrel-3'}
           - {os: ubuntu-latest,  r: 'oldrel-4'}
 
+          - {os: ubuntu-22.04-arm, r: 'release' }
+
+
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
@@ -50,6 +53,8 @@ jobs:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
+
+      - uses: gaborcsardi/quarto-actions/setup@fix/linux-arm64
 
       - uses: ./setup-r-dependencies
         with:
