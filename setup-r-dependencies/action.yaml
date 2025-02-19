@@ -265,6 +265,10 @@ runs:
             if (Sys.which("quarto") != "") {
               cat("Quarto is already installed at", Sys.which("quarto"), "\n")
               o <- "false"
+            } else if (Sys.info()[["machine"]] == "aarch64" && Sys.info()[["sysname"]] == "Linux") {
+              # do not install on aarch64 Linux, until this is merged and published:
+              # https://github.com/quarto-dev/quarto-actions/pull/122
+              o <- "false"
             } else {
               qmd <- dir(recursive = TRUE, pattern = "[.]qmd$")
               if (length(qmd) > 0) {
