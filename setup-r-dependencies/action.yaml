@@ -142,8 +142,11 @@ runs:
 
       - name: Repo status
         run: |
+          # Repo status
+          cat("::group::Repo status\n")
           options(width = 1000)
           pak::repo_status()
+          cat("::endgroup::\n")
         shell: Rscript {0}
 
       - name: Query dependencies
