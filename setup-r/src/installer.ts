@@ -641,7 +641,7 @@ async function setupRLibrary(version: IRVersion) {
     if (IS_WINDOWS) {
       rspm = `'https://packagemanager.posit.co/cran/${snapshot}'`;
     }
-    if (IS_LINUX) {
+    if (IS_LINUX && ARCH == 'x86_64') {
       let codename = "";
       try {
         await exec.exec("lsb_release", ["--short", "--codename"], {

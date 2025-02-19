@@ -103,6 +103,8 @@ runs:
           } else {
             message("R_LIBS_USER GH env var is already set: ", Sys.getenv("R_LIBS_USER"))
           }
+          dir.create(Sys.getenv("R_LIBS_SITE"), recursive = TRUE, showWarnings = FALSE)
+          dir.create(Sys.getenv("R_LIBS_USER"), recursive = TRUE, showWarnings = FALSE)
           cat("::endgroup::\n")
         shell: Rscript {0}
 
@@ -264,6 +266,10 @@ runs:
           if (! o %in% c('true', 'false')) {
             if (Sys.which("quarto") != "") {
               cat("Quarto is already installed at", Sys.which("quarto"), "\n")
+              o <- "false"
+            } else if (Sys.info()[["machine"]] == "aarch64" && Sys.info()[["sysname"]] == "Linux") {
+              # do not install on aarch64 Linux, until this is merged and published:
+              # https://github.com/quarto-dev/quarto-actions/pull/122
               o <- "false"
             } else {
               qmd <- dir(recursive = TRUE, pattern = "[.]qmd$")

@@ -1,6 +1,10 @@
 # Development version
 
-* `[setup-r]` now installs gfortan 14.2 for R 4.5.0 and later (#965).
+* `[setup-r]` now installs gfortran 14.2 for R 4.5.0 and later (#965).
+
+* `[setup-r]` now does not use PPM on aarch64 Linux, because PPM
+  does not have binary packages for aarch64 Linux, and it would send
+  x86_64 binarires for aarch64 systems as well.
 
 # `v2.11.1` (2024-11-25)
 
@@ -12,7 +16,7 @@
 * `[setup-r-dependencies]` parameter `pak-version` can now be `repo` or
   `none` as well. `repo` means that the action will install pak from
   the configured repositories, using `install.packages()`. `repo` is
-  appropriate on systems that do not have access to our pak reporitory
+  appropriate on systems that do not have access to our pak repository
   on GitHUb. `none` means that the action does not install pak at all.
   Use this if you want to install pak yourself manually. Set the
   `R_LIB_FOR_PAK` environment variable to point to the library where pak
