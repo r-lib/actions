@@ -103,6 +103,8 @@ runs:
           } else {
             message("R_LIBS_USER GH env var is already set: ", Sys.getenv("R_LIBS_USER"))
           }
+          dir.create(Sys.getenv("R_LIBS_SITE"), recursive = TRUE, showWarnings = FALSE)
+          dir.create(Sys.getenv("R_LIBS_USER"), recursive = TRUE, showWarnings = FALSE)
           cat("::endgroup::\n")
         shell: Rscript {0}
 
