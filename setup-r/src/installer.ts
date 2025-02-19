@@ -257,7 +257,7 @@ async function acquireUtilsMacOS() {
     await exec.exec(
       "brew",
 	[ "unlink", "pkg-config@0.29.2" ],
-	{ silent: false }
+	{ silent: true }
     );
   } catch (error) {
     // ignore error, in case it is not pre-installed in the future

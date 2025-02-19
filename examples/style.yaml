@@ -26,11 +26,10 @@ jobs:
         with:
           use-public-rspm: true
 
-      - name: Install dependencies
+      - name: Install styler and roxygen2
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::styler, any::roxygen2
-          needs: styler
+          packages: styler, roxygen2
 
       - name: Enable styler cache
         run: styler::cache_activate()
