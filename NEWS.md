@@ -1,10 +1,22 @@
-# Development version
+
+# `v2.11.2` (2025-02-19)
 
 * `[setup-r]` now installs gfortran 14.2 for R 4.5.0 and later (#965).
 
 * `[setup-r]` now does not use PPM on aarch64 Linux, because PPM
   does not have binary packages for aarch64 Linux, and it would send
   x86_64 binarires for aarch64 systems as well.
+
+* `[setup-r]` now unlinks `pkg-config@0.29.2` on macOS silently,
+  to avoid an error from the problem matchers (#973).
+
+* `[setup-r-dependencies]` now supports `dependencies: FALSE`
+  (@eitsupi, #961).
+
+* `[setup-r-dependencies]` now creates the `R_LIBS_USER` and
+  `R_LIBS_SITE` library directories (#974).
+
+* `[setup-r-dependencies]` now prints the R repo status (#975).
 
 * Example workflows that use renv now call `setup-r` with
   `r-version: renv`, to install the R version declared in the
