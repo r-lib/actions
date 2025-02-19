@@ -2,6 +2,10 @@
 
 * `[setup-r]` now installs gfortan 14.2 for R 4.5.0 and later (#965).
 
+* `[setup-r]` now does not use PPM on aarch64 Linux, because PPM
+  does not have binary packages for aarch64 Linux, and it would send
+  x86_64 binarires for aarch64 systems as well.
+
 # `v2.11.1` (2024-11-25)
 
 * `[setup-r]` now unlinks the pre-installed pkg-config brew package
