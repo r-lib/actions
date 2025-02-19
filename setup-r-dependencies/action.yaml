@@ -140,6 +140,12 @@ runs:
           echo "::endgroup::"
         shell: bash
 
+      - name: Repo status
+        run: |
+          options(width = 1000)
+          pak::repo_status()
+        shell: Rscript {0}
+
       - name: Query dependencies
         id: install
         run: |
