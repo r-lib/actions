@@ -6,6 +6,10 @@
   does not have binary packages for aarch64 Linux, and it would send
   x86_64 binarires for aarch64 systems as well.
 
+* Example workflows that use renv now call `setup-r` with
+  `r-version: renv`, to install the R version declared in the
+  `renv.lock` file.
+
 # `v2.11.1` (2024-11-25)
 
 * `[setup-r]` now unlinks the pre-installed pkg-config brew package

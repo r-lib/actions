@@ -278,12 +278,11 @@ results to GitHub, like the example here, then you can also use a global
 organization token in an organization secret called `CODECOV_TOKEN`.
 This way you can avoid having to add a secret to each repository of your
 organization. You can find this token at
-`https://app.codecov.io/account/gh/<org>/org-upload-token` where `<org>` is
-your GitHub organization. E.g. for `r-lib` it is at
-https://app.codecov.io/account/gh/r-lib/org-upload-token.
-To see it, you'll need log in to Codecov, and you need to be a Codecov
-admin for the organization.
-
+`https://app.codecov.io/account/gh/<org>/org-upload-token` where `<org>`
+is your GitHub organization. E.g. for `r-lib` it is at
+<https://app.codecov.io/account/gh/r-lib/org-upload-token>. To see it,
+you’ll need log in to Codecov, and you need to be a Codecov admin for
+the organization.
 
 ``` yaml
 # Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
@@ -531,6 +530,8 @@ jobs:
       - uses: r-lib/actions/setup-pandoc@v2
 
       - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: renv
 
       - uses: r-lib/actions/setup-renv@v2
 
@@ -817,6 +818,7 @@ jobs:
       - uses: r-lib/actions/setup-r@v2
         with:
           use-public-rspm: true
+          r-version: renv
 
       - uses: r-lib/actions/setup-renv@v2
 
@@ -876,6 +878,7 @@ jobs:
       - uses: r-lib/actions/setup-r@v2
         with:
           use-public-rspm: true
+          r-version: renv
 
       - uses: r-lib/actions/setup-renv@v2
 
@@ -968,6 +971,7 @@ jobs:
       - uses: r-lib/actions/setup-r@v2
         with:
           use-public-rspm: true
+          r-version: renv
 
       - uses: r-lib/actions/setup-renv@v2
 
@@ -1024,6 +1028,7 @@ jobs:
       - uses: r-lib/actions/setup-r@v2
         with:
           use-public-rspm: true
+          r-version: renv
 
       - uses: r-lib/actions/setup-renv@v2
 
@@ -1108,6 +1113,7 @@ jobs:
       - uses: r-lib/actions/setup-r@v2
         with:
           use-public-rspm: true
+          r-version: renv
 
       - uses: r-lib/actions/setup-renv@v2
 
