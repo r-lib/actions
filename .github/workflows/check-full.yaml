@@ -54,6 +54,8 @@ jobs:
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
 
+      - uses: gaborcsardi/quarto-actions/setup@fix/linux-arm64
+
       - uses: ./setup-r-dependencies
         with:
           extra-packages: any::rcmdcheck
