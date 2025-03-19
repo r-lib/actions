@@ -472,7 +472,11 @@ async function acquireRWindows(version: IRVersion): Promise<string> {
 }
 
 function getRtoolsUrl(version: string): string {
-  if (version == "44" && ARCH == "arm64") {
+  if (version == "45" && ARCH == "arm64") {
+    return "https://github.com/r-hub/rtools45/releases/download/latest/rtools45-aarch64.exe";
+  } else if (version == "45") {
+    return "https://github.com/r-hub/rtools45/releases/download/latest/rtools45.exe";
+  } else if (version == "44" && ARCH == "arm64") {
     return "https://github.com/r-hub/rtools44/releases/download/latest/rtools44-aarch64.exe";
   } else if (version == "44") {
     return "https://github.com/r-hub/rtools44/releases/download/latest/rtools44.exe";
@@ -503,16 +507,18 @@ async function acquireRtools(version: IRVersion) {
   }
 
   const versionNumber = parseInt(rtoolsVersion || "error");
-  const rtools44 = versionNumber >= 44;
-  const rtools43 = !rtools44 && versionNumber >= 43;
-  const rtools42 = !rtools44 && !rtools43 && versionNumber >= 41;
-  const rtools40 = !rtools44 && !rtools43 && !rtools42 && versionNumber >= 40;
-  const rtools3x = !rtools44 && !rtools43 && !rtools42 && !rtools40;
+  const rtools45 = versionNumber >= 45;
+  const rtools44 = !rtools45 && versionNumber >= 44;
+  const rtools43 = !rtools45 && !rtools44 && versionNumber >= 43;
+  const rtools42 = !rtools45 && !rtools44 && !rtools43 && versionNumber >= 41;
+  const rtools40 = !rtools45 && !rtools44 && !rtools43 && !rtools42 && versionNumber >= 40;
+  const rtools3x = !rtools45 && !rtools44 && !rtools43 && !rtools42 && !rtools40;
   var fileName = path.basename(downloadUrl);
 
   // If Rtools is already installed just return, as there is a message box
   // which hangs the build otherwise.
   if (
+    (rtools45 && fs.existsSync("C:\\Rtools45")) ||
     (rtools44 && fs.existsSync("C:\\Rtools44")) ||
     (rtools43 && fs.existsSync("C:\\Rtools43")) ||
     (rtools42 && fs.existsSync("C:\\Rtools42")) ||
@@ -547,7 +553,19 @@ async function acquireRtools(version: IRVersion) {
   // we never want patches (by default)
   let addpath = core.getInput("windows-path-include-rtools") === "true";
   core.exportVariable("_R_INSTALL_TIME_PATCHES_", "no");
-  if (rtools44) {
+  if (rtools45) {
+    if (addpath) {
+      if (ARCH == "arm64") {
+        core.addPath(`C:\\rtools45-aarch64\\usr\\bin`);
+        core.addPath(
+          `C:\\rtools45-aarch64\\aarch64-w64-mingw32.static.posix\\bin`,
+        );
+      } else {
+        core.addPath(`C:\\rtools45\\usr\\bin`);
+        core.addPath(`C:\\rtools45\\x86_64-w64-mingw32.static.posix\\bin`);
+      }
+    }
+  } else if (rtools44) {
     if (addpath) {
       if (ARCH == "arm64") {
         core.addPath(`C:\\rtools44-aarch64\\usr\\bin`);
