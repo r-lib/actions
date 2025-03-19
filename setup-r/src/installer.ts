@@ -270,7 +270,7 @@ async function acquireUtilsMacOS() {
       "pkgconfig",
       "checkbashisms",
       "ghostscript",
-    ], { silent: false });
+    ], { silent: true });
   } catch (error) {
     core.debug(`${error}`);
 
