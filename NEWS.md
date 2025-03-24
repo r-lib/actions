@@ -1,4 +1,9 @@
 
+# `v2.11.3` (2025-03-24)
+
+* `[setup-r]` now supports Rtools45, and installs it by default
+  for R >= 4.5.0.
+
 # `v2.11.2` (2025-02-19)
 
 * `[setup-r]` now installs gfortran 14.2 for R 4.5.0 and later (#965).
