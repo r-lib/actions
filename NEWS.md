@@ -139,7 +139,7 @@
   unsuccessful workflow runs as well (@schloerke, #695).
 
 * New example workflows `bookdown-gh-pages` and `blogdown-gh-pages` to
-  deploy bookdown books and blogdown sites to GH Pages without commiting
+  deploy bookdown books and blogdown sites to GH Pages without committing
   them into the repository (#856).
 
 # `v2.8.7` (2024-04-05)
