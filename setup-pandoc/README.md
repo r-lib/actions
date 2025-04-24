@@ -15,8 +15,8 @@ Inputs:
 
 | Name              | Type     | Default            | Description
 |-------------------|----------|--------------------|-------------------------------------------------------------------------------------------------
-| `pandoc-version`  | String   | `3.1.11`           | pandoc version to install. Can be `latest` or `nightly`. See notes about old and nigthly versions below.
-| `token`           | String   |                    | GitHub token. Needed when `pandoc-version` is `nigthly`.
+| `pandoc-version`  | String   | `3.1.11`           | pandoc version to install. Can be `latest` or `nightly`. See notes about old and nightly versions below.
+| `token`           | String   |                    | GitHub token. Needed when `pandoc-version` is `nightly`.
 
 The oldest supported pandoc version is pandoc 2.0.2, except on
 arm64 Linux, where it is pandoc 2.12.
@@ -26,7 +26,7 @@ https://github.com/jgm/pandoc/actions/workflows/nightly.yml.
 
 For nightly builds you also need to specify `token`. pandoc does
 not currently have nightly builds for arm64 machines, so using
-`nigthly` will error on these.
+`nightly` will error on these.
 
 # Usage
 
