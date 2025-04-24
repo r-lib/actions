@@ -5,7 +5,7 @@
 > Pull request pushing
 
 This GitHub Action pushes changes to the head of the pull request branch. It
-assumes you have already commited any results prior to running. It is intended
+assumes you have already committed any results prior to running. It is intended
 to be used by actions which trigger based on comment creation. It is often
 paired with the
 [pr-fetch](https://github.com/r-lib/actions/tree/v2/pr-fetch) action.
