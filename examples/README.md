@@ -774,7 +774,7 @@ Pages](https://pages.github.com/) or Cloudflare Pages. It uses
 remain consistent across builds. You will need to run `renv::snapshot()`
 locally and commit the `renv.lock` file before using this workflow, and
 after every time you add a new package to `DESCRIPTION`. See [Using renv
-with Continous
+with Continuous
 Integration](https://rstudio.github.io/renv/articles/ci.html) for
 additional information.
 
@@ -927,7 +927,7 @@ Pages](https://pages.github.com/) or Cloudflare Pages. It uses
 [renv](https://rstudio.github.io/renv/) to ensure the package versions
 remain consistent across builds. You will need to run `renv::snapshot()`
 locally and commit the `renv.lock` file before using this workflow, see
-[Using renv with Continous
+[Using renv with Continuous
 Integration](https://rstudio.github.io/renv/articles/ci.html) for
 additional information.
 

@@ -217,7 +217,7 @@ print_yaml("style.yaml")
 
 This example builds a [bookdown] site for a repository and then deploys the site via [GitHub Pages] or Cloudflare Pages.
 It uses [renv] to ensure the package versions remain consistent across builds.
-You will need to run `renv::snapshot()` locally and commit the `renv.lock` file before using this workflow, and after every time you add a new package to `DESCRIPTION`. See [Using renv with Continous Integration](https://rstudio.github.io/renv/articles/ci.html) for additional information.
+You will need to run `renv::snapshot()` locally and commit the `renv.lock` file before using this workflow, and after every time you add a new package to `DESCRIPTION`. See [Using renv with Continuous Integration](https://rstudio.github.io/renv/articles/ci.html) for additional information.
 
 You'll need to update your setting on GitHub to deploy the `_book`
 folder of the `gh-pages` branch (unless configured otherwise)
@@ -249,7 +249,7 @@ print_yaml("bookdown-gh-pages.yaml")
 
 This example builds a [blogdown] site for a repository and then deploys the book via [GitHub Pages] or Cloudflare Pages.
 It uses [renv] to ensure the package versions remain consistent across builds.
-You will need to run `renv::snapshot()` locally and commit the `renv.lock` file before using this workflow, see [Using renv with Continous Integration](https://rstudio.github.io/renv/articles/ci.html) for additional information.
+You will need to run `renv::snapshot()` locally and commit the `renv.lock` file before using this workflow, see [Using renv with Continuous Integration](https://rstudio.github.io/renv/articles/ci.html) for additional information.
 
 You'll need to update your setting on GitHub to deploy the `public`
 folder of the `gh-pages` branch (unless configured otherwise)
