@@ -26,7 +26,7 @@ inputs:
       rtools for the given version of R. Set it to "42" for Rtools42.
       If it is 'none', then Rtools will not be installed. (Note that
       there is still a pre-installed version of Rtools on the
-      GitHub-hoested GHA runners.)
+      GitHub-hosted GHA runners.)
     default: ''
   Ncpus:
     description: 'Value to set the R option `Ncpus` to.'

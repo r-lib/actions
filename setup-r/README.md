@@ -50,7 +50,7 @@ This action sets up an R environment for use in actions by:
   uses latest suitable rtools for the given version of R. Set it to “42”
   for Rtools42. If it is ‘none’, then Rtools will not be installed.
   (Note that there is still a pre-installed version of Rtools on the
-  GitHub-hoested GHA runners.)
+  GitHub-hosted GHA runners.)
 
 - **Ncpus** (`'1'`) - Value to set the R option `Ncpus` to.
 
