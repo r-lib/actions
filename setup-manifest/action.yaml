@@ -1,6 +1,6 @@
 name: 'setup-manifest'
 description: |
-  Set up R, renv and dependencies for a Posie Connect `manifest.json`
+  Set up R, renv and dependencies for a Posit Connect `manifest.json`
   file.
 
 runs:
