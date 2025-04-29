@@ -58,7 +58,7 @@ Inputs available
   are a version number number (without the `v` prefix), and 'pre-release'.
 - `upgrade` - Whether to install the latest available versions of the
   dependencies. Must be an R expression. See the README for details if
-  you need quoting. Defaults to `FALSE`.
+  you need quoting. Defaults to `'FALSE'`, enable with `'TRUE'`.
 - `working-directory` - default `'.'`. If the DESCRIPTION file is not in the
   root directory of your repository.
 
