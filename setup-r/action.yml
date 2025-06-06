@@ -65,7 +65,7 @@ inputs:
       Windows.'
     default: false
   extra-repositories:
-    description: 'One or more extra CRAN-like repositories to include in the `repos` global option'
+    description: 'One or more extra CRAN-like repositories to include in the `repos` global option. This must be a single character; multiple repos can be set using a comma: "https://repo1.org, https://repo2.org".'
     default: ''
   working-directory:
     description: >
