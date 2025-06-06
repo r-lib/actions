@@ -703,16 +703,19 @@ async function setupRLibrary(version: IRVersion) {
         : `"${core.getInput("http-user-agent")}"`;
   }
 
-  // Split the repositories by whitespace and then quote each entry joining with commas
-  let extra_repositories = core.getInput("extra-repositories");
 
-  // Prepend a , if there are extra repositories
-  if (extra_repositories) {
+  // Read multiline input which supports both YAML list and comma-separated string
+  let extra_repositories = core.getMultilineInput("extra-repositories", { trimWhitespace: true });
+
+  if (extra_repositories.length > 0) {
     extra_repositories = extra_repositories
-      .split(/\s+/)
-      .map((x) => `"${x}"`)
+      .flatMap((x) => x.split(/\s*,\s*/)) // split comma-separated lines if any
+      .filter((x) => x.length > 0)        // remove empty strings
+      .map((x) => `"${x}"`)               // quote each
       .join(",");
     extra_repositories = ",\n    " + extra_repositories;
+  } else {
+    extra_repositories = "";
   }
 
   await fs.promises.writeFile(
