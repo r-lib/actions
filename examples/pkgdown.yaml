@@ -15,9 +15,11 @@ permissions: read-all
 jobs:
   pkgdown:
     runs-on: ubuntu-latest
-    # Only restrict concurrency for non-PR jobs
+    # Restrict concurrency by event type and ref (e.g.
+    # push/release/schedule/manual jobs on the same branch/tag will not run
+    # concurrently, but different event types/refs can run in parallel)
     concurrency:
-      group: pkgdown-${{ github.event_name != 'pull_request' || github.run_id }}
+      group: pkgdown-${{ github.event_name }}-${{ github.ref }}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     permissions:
