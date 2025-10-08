@@ -132,7 +132,7 @@ async function acquireR(version: IRVersion) {
     throw `Failed to get R ${version.version}: ${error}`;
   }
 
-  // version.rtools_cersion is always trithy on Windows, but typescript
+  // version.rtools_version is always truthy on Windows, but typescript
   // does not know that
   if (IS_WINDOWS && version.rtools) {
     try {
@@ -517,13 +517,14 @@ async function acquireRtools(version: IRVersion) {
 
   // If Rtools is already installed just return, as there is a message box
   // which hangs the build otherwise.
+  const suffix = version.url.match("aarch64") ? "-aarch64" : "";
   if (
-    (rtools45 && fs.existsSync("C:\\Rtools45")) ||
-    (rtools44 && fs.existsSync("C:\\Rtools44")) ||
-    (rtools43 && fs.existsSync("C:\\Rtools43")) ||
-    (rtools42 && fs.existsSync("C:\\Rtools42")) ||
-    (rtools40 && fs.existsSync("C:\\Rtools40")) ||
-    (rtools3x && fs.existsSync("C:\\Rtools"))
+    (rtools45 && fs.existsSync("C:\\Rtools45" + suffix)) ||
+    (rtools44 && fs.existsSync("C:\\Rtools44" + suffix)) ||
+    (rtools43 && fs.existsSync("C:\\Rtools43" + suffix)) ||
+    (rtools42 && fs.existsSync("C:\\Rtools42" + suffix)) ||
+    (rtools40 && fs.existsSync("C:\\Rtools40" + suffix)) ||
+    (rtools3x && fs.existsSync("C:\\Rtools" + suffix))
   ) {
     core.debug(
       "Skipping Rtools installation as a suitable Rtools is already installed",
