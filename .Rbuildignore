@@ -15,3 +15,5 @@
 ^check-r-package$
 ^setup-r-dependencies$
 ^setup-renv$
+^setup-manifest$
+^_pkgdown\.yml$
