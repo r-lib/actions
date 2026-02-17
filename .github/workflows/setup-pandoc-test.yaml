@@ -27,6 +27,8 @@ jobs:
         config:
           - { os: macos-14         }
           - { os: macos-15-intel   }
+          - { os: macos-latest     }
+          - { os: macos-26         }  
           - { os: windows-latest   }
           - { os: ubuntu-latest    }
           - { os: ubuntu-22.04-arm }
