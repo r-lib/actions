@@ -65,7 +65,9 @@ inputs:
       Windows.'
     default: false
   extra-repositories:
-    description: 'One or more extra CRAN-like repositories to include in the `repos` global option'
+    description: >
+      One or more extra CRAN-like repositories to include in the `repos` global
+      option. Accepts comma-separated or multiline values.
     default: ''
   working-directory:
     description: >
@@ -79,5 +81,5 @@ outputs:
   installed-r-version:
     description: 'The full R version installed'
 runs:
-  using: 'node20'
+  using: 'node24'
   main: 'dist/index.js'

@@ -157,9 +157,9 @@ async function acquireFortranMacOS(version: string): Promise<string> {
 }
 
 async function acquireFortranMacOSNew(version: string): Promise<string> {
-  let downloadUrl = semver.lt(version, "4.5.0") ?
-	"https://github.com/r-hub/mac-tools/releases/download/tools/gfortran-12.2-universal.pkg" :
-	"https://github.com/R-macos/gcc-14-branch/releases/download/gcc-14.2-darwin-r2.1/gfortran-14.2-universal.pkg";
+  let downloadUrl = semver.lt(version, "4.5.0")
+    ? "https://github.com/r-hub/mac-tools/releases/download/tools/gfortran-12.2-universal.pkg"
+    : "https://github.com/R-macos/gcc-14-branch/releases/download/gcc-14.2-darwin-r2.1/gfortran-14.2-universal.pkg";
   let fileName = path.basename(downloadUrl);
   let downloadPath: string | null = null;
   try {
@@ -254,23 +254,17 @@ async function acquireUtilsMacOS() {
   // https://github.com/r-lib/actions/issues/948
   try {
     process.env.HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK = "true";
-    await exec.exec(
-      "brew",
-	[ "unlink", "pkg-config@0.29.2" ],
-	{ silent: true }
-    );
+    await exec.exec("brew", ["unlink", "pkg-config@0.29.2"], { silent: true });
   } catch (error) {
     // ignore error, in case it is not pre-installed in the future
   }
   try {
     process.env.HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK = "true";
-    await exec.exec("brew", [
-      "install",
-      "qpdf",
-      "pkgconfig",
-      "checkbashisms",
-      "ghostscript",
-    ], { silent: true });
+    await exec.exec(
+      "brew",
+      ["install", "qpdf", "pkgconfig", "checkbashisms", "ghostscript"],
+      { silent: true },
+    );
   } catch (error) {
     core.debug(`${error}`);
 
@@ -410,7 +404,7 @@ async function acquireRMacOS(version: IRVersion): Promise<string> {
 
   // Remove homebrew R from the PATH
   try {
-    await exec.exec("brew", ["unlink", "r"] , { silent: true });
+    await exec.exec("brew", ["unlink", "r"], { silent: true });
   } catch (error) {
     core.debug(`${error}`);
   }
@@ -511,8 +505,10 @@ async function acquireRtools(version: IRVersion) {
   const rtools44 = !rtools45 && versionNumber >= 44;
   const rtools43 = !rtools45 && !rtools44 && versionNumber >= 43;
   const rtools42 = !rtools45 && !rtools44 && !rtools43 && versionNumber >= 41;
-  const rtools40 = !rtools45 && !rtools44 && !rtools43 && !rtools42 && versionNumber >= 40;
-  const rtools3x = !rtools45 && !rtools44 && !rtools43 && !rtools42 && !rtools40;
+  const rtools40 =
+    !rtools45 && !rtools44 && !rtools43 && !rtools42 && versionNumber >= 40;
+  const rtools3x =
+    !rtools45 && !rtools44 && !rtools43 && !rtools42 && !rtools40;
   var fileName = path.basename(downloadUrl);
 
   // If Rtools is already installed just return, as there is a message box
@@ -654,13 +650,13 @@ async function setupRLibrary(version: IRVersion) {
   if (rspm === "NULL" && core.getInput("use-public-rspm") === "true") {
     // if we are on R 3.6.x, we use an RSPM snapshot
     const pin36: boolean =
-      !process.env['RSPM_PIN_3_6'] && !!version.version.match(/^3[.]6[.]/);
+      !process.env["RSPM_PIN_3_6"] && !!version.version.match(/^3[.]6[.]/);
     const snapshot: string = pin36 ? "2024-05-25" : "latest";
 
     if (IS_WINDOWS) {
       rspm = `'https://packagemanager.posit.co/cran/${snapshot}'`;
     }
-    if (IS_LINUX && ARCH == 'x86_64') {
+    if (IS_LINUX && ARCH == "x86_64") {
       let codename = "";
       try {
         await exec.exec("lsb_release", ["--short", "--codename"], {
@@ -704,13 +700,16 @@ async function setupRLibrary(version: IRVersion) {
         : `"${core.getInput("http-user-agent")}"`;
   }
 
-  // Split the repositories by whitespace and then quote each entry joining with commas
-  let extra_repositories = core.getInput("extra-repositories");
+  // Read multiline input which supports both YAML lists and comma-separated values
+  const extraRepositories = core.getMultilineInput("extra-repositories", {
+    trimWhitespace: true,
+  });
+  let extra_repositories = "";
 
-  // Prepend a , if there are extra repositories
-  if (extra_repositories) {
-    extra_repositories = extra_repositories
-      .split(/\s+/)
+  if (extraRepositories.length > 0) {
+    extra_repositories = extraRepositories
+      .flatMap((x) => x.split(/\s*,\s*/))
+      .filter((x) => x.length > 0)
       .map((x) => `"${x}"`)
       .join(",");
     extra_repositories = ",\n    " + extra_repositories;
@@ -793,10 +792,12 @@ export async function determineVersion(version: string): Promise<IRVersion> {
     // if arm mac, try intel as well
     if (OS == "mac" && ARCH == "arm64") {
       let url2: string =
-	"https://api.r-hub.io/rversions/resolve/" + version + "/" + OS;
+        "https://api.r-hub.io/rversions/resolve/" + version + "/" + OS;
       tags = (await rest.get<IRVersion>(url2)).result;
       if (!tags) {
-        throw new Error(`Failed to resolve R version ${version} at ${url} and ${url2}`);
+        throw new Error(
+          `Failed to resolve R version ${version} at ${url} and ${url2}`,
+        );
       }
     }
     throw new Error(`Failed to resolve R version ${version} at ${url}.`);
