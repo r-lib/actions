@@ -9,7 +9,7 @@ Supported platforms:
 
 - Windows x86_64,
 - macOS x86_64 and arm64,
-- Linux x86_53 and aarch64.
+- Linux x86_64 and aarch64.
 
 Inputs:
 
@@ -32,7 +32,7 @@ not currently have nightly builds for arm64 machines, so using
 
 ```yaml
 steps:
-- uses: actions/checkout@v4
+- uses: actions/checkout@v6
 - uses: r-lib/actions/setup-pandoc@v2
   with:
     pandoc-version: '3.1.11' # The pandoc version to download (if necessary) and use.

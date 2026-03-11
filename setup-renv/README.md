@@ -28,7 +28,7 @@ Example:
 
 ```yaml
 steps:
-- uses: actions/checkout@v4
+- uses: actions/checkout@v6
 - uses: r-lib/actions/setup-r@v2
 - uses: r-lib/actions/setup-renv@v2
   with:

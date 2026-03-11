@@ -20,8 +20,8 @@ jobs:
   setup:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: r-lib/actions/setup-manifest@feature/setup-manifest
+      - uses: actions/checkout@v6
+      - uses: r-lib/actions/setup-manifest@v2
 ```
 
 # How it works
