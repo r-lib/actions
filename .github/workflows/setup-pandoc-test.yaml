@@ -26,13 +26,15 @@ jobs:
       matrix:
         config:
           - { os: macos-14         }
-          - { os: macos-13         }
+          - { os: macos-15-intel   }
+          - { os: macos-latest     }
+          - { os: macos-26         }
           - { os: windows-latest   }
           - { os: ubuntu-latest    }
           - { os: ubuntu-22.04-arm }
 
     steps:
-      - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
       - uses: ./setup-pandoc
         with:

@@ -7,3 +7,7 @@ add_one <- function(x) {
 times2 <- function(x) {
   .Call(test_fun, as.integer(x)[1])
 }
+
+plus <- function(x, y) {
+  x + y
+}
