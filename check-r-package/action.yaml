@@ -21,12 +21,12 @@ inputs:
     description: |
       Whether to upload all testthat snapshots as an artifact. Possible values are 'true',
       'false', 'always'.
-    default: false
+    default: 'false'
   upload-results:
     description: |
       Whether to upload check results for successful runs too. If 'never',
       then it does not upload the results, even on failure.
-    default: false
+    default: 'false'
   artifact-name:
     description: |
       Use this to override the default artifact name for the check results.
