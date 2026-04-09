@@ -65,7 +65,10 @@ inputs:
       Windows.'
     default: false
   extra-repositories:
-    description: 'One or more extra CRAN-like repositories to include in the `repos` global option'
+    description: >
+      One or more extra CRAN-like repositories to include in the `repos` global option.
+      Separate the repositories with a space.
+      E.g. `extra-repositories: https://r-lib.r-universe.dev/ https://ropensci.r-universe.dev/`
     default: ''
   working-directory:
     description: >
