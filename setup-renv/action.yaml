@@ -76,7 +76,7 @@ runs:
 
       - name: Save Renv package cache
         if: ${{ always() && steps.cache-packages-restore.outputs.cache-hit != 'true' && (inputs.bypass-cache == 'always' || inputs.bypass-cache == 'never') }}
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: |
             ${{ env.RENV_PATHS_ROOT }}
