@@ -54,7 +54,7 @@ runs:
       - name: Restore Renv package cache
         id: cache-packages-restore
         if: ${{ inputs.bypass-cache == 'always' || inputs.bypass-cache == 'never' }}
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: |
             ${{ env.RENV_PATHS_ROOT }}
