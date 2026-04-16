@@ -79,5 +79,5 @@ outputs:
   installed-r-version:
     description: 'The full R version installed'
 runs:
-  using: 'node20'
+  using: 'node24'
   main: 'dist/index.js'
