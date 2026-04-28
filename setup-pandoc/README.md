@@ -9,7 +9,7 @@ Supported platforms:
 
 - Windows x86_64,
 - macOS x86_64 and arm64,
-- Linux x86_53 and aarch64.
+- Linux x86_64 and aarch64.
 
 Inputs:
 

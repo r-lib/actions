@@ -22,5 +22,5 @@ inputs:
       GitHub token to use to download nightly builds of pandoc.
       It is not needed for other pandoc versions.
 runs:
-  using: 'node20'
+  using: 'node24'
   main: 'dist/index.js'
