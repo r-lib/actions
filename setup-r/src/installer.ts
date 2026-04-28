@@ -323,7 +323,7 @@ async function acquireRUbuntu(version: IRVersion): Promise<string> {
   try {
     await core.group("Updating system package data", async () => {
       await exec.exec(
-        "sudo DEBIAN_FRONTEND=noninteractive apt-get update -y -qq",
+        "sudo DEBIAN_FRONTEND=noninteractive apt-get update -y",
       );
     });
     // install gdbi-core and also qpdf, which is used by `--as-cran`
