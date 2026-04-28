@@ -19,7 +19,7 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - uses: r-lib/actions/setup-pandoc@v2
 
@@ -31,7 +31,7 @@ jobs:
       - uses: r-lib/actions/setup-renv@v2
 
       - name: Cache bookdown results
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: _bookdown_files
           key: bookdown-${{ hashFiles('**/*Rmd') }}
@@ -43,7 +43,7 @@ jobs:
 
       - name: Upload website artifact
         if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' }}
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: "_book"
 
@@ -62,4 +62,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
