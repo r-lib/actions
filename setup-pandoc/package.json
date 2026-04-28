@@ -29,8 +29,8 @@
     "@actions/http-client": "^2.2.1",
     "@actions/io": "^1.1.3",
     "@actions/tool-cache": "^2.0.1",
-    "@octokit/action": "^6.1.0",
-    "@octokit/plugin-paginate-rest": "^11.3.0",
+    "@octokit/action": "^7.0.1",
+    "@octokit/plugin-paginate-rest": "^11.4.2",
     "compare-versions": "^6.1.0"
   },
   "devDependencies": {
