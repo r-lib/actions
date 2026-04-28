@@ -86,9 +86,9 @@ async function installTinyTeXPosix() {
 }
 
 async function installTinyTeXWindows() {
-  const fileName = "install-windows.bat";
+  const fileName = "install-windows.ps1";
   const downloadUrl =
-    "https://yihui.name/gh/tinytex/tools/install-bin-windows.bat";
+    "https://github.com/rstudio/tinytex/raw/refs/heads/main/tools/install-bin-windows.ps1";
   let downloadPath: string | null = null;
 
   try {
@@ -112,7 +112,7 @@ async function installTinyTeXWindows() {
   );
 
   try {
-    exec.exec(path.join(tempDirectory, fileName));
+    await exec.exec("powershell", ["-File", path.join(tempDirectory, fileName)]);
   } catch (error) {
     throw `Failed to install TinyTeX: ${error}`;
   }
