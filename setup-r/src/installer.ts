@@ -704,7 +704,6 @@ async function setupRLibrary(version: IRVersion) {
         : `"${core.getInput("http-user-agent")}"`;
   }
 
-
   const repos_raw = core.getMultilineInput("extra-repositories", { trimWhitespace: true });
   let extra_repositories = "";
 
