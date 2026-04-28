@@ -1,3 +1,7 @@
+# `v2.11.4` (2025-10-08)
+
+* `[setup-r]` correctly installs Rtools again on aarch64 Windows,
+  as needed.
 
 # `v2.11.3` (2025-03-24)
 
