@@ -35,7 +35,7 @@ inputs:
     description: >
       If true, remove `-fopenmp` from the default compilation
       flags, e.g. `SHLIB_OPENMP_CFLAGS`, as the macOS Command Line Tools do not
-      support OpenMP.    
+      support OpenMP.
     default: "true"
   http-user-agent:
     description: 'If `"default"` or `""`, sets the HTTPUserAgent option to e.g. for
