@@ -705,18 +705,16 @@ async function setupRLibrary(version: IRVersion) {
   }
 
 
-  // Read multiline input which supports both YAML list and comma-separated string
-  let extra_repositories = core.getMultilineInput("extra-repositories", { trimWhitespace: true });
+  const repos_raw = core.getMultilineInput("extra-repositories", { trimWhitespace: true });
+  let extra_repositories = "";
 
-  if (extra_repositories.length > 0) {
-    extra_repositories = extra_repositories
-      .flatMap((x) => x.split(/\s*,\s*/)) // split comma-separated lines if any
-      .filter((x) => x.length > 0)        // remove empty strings
-      .map((x) => `"${x}"`)               // quote each
+  if (repos_raw.length > 0) {
+    extra_repositories = repos_raw
+      .flatMap((x) => x.split(/\s*,\s*/))
+      .filter((x) => x.length > 0)
+      .map((x) => `"${x}"`)
       .join(",");
     extra_repositories = ",\n    " + extra_repositories;
-  } else {
-    extra_repositories = "";
   }
 
   await fs.promises.writeFile(
