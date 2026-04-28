@@ -193,7 +193,7 @@ runs:
 
       - name: R package cache
         if: inputs.cache == 'true'
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ${{ env.R_LIBS_USER }}/*
@@ -206,7 +206,7 @@ runs:
       - name: R package cache restore
         id: cache-packages-restore
         if: inputs.cache == 'always'
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: |
             ${{ env.R_LIBS_USER }}/*
@@ -325,7 +325,7 @@ runs:
 
       - name: R package cache save
         if: ${{ always() && steps.cache-packages-restore.outputs.cache-hit != 'true' && inputs.cache == 'always' }}
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: |
             ${{ env.R_LIBS_USER }}/*
