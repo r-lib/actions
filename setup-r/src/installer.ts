@@ -710,7 +710,7 @@ async function setupRLibrary(version: IRVersion) {
 
   if (repos_raw.length > 0) {
     extra_repositories = repos_raw
-      .flatMap((x) => x.split(/\s*,\s*/))
+      .flatMap((x) => x.split(/[\s,]+/))
       .filter((x) => x.length > 0)
       .map((x) => `"${x}"`)
       .join(",");
