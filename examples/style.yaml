@@ -17,7 +17,7 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -49,7 +49,7 @@ jobs:
         shell: Rscript {0}
 
       - name: Cache styler
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ${{ steps.styler-location.outputs.location }}
           key: ${{ runner.os }}-styler-${{ github.sha }}
