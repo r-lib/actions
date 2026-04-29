@@ -11,6 +11,7 @@ exercitation dolore magna. Mollit qui labore tempor commodo veniam
 cupidatat esse irure nisi eiusmod qui dolore nisi.
 
 ``` r
+
 summary(mtcars)
 #>       mpg             cyl             disp             hp       
 #>  Min.   :10.40   Min.   :4.000   Min.   : 71.1   Min.   : 52.0  

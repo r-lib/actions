@@ -135,8 +135,9 @@ workflow on the R package in this repository. Thank You!
       
     You need to install XQuartz to do plotting with the default quartz
     device on macOS. This can be done by adding the following to your
-    workflow.
-    `yaml - if: runner.os == 'macOS' run: brew install --cask xquartz`
+    workflow. \`\`\`yaml
+
+    - if: runner.os == ‘macOS’ run: brew install –cask xquartz \`\`\`
 
 2.  *Why are my Windows builds failing with an error about
     `configure.ac` having CRLF line endings?*  
@@ -156,7 +157,10 @@ workflow on the R package in this repository. Thank You!
     `Rscript {0}` as the `shell` for that step. Here’s an example from
     the [bookdown
     action](https://github.com/r-lib/actions/tree/v2-branch/examples#build-bookdown-site):
-    `yaml - name: Build site run: bookdown::render_book("index.Rmd", quiet = TRUE) shell: Rscript {0}`
+    \`\`\`yaml
+
+    - name: Build site run: bookdown::render_book(“index.Rmd”, quiet =
+      TRUE) shell: Rscript {0} \`\`\`
 
 ## Additional resources
 
