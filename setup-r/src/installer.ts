@@ -636,6 +636,25 @@ async function acquireGsWindows() {
   });
 }
 
+const RSPM_DOGFOOD_MACOS_ORGS = ['tidyverse', 'r-lib', 'tidymodels', 'rstudio', 'posit-dev'];
+
+function shouldUsePublicRspm(): boolean {
+  const input = core.getInput("use-public-rspm");
+  if (input === "true") return true;
+  if (input === "false") return false;
+  // not win/linux/macos -> false
+  if (!IS_WINDOWS && !IS_LINUX && !IS_MAC) return false;
+  // linux in docker -> false
+  if (IS_LINUX && fs.existsSync('/.dockerenv')) return false;
+  // non-intel windows -> false
+  if (IS_WINDOWS && ARCH !== 'x86_64') return false;
+  // windows and linux -> true
+  if (IS_WINDOWS || IS_LINUX) return true;
+  // macos -> only Posit orgs
+  const owner = (process.env['GITHUB_REPOSITORY_OWNER'] ?? '').toLowerCase();
+  return RSPM_DOGFOOD_MACOS_ORGS.includes(owner);
+}
+
 async function setupRLibrary(version: IRVersion) {
   let profilePath: fs.PathLike | fs.promises.FileHandle;
   if (IS_WINDOWS) {
@@ -651,7 +670,7 @@ async function setupRLibrary(version: IRVersion) {
 
   let rspm = process.env["RSPM"] ? `'${process.env["RSPM"]}'` : "NULL";
 
-  if (rspm === "NULL" && core.getInput("use-public-rspm") === "true") {
+  if (rspm === "NULL" && shouldUsePublicRspm()) {
     // if we are on R 3.6.x, we use an RSPM snapshot
     const pin36: boolean =
       !process.env['RSPM_PIN_3_6'] && !!version.version.match(/^3[.]6[.]/);
@@ -660,7 +679,7 @@ async function setupRLibrary(version: IRVersion) {
     if (IS_WINDOWS) {
       rspm = `'https://packagemanager.posit.co/cran/${snapshot}'`;
     }
-    if (IS_LINUX && ARCH == 'x86_64') {
+    if (IS_LINUX) {
       let codename = "";
       try {
         await exec.exec("lsb_release", ["--short", "--codename"], {
@@ -676,6 +695,9 @@ async function setupRLibrary(version: IRVersion) {
       codename = codename.trim();
 
       rspm = `'https://packagemanager.posit.co/cran/__linux__/${codename}/${snapshot}'`;
+    }
+    if (IS_MAC) {
+      rspm = `'https://packagemanager.posit.co/cran/${snapshot}'`;
     }
   }
 
