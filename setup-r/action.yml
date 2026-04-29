@@ -66,8 +66,8 @@ inputs:
       Use the public version of Posit package manager available
       at https://packagemanager.posit.co/ to serve binaries for Linux,
       Windows and macOS. Possible values: "true" (default), "false",
-      "always". "true" enables it on x86_64 Windows and non-container
-      Linux runners. "always" always enables it.
+      "always". "true" enables it on x86_64 Windows and Linux runners.
+      "always" always enables it.
     default: "true"
   extra-repositories:
     description: >

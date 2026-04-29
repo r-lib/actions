@@ -645,8 +645,6 @@ function shouldUsePublicRspm(): boolean {
   if (input === "false") return false;
   // not win/linux/macos -> false
   if (!IS_WINDOWS && !IS_LINUX && !IS_MAC) return false;
-  // linux in docker -> false
-  if (IS_LINUX && fs.existsSync('/.dockerenv')) return false;
   // non-intel windows -> false
   if (IS_WINDOWS && ARCH !== 'x86_64') return false;
   // windows and linux -> true
