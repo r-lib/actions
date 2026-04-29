@@ -28,7 +28,6 @@ jobs:
       - uses: ./setup-pandoc
 
       - uses: ./setup-r
-        with:
 
       - uses: ./setup-r-dependencies
         with:
