@@ -212,10 +212,13 @@ Contributors can accept the suggestions with a single click without needing
 roxygen2 installed locally.
 
 > **Security note:** This workflow uses `pull_request_target` and executes R
-> code from the pull request via roxygen2. Only use it on repositories where you
-> trust all contributors. For repositories that accept untrusted contributions,
-> use [`pr-commands`](#commands-workflow) instead, which requires an explicit
-> comment from a MEMBER or OWNER.
+> code from the pull request via roxygen2. Sensitive environment variables
+> (including `GITHUB_TOKEN`) are cleared for the steps that run untrusted code,
+> so a malicious PR cannot use them to affect the repository. However, untrusted
+> code can still make outbound network requests. Only use this workflow on
+> repositories where you are comfortable with that risk. For repositories that
+> accept untrusted contributions, use [`pr-commands`](#commands-workflow)
+> instead, which requires an explicit comment from a MEMBER or OWNER.
 
 ### When should you use it?
 

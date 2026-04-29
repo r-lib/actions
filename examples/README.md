@@ -692,11 +692,14 @@ Contributors can accept the suggestions with a single click without
 needing roxygen2 installed locally.
 
 > **Security note:** This workflow uses `pull_request_target` and
-> executes R code from the pull request via roxygen2. Only use it on
-> repositories where you trust all contributors. For repositories that
-> accept untrusted contributions, use
-> [`pr-commands`](#commands-workflow) instead, which requires an
-> explicit comment from a MEMBER or OWNER.
+> executes R code from the pull request via roxygen2. Sensitive
+> environment variables (including `GITHUB_TOKEN`) are cleared for the
+> steps that run untrusted code, so a malicious PR cannot use them to
+> affect the repository. However, untrusted code can still make outbound
+> network requests. Only use this workflow on repositories where you are
+> comfortable with that risk. For repositories that accept untrusted
+> contributions, use [`pr-commands`](#commands-workflow) instead, which
+> requires an explicit comment from a MEMBER or OWNER.
 
 ### When should you use it?
 
@@ -710,10 +713,11 @@ needing roxygen2 installed locally.
 ``` yaml
 # Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
-# WARNING: This workflow uses pull_request_target and runs roxygen2, which
-# executes R code from the pull request. Only use this workflow on repositories
-# where you trust all contributors. For untrusted contributions, use pr-commands
-# instead, which requires a MEMBER or OWNER comment to trigger documentation.
+# Note: this workflow uses pull_request_target and runs roxygen2, which executes
+# R code from the pull request. Sensitive environment variables are cleared for
+# those steps so they cannot be used to affect the repository. Code can still
+# make outbound network requests, so for fully untrusted contributions consider
+# pr-commands instead, which requires a MEMBER or OWNER comment to trigger.
 on:
   pull_request_target:
     paths: ["R/**"]
@@ -738,6 +742,11 @@ jobs:
           use-public-rspm: true
 
       - uses: r-lib/actions/setup-r-dependencies@v2
+        env:
+          GITHUB_TOKEN: ""
+          GITHUB_PAT: ""
+          ACTIONS_RUNTIME_TOKEN: ""
+          ACTIONS_ID_TOKEN_REQUEST_TOKEN: ""
         with:
           extra-packages: any::roxygen2
           needs: roxygen2
@@ -745,6 +754,11 @@ jobs:
       - name: Document
         run: roxygen2::roxygenise()
         shell: Rscript {0}
+        env:
+          GITHUB_TOKEN: ""
+          GITHUB_PAT: ""
+          ACTIONS_RUNTIME_TOKEN: ""
+          ACTIONS_ID_TOKEN_REQUEST_TOKEN: ""
 
       - name: Suggest
         uses: reviewdog/action-suggester@v1
