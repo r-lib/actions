@@ -7,6 +7,9 @@
   Windows. macOS binaries require further opt-in with
   `use-public-rspm: always`.
 
+* `[setup-pandoc][setup-r-dependencies]` now default to Pandoc
+  version 3.8.3.
+
 * `[setup-r-dependencies]` now includes the R architecture in the
   cache key, so caches for `macos-15` (Apple Silicon) and
   `macos-15-intel` (Rosetta/x86_64) no longer collide (#1035).

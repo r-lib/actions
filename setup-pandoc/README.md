@@ -15,7 +15,7 @@ Inputs:
 
 | Name              | Type     | Default            | Description
 |-------------------|----------|--------------------|-------------------------------------------------------------------------------------------------
-| `pandoc-version`  | String   | `3.1.11`           | pandoc version to install. Can be `latest` or `nightly`. See notes about old and nightly versions below.
+| `pandoc-version`  | String   | `3.8.3`           | pandoc version to install. Can be `latest` or `nightly`. See notes about old and nightly versions below.
 | `token`           | String   |                    | GitHub token. Needed when `pandoc-version` is `nightly`.
 
 The oldest supported pandoc version is pandoc 2.0.2, except on
@@ -35,7 +35,7 @@ steps:
 - uses: actions/checkout@v4
 - uses: r-lib/actions/setup-pandoc@v2
   with:
-    pandoc-version: '3.1.11' # The pandoc version to download (if necessary) and use.
+    pandoc-version: '3.8.3' # The pandoc version to download (if necessary) and use.
 - run: echo "# Test" | pandoc -t html
 ```
 
