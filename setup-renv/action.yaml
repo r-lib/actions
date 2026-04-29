@@ -7,7 +7,7 @@ inputs:
   cache-version:
     description: 'The version of the cache, change this from the default (1) to start over with a fresh cache'
     required: true
-    default: 1
+    default: '1'
   bypass-cache:
     description: |
       Whether attempts to cache should be completely skipped (for non
