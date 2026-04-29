@@ -95,7 +95,6 @@ jobs:
       - uses: actions/checkout@v6
 
       - uses: r-lib/actions/setup-r@v2
-        with:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
@@ -303,7 +302,6 @@ jobs:
       - uses: actions/checkout@v6
 
       - uses: r-lib/actions/setup-r@v2
-        with:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
@@ -373,7 +371,6 @@ jobs:
       - uses: actions/checkout@v6
 
       - uses: r-lib/actions/setup-r@v2
-        with:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
@@ -593,7 +590,6 @@ jobs:
       - uses: r-lib/actions/setup-pandoc@v2
 
       - uses: r-lib/actions/setup-r@v2
-        with:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
