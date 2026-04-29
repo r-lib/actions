@@ -636,11 +636,12 @@ async function acquireGsWindows() {
   });
 }
 
-const RSPM_DOGFOOD_MACOS_ORGS = ['tidyverse', 'r-lib', 'tidymodels', 'rstudio', 'posit-dev'];
+const RSPM_DOGFOOD_MACOS_ORGS =
+  ['tidyverse', 'r-lib', 'tidymodels', 'rstudio', 'posit-dev', 'jeroen'];
 
 function shouldUsePublicRspm(): boolean {
   const input = core.getInput("use-public-rspm");
-  if (input === "true") return true;
+  if (input === "always") return true;
   if (input === "false") return false;
   // not win/linux/macos -> false
   if (!IS_WINDOWS && !IS_LINUX && !IS_MAC) return false;
