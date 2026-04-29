@@ -1,4 +1,4 @@
-# development version
+# `v2.12.0` (2026-04-29)
 
 * All node.js actions use node 24 now. Relatedly, all example workflows
   use recent versions of actions that use node 24.
