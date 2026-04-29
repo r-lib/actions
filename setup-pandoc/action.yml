@@ -6,7 +6,7 @@ author: 'Jim Hester'
 inputs:
   pandoc-version:
     description: |
-      It can be a version number, e.g. '3.1.11', or 'latest' for
+      It can be a version number, e.g. '3.8.3', or 'latest' for
       installing the latest pandoc release, or 'nightly' to for
       installing the latest nightly build from
       https://github.com/jgm/pandoc/actions/workflows/nightly.yml.
@@ -16,7 +16,7 @@ inputs:
       The oldest supported pandoc version is pandoc 2.0.2, except on
       arm64 Linux, where it is pandoc 2.12.
     required: true
-    default: '3.1.11'
+    default: '3.8.3'
   token:
     description: |
       GitHub token to use to download nightly builds of pandoc.
