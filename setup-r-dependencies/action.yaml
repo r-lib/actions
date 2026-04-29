@@ -5,11 +5,11 @@ inputs:
   cache:
     description: 'Whether packages should be cached across runs or not. If `"always"` is provided, the package cache will be saved even if the workflow fails.'
     required: true
-    default: true
+    default: 'true'
   cache-version:
     description: 'The version of the cache, change this from the default (1) to start over with a fresh cache. Ignored if cache: false'
     required: true
-    default: 1
+    default: '1'
   extra-packages:
     description: 'Any extra packages to install outside of the packages listed in the dependencies'
   needs:
@@ -39,8 +39,7 @@ inputs:
     description: 'Whether to install the latest available versions of the dependencies. Must be an R expression. See the README for details if you need quoting.'
     default: 'FALSE'
   lockfile-create-lib:
-    description: 'The package library to consider when creating the pak lockfile. This is passed to the `lib` argument of `pak::lockfile_create()`. Defaults to an empty library, for reproducibility. Must be an R expression. Note that it often needs to be quoted in YAML, see the README for detail\
-s.'
+    description: 'The package library to consider when creating the pak lockfile. This is passed to the `lib` argument of `pak::lockfile_create()`. Defaults to an empty library, for reproducibility. Must be an R expression. Note that it often needs to be quoted in YAML, see the README for details.'
     default: 'NULL'
   install-pandoc:
     description: 'Whether to install pandoc. By default it is installed if it is not on the PATH and the local package suggests or depends on the rmarkdown package.'
