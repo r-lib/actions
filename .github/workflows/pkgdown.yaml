@@ -29,7 +29,6 @@ jobs:
 
       - uses: ./setup-r
         with:
-          use-public-rspm: true
 
       - uses: ./setup-r-dependencies
         with:
