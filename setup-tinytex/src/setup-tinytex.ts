@@ -54,7 +54,7 @@ async function installTinyTeXPosix() {
   }
 
   const fileName = "install-unx.sh";
-  const downloadUrl = "https://yihui.name/gh/tinytex/tools/install-bin-unix.sh";
+  const downloadUrl = "https://github.com/rstudio/tinytex/raw/refs/heads/main/tools/install-bin-unix.sh";
   let downloadPath: string | null = null;
 
   try {
