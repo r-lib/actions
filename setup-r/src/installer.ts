@@ -727,13 +727,13 @@ async function setupRLibrary(version: IRVersion) {
         : `"${core.getInput("http-user-agent")}"`;
   }
 
-  // Split the repositories by whitespace and then quote each entry joining with commas
-  let extra_repositories = core.getInput("extra-repositories");
+  const repos_raw = core.getMultilineInput("extra-repositories", { trimWhitespace: true });
+  let extra_repositories = "";
 
-  // Prepend a , if there are extra repositories
-  if (extra_repositories) {
-    extra_repositories = extra_repositories
-      .split(/\s+/)
+  if (repos_raw.length > 0) {
+    extra_repositories = repos_raw
+      .flatMap((x) => x.split(/[\s,]+/))
+      .filter((x) => x.length > 0)
       .map((x) => `"${x}"`)
       .join(",");
     extra_repositories = ",\n    " + extra_repositories;

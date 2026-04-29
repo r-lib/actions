@@ -70,7 +70,11 @@ inputs:
       Linux runners. "always" always enables it.
     default: "true"
   extra-repositories:
-    description: 'One or more extra CRAN-like repositories to include in the `repos` global option'
+    description: >
+      One or more extra CRAN-like repositories to include in the `repos` global option.
+      Can be a comma- or space-separated string (e.g.
+      'https://repo1.r-universe.dev, https://repo2.r-universe.dev'), or a YAML list
+      with one URL per line using the '|' block scalar syntax.
     default: ''
   working-directory:
     description: >
