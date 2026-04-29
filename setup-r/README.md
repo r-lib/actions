@@ -81,9 +81,11 @@ This action sets up an R environment for use in actions by:
 - **update-rtools** (`false`) - Update rtools40 compilers and libraries
   to the latest builds.
 
-- **use-public-rspm** (`false`) - Use the public version of Posit
-  package manager available at <https://packagemanager.posit.co/> to
-  serve binaries for Linux and Windows.
+- **use-public-rspm** - Use the public version of Posit package manager
+  available at <https://packagemanager.posit.co/> to serve binaries for
+  Linux, Windows and macOS. Set to `true` to always enable, `false` to
+  always disable. Defaults to `true` on x86_64 Windows and Linux,
+  `false` on macOS, aarch64 Windows, and container jobs.
 
 - **extra-repositories** (`''`) - One or more extra CRAN-like
   repositories to include in the `repos` global option

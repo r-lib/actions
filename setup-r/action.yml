@@ -64,11 +64,17 @@ inputs:
   use-public-rspm:
     description: >
       Use the public version of Posit package manager available
-      at https://packagemanager.posit.co/ to serve binaries for Linux and
-      Windows.
-    default: "false"
+      at https://packagemanager.posit.co/ to serve binaries for Linux,
+      Windows and macOS. Possible values: "true" (default), "false",
+      "always". "true" enables it on x86_64 Windows and Linux runners.
+      "always" always enables it.
+    default: "true"
   extra-repositories:
-    description: 'One or more extra CRAN-like repositories to include in the `repos` global option'
+    description: >
+      One or more extra CRAN-like repositories to include in the `repos` global option.
+      Can be a comma- or space-separated string (e.g.
+      'https://repo1.r-universe.dev, https://repo2.r-universe.dev'), or a YAML list
+      with one URL per line using the '|' block scalar syntax.
     default: ''
   working-directory:
     description: >
