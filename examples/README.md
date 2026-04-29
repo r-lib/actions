@@ -22,6 +22,9 @@ Package workflows:
   Pages](https://pages.cloudflare.com/).
 - [`document`](#document-package) - Run `roxygen2::roxygenise()` on an R
   package.
+- [`document-suggest`](#document-suggest-workflow) - Run
+  `roxygen2::roxygenise()` on an R package and suggest the changes as
+  pull request review comments.
 - [`style`](#style-package) - Run `styler::style_pkg()` on an R package.
 
 RMarkdown workflows:
@@ -675,6 +678,80 @@ jobs:
           git commit -m "Update documentation" || echo "No changes to commit"
           git pull --ff-only
           git push origin
+```
+
+## Document-suggest workflow
+
+`usethis::use_github_action("document-suggest")`
+
+This workflow runs `roxygen2::roxygenise()` when R source files change
+in a pull request and posts the resulting documentation changes as [pull
+request review
+suggestions](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests/incorporating-feedback-in-your-pull-request).
+Contributors can accept the suggestions with a single click without
+needing roxygen2 installed locally.
+
+> **Security note:** This workflow uses `pull_request_target` and
+> executes R code from the pull request via roxygen2. Only use it on
+> repositories where you trust all contributors. For repositories that
+> accept untrusted contributions, use
+> [`pr-commands`](#commands-workflow) instead, which requires an
+> explicit comment from a MEMBER or OWNER.
+
+### When should you use it?
+
+1.  You maintain a package that receives pull requests from trusted
+    contributors.
+2.  You want to ensure documentation stays up to date without requiring
+    contributors to have roxygen2 installed locally.
+3.  You prefer review suggestions over automatic commits to the PR
+    branch.
+
+``` yaml
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
+# WARNING: This workflow uses pull_request_target and runs roxygen2, which
+# executes R code from the pull request. Only use this workflow on repositories
+# where you trust all contributors. For untrusted contributions, use pr-commands
+# instead, which requires a MEMBER or OWNER comment to trigger documentation.
+on:
+  pull_request_target:
+    paths: ["R/**"]
+
+name: document-suggest.yaml
+
+permissions: read-all
+
+jobs:
+  document-suggest:
+    name: document-suggest
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::roxygen2
+          needs: roxygen2
+
+      - name: Document
+        run: roxygen2::roxygenise()
+        shell: Rscript {0}
+
+      - name: Suggest
+        uses: reviewdog/action-suggester@v1
+        with:
+          tool_name: roxygen2
+          filter_mode: nofilter
+          fail_on_error: false
 ```
 
 ## Style package

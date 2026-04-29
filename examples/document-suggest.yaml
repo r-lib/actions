@@ -1,0 +1,44 @@
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
+# WARNING: This workflow uses pull_request_target and runs roxygen2, which
+# executes R code from the pull request. Only use this workflow on repositories
+# where you trust all contributors. For untrusted contributions, use pr-commands
+# instead, which requires a MEMBER or OWNER comment to trigger documentation.
+on:
+  pull_request_target:
+    paths: ["R/**"]
+
+name: document-suggest.yaml
+
+permissions: read-all
+
+jobs:
+  document-suggest:
+    name: document-suggest
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::roxygen2
+          needs: roxygen2
+
+      - name: Document
+        run: roxygen2::roxygenise()
+        shell: Rscript {0}
+
+      - name: Suggest
+        uses: reviewdog/action-suggester@v1
+        with:
+          tool_name: roxygen2
+          filter_mode: nofilter
+          fail_on_error: false
