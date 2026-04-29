@@ -1,3 +1,9 @@
+# development version
+
+* `[setup-r-dependencies]` now includes the R architecture in the
+  cache key, so caches for `macos-15` (Apple Silicon) and
+  `macos-15-intel` (Rosetta/x86_64) no longer collide (#1035).
+
 # `v2.11.4` (2025-10-08)
 
 * `[setup-r]` correctly installs Rtools again on aarch64 Windows,

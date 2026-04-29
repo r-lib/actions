@@ -155,6 +155,7 @@ runs:
           # Dependency resolution
           cat("::group::Dependency resolution\n")
           cat("os-version=", sessionInfo()$running, "\n", file = Sys.getenv("GITHUB_OUTPUT"), sep = "", append = TRUE)
+          cat("r-arch=", R.Version()$arch, "\n", file = Sys.getenv("GITHUB_OUTPUT"), sep = "", append = TRUE)
           r_version <-
             if (grepl("development", R.version.string)) {
               pdf(tempfile())
@@ -201,8 +202,8 @@ runs:
             renv/library
             !${{ env.R_LIBS_USER }}/pak
             !${{ env.R_LIBS_USER }}/_cache
-          key: ${{ format('{0}-{1}-{2}-{3}', steps.install.outputs.os-version, steps.install.outputs.r-version, inputs.cache-version, hashFiles(format('{0}/.github/pkg.lock', inputs.working-directory ))) }}
-          restore-keys: ${{ format('{0}-{1}-{2}-', steps.install.outputs.os-version, steps.install.outputs.r-version, inputs.cache-version) }}
+          key: ${{ format('{0}-{1}-{2}-{3}-{4}', steps.install.outputs.os-version, steps.install.outputs.r-version, steps.install.outputs.r-arch, inputs.cache-version, hashFiles(format('{0}/.github/pkg.lock', inputs.working-directory ))) }}
+          restore-keys: ${{ format('{0}-{1}-{2}-{3}-', steps.install.outputs.os-version, steps.install.outputs.r-version, steps.install.outputs.r-arch, inputs.cache-version) }}
 
       - name: R package cache restore
         id: cache-packages-restore
@@ -214,8 +215,8 @@ runs:
             renv/library
             !${{ env.R_LIBS_USER }}/pak
             !${{ env.R_LIBS_USER }}/_cache
-          key: ${{ format('{0}-{1}-{2}-{3}', steps.install.outputs.os-version, steps.install.outputs.r-version, inputs.cache-version, hashFiles(format('{0}/.github/pkg.lock', inputs.working-directory ))) }}
-          restore-keys: ${{ format('{0}-{1}-{2}-', steps.install.outputs.os-version, steps.install.outputs.r-version, inputs.cache-version) }}
+          key: ${{ format('{0}-{1}-{2}-{3}-{4}', steps.install.outputs.os-version, steps.install.outputs.r-version, steps.install.outputs.r-arch, inputs.cache-version, hashFiles(format('{0}/.github/pkg.lock', inputs.working-directory ))) }}
+          restore-keys: ${{ format('{0}-{1}-{2}-{3}-', steps.install.outputs.os-version, steps.install.outputs.r-version, steps.install.outputs.r-arch, inputs.cache-version) }}
 
       - name: Install dependencies
         run: |
