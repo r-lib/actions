@@ -43,7 +43,7 @@ runs:
 
       - name: Restore Renv package cache
         if: ${{ inputs.bypass-cache == 'false' }}
-        uses: actions/cache@v5
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
         with:
           path: |
             ${{ env.RENV_PATHS_ROOT }}
@@ -54,7 +54,7 @@ runs:
       - name: Restore Renv package cache
         id: cache-packages-restore
         if: ${{ inputs.bypass-cache == 'always' || inputs.bypass-cache == 'never' }}
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae
         with:
           path: |
             ${{ env.RENV_PATHS_ROOT }}
@@ -76,7 +76,7 @@ runs:
 
       - name: Save Renv package cache
         if: ${{ always() && steps.cache-packages-restore.outputs.cache-hit != 'true' && (inputs.bypass-cache == 'always' || inputs.bypass-cache == 'never') }}
-        uses: actions/cache/save@v5
+        uses: actions/cache/save@27d5ce7f107fe9357f9df03efb73ab90386fccae
         with:
           path: |
             ${{ env.RENV_PATHS_ROOT }}

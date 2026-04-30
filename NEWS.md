@@ -7,6 +7,9 @@
   Windows. macOS binaries require further opt-in with
   `use-public-rspm: always`.
 
+* It is now possible to require actions to be pinned to a full-length
+  commit SHA in repositories using `r-lib/actions` (#1070).
+
 * `[setup-pandoc][setup-r-dependencies]` now default to Pandoc
   version 3.8.3.
 

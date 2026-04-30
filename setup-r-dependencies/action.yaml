@@ -194,7 +194,7 @@ runs:
 
       - name: R package cache
         if: inputs.cache == 'true'
-        uses: actions/cache@v5
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
         with:
           path: |
             ${{ env.R_LIBS_USER }}/*
@@ -207,7 +207,7 @@ runs:
       - name: R package cache restore
         id: cache-packages-restore
         if: inputs.cache == 'always'
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae
         with:
           path: |
             ${{ env.R_LIBS_USER }}/*
@@ -262,7 +262,7 @@ runs:
 
       - name: Install pandoc if needed
         if: ${{ steps.check-pandoc.outputs.install == 'true' }}
-        uses: r-lib/actions/setup-pandoc@v2
+        uses: r-lib/actions/setup-pandoc@9f58233a78a2a9fd874714be10f8bba627233339
         with:
           pandoc-version: ${{ inputs.pandoc-version }}
 
@@ -326,7 +326,7 @@ runs:
 
       - name: R package cache save
         if: ${{ always() && steps.cache-packages-restore.outputs.cache-hit != 'true' && inputs.cache == 'always' }}
-        uses: actions/cache/save@v5
+        uses: actions/cache/save@27d5ce7f107fe9357f9df03efb73ab90386fccae
         with:
           path: |
             ${{ env.R_LIBS_USER }}/*
