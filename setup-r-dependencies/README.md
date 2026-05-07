@@ -23,7 +23,7 @@ Inputs available
 - `dependencies` - default `'"all"'`. Types of dependencies to install. By
   default all direct dependencies of the current package are installed, and
   hard dependencies of these direct dependencies.
-  If you only want to install hard (required) dependecies, use
+  If you only want to install hard (required) dependencies, use
   `dependencies: '"hard"'`.
   See also the `needs` and `extra-packages` parameters. This parameter must
   be a valid R expression, and it is passed to the `dependencies` argument
