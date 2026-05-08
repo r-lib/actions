@@ -23,7 +23,6 @@ import * as io from "@actions/io";
 import * as util from "util";
 import * as path from "path";
 import * as fs from "fs";
-import * as restm from "typed-rest-client/RestClient";
 import * as semver from "semver";
 import osInfo from "linux-os-info";
 
@@ -770,15 +769,20 @@ function setREnvironmentVariables() {
   if (!process.env["NOT_CRAN"]) core.exportVariable("NOT_CRAN", "true");
 }
 
+async function getJSON<T>(url: string): Promise<T | undefined> {
+  const response = await fetch(url, {
+    headers: { "User-Agent": "setup-r" },
+  });
+  if (!response.ok) return undefined;
+  return (await response.json()) as T;
+}
+
 // Need to keep this for setting the HTTP User-Agent header to
 // R-release for RSPM
 async function getReleaseVersion(platform: string): Promise<string> {
-  let rest: restm.RestClient = new restm.RestClient("setup-r");
-  let tags: IRRef = (
-    await rest.get<IRRef>(
-      util.format("https://api.r-hub.io/rversions/r-release-%s", platform),
-    )
-  ).result || { version: "" };
+  const tags = (await getJSON<IRRef>(
+    util.format("https://api.r-hub.io/rversions/r-release-%s", platform),
+  )) || { version: "" };
 
   return tags.version;
 }
@@ -801,21 +805,20 @@ export async function determineVersion(version: string): Promise<IRVersion> {
     version = version.replace(/^oldrel[-]/, "oldrel/");
   }
 
-  let rest: restm.RestClient = new restm.RestClient("setup-r");
   let os: string = OS != "linux" ? OS : await getLinuxPlatform();
   let url: string =
     "https://api.r-hub.io/rversions/resolve/" + version + "/" + os;
   if (ARCH) {
     url = url + "/" + ARCH;
   }
-  var tags = (await rest.get<IRVersion>(url)).result;
+  var tags = await getJSON<IRVersion>(url);
 
   if (!tags) {
     // if arm mac, try intel as well
     if (OS == "mac" && ARCH == "arm64") {
       let url2: string =
 	"https://api.r-hub.io/rversions/resolve/" + version + "/" + OS;
-      tags = (await rest.get<IRVersion>(url2)).result;
+      tags = await getJSON<IRVersion>(url2);
       if (!tags) {
         throw new Error(`Failed to resolve R version ${version} at ${url} and ${url2}`);
       }
