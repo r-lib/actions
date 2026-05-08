@@ -28,8 +28,7 @@
     "@actions/io": "^1.1.3",
     "@actions/tool-cache": "^3.0.1",
     "linux-os-info": "^2.0.0",
-    "semver": "^7.6.0",
-    "typed-rest-client": "^1.8.11"
+    "semver": "^7.6.0"
   },
   "devDependencies": {
     "@types/node": "^20.12.10",
