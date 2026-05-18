@@ -1,0 +1,56 @@
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
+# Build against MacOSX11.3 SDK to replicate the header environment seen on
+# CRAN's r-release-macos-x86_64, r-oldrel-macos-arm64, r-oldrel-macos-x86_64 machines, where missing
+# explicit C++ standard library includes cause build failures.
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+name: check-strict-includes.yaml
+
+permissions: read-all
+
+jobs:
+  strict-includes:
+    runs-on: ${{ matrix.config.os }}
+
+    name: ${{ matrix.config.os }} (${{ matrix.config.r }}) [MacOSX11.3 SDK]
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { os: macos-15-intel, r: release }
+          - { os: macos-15-intel, r: oldrel-1 }
+          - { os: macos-15,       r: oldrel-1 }
+
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_KEEP_PKG_SOURCE: yes
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install MacOSX11.3 SDK
+        run: |
+          curl -fsSL https://github.com/phracker/MacOSX-SDKs/releases/download/11.3/MacOSX11.3.sdk.tar.xz \
+            | sudo tar xJ -C /Library/Developer/CommandLineTools/SDKs/
+          echo "SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk" >> "$GITHUB_ENV"
+
+      - uses: r-lib/actions/setup-pandoc@v2
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: ${{ matrix.config.r }}
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::rcmdcheck
+          needs: check
+
+      - uses: r-lib/actions/check-r-package@v2
+        with:
+          upload-snapshots: true
+          build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
