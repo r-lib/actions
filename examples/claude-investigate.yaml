@@ -1,0 +1,147 @@
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
+on:
+  issue_comment:
+    types: [created]
+
+name: investigate.yaml
+
+permissions: read-all
+
+jobs:
+  investigate:
+    name: investigate
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    # Can only be triggered on issues (not PRs!) by team members with a comment starting with `/investigate`
+    if: ${{ !github.event.issue.pull_request && (github.event.comment.author_association == 'MEMBER' || github.event.comment.author_association == 'OWNER') && startsWith(github.event.comment.body, '/investigate') }}
+
+    permissions:
+      contents: read
+      issues: write
+
+    steps:
+      # 👀
+      - name: Starting
+        id: starting
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          COMMENT_ID: ${{ github.event.comment.id }}
+        run: |
+          reaction_id=$(gh api --method POST "/repos/$REPO/issues/comments/$COMMENT_ID/reactions" -f content='eyes' --jq '.id')
+          echo "reaction_id=$reaction_id" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r@v2
+
+      # Install self and reprex
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: local::., any::reprex
+
+      - uses: anthropics/claude-code-action@v1
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          claude_args: |
+            --model claude-sonnet-4-6
+            --max-turns 20
+            --allowedTools "Bash,Read,Write,Edit"
+          prompt: |
+            You are triaging GitHub issue #${{ github.event.issue.number }} in the
+            ${{ github.repository }} repository. Your job is to reduce it to a minimal,
+            reproducible example (a "reprex") and post that reprex back to the issue.
+
+            ## Environment
+
+            - This repo is an R package. Read its name from the `Package:` field of
+              `DESCRIPTION`. This is the package referenced in the steps below.
+            - The dev version of the package (the current state of this repo) is already
+              installed and loadable with `library({package})`.
+            - The `reprex` package is installed.
+            - Run R with `Rscript -e '...'` or `Rscript file.R`.
+            - The `gh` CLI is authenticated.
+
+            ## Steps
+
+            1. Read the full issue, including all comments:
+               `gh issue view ${{ github.event.issue.number }} --comments`.
+               Identify the reported problem, the expected vs. actual behavior, any
+               existing reprex, and any package/R versions mentioned.
+
+            2. Build a minimal reprex that reproduces the reported behavior:
+               - Prefer small inline minimal data structures (vectors or data frames).
+               - Use the fewest function calls possible and minimize dependencies.
+               - If the issue already contains a reprex, reduce it rather than
+                 starting from scratch.
+
+            3. Run and iterate. Write the candidate to a file and render it:
+               `Rscript -e 'reprex::reprex(input = "repro.R", venue = "gh", session_info = TRUE)'`
+               Inspect the rendered output, then shrink further while confirming the
+               reported behavior still appears. Stop when it is minimal or you are
+               running low on turns.
+
+            4. Rate your confidence (low / medium / high) that the final reprex
+               faithfully reproduces the issue as reported on the dev version of the
+               package:
+               - Use "low" when the issue is vague, when no original reprex
+                 existed, or when you could not fully reproduce the behavior.
+               - Use "high" when you clearly reproduced the reported behavior.
+               - Say explicitly if the issue did not reproduce.
+
+            5. Post EXACTLY ONE new comment on the issue. The comment MUST follow this
+               exact template, filling in each placeholder and keeping every heading,
+               in this order, verbatim. Do not add, remove, or reorder sections. If a
+               section does not apply, write "N/A" rather than dropping it. Always post
+               the comment, even when confidence is low and even when the issue did not
+               reproduce.
+
+               ```markdown
+               Automated `/investigate` result
+
+               Confidence: {low / medium / high}
+
+               ## Summary
+
+               {One or two sentences about what the issue reports and the underlying cause,
+               if you discovered one.}
+
+               {If the confidence level was low / medium, one or two sentences about why.}
+
+               ## Reprex
+
+               {The rendered reprex output from `venue = "gh"`, which includes the minimal
+               reprex code alongside its output.}
+
+               ---
+               *This comment was generated automatically. It may be incorrect.*
+               ```
+
+      # 👀 -> 👍
+      - name: Success
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          COMMENT_ID: ${{ github.event.comment.id }}
+          REACTION_ID: ${{ steps.starting.outputs.reaction_id }}
+        run: |
+          gh api --method DELETE "/repos/$REPO/issues/comments/$COMMENT_ID/reactions/$REACTION_ID"
+          gh api --method POST "/repos/$REPO/issues/comments/$COMMENT_ID/reactions" -f content='+1'
+
+      # 👀 -> 👎
+      - name: Failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          COMMENT_ID: ${{ github.event.comment.id }}
+          REACTION_ID: ${{ steps.starting.outputs.reaction_id }}
+        run: |
+          gh api --method DELETE "/repos/$REPO/issues/comments/$COMMENT_ID/reactions/$REACTION_ID"
+          gh api --method POST "/repos/$REPO/issues/comments/$COMMENT_ID/reactions" -f content='-1'
