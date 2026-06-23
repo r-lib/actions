@@ -1,3 +1,16 @@
+# `v2.12.1` (2026-06-23)
+
+* `[setup-r]` now avoids a warning about an `url.parse()` deprecation
+  (#1074).
+
+* `[setup-r-dependencies]` now uses `quarto-dev/quarto-actions` `v2.2.0`
+  (@jdblischak, #1076).
+
+* Examples: `test-coverage.yaml` now uses `codecov/codecov-action` `v7`
+  (@shikokuchuo, #1081).
+
+* New example `claude-investigate.yaml` workflow (@DavisVaughan, #1084).
+
 # `v2.12.0` (2026-04-29)
 
 * All node.js actions use node 24 now. Relatedly, all example workflows
