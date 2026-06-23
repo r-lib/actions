@@ -9,6 +9,8 @@
 * Examples: `test-coverage.yaml` now uses `codecov/codecov-action` `v7`
   (@shikokuchuo, #1081).
 
+* New example `claude-investigate.yaml` workflow (@DavisVaughan, #1084).
+
 # `v2.12.0` (2026-04-29)
 
 * All node.js actions use node 24 now. Relatedly, all example workflows
