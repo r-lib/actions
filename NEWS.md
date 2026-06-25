@@ -1,3 +1,9 @@
+# development version
+
+* `[setup-r]` now retries transient failures when resolving the R
+  version from `api.r-hub.io`, rather than failing the job on the first
+  timeout or server error (@nbenn, #1086).
+
 # `v2.12.1` (2026-06-23)
 
 * `[setup-r]` now avoids a warning about an `url.parse()` deprecation
