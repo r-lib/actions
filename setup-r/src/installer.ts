@@ -97,7 +97,7 @@ export async function getR(version: string) {
 }
 
 async function acquireR(version: IRVersion) {
-  if (core.getInput("install-r") !== "true") {
+  if (core.getInput("install-r") !== "true" && (!IS_WINDOWS || (core.getInput("rtools-version") === 'none'))) {
     return;
   }
 
@@ -436,6 +436,9 @@ async function acquireRMacOS(version: IRVersion): Promise<string> {
 }
 
 async function acquireRWindows(version: IRVersion): Promise<string> {
+  if (core.getInput("install-r") !== "true") {
+    return "";
+  }
   let fileName: string = path.basename(version.url);
   let downloadPath: string | null = null;
   try {
