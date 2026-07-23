@@ -128,6 +128,18 @@ runs:
           cat("::endgroup::\n")
         shell: Rscript {0}
 
+      - name: Set JAVA_HOME (Windows x64)
+        if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && env.JAVA_HOME == '' }}
+        shell: bash
+        run: |
+          echo "JAVA_HOME=${JAVA_HOME_21_X64}" >> $GITHUB_ENV
+
+      - name: Set JAVA_HOME (Windows arm64)
+        if: ${{ runner.os == 'Windows' && runner.arch == 'ARM64' && env.JAVA_HOME == '' }}
+        shell: bash
+        run: |
+          echo "JAVA_HOME=${JAVA_HOME_21_AARCH64}" >> $GITHUB_ENV
+
       - name: Install pak (Unix)
         if: ${{ runner.os != 'Windows' && inputs.pak-version != 'none' }}
         run: |
