@@ -128,17 +128,19 @@ runs:
           cat("::endgroup::\n")
         shell: Rscript {0}
 
-      - name: Set JAVA_HOME (Windows x64)
-        if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && env.JAVA_HOME == '' }}
+      - name: Set JAVA_HOME (Windows)
+        if: ${{ runner.os == 'Windows' }}
         shell: bash
         run: |
-          echo "JAVA_HOME=${JAVA_HOME_21_X64}" >> $GITHUB_ENV
-
-      - name: Set JAVA_HOME (Windows arm64)
-        if: ${{ runner.os == 'Windows' && runner.arch == 'ARM64' && env.JAVA_HOME == '' }}
-        shell: bash
-        run: |
-          echo "JAVA_HOME=${JAVA_HOME_21_AARCH64}" >> $GITHUB_ENV
+          if [ -z "${JAVA_HOME:-}" ]; then
+            arch="${RUNNER_ARCH^^}"
+            case "${arch}" in
+              X64) echo "JAVA_HOME=${JAVA_HOME_21_X64}" >> $GITHUB_ENV ;;
+              # GitHub runners expose ARM64 Java 21 in JAVA_HOME_21_AARCH64.
+              ARM64) echo "JAVA_HOME=${JAVA_HOME_21_AARCH64}" >> $GITHUB_ENV ;;
+              *) echo "Warning: unsupported Windows architecture '${arch}', JAVA_HOME not set by setup-r-dependencies." >&2 ;;
+            esac
+          fi
 
       - name: Install pak (Unix)
         if: ${{ runner.os != 'Windows' && inputs.pak-version != 'none' }}

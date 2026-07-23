@@ -286,10 +286,6 @@ On macOS you can usually use `brew`, here is an example step in a workflow:
 On Windows you can usually use `pacman` that is included in Rtools4, or
 `choco` to install external software:
 
-`setup-r-dependencies` also sets `JAVA_HOME` to Java 21 on GitHub-hosted
-Windows runners (`JAVA_HOME_21_X64` on x64, `JAVA_HOME_21_AARCH64` on arm64)
-if `JAVA_HOME` is not already set.
-
 ```yaml
       - name: Install most Windows system dependencies
         if: runner.os == 'Windows'
@@ -304,6 +300,10 @@ if `JAVA_HOME` is not already set.
         run: |
           choco install mariadb
 ```
+
+`setup-r-dependencies` also sets `JAVA_HOME` to Java 21 on GitHub-hosted
+Windows runners (`JAVA_HOME_21_X64` on x64, `JAVA_HOME_21_AARCH64` on arm64)
+if `JAVA_HOME` is not already set.
 
 # Installing the latest dependencies
 
