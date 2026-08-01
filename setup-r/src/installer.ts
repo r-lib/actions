@@ -712,6 +712,11 @@ async function setupRLibrary(version: IRVersion) {
     core.getInput("cran") || process.env["CRAN"] || "https://cran.rstudio.com"
   }'`;
 
+  // the windows-arm builds should have a preferred mirror set
+  if(IS_WINDOWS && ARCH === 'arm64' && semver.gte(version.version, "4.6.1")) {
+    cran = 'getOption("repos")[["CRAN"]]';
+  }
+
   let user_agent;
 
   if (core.getInput("http-user-agent") === "release") {
