@@ -709,7 +709,7 @@ async function setupRLibrary(version: IRVersion) {
   }
 
   const cran_input = core.getInput("cran") || process.env["CRAN"];
-  let cran = `'${cran_input || "https://cran.rstudio.com"}'`;
+  const cran = `'${cran_input || "https://cran.rstudio.com"}'`;
 
   // Some R installations set up a preferred mirror themselves, e.g. the
   // Windows ARM64 builds. We only override these if the repository was
@@ -750,6 +750,12 @@ async function setupRLibrary(version: IRVersion) {
     profilePath,
     `Sys.setenv("PKGCACHE_HTTP_VERSION" = "2")
 local({
+  # The 'repos' option is not set yet while the profile files are sourced. It is
+  # utils' .onLoad() that reads R_HOME/etc/repositories (or ~/.R/repositories),
+  # and only 'base' is loaded at this point. Load utils here, both to see the
+  # repositories that this R installation has set up, and because .onLoad()
+  # would skip them altogether, once we have set the option ourselves.
+  loadNamespace("utils")
   # Repositories that this R installation has set up already, e.g. in its
   # site profile. "@CRAN@" is a placeholder, not an actual repository.
   set <- getOption("repos")
