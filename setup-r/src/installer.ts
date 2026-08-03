@@ -708,14 +708,16 @@ async function setupRLibrary(version: IRVersion) {
     core.exportVariable("RENV_CONFIG_REPOS_OVERRIDE", rspm_noq);
   }
 
-  let cran = `'${
-    core.getInput("cran") || process.env["CRAN"] || "https://cran.rstudio.com"
-  }'`;
+  const cran_input = core.getInput("cran") || process.env["CRAN"];
+  let cran = `'${cran_input || "https://cran.rstudio.com"}'`;
 
-  // the windows-arm builds should have a preferred mirror set
-  if(IS_WINDOWS && ARCH === 'arm64' && semver.gte(version.version, "4.6.1")) {
-    cran = 'getOption("repos")[["CRAN"]]';
-  }
+  // Some R installations set up a preferred mirror themselves, e.g. the
+  // Windows ARM64 builds. We only override these if the repository was
+  // requested explicitly.
+  let forced: string[] = [];
+  if (process.env["RSPM"]) forced.push('"RSPM"');
+  if (cran_input) forced.push('"CRAN"');
+  const force = forced.join(", ");
 
   let user_agent;
 
@@ -747,11 +749,22 @@ async function setupRLibrary(version: IRVersion) {
   await fs.promises.writeFile(
     profilePath,
     `Sys.setenv("PKGCACHE_HTTP_VERSION" = "2")
-options(
-  repos = c(
+local({
+  # Repositories that this R installation has set up already, e.g. in its
+  # site profile. "@CRAN@" is a placeholder, not an actual repository.
+  set <- getOption("repos")
+  set <- set[!is.na(set) & set != "@CRAN@" & names(set) != ""]
+  repos <- c(
     RSPM = ${rspm},
     CRAN = ${cran}${extra_repositories}
-  ),
+  )
+  # Keep the repositories that are already set, unless they were requested
+  # explicitly, and also keep the ones we don't know about.
+  keep <- setdiff(intersect(names(set), names(repos)), c(${force}))
+  repos[keep] <- set[keep]
+  options(repos = c(repos, set[setdiff(names(set), names(repos))]))
+})
+options(
   Ncpus = ${core.getInput("Ncpus")},
   HTTPUserAgent = ${user_agent}
 )\n`,
