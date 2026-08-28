@@ -301,6 +301,10 @@ On Windows you can usually use `pacman` that is included in Rtools4, or
           choco install mariadb
 ```
 
+`setup-r-dependencies` also sets `JAVA_HOME` to Java 21 on GitHub-hosted
+Windows runners (`JAVA_HOME_21_X64` on x64, `JAVA_HOME_21_AARCH64` on arm64)
+if `JAVA_HOME` is not already set.
+
 # Installing the latest dependencies
 
 Note that `setup-r-dependencies` does _not_ necessarily install the latest
