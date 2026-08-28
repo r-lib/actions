@@ -147,6 +147,9 @@ runs:
         run: |
           # Install pak
           echo "::group::Install pak"
+          # sudo-rs (default on Ubuntu 25.10+) does not support 'sudo -E',
+          # switch back to classic sudo if available (#1094)
+          if [ -e /usr/bin/sudo.ws ]; then sudo update-alternatives --set sudo /usr/bin/sudo.ws; fi
           if which sudo >/dev/null; then SUDO="sudo -E --preserve-env=PATH env"; else SUDO=""; fi
           $SUDO R -q -e 'dir.create(Sys.getenv("R_LIB_FOR_PAK"), recursive = TRUE, showWarnings = FALSE)'
           $SUDO R -q -e 'if ("${{ inputs.pak-version }}" == "repo") { install.packages("pak", lib = Sys.getenv("R_LIB_FOR_PAK")) } else { install.packages("pak", lib = Sys.getenv("R_LIB_FOR_PAK"), repos = sprintf("https://r-lib.github.io/p/pak/%s/%s/%s/%s", "${{ inputs.pak-version }}", .Platform$pkgType, R.Version()$os, R.Version()$arch)) }'

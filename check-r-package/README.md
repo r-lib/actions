@@ -31,7 +31,7 @@ Inputs available:
   not defined.
 - snapshot-artifact-name: Use this to override the default artifact name
   for testthat snapshots. The default is
-  `{os}-{arch}-r{rversion}-{id}-testthat-snapsots`, where `{id}` is
+  `{os}-{arch}-r{rversion}-{id}-testthat-snapshots`, where `{id}` is
   `matrix.config.id` or `strategy.job-index` if the former is not defined.
 
 Basic:

@@ -275,7 +275,6 @@ async function installPandocLinux(version: string): Promise<void> {
 
   let downloadPath: string;
   try {
-    console.log("::group::Download pandoc");
     downloadPath = await tc.downloadTool(downloadUrl);
   } catch (error) {
     throw new Error(`Failed to download Pandoc ${version}: ${error}`);
