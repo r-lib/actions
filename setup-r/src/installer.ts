@@ -557,40 +557,51 @@ async function acquireRtools(version: IRVersion) {
   let addpath = core.getInput("windows-path-include-rtools") === "true";
   core.exportVariable("_R_INSTALL_TIME_PATCHES_", "no");
   if (rtools45) {
-    if (addpath) {
-      if (ARCH == "arm64") {
+    if (ARCH == "arm64") {
+      core.exportVariable("RTOOLS45_AARCH64_HOME", "C:\\rtools45-aarch64");
+      if (addpath) {
         core.addPath(`C:\\rtools45-aarch64\\usr\\bin`);
         core.addPath(
           `C:\\rtools45-aarch64\\aarch64-w64-mingw32.static.posix\\bin`,
         );
-      } else {
+      }
+    } else {
+      core.exportVariable("RTOOLS45_HOME", "C:\\rtools45");
+      if (addpath) {
         core.addPath(`C:\\rtools45\\usr\\bin`);
         core.addPath(`C:\\rtools45\\x86_64-w64-mingw32.static.posix\\bin`);
       }
     }
   } else if (rtools44) {
-    if (addpath) {
-      if (ARCH == "arm64") {
+    if (ARCH == "arm64") {
+      core.exportVariable("RTOOLS44_AARCH64_HOME", "C:\\rtools44-aarch64");
+      if (addpath) {
         core.addPath(`C:\\rtools44-aarch64\\usr\\bin`);
         core.addPath(
           `C:\\rtools44-aarch64\\aarch64-w64-mingw32.static.posix\\bin`,
         );
-      } else {
+      }
+    } else {
+      core.exportVariable("RTOOLS44_HOME", "C:\\rtools44");
+      if (addpath) {
         core.addPath(`C:\\rtools44\\usr\\bin`);
         core.addPath(`C:\\rtools44\\x86_64-w64-mingw32.static.posix\\bin`);
       }
     }
   } else if (rtools43) {
+    core.exportVariable("RTOOLS43_HOME", "C:\\rtools43");
     if (addpath) {
       core.addPath(`C:\\rtools43\\usr\\bin`);
       core.addPath(`C:\\rtools43\\x86_64-w64-mingw32.static.posix\\bin`);
     }
   } else if (rtools42) {
+    core.exportVariable("RTOOLS42_HOME", "C:\\rtools42");
     if (addpath) {
       core.addPath(`C:\\rtools42\\usr\\bin`);
       core.addPath(`C:\\rtools42\\x86_64-w64-mingw32.static.posix\\bin`);
     }
   } else if (rtools40) {
+    core.exportVariable("RTOOLS40_HOME", "C:\\rtools40");
     if (addpath) {
       core.addPath(`C:\\rtools40\\usr\\bin`);
       // If we use Rtools40 and R 4.2.0 or later, then we need to add this
