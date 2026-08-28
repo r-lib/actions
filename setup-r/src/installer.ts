@@ -808,11 +808,53 @@ function setREnvironmentVariables() {
 }
 
 async function getJSON<T>(url: string): Promise<T | undefined> {
-  const response = await fetch(url, {
-    headers: { "User-Agent": "setup-r" },
-  });
-  if (!response.ok) return undefined;
-  return (await response.json()) as T;
+  const maxAttempts = 4;
+  const requestTimeoutMs = 15000;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    let reason: string;
+
+    try {
+      const response = await fetch(url, {
+        headers: { "User-Agent": "setup-r" },
+        signal: AbortSignal.timeout(requestTimeoutMs),
+      });
+
+      if (response.ok) return (await response.json()) as T;
+
+      // A 404 -- like any status that is not a 5xx, 429 or 408 -- is a
+      // stable answer the callers depend on (to fall back, or to report
+      // "Failed to resolve"), so return it without retrying.
+      if (
+        response.status < 500 &&
+        response.status !== 429 &&
+        response.status !== 408
+      ) {
+        core.debug(`Request to ${url} returned HTTP ${response.status}`);
+        return undefined;
+      }
+
+      reason = `server responded with HTTP ${response.status}`;
+    } catch (error) {
+      reason = `${error}`;
+    }
+
+    // Transient failure: record it at debug (as elsewhere in this file)
+    // and retry with exponential backoff. Once attempts are exhausted,
+    // return undefined like the stable non-OK case above and let the
+    // caller decide (determineVersion's macOS fallback / "Failed to
+    // resolve" error, getReleaseVersion's empty-version degradation).
+    core.debug(
+      `Request to ${url} failed (attempt ${attempt}/${maxAttempts}): ${reason}`,
+    );
+
+    if (attempt >= maxAttempts) return undefined;
+
+    const backoffMs = 1000 * 5 ** (attempt - 1);
+    await new Promise((resolve) => setTimeout(resolve, backoffMs));
+  }
+
+  return undefined;
 }
 
 // Need to keep this for setting the HTTP User-Agent header to
