@@ -283,7 +283,7 @@ runs:
         with:
           pandoc-version: ${{ inputs.pandoc-version }}
 
-      - name: Check whether quarto if needed
+      - name: Check whether quarto is needed
         id: check-quarto
         run: |
           # Quarto check
