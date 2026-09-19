@@ -109,7 +109,7 @@ async function acquireR(version: IRVersion) {
       ]);
     } else if (IS_MAC) {
       await core.group("Downloading Fortran compiler", async () => {
-        await acquireFortranMacOS(version);
+        await acquireFortranMacOS(version.version);
       });
       await core.group("Downloading macOS utils", async () => {
         await acquireUtilsMacOS();
@@ -147,13 +147,13 @@ async function acquireR(version: IRVersion) {
   }
 }
 
-async function acquireFortranMacOS(version: IRVersion): Promise<string> {
-  if (version.type === "devel" && ARCH === "arm64") {
+async function acquireFortranMacOS(version: string): Promise<string> {
+  if (semver.gte(version, "4.7.0") && ARCH === "arm64") {
     return acquireFlangMacOS();
-  } else if (semver.lt(version.version, "4.3.0")) {
+  } else if (semver.lt(version, "4.3.0")) {
     return acquireFortranMacOSOld();
   } else {
-    return acquireFortranMacOSNew(version.version);
+    return acquireFortranMacOSNew(version);
   }
 }
 
