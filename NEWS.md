@@ -1,3 +1,8 @@
+# 'v2.14.0` (not released yet)
+
+* `[setup-r]`: `use-public-rspm: true` now sets up P3M (https://p3m.dev)
+  on macOS as well, for all repositories.
+
 # `v2.13.0` (2026-08028)
 
 * `[setup-r]` now retries r-hub.io HTTP failures (#1088, @nbenn).
