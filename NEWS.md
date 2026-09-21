@@ -1,9 +1,15 @@
-# 'v2.14.0` (not released yet)
+# 'v2.14.0` (2026-09-21)
 
 * `[setup-r]`: `use-public-rspm: true` now sets up P3M (https://p3m.dev)
   on macOS as well, for all repositories.
 
-# `v2.13.0` (2026-08028)
+* `[setup-r]` now installs flang 23 on R 4.7.0 (current R-devel) and
+  later, as this is what CRAN uses now (#1107, @andrjohns).
+
+* `[check-r-package]` now uses the correct check directory when showing
+  the testthat output (#1109, @NotAFlightRisk).
+
+# `v2.13.0` (2026-08-28)
 
 * `[setup-r]` now retries r-hub.io HTTP failures (#1088, @nbenn).
 
