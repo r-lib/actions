@@ -108,7 +108,7 @@ async function acquireR(version: IRVersion) {
         await acquireRtools(version),
       ]);
     } else if (IS_MAC) {
-      await core.group("Downloading gfortran", async () => {
+      await core.group("Downloading Fortran compiler", async () => {
         await acquireFortranMacOS(version.version);
       });
       await core.group("Downloading macOS utils", async () => {
@@ -148,11 +148,39 @@ async function acquireR(version: IRVersion) {
 }
 
 async function acquireFortranMacOS(version: string): Promise<string> {
-  if (semver.lt(version, "4.3.0")) {
+  if (semver.gte(version, "4.7.0") && ARCH === "arm64") {
+    return acquireFlangMacOS();
+  } else if (semver.lt(version, "4.3.0")) {
     return acquireFortranMacOSOld();
   } else {
     return acquireFortranMacOSNew(version);
   }
+}
+
+async function acquireFlangMacOS(): Promise<string> {
+  const downloadUrl = "https://mac.cran.dev/tools/flang-23.1.0-darwin23.tar.xz";
+  let downloadPath: string;
+  try {
+    downloadPath = await tc.downloadTool(downloadUrl);
+  } catch (error) {
+    core.debug(`${error}`);
+    throw `Failed to download flang: ${error}`;
+  }
+
+  try {
+    await exec.exec("sudo", ["tar", "-xJf", downloadPath, "-C", "/"]);
+    if (!process.env.SDKROOT) {
+      const sdk = await exec.getExecOutput("xcrun", ["--show-sdk-path"]);
+      core.exportVariable("SDKROOT", sdk.stdout.trim());
+    }
+  } catch (error) {
+    core.debug(`${error}`);
+    throw `Failed to install flang: ${error}`;
+  }
+
+  core.addPath("/opt/R/flang-23/bin");
+
+  return "/";
 }
 
 async function acquireFortranMacOSNew(version: string): Promise<string> {
