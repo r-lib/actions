@@ -677,9 +677,6 @@ async function acquireGsWindows() {
   });
 }
 
-const RSPM_DOGFOOD_MACOS_ORGS =
-  ['tidyverse', 'r-lib', 'tidymodels', 'rstudio', 'posit-dev', 'jeroen'];
-
 function shouldUsePublicRspm(): boolean {
   const input = core.getInput("use-public-rspm");
   if (input === "always") return true;
@@ -688,11 +685,8 @@ function shouldUsePublicRspm(): boolean {
   if (!IS_WINDOWS && !IS_LINUX && !IS_MAC) return false;
   // non-intel windows -> false
   if (IS_WINDOWS && ARCH !== 'x86_64') return false;
-  // windows and linux -> true
-  if (IS_WINDOWS || IS_LINUX) return true;
-  // macos -> only Posit orgs
-  const owner = (process.env['GITHUB_REPOSITORY_OWNER'] ?? '').toLowerCase();
-  return RSPM_DOGFOOD_MACOS_ORGS.includes(owner);
+  // otherwise windows, linux or macos -> true
+  return true;
 }
 
 async function setupRLibrary(version: IRVersion) {
