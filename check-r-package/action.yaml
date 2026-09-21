@@ -55,7 +55,7 @@ runs:
       run: |
         ## --------------------------------------------------------------------
         echo ::group::Show testthat output
-        find check -name 'testthat.Rout*' -exec cat '{}' \; || true
+        find '${{ steps.rcmdcheck.outputs.check-dir-path }}' -name 'testthat.Rout*' -exec cat '{}' \; || true
         echo ::endgroup::
       shell: bash
       working-directory: ${{ inputs.working-directory }}
