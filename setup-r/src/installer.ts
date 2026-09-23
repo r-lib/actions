@@ -925,7 +925,7 @@ export async function determineVersion(version: string): Promise<IRVersion> {
         throw new Error(`Failed to resolve R version ${version} at ${url} and ${url2}`);
       }
     }
-    throw new Error(`Failed to resolve R version ${version} at ${url}.`);
+    throw new Error(`Failed to resolve R version ${version} at ${url}`);
   }
 
   return tags;
