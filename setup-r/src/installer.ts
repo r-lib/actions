@@ -335,7 +335,7 @@ async function acquireRUbuntu(version: IRVersion): Promise<string> {
     await io.mv(downloadPath, path.join(tempDirectory, fileName));
   } catch (error) {
     core.debug(`${error}`);
-    throw `Failed to download version ${version}: ${error}`;
+    throw `Failed to download R ${version.version} from ${downloadUrl}: ${error}`;
   }
   core.endGroup();
 
@@ -409,7 +409,7 @@ async function acquireRMacOS(version: IRVersion): Promise<string> {
     await io.mv(downloadPath, path.join(tempDirectory, fileName));
   } catch (error) {
     core.debug(`${error}`);
-    throw `Failed to download version ${version}: ${error}`;
+    throw `Failed to download R ${version.version} from ${downloadUrl}: ${error}`;
   }
 
   //
@@ -474,7 +474,7 @@ async function acquireRWindows(version: IRVersion): Promise<string> {
     await io.mv(downloadPath, path.join(tempDirectory, fileName));
   } catch (error) {
     core.debug(`${error}`);
-    throw `Failed to download version ${version}: ${error}`;
+    throw `Failed to download R ${version.version} from ${version.url}: ${error}`;
   }
 
   //
@@ -567,7 +567,7 @@ async function acquireRtools(version: IRVersion) {
       await io.mv(downloadPath, path.join(tempDirectory, fileName));
     } catch (error) {
       core.debug(`${error}`);
-      throw `Failed to download version ${version}: ${error}`;
+      throw `Failed to download Rtools from ${downloadUrl}: ${error}`;
     }
 
     try {
