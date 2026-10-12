@@ -117,10 +117,17 @@ runs:
           if ("${{ inputs.pak-version }}" == "repo") {
             install.packages("pak", lib = lib)
           } else {
-            install.packages("pak", lib = lib, repos = sprintf(
+            # Windows arm64 builds of R used to have the clang-aarch64 package
+            # type, newer ones have arm64. pak binaries are only built for the
+            # former, which work for both.
+            type <- .Platform$pkgType
+            if (type == "windows.binary.arm64") {
+              type <- "windows.binary.clang-aarch64"
+            }
+            install.packages("pak", lib = lib, type = type, repos = sprintf(
               "https://r-lib.github.io/p/pak/%s/%s/%s/%s",
               "${{ inputs.pak-version }}",
-              .Platform$pkgType,
+              type,
               R.Version()$os,
               R.Version()$arch
             ))
