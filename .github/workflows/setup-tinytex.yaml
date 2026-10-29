@@ -36,3 +36,22 @@ jobs:
       - run: tlmgr --version
 
       - run: tlmgr install colortbl grfext ae
+
+  tinytex-rtools:
+    # tlmgr used to hang on Windows with Rtools on the PATH (#1118)
+    runs-on: windows-latest
+    name: windows-latest (with setup-r)
+
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - uses: ./setup-r
+
+      - uses: ./setup-tinytex
+
+      - run: tlmgr update --self
+
+      - run: tlmgr install ae babel-english pdflscape pdfpages sidecap
+        timeout-minutes: 10
+
+      - run: tlmgr list --only-installed

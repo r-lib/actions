@@ -1,3 +1,9 @@
+# Development version
+
+* `[setup-tinytex]` now sets `TEXLIVE_PREFER_OWN=1` on Windows, so
+  `tlmgr` uses its own bundled tools instead of the ones from Rtools.
+  This fixes `tlmgr install` hanging after `setup-r` (#1118).
+
 # 'v2.14.0` (2026-09-21)
 
 * `[setup-r]`: `use-public-rspm: true` now sets up P3M (https://p3m.dev)

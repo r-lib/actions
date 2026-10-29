@@ -126,6 +126,14 @@ async function installTinyTeXWindows() {
     : path.join(winBin, "windows");
 
   core.addPath(winBin);
+
+  // Make tlmgr use its own bundled tools (xz, wget, etc.) instead of the
+  // ones on the PATH. Rtools (added by setup-r) has its own versions of
+  // these, and tlmgr may hang when using them. tinytex::tlmgr() does the
+  // same, see https://github.com/rstudio/tinytex/issues/354
+  if (!process.env["TEXLIVE_PREFER_OWN"]) {
+    core.exportVariable("TEXLIVE_PREFER_OWN", "1");
+  }
 }
 
 run();
