@@ -463,6 +463,25 @@ async function acquireRMacOS(version: IRVersion): Promise<string> {
   return "/";
 }
 
+// CRAN moves old Windows installers (R < 4.2, Rtools < 42) to the archive,
+// but the URLs that we get from the rversions API might still point to CRAN.
+const CRAN_WINDOWS_URL =
+  /^https?:\/\/cran\.(rstudio\.com|r-project\.org)\/bin\/windows\//;
+
+async function downloadWindowsTool(url: string): Promise<string> {
+  try {
+    return await tc.downloadTool(url);
+  } catch (error) {
+    if (!CRAN_WINDOWS_URL.test(url)) throw error;
+    const archiveUrl = url.replace(
+      CRAN_WINDOWS_URL,
+      "https://cran-archive.r-project.org/bin/windows/",
+    );
+    core.info(`Failed to download ${url}, trying ${archiveUrl}`);
+    return await tc.downloadTool(archiveUrl);
+  }
+}
+
 async function acquireRWindows(version: IRVersion): Promise<string> {
   if (core.getInput("install-r") !== "true") {
     return "";
@@ -470,7 +489,7 @@ async function acquireRWindows(version: IRVersion): Promise<string> {
   let fileName: string = path.basename(version.url);
   let downloadPath: string | null = null;
   try {
-    downloadPath = await tc.downloadTool(version.url);
+    downloadPath = await downloadWindowsTool(version.url);
     await io.mv(downloadPath, path.join(tempDirectory, fileName));
   } catch (error) {
     core.debug(`${error}`);
@@ -515,9 +534,9 @@ function getRtoolsUrl(version: string): string {
   } else if (version == "42") {
     return "https://github.com/r-hub/rtools42/releases/download/latest/rtools42.exe";
   } else if (version == "40") {
-    return "https://cran.rstudio.com/bin/windows/Rtools/rtools40-x86_64.exe";
+    return "https://cran-archive.r-project.org/bin/windows/Rtools/rtools40-x86_64.exe";
   } else {
-    return `https://cran.rstudio.com/bin/windows/Rtools/Rtools${version}.exe`;
+    return `https://cran-archive.r-project.org/bin/windows/Rtools/Rtools${version}.exe`;
   }
 }
 
@@ -563,7 +582,7 @@ async function acquireRtools(version: IRVersion) {
     console.log(`Downloading ${downloadUrl}...`);
     let downloadPath: string | null = null;
     try {
-      downloadPath = await tc.downloadTool(downloadUrl);
+      downloadPath = await downloadWindowsTool(downloadUrl);
       await io.mv(downloadPath, path.join(tempDirectory, fileName));
     } catch (error) {
       core.debug(`${error}`);

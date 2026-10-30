@@ -4,6 +4,10 @@
   `tlmgr` uses its own bundled tools instead of the ones from Rtools.
   This fixes `tlmgr install` hanging after `setup-r` (#1118).
 
+* `[setup-r]` now downloads the Windows installers of R < 4.2 and
+  Rtools < 42 from https://cran-archive.r-project.org, as CRAN has
+  moved them there.
+
 # 'v2.14.0` (2026-09-21)
 
 * `[setup-r]`: `use-public-rspm: true` now sets up P3M (https://p3m.dev)
