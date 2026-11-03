@@ -10,6 +10,13 @@ interface IRVersion {
   type: string;
 }
 
+interface IRtoolsVersion {
+  version: string;
+  url: string;
+  first: string;
+  last: string;
+}
+
 interface IRRefURL {
   URL: string;
 }
@@ -501,24 +508,22 @@ async function acquireRWindows(version: IRVersion): Promise<string> {
   return "";
 }
 
-function getRtoolsUrl(version: string): string {
-  if (version == "45" && ARCH == "arm64") {
-    return "https://github.com/r-hub/rtools45/releases/download/latest/rtools45-aarch64.exe";
-  } else if (version == "45") {
-    return "https://github.com/r-hub/rtools45/releases/download/latest/rtools45.exe";
-  } else if (version == "44" && ARCH == "arm64") {
-    return "https://github.com/r-hub/rtools44/releases/download/latest/rtools44-aarch64.exe";
-  } else if (version == "44") {
-    return "https://github.com/r-hub/rtools44/releases/download/latest/rtools44.exe";
-  } else if (version == "43") {
-    return "https://github.com/r-hub/rtools43/releases/download/latest/rtools43.exe";
-  } else if (version == "42") {
-    return "https://github.com/r-hub/rtools42/releases/download/latest/rtools42.exe";
-  } else if (version == "40") {
-    return "https://cran.rstudio.com/bin/windows/Rtools/rtools40-x86_64.exe";
-  } else {
-    return `https://cran.rstudio.com/bin/windows/Rtools/Rtools${version}.exe`;
+async function getRtoolsUrl(version: string): Promise<string> {
+  const arch = ARCH == "arm64" || ARCH == "aarch64" ? "aarch64" : "x86_64";
+  const url = "https://api.r-hub.io/rversions/rtools-versions/" + arch;
+  const versions = await getJSON<IRtoolsVersion[]>(url);
+  if (!versions) {
+    throw new Error(`Failed to query Rtools versions at ${url}.`);
   }
+  const match = versions.find((v) => v.version == version);
+  if (!match) {
+    const available = versions.map((v) => v.version).join(", ");
+    throw new Error(
+      `Unknown Rtools version '${version}' for ${arch}. ` +
+        `Available versions: ${available}.`,
+    );
+  }
+  return match.url;
 }
 
 async function acquireRtools(version: IRVersion) {
@@ -533,7 +538,7 @@ async function acquireRtools(version: IRVersion) {
     downloadUrl = version.rtools_url || "error";
   } else {
     rtoolsVersion = inpver;
-    downloadUrl = getRtoolsUrl(rtoolsVersion);
+    downloadUrl = await getRtoolsUrl(rtoolsVersion);
   }
 
   const versionNumber = parseInt(rtoolsVersion || "error");
