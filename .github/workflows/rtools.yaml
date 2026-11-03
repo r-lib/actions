@@ -7,20 +7,26 @@ permissions: read-all
 
 jobs:
   R-CMD-check:
-    runs-on: windows-latest
+    runs-on: ${{ matrix.config.os }}
 
-    name: Windows, R ${{ matrix.config.r }}, Rtools ${{ matrix.config.rtools-version }}
+    name: ${{ matrix.config.os }}, R ${{ matrix.config.r }}, Rtools ${{ matrix.config.rtools-version || 'default' }}
 
     strategy:
       fail-fast: false
       matrix:
         config:
-          # the default is rtools40 here
-          - { r: 'release'                       }
-          # manually select rtools42
-          - { r: 'release', rtools-version: '42' }
-          # defaults to rtools43
-          - { r: 'devel'                         }
+          # default Rtools for R release (rtools45)
+          - { os: windows-latest,  r: 'release',                         rtools-dir: 'C:\rtools45' }
+          # default Rtools for R devel (rtools45)
+          - { os: windows-latest,  r: 'devel',                           rtools-dir: 'C:\rtools45' }
+          # manually select an older Rtools
+          - { os: windows-latest,  r: 'release', rtools-version: '44',   rtools-dir: 'C:\rtools44' }
+          # rtools40 and rtools35 are downloaded from the CRAN archive (#1121)
+          - { os: windows-latest,  r: '4.1',     rtools-version: '40',   rtools-dir: 'C:\rtools40' }
+          - { os: windows-latest,  r: '3.6',     rtools-version: '35',   rtools-dir: 'C:\Rtools' }
+          # aarch64 Rtools
+          - { os: windows-11-arm,  r: 'release',                         rtools-dir: 'C:\rtools45-aarch64' }
+          - { os: windows-11-arm,  r: 'release', rtools-version: '45',   rtools-dir: 'C:\rtools45-aarch64' }
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -37,11 +43,17 @@ jobs:
           rtools-version: ${{ matrix.config.rtools-version }}
           use-public-rspm: true
 
-      - name: "Check what version of rtools is installed"
+      - name: "Check what version of Rtools is installed"
         run: |
-          ls c:/
+          Get-ChildItem C:\
+          if (-not (Test-Path "${{ matrix.config.rtools-dir }}")) {
+            Write-Error "Rtools not found at ${{ matrix.config.rtools-dir }}"
+            exit 1
+          }
+        shell: pwsh
 
       - name: "Install package from source"
         run: |
           install.packages("filelock", type = "source")
+          library(filelock)
         shell: Rscript {0}
